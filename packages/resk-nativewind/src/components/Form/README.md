@@ -45,20 +45,42 @@ A comprehensive, cross-platform form management system for React Native and Web 
 ### Installation
 
 ```tsx
+// Core Form component
 import { Form } from '@resk/nativewind/components/Form';
-// Import custom field types to enable checkbox, switch, select, etc.
-import '@resk/nativewind/components/Form/Fields';
 ```
+
+#### Available Field Types
+
+**Built-in types**:
+
+- `text`, 
+- `email`, 
+- `password`, 
+- `number`, 
+- `tel`, 
+- `url`
+- `date`, `datetime`, `time`
+- `checkbox` - Checkbox input with label
+- `switch` - Toggle switch control
+- `select` - Dropdown selection
+- `selectCountry` - Country picker with flags
 
 ### Form Architecture Overview
 
 The Resk Form system consists of:
 
 - **Form Component**: Container that manages form state and context
-- **Field Definitions Object**: Defines all form fields and their properties. It's used for **extension purposes only**, not direct rendering. Please don't use it directly for render purposes.
-- **Form.FieldRenderer**: Component that renders individual fields based on type
+- **Field Definitions Object**: Defines all form fields and their properties
+- **Automatic Field Rendering**: When `fields` prop is provided, Form automatically renders all fields
+- **Form.FieldRenderer**: Used only for custom layouts with `renderFields` or `renderField` props
 - **Form.Action**: Smart buttons that integrate with form state
 - **useForm()**: Context hook to access form state from any child component
+
+**Key Point**:
+
+- When you pass `fields` prop, the Form automatically renders ALL those fields
+- Use `Form.FieldRenderer` only for additional fields NOT included in the `fields` prop
+- For complete layout control, use `renderFields` prop
 
 ### Basic Examples
 
@@ -93,14 +115,11 @@ export default function LoginForm() {
   return (
     <Form
       name="login-form"           // Unique form identifier
-      fields={fields}             // Field definitions
+      fields={fields}             // Field definitions - automatically renders all fields
       onSubmit={handleSubmit}     // Submission handler
     >
-      {/* Render fields using Form.FieldRenderer */}
-      <Form.FieldRenderer {...fields.username} />
-      <Form.FieldRenderer {...fields.password} />
-  
-      {/* Form.Action automatically integrates with form state */}
+      {/* Fields are automatically rendered based on the fields prop */}
+      {/* You only need children for actions, custom content, or layout */}
       <Form.Action formName="login-form" variant="primary">
         Login
       </Form.Action>
@@ -140,16 +159,13 @@ export default function ContactForm() {
   return (
     <Form
       name="contact-form"
-      fields={fields}
-      validateBeforeFirstSubmit={true}  // Show validation early
+      fields={fields}             // All fields automatically rendered
+      validateBeforeFirstSubmit={true}
       onSubmit={({ data }) => {
         console.log('Contact data:', data);
-        // Send email or save to database
       }}
     >
-      <Form.FieldRenderer {...fields.name} />
-      <Form.FieldRenderer {...fields.email} />
-      <Form.FieldRenderer {...fields.message} />
+      {/* Only action needed - fields render automatically */}
       <Form.Action formName="contact-form">Send Message</Form.Action>
     </Form>
   );
@@ -215,35 +231,64 @@ export default function RegistrationForm() {
   return (
     <Form
       name="registration-form"
-      fields={fields}
+      fields={fields}               // All fields automatically rendered in order
       onSubmit={({ data }) => {
         console.log('Registration data:', data);
         // Create user account
       }}
     >
-      <div className="grid grid-cols-2 gap-4">
-        <Form.FieldRenderer {...fields.firstName} />
-        <Form.FieldRenderer {...fields.lastName} />
-      </div>
-  
-      <Form.FieldRenderer {...fields.email} />
-      <Form.FieldRenderer {...fields.password} />
-      <Form.FieldRenderer {...fields.country} />
-      <Form.FieldRenderer {...fields.category} />
-      <Form.FieldRenderer {...fields.agreeToTerms} />
-      <Form.FieldRenderer {...fields.notifications} />
-  
+      {/* Only action needed - all fields render automatically from fields prop */}
       <Form.Action formName="registration-form">Create Account</Form.Action>
     </Form>
   );
 }
 ```
 
+#### Mixed Rendering: Auto + Additional Fields
+
+```tsx
+export default function ProfileForm() {
+  // Main profile fields - will auto-render
+  const profileFields = {
+    firstName: { type: 'text', name: 'firstName', required: true },
+    lastName: { type: 'text', name: 'lastName', required: true },
+    email: { type: 'email', name: 'email', required: true },
+    phone: { type: 'tel', name: 'phone' }
+  } as const;
+
+  return (
+    <Form
+      name="profile-form"
+      fields={profileFields}       // These fields auto-render first
+      onSubmit={({ data }) => {
+        console.log('Profile data:', data);
+      }}
+    >
+      {/* profileFields auto-render here in definition order */}
+  
+      {/* Add additional fields not in the fields prop */}
+      <Form.FieldRenderer 
+        type="checkbox" 
+        name="terms" 
+        label="I agree to the terms and conditions"
+        required 
+      />
+  
+      <Form.FieldRenderer 
+        type="text" 
+        name="referralCode" 
+        placeholder="Referral code (optional)"
+      />
+  
+      <Form.Action formName="profile-form">Save Profile</Form.Action>
+    </Form>
+  );
+}
 ---
 
 ## 2. Form Component Overview
 
-> **Target**: Developers understanding core concepts
+> **Target**: Developers understanding core concepts  
 > **Content**: Props overview, basic configuration, form lifecycle
 
 ### Form Architecture Deep Dive
@@ -251,10 +296,11 @@ export default function RegistrationForm() {
 The Resk Form system uses a unique architecture:
 
 1. **Field Definitions Object**: All fields are defined in a single object passed to the Form
-2. **Form.FieldRenderer**: Renders individual fields based on their type definition
-3. **Form.Field Class**: Base class for extending and creating custom field types
-4. **Form.Action**: Smart buttons that automatically integrate with form validation state
-5. **useForm() Hook**: Context hook that provides access to form state from any child component
+2. **Automatic Field Rendering**: Form automatically renders all fields when `fields` prop is provided
+3. **Form.FieldRenderer**: Used only for custom layouts with `renderFields` or `renderField` props
+4. **Form.Field Class**: Base class for extending and creating custom field types  
+5. **Form.Action**: Smart buttons that automatically integrate with form validation state
+6. **useForm() Hook**: Context hook that provides access to form state from any child component
 
 ### Basic Form Structure
 
@@ -269,18 +315,125 @@ const fields = {
   }
 } as const;
 
-// 2. Pass fields to Form component
-<Form
-  name="my-form"           // Unique form identifier (required)
-  fields={fields}          // Field definitions object (required)
-  onSubmit={handleSubmit}  // Submission handler
->
-  {/* 3. Render fields using Form.FieldRenderer */}
-  <Form.FieldRenderer {...fields.fieldName} />
-  
-  {/* 4. Add form actions */}
-  <Form.Action formName="my-form">Submit</Form.Action>
+// 2. Pass fields to Form component - fields auto-render
+<Form name="my-form" fields={fields}>
+  {/* Fields automatically render in definition order */}
+  <Form.Action>Submit</Form.Action>
 </Form>
+```
+
+### Three Ways to Render Fields
+
+#### 1. Automatic Rendering (Recommended)
+
+```tsx
+// ✅ Form automatically renders ALL fields from fields prop
+<Form name="auto-form" fields={fields}>
+  {/* All fields auto-render - no Form.FieldRenderer needed */}
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### 2. Manual Rendering Only
+
+```tsx
+// ✅ No fields prop - manually render each field
+<Form name="manual-form">
+  <Form.FieldRenderer type="text" name="username" required />
+  <Form.FieldRenderer type="email" name="email" required />
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### 3. Mixed Rendering (Auto + Additional)
+
+```tsx
+// ✅ fields prop renders main fields + Form.FieldRenderer for additional ones
+<Form name="mixed-form" fields={fields}>
+  {/* All fields from 'fields' prop auto-render first */}
+  
+  {/* Then add additional fields not in the fields prop */}
+  <Form.FieldRenderer type="checkbox" name="terms" required />
+  <Form.FieldRenderer type="text" name="additionalInfo" />
+  
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### 4. Custom Layout Control
+
+```tsx
+// ✅ Use renderFields when you need complete layout control
+<Form 
+  name="custom-form" 
+  fields={fields}
+  renderFields={({ fields }) => (
+    <div className="custom-grid">
+      <Form.FieldRenderer {...fields.username} />
+      <Form.FieldRenderer {...fields.email} />
+    </div>
+  )}
+/>
+```
+
+> **Key Concept**:
+>
+> - `fields` prop → Auto-renders ALL those fields
+> - `Form.FieldRenderer` → Use for additional fields NOT in the fields prop
+> - `renderFields` → Use when you need complete layout control
+
+### Auto-Rendering vs Custom Rendering
+
+#### Auto-Rendering (Default Behavior)
+
+```tsx
+// ✅ CORRECT - Fields automatically render when fields prop is provided
+<Form name="auto-form" fields={fields}>
+  {/* NO manual Form.FieldRenderer needed - fields auto-render in definition order */}
+  <Form.Action formName="auto-form">Submit</Form.Action>
+</Form>
+```
+
+#### Manual Field Rendering (No fields prop)
+
+```tsx
+// ✅ CORRECT - Manual rendering without fields prop
+<Form name="manual-form">
+  <Form.FieldRenderer type="text" name="username" required />
+  <Form.FieldRenderer type="email" name="email" required />
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### Custom Layout (When you need control)
+
+```tsx
+// ✅ CORRECT - Use renderFields for custom layout
+<Form 
+  name="custom-form" 
+  fields={fields}
+  renderFields={({ fields }) => (
+    <div className="custom-layout">
+      <Form.FieldRenderer {...fields.fieldName} />
+      {/* Custom layout logic */}
+    </div>
+  )}
+>
+  <Form.Action formName="custom-form">Submit</Form.Action>
+</Form>
+```
+
+// 2. Pass fields to Form component - fields auto-render automatically
+<Form
+name="my-form"           // Unique form identifier (required)
+fields={fields}          // Field definitions object (required) - auto-renders all fields
+onSubmit={handleSubmit}  // Submission handler
+
+{/* Fields render automatically from the fields prop */}
+{/* Only add children for actions, custom content, or additional layout */}
+<Form.Action formName="my-form">Submit</Form.Action>
+</Form>
+
 ```
 
 ### Complete Form Props Reference
@@ -429,11 +582,17 @@ function FormStatusComponent() {
   );
 }
 
-// Use inside a Form
-<Form name="my-form" fields={fields}>
-  <Form.FieldRenderer {...fields.email} />
-  <FormStatusComponent />  {/* Has access to form context */}
-</Form>
+// Use inside a Form with custom rendering
+<Form 
+  name="my-form" 
+  fields={fields}
+  renderFields={({ fields }) => (
+    <div>
+      <Form.FieldRenderer {...fields.email} />
+      <FormStatusComponent />  {/* Has access to form context */}
+    </div>
+  )}
+/>
 ```
 
 ### Form Lifecycle & Events
@@ -479,12 +638,37 @@ function FormStatusComponent() {
 </Form>
 ```
 
----
-
 ## 3. Field System Fundamentals
 
 > **Target**: Users working with form fields
 > **Content**: Field types, validation, field properties, custom fields
+
+### Complete Field Types Reference
+
+#### Built-in Field Types (No import required)
+
+
+| Type       | Component      | Description                 | Common Use Cases            |
+| ---------- | -------------- | --------------------------- | --------------------------- |
+| `text`     | TextInput      | Basic text input            | Names, titles, descriptions |
+| `email`    | TextInput      | Email input with validation | Email addresses             |
+| `password` | TextInput      | Password input (masked)     | Passwords, sensitive data   |
+| `number`   | TextInput      | Numeric input               | Ages, quantities, prices    |
+| `tel`      | TextInput      | Phone number input          | Phone numbers               |
+| `url`      | TextInput      | URL input                   | Website links               |
+| `date`     | DatePicker     | Date selection              | Birth dates, deadlines      |
+| `datetime` | DateTimePicker | Date and time selection     | Appointments, events        |
+| `time`     | TimePicker     | Time selection              | Meeting times               |
+
+#### Custom Field Types (Requires `/Fields` import)
+
+
+| Type            | Component          | Description               | Common Use Cases                 |
+| --------------- | ------------------ | ------------------------- | -------------------------------- |
+| `checkbox`      | FormFieldCheckbox  | Checkbox with label       | Terms agreement, feature toggles |
+| `switch`        | FormFieldSwitch    | Toggle switch             | Settings, preferences            |
+| `select`        | FormFieldSelect    | Dropdown selection        | Categories, options, status      |
+| `selectCountry` | SelectCountryField | Country picker with flags | Address forms, localization      |
 
 ### Built-in Field Types
 
@@ -580,23 +764,42 @@ const dateTimeFields = {
 
 ### Custom Field Types (From Fields Folder)
 
-The `/Fields` folder contains additional field types that must be imported:
+The `/Fields` folder contains pre-built custom field components that extend the base Form functionality. These fields are implemented using the `@AttachFormField` decorator and must be imported to be available.
+
+#### Installation & Import
 
 ```tsx
-// Import custom field types to enable them
+// Import ALL custom field types to enable them
 import '@resk/nativewind/components/Form/Fields';
+
+// Or import specific fields individually
+import '@resk/nativewind/components/Form/Fields/Checkbox';
+import '@resk/nativewind/components/Form/Fields/Switch';
+import '@resk/nativewind/components/Form/Fields/Select';
+import '@resk/nativewind/components/Form/Fields/SelectCountry';
 ```
+
+#### Available Custom Field Types
+
+
+| Field Type      | Component            | Description               | Use Case                         |
+| --------------- | -------------------- | ------------------------- | -------------------------------- |
+| `checkbox`      | `FormFieldCheckbox`  | Checkbox input with label | Terms agreement, feature toggles |
+| `switch`        | `FormFieldSwitch`    | Toggle switch control     | Settings, preferences            |
+| `select`        | `FormFieldSelect`    | Dropdown selection        | Categories, options              |
+| `selectCountry` | `SelectCountryField` | Country picker with flags | Address forms, localization      |
 
 #### Boolean Input Fields
 
 ```tsx
 const booleanFields = {
-  // Checkbox component (FormFieldCheckbox)
+  // Checkbox component (FormFieldCheckbox) 
   agreeToTerms: { 
     type: 'checkbox', 
     name: 'agreeToTerms', 
     label: 'I agree to the terms and conditions',
-    required: true
+    required: true,
+    helpText: 'You must agree to continue'
   },
   
   // Switch toggle component (FormFieldSwitch)
@@ -605,7 +808,17 @@ const booleanFields = {
     name: 'enableNotifications', 
     label: 'Enable push notifications',
     checkedValue: true,      // Value when toggled on
-    uncheckedValue: false    // Value when toggled off
+    uncheckedValue: false,   // Value when toggled off
+    defaultValue: false      // Initial state
+  },
+
+  // Multiple checkboxes for features
+  features: {
+    type: 'checkbox',
+    name: 'features',
+    label: 'Newsletter subscription',
+    checkedValue: 'subscribed',
+    uncheckedValue: 'unsubscribed'
   }
 } as const;
 ```
@@ -623,8 +836,10 @@ const selectionFields = {
     options: [
       { label: 'Technology', value: 'tech' },
       { label: 'Business', value: 'business' },
-      { label: 'Design', value: 'design' }
-    ]
+      { label: 'Design', value: 'design' },
+      { label: 'Marketing', value: 'marketing' }
+    ],
+    helpText: 'Select the most relevant category'
   },
   
   // Country selector component (SelectCountryField)
@@ -633,9 +848,106 @@ const selectionFields = {
     name: 'country', 
     placeholder: 'Select your country',
     required: true,
-    displayDialCode: false   // Hide dial code in display
+    displayDialCode: false,   // Hide dial code in display
+    anchor: 'bottom',         // Dropdown anchor position
+    helpText: 'Choose your country of residence'
+  },
+
+  // Select with custom data
+  priority: {
+    type: 'select',
+    name: 'priority',
+    label: 'Task Priority',
+    options: [
+      { label: 'Low', value: 'low', disabled: false },
+      { label: 'Medium', value: 'medium', disabled: false },
+      { label: 'High', value: 'high', disabled: false },
+      { label: 'Critical', value: 'critical', disabled: false }
+    ],
+    defaultValue: 'medium'
   }
 } as const;
+```
+
+#### Complete Example with Custom Fields
+
+```tsx
+export default function RegistrationForm() {
+  const fields = {
+    // Built-in text fields
+    firstName: { type: 'text', name: 'firstName', required: true },
+    lastName: { type: 'text', name: 'lastName', required: true },
+    email: { type: 'email', name: 'email', required: true },
+  
+    // Custom Fields from /Fields folder
+    country: { 
+      type: 'selectCountry', 
+      name: 'country', 
+      required: true,
+      placeholder: 'Select your country'
+    },
+    accountType: {
+      type: 'select',
+      name: 'accountType',
+      required: true,
+      options: [
+        { label: 'Personal', value: 'personal' },
+        { label: 'Business', value: 'business' }
+      ]
+    },
+    newsletter: {
+      type: 'checkbox',
+      name: 'newsletter',
+      label: 'Subscribe to newsletter'
+    },
+    notifications: {
+      type: 'switch',
+      name: 'notifications',
+      label: 'Enable email notifications',
+      defaultValue: true
+    }
+  } as const;
+
+  return (
+    <Form
+      name="registration-form"
+      fields={fields}  // All fields auto-render including custom ones
+      onSubmit={({ data }) => {
+        console.log('Registration data:', data);
+        // data includes values from all field types
+      }}
+    >
+      <Form.Action formName="registration-form">Create Account</Form.Action>
+    </Form>
+  );
+}
+```
+
+#### Field Type Architecture
+
+Each custom field in the `/Fields` folder:
+
+1. **Extends `Form.Field`**: Inherits core form functionality
+2. **Uses `@AttachFormField` decorator**: Registers the field type globally
+3. **Implements `_render` method**: Defines how the field renders
+4. **Declares TypeScript interface**: Provides type safety and IntelliSense
+5. **Extends `IFieldMap`**: Makes the field type available in form definitions
+
+```tsx
+// Example: How custom fields are implemented
+@AttachFormField<"checkbox">("checkbox")
+export class FormFieldCheckbox extends FormFieldSwitch<"checkbox"> {
+    _render(props: IField<"checkbox">, innerRef: any): ReactElement {
+        return <Checkbox {...(props as any)} ref={innerRef} />;
+    }
+}
+
+// TypeScript declaration makes it available
+declare module "@resk/core/resources" {
+    export interface IFieldMap {
+        checkbox: IFormFieldCheckboxProps;
+    }
+}
 ```
 
 ### Field Properties & Configuration
@@ -831,8 +1143,7 @@ const handleSubmit = ({ data, isUpdate, form }: {
   fields={fields}
   onSubmit={handleSubmit}
 >
-  <Form.FieldRenderer {...fields.name} />
-  <Form.FieldRenderer {...fields.email} />
+  {/* Fields auto-render from fields prop */}
   <Form.Action formName="basic-form">Submit</Form.Action>
 </Form>
 ```
@@ -879,8 +1190,7 @@ const handleAsyncSubmit = async ({ data, isUpdate }: { data: any; isUpdate: bool
   onSubmit={handleAsyncSubmit}
   isLoading={isSubmitting}  // Disables form during submission
 >
-  <Form.FieldRenderer {...fields.name} />
-  <Form.FieldRenderer {...fields.email} />
+  {/* Fields auto-render from fields prop */}
   
   {submitError && (
     <div className="error-message">{submitError}</div>
@@ -1141,12 +1451,18 @@ function FormMonitor() {
   );
 }
 
-// Use in form
-<Form name="monitored-form" fields={fields}>
-  <Form.FieldRenderer {...fields.email} />
-  <Form.FieldRenderer {...fields.password} />
-  <FormMonitor />  {/* Shows real-time form state */}
-</Form>
+// Use in form with custom rendering
+<Form 
+  name="monitored-form" 
+  fields={fields}
+  renderFields={({ fields }) => (
+    <div>
+      <Form.FieldRenderer {...fields.email} />
+      <Form.FieldRenderer {...fields.password} />
+      <FormMonitor />  {/* Shows real-time form state */}
+    </div>
+  )}
+/>
 ```
 
 #### Manual Form Operations
@@ -1199,76 +1515,137 @@ function FormController() {
 
 ## 5. Form.FieldRenderer Usage
 
-> **Target**: Users rendering fields and creating layouts
-> **Content**: Field rendering, custom layouts, property overrides
+> **Target**: Users needing to add individual fields
+> **Content**: When and how to use Form.FieldRenderer
 
 ### Understanding Form.FieldRenderer
 
-`Form.FieldRenderer` is the core component that renders individual form fields. It:
+`Form.FieldRenderer` is used for rendering individual form fields in these scenarios:
 
-- Automatically selects the correct field component based on the `type` property
+1. **No fields prop**: When building forms manually without a fields definition object
+2. **Additional fields**: When you need extra fields beyond those in the `fields` prop
+3. **Custom layouts**: When using `renderFields` or `renderField` for layout control
+
+It automatically:
+
+- Selects the correct field component based on the `type` property
 - Integrates with form state management and validation
 - Handles field lifecycle events (mount, unmount, validation)
 - Manages field interactions within the form context
 
-### Basic Field Rendering
+### When NOT to Use Form.FieldRenderer
 
 ```tsx
-const fields = {
-  username: { 
-    type: 'text', 
-    name: 'username', 
-    required: true, 
-    placeholder: 'Enter username' 
-  },
-  email: { 
-    type: 'email', 
-    name: 'email', 
-    required: true, 
-    validateEmail: true 
-  },
-  country: { 
-    type: 'selectCountry', 
-    name: 'country', 
-    placeholder: 'Select country' 
-  }
-} as const;
-
-<Form name="basic-form" fields={fields}>
-  {/* Render fields with their complete configuration */}
-  <Form.FieldRenderer {...fields.username} />
-  <Form.FieldRenderer {...fields.email} />
-  <Form.FieldRenderer {...fields.country} />
+// ❌ INCORRECT - Don't use Form.FieldRenderer for fields already in fields prop
+<Form name="my-form" fields={fields}>
+  <Form.FieldRenderer {...fields.username} />  {/* Already auto-rendered! */}
+  <Form.FieldRenderer {...fields.email} />     {/* Already auto-rendered! */}
 </Form>
+
+// ✅ CORRECT - fields prop auto-renders all fields
+<Form name="my-form" fields={fields}>
+  {/* Fields auto-render - no Form.FieldRenderer needed */}
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+### When TO Use Form.FieldRenderer
+
+#### 1. Manual Form Building (No fields prop)
+
+#### 1. Manual Form Building (No fields prop)
+
+```tsx
+// ✅ Building form field by field
+<Form name="manual-form">
+  <Form.FieldRenderer 
+    type="text" 
+    name="username" 
+    required 
+    placeholder="Enter username" 
+  />
+  <Form.FieldRenderer 
+    type="email" 
+    name="email" 
+    required 
+    validateEmail 
+  />
+  <Form.FieldRenderer 
+    type="selectCountry" 
+    name="country" 
+    placeholder="Select country" 
+  />
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### 2. Adding Extra Fields to Auto-Rendered Form
+
+```tsx
+// ✅ Mix auto-rendered fields + additional fields
+<Form name="mixed-form" fields={mainFields}>
+  {/* mainFields auto-render first */}
+  
+  {/* Add extra fields not in mainFields */}
+  <Form.FieldRenderer 
+    type="checkbox" 
+    name="terms" 
+    label="I agree to terms"
+    required 
+  />
+  <Form.FieldRenderer 
+    type="text" 
+    name="comments" 
+    placeholder="Additional comments" 
+  />
+  <Form.Action>Submit</Form.Action>
+</Form>
+```
+
+#### 3. Custom Layout Control
+
+```tsx
+// ✅ Use renderFields for complete layout control
+<Form 
+  name="custom-layout" 
+  fields={fields}
+  renderFields={({ fields }) => (
+    <div className="grid grid-cols-2 gap-4">
+      <Form.FieldRenderer {...fields.username} />
+      <Form.FieldRenderer {...fields.email} />
+    </div>
+  )}
+/>
 ```
 
 ### Field Rendering with Property Overrides
 
+When using the `fields` prop, the Form automatically renders all fields. To override properties, modify the field definitions in your form schema:
+
 ```tsx
-<Form name="override-form" fields={fields}>
-  {/* Override placeholder and styling */}
-  <Form.FieldRenderer 
-    {...fields.username} 
-    placeholder="Your unique username"
-    className="large-text-field"
-    style={{ fontSize: 18 }}
-  />
-  
-  {/* Override validation behavior */}
-  <Form.FieldRenderer 
-    {...fields.email}
-    validateOnBlur={false}        // Don't validate on blur
-    validateOnChange={true}       // Validate while typing
-    helpText="We'll never share your email"
-  />
-  
-  {/* Override field state */}
-  <Form.FieldRenderer 
-    {...fields.country}
-    disabled={!isEmailValid}     // Conditional disabling
-    fieldContainerClassName="highlighted-field"
-  />
-</Form>
+// Modify field properties in your schema
+const overrideFields = {
+  username: Field.text({
+    name: "username",
+    placeholder: "Your unique username",
+    className: "large-text-field",
+    style: { fontSize: 18 }
+  }),
+  email: Field.email({
+    name: "email",
+    validateOnBlur: false,       // Don't validate on blur
+    validateOnChange: true,      // Validate while typing
+    helpText: "We'll never share your email"
+  }),
+  country: Field.select({
+    name: "country",
+    disabled: !isEmailValid,    // Conditional disabling
+    fieldContainerClassName: "highlighted-field"
+  })
+};
+
+// Form automatically renders all fields with overrides
+<Form name="override-form" fields={overrideFields} />
 ```
 
 ### Automatic Component Selection
@@ -1294,6 +1671,101 @@ The `Form.FieldRenderer` automatically chooses the right component:
 <Form.FieldRenderer type="switch" name="notifications" /> // Switch component
 <Form.FieldRenderer type="select" name="category" />    // Dropdown component
 <Form.FieldRenderer type="selectCountry" name="country" /> // Country selector
+```
+
+### Custom Fields from /Fields Folder
+
+#### Checkbox Fields (FormFieldCheckbox)
+
+```tsx
+<Form.FieldRenderer 
+  type="checkbox" 
+  name="agreeToTerms" 
+  label="I agree to the terms and conditions"
+  required 
+  helpText="You must agree to continue"
+/>
+
+<Form.FieldRenderer 
+  type="checkbox" 
+  name="newsletter" 
+  label="Subscribe to newsletter"
+  checkedValue="subscribed"
+  uncheckedValue="unsubscribed"
+  defaultValue="unsubscribed"
+/>
+```
+
+#### Switch Fields (FormFieldSwitch)
+
+```tsx
+<Form.FieldRenderer 
+  type="switch" 
+  name="notifications" 
+  label="Enable push notifications"
+  checkedValue={true}
+  uncheckedValue={false}
+  defaultValue={true}
+/>
+
+<Form.FieldRenderer 
+  type="switch" 
+  name="darkMode" 
+  label="Dark mode"
+  helpText="Toggle app appearance"
+/>
+```
+
+#### Select Fields (FormFieldSelect)
+
+```tsx
+<Form.FieldRenderer 
+  type="select" 
+  name="category" 
+  label="Category"
+  placeholder="Choose category"
+  required
+  options={[
+    { label: 'Technology', value: 'tech' },
+    { label: 'Business', value: 'business' },
+    { label: 'Design', value: 'design' }
+  ]}
+/>
+
+<Form.FieldRenderer 
+  type="select" 
+  name="priority" 
+  label="Priority Level"
+  options={[
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' },
+    { label: 'Critical', value: 'critical' }
+  ]}
+  defaultValue="medium"
+/>
+```
+
+#### Country Select (SelectCountryField)
+
+```tsx
+<Form.FieldRenderer 
+  type="selectCountry" 
+  name="country" 
+  label="Country"
+  placeholder="Select your country"
+  required
+  displayDialCode={false}
+  helpText="Choose your country of residence"
+/>
+
+<Form.FieldRenderer 
+  type="selectCountry" 
+  name="birthCountry" 
+  label="Country of Birth"
+  anchor="bottom"
+  displayDialCode={true}
+/>
 ```
 
 ### Custom Layout with renderFields

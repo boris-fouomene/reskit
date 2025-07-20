@@ -1052,7 +1052,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
  * @param {boolean} [props.isUpdate] - Override update mode detection
  * @param {ReactNode | ((context: IFormContext<Fields>) => ReactNode)} [props.header] - Form header content
  * @param {ReactNode | ((context: IFormContext<Fields>) => ReactNode)} [props.children] - Form footer content
- * @param {(options: {data: IFormData<Fields>, primaryKeys: IFieldName<Fields>[]}) => boolean} [props.isEditingData] - Custom update mode detection
+ * @param {(options: {data: IFormData<Fields>, primaryKeys: IFormFieldName<Fields>[]}) => boolean} [props.isEditingData] - Custom update mode detection
  * @param {IFormData} [props.data] - Initial form data
  * @param {(options: IFormSubmitOptions<Fields>) => any} [props.onSubmit] - Form submission handler
  * @param {(context: IFormContext<Fields>) => ReactNode} [props.renderSkeleton] - Custom loading skeleton renderer
@@ -1293,7 +1293,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
     }, [customData]);
     const { fields: preparedFields, primaryKeys } = useMemo(() => {
         const preparedFields: Fields = {} as Fields;
-        const primaryKeys: IFieldName<Fields>[] = [];
+        const primaryKeys: IFormFieldName<Fields>[] = [];
         if (fields && isObj(fields)) {
             typedEntries(fields as Fields).map(([name, _field]) => {
                 if (!_field || !isObj(_field) || _field.isRendable === false) return;
@@ -1301,6 +1301,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
                 const field = Object.clone(_field);
                 delete field.isRendable;
                 field.name = defaultStr(field.name, name);
+                (field as any)._formFieldName = name;
                 if (field.primaryKey === true) {
                     primaryKeys.push(name as string);
                 }
@@ -1323,11 +1324,11 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
         }
         return false;
     }, [data, isEditingData, primaryKeys, customIsUpdate]);
-    const fieldsInstancesRef = useRef<Record<IFieldName<Fields>, FormField>>({} as Record<IFieldName<Fields>, FormField>);
+    const fieldsInstancesRef = useRef<Record<IFormFieldName<Fields>, FormField>>({} as Record<IFormFieldName<Fields>, FormField>);
     const formRef = useRef<IForm | null>(null);
     const contextRef = useRef<{
         isSubmitting: boolean,
-        isLoading: boolean, primaryKeys: IFieldName<Fields>[], data: IFormData<Fields>,
+        isLoading: boolean, primaryKeys: IFormFieldName<Fields>[], data: IFormData<Fields>,
         isUpdate: boolean, submitCount: number, invalidSubmitCount: number, errors: string[],
         validateBeforeFirstSubmit: boolean;
     }>({ primaryKeys, isSubmitting, isLoading, isUpdate, data, submitCount: 0, invalidSubmitCount: 0, errors: [], validateBeforeFirstSubmit: !!validateBeforeFirstSubmit });
@@ -1377,7 +1378,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
             for (let i in fields) {
                 const field = fields[i];
                 if (!(field instanceof FormField)) continue;
-                const fName: IFieldName<Fields> = field.getName(), fValue = field.isValid() ? field.getValidValue(data) : field.getValue();
+                const fName: IFormFieldName<Fields> = field.getName(), fValue = field.isValid() ? field.getValidValue(data) : field.getValue();
                 data[fName] = fValue;
                 if (fValue === undefined) {
                     delete data[fName];
@@ -1458,12 +1459,12 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
         if (typeof renderFields == "function") {
             return renderFields(options);
         }
-        const _renderField = typeof renderField == "function" ? renderField : (field: IField) => <FormFieldRenderer {...field} key={field.name} />;
+        const _renderField: IFormProps<Fields>["renderField"] = typeof renderField == "function" ? renderField : (field, options, name) => <FormFieldRenderer {...field} name={name} key={name} />;
         return typedEntries(preparedFields).map(([name, _field]) => {
             return <Fragment key={String(name)}>
-                {_renderField(_field, options)}
+                {_renderField(_field, options, name as IFormFieldName<Fields>)}
             </Fragment>
-        })
+        });
     }, [stableHash(renderFields), stableHash(renderField), preparedFields, primaryKeys, form, formName, data, isUpdate, disabled, readOnly]);
     const formContext: IFormContext<Fields> = {
         get isUpdate() {
@@ -1537,7 +1538,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
 }
 
 
-function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
+function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref" | "name"> & { name: string; type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
     const { form, fieldContainerClassName, isSubmitting, isLoading, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
@@ -1695,7 +1696,7 @@ class FormsManager {
         return this.forms[formName] as any || null;
     }
 
-    static getFieldInstances<Fields extends IFields = IFields>(formName: string): Record<IFieldName<Fields>, FormField> {
+    static getFieldInstances<Fields extends IFields = IFields>(formName: string): Record<IFormFieldName<Fields>, FormField> {
         return this.getForm<Fields>(formName)?.getFieldInstances?.() || {} as any;
     }
 
@@ -1853,7 +1854,7 @@ export interface IFormActionProps<FormFields extends IFields = IFields, Context 
 };
 
 export interface IForm<Fields extends IFields = IFields> extends IObservable<IFormEvent> {
-    getName(): IFieldName<Fields>;
+    getName(): IFormFieldName<Fields>;
     isValid(): boolean;
     isEditing(): boolean;
     getData(): IFormData;
@@ -1868,10 +1869,10 @@ export interface IForm<Fields extends IFields = IFields> extends IObservable<IFo
      * instances?.email.isValid(); // manually focus email input
      * ```
      */
-    getFieldInstances(): Record<IFieldName<Fields>, FormField>;
+    getFieldInstances(): Record<IFormFieldName<Fields>, FormField>;
 
     isSubmitting(): boolean;
-    getPrimaryKeys(): IFieldName<Fields>[];
+    getPrimaryKeys(): IFormFieldName<Fields>[];
     isLoading(): boolean;
     submit(): Promise<any>;
     isValid(): boolean;
@@ -1932,9 +1933,9 @@ export interface IFormContext<Fields extends IFields = IFields> extends IFormCon
     readonly fields: Fields;
     readonly data: IFormData<Fields>;
     readonly isSubmitting: boolean;
-    readonly fieldsInstances: Record<IFieldName<Fields>, FormField>;
+    readonly fieldsInstances: Record<IFormFieldName<Fields>, FormField>;
     readonly isLoading: boolean;
-    readonly primaryKeys: IFieldName<Fields>[];
+    readonly primaryKeys: IFormFieldName<Fields>[];
     readonly isUpdate: boolean;
     readonly isDisabled: boolean;
     readonly isReadOnly: boolean;
@@ -1954,7 +1955,7 @@ export interface IFormKeyboardEventHandlerOptions {
 };
 
 
-type IFieldName<Fields extends IFields = IFields> = keyof Fields & string;
+type IFormFieldName<Fields extends IFields = IFields> = keyof Fields & string;
 export type IFormData<Fields extends IFields = IFields> = {
     [K in (keyof Fields | string | number | symbol)]: any;
 };
@@ -2117,7 +2118,7 @@ interface IFormRenderFieldOptions<Fields extends IFields = IFields> extends IFor
     disabled: boolean;
     readOnly: boolean;
     formName: string;
-    primaryKeys: IFieldName<Fields>[];
+    primaryKeys: IFormFieldName<Fields>[];
 }
 
 export interface IFormContextProps<Fields extends IFields = IFields> {
@@ -2358,6 +2359,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * 
      * @param {IField} field - The field definition object containing all field properties and configuration
      * @param {IFormRenderFieldOptions<Fields>} options - Form context and rendering options including form state, validation status, and field collection
+     * @param {IFormFieldName<Fields>} fieldName - The name of the field being rendered, useful for identifying fields in the context. It represents the key in the fields object.
      * @returns {ReactNode} - The rendered field component
      * 
      * @example
@@ -2429,7 +2431,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * 
      * @since v1.0.0
      */
-    renderField?: (field: IField, options: IFormRenderFieldOptions<Fields>) => ReactNode;
+    renderField?: (field: IField, options: IFormRenderFieldOptions<Fields>, fieldName: IFormFieldName<Fields>) => ReactNode;
 
     beforeSubmit?: (options: IFormSubmitOptions<Fields>) => any;
 
@@ -2441,7 +2443,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
 
     isEditingData?: (options: {
         data: IFormData<Fields>;
-        primaryKeys: IFieldName<Fields>[];
+        primaryKeys: IFormFieldName<Fields>[];
     }) => boolean;
 
     /**

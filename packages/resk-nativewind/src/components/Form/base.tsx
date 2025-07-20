@@ -454,7 +454,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
                 const areEqual = this.compareValues(currentValue, targetValue);
                 if (!areEqual) {
                     throw {
-                        message: i18n.t("form.validator.matchField", {
+                        message: i18n.t("components.form.validator.matchField", {
                             fieldName: this.getLabel(),
                             matchFieldName: targetField.getLabel(),
                         })

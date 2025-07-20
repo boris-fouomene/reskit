@@ -1,4 +1,4 @@
-import { IMongoComparisonOperators, IMongoLogicalOperators, IMongoOperatorName } from "@resk/core/types";
+import { IMongoOperatorName } from "@resk/core/types";
 import { I18n } from "@resk/core/i18n";
 I18n.RegisterTranslations({
   en: {

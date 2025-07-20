@@ -177,10 +177,10 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.23.0",
+    "@resk/core": "^1.23.1",
     "clsx": "^2.1.1",
     "commander": "^14.0.0",
-    "tailwind-merge": "^3.2.0",
+    "tailwind-merge": "^3.3.1",
     "tippy.js": "^6.3.7"
   }
 }

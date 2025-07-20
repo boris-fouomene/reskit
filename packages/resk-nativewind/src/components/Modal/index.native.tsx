@@ -11,6 +11,7 @@ export function Modal({ children, dismissible, withBackdrop, visible, onRequestC
     testID = defaultStr(testID, "resk-modal");
     return <RNModal animationType="fade"  {...props} visible={!!visible} transparent>
         {backdropClassName && withBackdrop !== false ? <Backdrop
+            transparent
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", commonVariant({ backdrop: withBackdrop }), backdropClassName)}
         /> : null}

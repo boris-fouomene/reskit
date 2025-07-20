@@ -213,7 +213,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
       className={cn("resk-dialog-modal", computedVariant.modal())}
     >
       <Div className={cn("resk-dialog-container", computedVariant.container(), containerClassName)}>
-        {!isFullScreen && props.dismissible !== false ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
+        {!isFullScreen && props.dismissible !== false ? <Backdrop transparent testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
         <Div
           testID={testID}
           className={cn("resk-dialog", computedVariant.base(), isFullScreen && computedVariant.fullScreen(), className)}

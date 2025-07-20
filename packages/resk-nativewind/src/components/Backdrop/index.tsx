@@ -13,7 +13,7 @@ import { commonVariant } from "@variants/common";
  * It can be either transparent or have a semi-transparent dark background.
  *
  * @param {IBackdropProps} props - The properties for the Backdrop component.
- * @param {boolean} [props.transparent=true] - If `false`, the backdrop will have a semi-transparent black background. Defaults to `true` (fully transparent).
+ * @param {boolean} [props.transparent=false] - If `false`, the backdrop will have a semi-transparent black background. Defaults to `false`.If `true`, the backdrop will be fully transparent.
  * @returns {JSX.Element} A `Div` element styled as a full-screen backdrop.
  *
  * @example
@@ -62,7 +62,7 @@ export function Backdrop({ transparent, ...props }: IBackdropProps) {
         testID="resk-backdrop"
         {...props}
         className={cn(classes.absoluteFill, "overflow-hidden z-0 resk-backdrop flex-1 w-screen h-screen",
-            transparent !== false ? "bg-transparent" : commonVariant({ backdrop: true }),
+            transparent === true ? "bg-transparent" : commonVariant({ backdrop: true }),
             props.className
         )}
     />
@@ -80,7 +80,7 @@ export interface IBackdropProps extends IHtmlDivProps {
      * Determines the visibility of the backdrop's background color.
      *
      * @property {boolean} [transparent]
-     * @default true
+     * @default false
      *
      * @example
      * // Renders a backdrop with a semi-transparent black background.
@@ -88,7 +88,7 @@ export interface IBackdropProps extends IHtmlDivProps {
      *
      * @example
      * // Renders a completely transparent backdrop. This is the default behavior.
-     * <Backdrop transparent={true} />
+     * <Backdrop transparent={false} />
      * // or simply
      * <Backdrop />
      */

@@ -18,7 +18,7 @@ export function BottomSheet({ variant, visible, className, appBarClassName, cont
         backdropClassName={cn("resk-bottom-sheet-backdrop", computedVariant.modalBackdrop())}
     >
         <View testID={testID + "-content-container"} className={cn("bottom-sheet-content-container", computedVariant.contentContainer(), contentContainerClassName)}>
-            {<Backdrop className={cn("resk-bottom-sheet-backdrop")}
+            {<Backdrop transparent className={cn("resk-bottom-sheet-backdrop")}
                 testID={testID + "-bottom-sheet-backdrop"}
                 onPress={props.onRequestClose}
             />}

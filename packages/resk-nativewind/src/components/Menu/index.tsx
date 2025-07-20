@@ -260,7 +260,7 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    {dismissible !== false ? <Backdrop testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
+                    {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
                         onPress={() => close()}
                     /> : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>

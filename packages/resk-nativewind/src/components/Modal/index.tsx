@@ -101,6 +101,7 @@ export function Modal({ animationType = "fade", dismissible, withBackdrop, backd
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
         {backdropClassName && withBackdrop !== false ? <Backdrop
+            transparent
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", commonVariant({ backdrop: withBackdrop }), !visible && "pointer-events-none", backdropClassName)}
         /> : null}

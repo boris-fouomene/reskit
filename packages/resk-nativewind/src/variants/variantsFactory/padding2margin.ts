@@ -56,7 +56,7 @@ export const paddingClasses = {
     "195px": "p-[195px]",
     "200px": "p-[200px]",
   },
-  "sm:padding": {
+  ":sm:padding": {
     1: "sm:p-1",
     2: "sm:p-2",
     3: "sm:p-3",
@@ -113,7 +113,7 @@ export const paddingClasses = {
     "195px": "sm:p-[195px]",
     "200px": "sm:p-[200px]",
   },
-  "md:padding": {
+  ":md:padding": {
     1: "md:p-1",
     2: "md:p-2",
     3: "md:p-3",
@@ -170,7 +170,7 @@ export const paddingClasses = {
     "195px": "md:p-[195px]",
     "200px": "md:p-[200px]",
   },
-  "lg:padding": {
+  ":lg:padding": {
     1: "lg:p-1",
     2: "lg:p-2",
     3: "lg:p-3",
@@ -227,7 +227,7 @@ export const paddingClasses = {
     "195px": "lg:p-[195px]",
     "200px": "lg:p-[200px]",
   },
-  "xl:padding": {
+  ":xl:padding": {
     1: "xl:p-1",
     2: "xl:p-2",
     3: "xl:p-3",
@@ -284,7 +284,7 @@ export const paddingClasses = {
     "195px": "xl:p-[195px]",
     "200px": "xl:p-[200px]",
   },
-  "2xl:padding": {
+  ":2xl:padding": {
     1: "2xl:p-1",
     2: "2xl:p-2",
     3: "2xl:p-3",

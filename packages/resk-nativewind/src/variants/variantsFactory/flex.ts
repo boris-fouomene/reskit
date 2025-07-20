@@ -193,37 +193,37 @@ export const flexClasses = {
     },
 
     // SM Responsive Breakpoint
-    "sm:flexDirection": {
+    ":sm:flexDirection": {
         row: "sm:flex-row",
         "row-reverse": "sm:flex-row-reverse",
         col: "sm:flex-col",
         "col-reverse": "sm:flex-col-reverse",
     },
 
-    "sm:flexWrap": {
+    ":sm:flexWrap": {
         wrap: "sm:flex-wrap",
         "wrap-reverse": "sm:flex-wrap-reverse",
         nowrap: "sm:flex-nowrap",
     },
 
-    "sm:flex": {
+    ":sm:flex": {
         1: "sm:flex-1",
         auto: "sm:flex-auto",
         initial: "sm:flex-initial",
         none: "sm:flex-none",
     },
 
-    "sm:flexGrow": {
+    ":sm:flexGrow": {
         0: "sm:grow-0",
         1: "sm:grow",
     },
 
-    "sm:flexShrink": {
+    ":sm:flexShrink": {
         0: "sm:shrink-0",
         1: "sm:shrink",
     },
 
-    "sm:flexBasis": {
+    ":sm:flexBasis": {
         0: "sm:basis-0",
         1: "sm:basis-1",
         2: "sm:basis-2",
@@ -289,7 +289,7 @@ export const flexClasses = {
         "11/12": "sm:basis-11/12",
     },
 
-    "sm:justifyContent": {
+    ":sm:justifyContent": {
         normal: "sm:justify-normal",
         start: "sm:justify-start",
         end: "sm:justify-end",
@@ -300,14 +300,14 @@ export const flexClasses = {
         stretch: "sm:justify-stretch",
     },
 
-    "sm:justifyItems": {
+    ":sm:justifyItems": {
         start: "sm:justify-items-start",
         end: "sm:justify-items-end",
         center: "sm:justify-items-center",
         stretch: "sm:justify-items-stretch",
     },
 
-    "sm:justifySelf": {
+    ":sm:justifySelf": {
         auto: "sm:justify-self-auto",
         start: "sm:justify-self-start",
         end: "sm:justify-self-end",
@@ -315,7 +315,7 @@ export const flexClasses = {
         stretch: "sm:justify-self-stretch",
     },
 
-    "sm:alignContent": {
+    ":sm:alignContent": {
         normal: "sm:content-normal",
         center: "sm:content-center",
         start: "sm:content-start",
@@ -327,7 +327,7 @@ export const flexClasses = {
         stretch: "sm:content-stretch",
     },
 
-    "sm:alignItems": {
+    ":sm:alignItems": {
         start: "sm:items-start",
         end: "sm:items-end",
         center: "sm:items-center",
@@ -335,7 +335,7 @@ export const flexClasses = {
         stretch: "sm:items-stretch",
     },
 
-    "sm:alignSelf": {
+    ":sm:alignSelf": {
         auto: "sm:self-auto",
         start: "sm:self-start",
         end: "sm:self-end",
@@ -344,7 +344,7 @@ export const flexClasses = {
         baseline: "sm:self-baseline",
     },
 
-    "sm:placeContent": {
+    ":sm:placeContent": {
         center: "sm:place-content-center",
         start: "sm:place-content-start",
         end: "sm:place-content-end",
@@ -355,7 +355,7 @@ export const flexClasses = {
         stretch: "sm:place-content-stretch",
     },
 
-    "sm:placeItems": {
+    ":sm:placeItems": {
         start: "sm:place-items-start",
         end: "sm:place-items-end",
         center: "sm:place-items-center",
@@ -363,7 +363,7 @@ export const flexClasses = {
         stretch: "sm:place-items-stretch",
     },
 
-    "sm:placeSelf": {
+    ":sm:placeSelf": {
         auto: "sm:place-self-auto",
         start: "sm:place-self-start",
         end: "sm:place-self-end",
@@ -372,37 +372,37 @@ export const flexClasses = {
     },
 
     // MD Responsive Breakpoint
-    "md:flexDirection": {
+    ":md:flexDirection": {
         row: "md:flex-row",
         "row-reverse": "md:flex-row-reverse",
         col: "md:flex-col",
         "col-reverse": "md:flex-col-reverse",
     },
 
-    "md:flexWrap": {
+    ":md:flexWrap": {
         wrap: "md:flex-wrap",
         "wrap-reverse": "md:flex-wrap-reverse",
         nowrap: "md:flex-nowrap",
     },
 
-    "md:flex": {
+    ":md:flex": {
         1: "md:flex-1",
         auto: "md:flex-auto",
         initial: "md:flex-initial",
         none: "md:flex-none",
     },
 
-    "md:flexGrow": {
+    ":md:flexGrow": {
         0: "md:grow-0",
         1: "md:grow",
     },
 
-    "md:flexShrink": {
+    ":md:flexShrink": {
         0: "md:shrink-0",
         1: "md:shrink",
     },
 
-    "md:flexBasis": {
+    ":md:flexBasis": {
         0: "md:basis-0",
         1: "md:basis-1",
         2: "md:basis-2",
@@ -468,7 +468,7 @@ export const flexClasses = {
         "11/12": "md:basis-11/12",
     },
 
-    "md:justifyContent": {
+    ":md:justifyContent": {
         normal: "md:justify-normal",
         start: "md:justify-start",
         end: "md:justify-end",
@@ -479,14 +479,14 @@ export const flexClasses = {
         stretch: "md:justify-stretch",
     },
 
-    "md:justifyItems": {
+    ":md:justifyItems": {
         start: "md:justify-items-start",
         end: "md:justify-items-end",
         center: "md:justify-items-center",
         stretch: "md:justify-items-stretch",
     },
 
-    "md:justifySelf": {
+    ":md:justifySelf": {
         auto: "md:justify-self-auto",
         start: "md:justify-self-start",
         end: "md:justify-self-end",
@@ -494,7 +494,7 @@ export const flexClasses = {
         stretch: "md:justify-self-stretch",
     },
 
-    "md:alignContent": {
+    ":md:alignContent": {
         normal: "md:content-normal",
         center: "md:content-center",
         start: "md:content-start",
@@ -506,7 +506,7 @@ export const flexClasses = {
         stretch: "md:content-stretch",
     },
 
-    "md:alignItems": {
+    ":md:alignItems": {
         start: "md:items-start",
         end: "md:items-end",
         center: "md:items-center",
@@ -514,7 +514,7 @@ export const flexClasses = {
         stretch: "md:items-stretch",
     },
 
-    "md:alignSelf": {
+    ":md:alignSelf": {
         auto: "md:self-auto",
         start: "md:self-start",
         end: "md:self-end",
@@ -523,7 +523,7 @@ export const flexClasses = {
         baseline: "md:self-baseline",
     },
 
-    "md:placeContent": {
+    ":md:placeContent": {
         center: "md:place-content-center",
         start: "md:place-content-start",
         end: "md:place-content-end",
@@ -534,7 +534,7 @@ export const flexClasses = {
         stretch: "md:place-content-stretch",
     },
 
-    "md:placeItems": {
+    ":md:placeItems": {
         start: "md:place-items-start",
         end: "md:place-items-end",
         center: "md:place-items-center",
@@ -542,7 +542,7 @@ export const flexClasses = {
         stretch: "md:place-items-stretch",
     },
 
-    "md:placeSelf": {
+    ":md:placeSelf": {
         auto: "md:place-self-auto",
         start: "md:place-self-start",
         end: "md:place-self-end",
@@ -551,37 +551,37 @@ export const flexClasses = {
     },
 
     // LG Responsive Breakpoint
-    "lg:flexDirection": {
+    ":lg:flexDirection": {
         row: "lg:flex-row",
         "row-reverse": "lg:flex-row-reverse",
         col: "lg:flex-col",
         "col-reverse": "lg:flex-col-reverse",
     },
 
-    "lg:flexWrap": {
+    ":lg:flexWrap": {
         wrap: "lg:flex-wrap",
         "wrap-reverse": "lg:flex-wrap-reverse",
         nowrap: "lg:flex-nowrap",
     },
 
-    "lg:flex": {
+    ":lg:flex": {
         1: "lg:flex-1",
         auto: "lg:flex-auto",
         initial: "lg:flex-initial",
         none: "lg:flex-none",
     },
 
-    "lg:flexGrow": {
+    ":lg:flexGrow": {
         0: "lg:grow-0",
         1: "lg:grow",
     },
 
-    "lg:flexShrink": {
+    ":lg:flexShrink": {
         0: "lg:shrink-0",
         1: "lg:shrink",
     },
 
-    "lg:flexBasis": {
+    ":lg:flexBasis": {
         0: "lg:basis-0",
         1: "lg:basis-1",
         2: "lg:basis-2",
@@ -647,7 +647,7 @@ export const flexClasses = {
         "11/12": "lg:basis-11/12",
     },
 
-    "lg:justifyContent": {
+    ":lg:justifyContent": {
         normal: "lg:justify-normal",
         start: "lg:justify-start",
         end: "lg:justify-end",
@@ -658,14 +658,14 @@ export const flexClasses = {
         stretch: "lg:justify-stretch",
     },
 
-    "lg:justifyItems": {
+    ":lg:justifyItems": {
         start: "lg:justify-items-start",
         end: "lg:justify-items-end",
         center: "lg:justify-items-center",
         stretch: "lg:justify-items-stretch",
     },
 
-    "lg:justifySelf": {
+    ":lg:justifySelf": {
         auto: "lg:justify-self-auto",
         start: "lg:justify-self-start",
         end: "lg:justify-self-end",
@@ -673,7 +673,7 @@ export const flexClasses = {
         stretch: "lg:justify-self-stretch",
     },
 
-    "lg:alignContent": {
+    ":lg:alignContent": {
         normal: "lg:content-normal",
         center: "lg:content-center",
         start: "lg:content-start",
@@ -685,7 +685,7 @@ export const flexClasses = {
         stretch: "lg:content-stretch",
     },
 
-    "lg:alignItems": {
+    ":lg:alignItems": {
         start: "lg:items-start",
         end: "lg:items-end",
         center: "lg:items-center",
@@ -693,7 +693,7 @@ export const flexClasses = {
         stretch: "lg:items-stretch",
     },
 
-    "lg:alignSelf": {
+    ":lg:alignSelf": {
         auto: "lg:self-auto",
         start: "lg:self-start",
         end: "lg:self-end",
@@ -702,7 +702,7 @@ export const flexClasses = {
         baseline: "lg:self-baseline",
     },
 
-    "lg:placeContent": {
+    ":lg:placeContent": {
         center: "lg:place-content-center",
         start: "lg:place-content-start",
         end: "lg:place-content-end",
@@ -713,7 +713,7 @@ export const flexClasses = {
         stretch: "lg:place-content-stretch",
     },
 
-    "lg:placeItems": {
+    ":lg:placeItems": {
         start: "lg:place-items-start",
         end: "lg:place-items-end",
         center: "lg:place-items-center",
@@ -721,7 +721,7 @@ export const flexClasses = {
         stretch: "lg:place-items-stretch",
     },
 
-    "lg:placeSelf": {
+    ":lg:placeSelf": {
         auto: "lg:place-self-auto",
         start: "lg:place-self-start",
         end: "lg:place-self-end",
@@ -730,37 +730,37 @@ export const flexClasses = {
     },
 
     // XL Responsive Breakpoint
-    "xl:flexDirection": {
+    ":xl:flexDirection": {
         row: "xl:flex-row",
         "row-reverse": "xl:flex-row-reverse",
         col: "xl:flex-col",
         "col-reverse": "xl:flex-col-reverse",
     },
 
-    "xl:flexWrap": {
+    ":xl:flexWrap": {
         wrap: "xl:flex-wrap",
         "wrap-reverse": "xl:flex-wrap-reverse",
         nowrap: "xl:flex-nowrap",
     },
 
-    "xl:flex": {
+    ":xl:flex": {
         1: "xl:flex-1",
         auto: "xl:flex-auto",
         initial: "xl:flex-initial",
         none: "xl:flex-none",
     },
 
-    "xl:flexGrow": {
+    ":xl:flexGrow": {
         0: "xl:grow-0",
         1: "xl:grow",
     },
 
-    "xl:flexShrink": {
+    ":xl:flexShrink": {
         0: "xl:shrink-0",
         1: "xl:shrink",
     },
 
-    "xl:flexBasis": {
+    ":xl:flexBasis": {
         0: "xl:basis-0",
         1: "xl:basis-1",
         2: "xl:basis-2",
@@ -826,7 +826,7 @@ export const flexClasses = {
         "11/12": "xl:basis-11/12",
     },
 
-    "xl:justifyContent": {
+    ":xl:justifyContent": {
         normal: "xl:justify-normal",
         start: "xl:justify-start",
         end: "xl:justify-end",
@@ -837,14 +837,14 @@ export const flexClasses = {
         stretch: "xl:justify-stretch",
     },
 
-    "xl:justifyItems": {
+    ":xl:justifyItems": {
         start: "xl:justify-items-start",
         end: "xl:justify-items-end",
         center: "xl:justify-items-center",
         stretch: "xl:justify-items-stretch",
     },
 
-    "xl:justifySelf": {
+    ":xl:justifySelf": {
         auto: "xl:justify-self-auto",
         start: "xl:justify-self-start",
         end: "xl:justify-self-end",
@@ -852,7 +852,7 @@ export const flexClasses = {
         stretch: "xl:justify-self-stretch",
     },
 
-    "xl:alignContent": {
+    ":xl:alignContent": {
         normal: "xl:content-normal",
         center: "xl:content-center",
         start: "xl:content-start",
@@ -864,7 +864,7 @@ export const flexClasses = {
         stretch: "xl:content-stretch",
     },
 
-    "xl:alignItems": {
+    ":xl:alignItems": {
         start: "xl:items-start",
         end: "xl:items-end",
         center: "xl:items-center",
@@ -872,7 +872,7 @@ export const flexClasses = {
         stretch: "xl:items-stretch",
     },
 
-    "xl:alignSelf": {
+    ":xl:alignSelf": {
         auto: "xl:self-auto",
         start: "xl:self-start",
         end: "xl:self-end",
@@ -881,7 +881,7 @@ export const flexClasses = {
         baseline: "xl:self-baseline",
     },
 
-    "xl:placeContent": {
+    ":xl:placeContent": {
         center: "xl:place-content-center",
         start: "xl:place-content-start",
         end: "xl:place-content-end",
@@ -892,7 +892,7 @@ export const flexClasses = {
         stretch: "xl:place-content-stretch",
     },
 
-    "xl:placeItems": {
+    ":xl:placeItems": {
         start: "xl:place-items-start",
         end: "xl:place-items-end",
         center: "xl:place-items-center",
@@ -900,7 +900,7 @@ export const flexClasses = {
         stretch: "xl:place-items-stretch",
     },
 
-    "xl:placeSelf": {
+    ":xl:placeSelf": {
         auto: "xl:place-self-auto",
         start: "xl:place-self-start",
         end: "xl:place-self-end",
@@ -909,37 +909,37 @@ export const flexClasses = {
     },
 
     // 2XL Responsive Breakpoint
-    "2xl:flexDirection": {
+    ":2xl:flexDirection": {
         row: "2xl:flex-row",
         "row-reverse": "2xl:flex-row-reverse",
         col: "2xl:flex-col",
         "col-reverse": "2xl:flex-col-reverse",
     },
 
-    "2xl:flexWrap": {
+    ":2xl:flexWrap": {
         wrap: "2xl:flex-wrap",
         "wrap-reverse": "2xl:flex-wrap-reverse",
         nowrap: "2xl:flex-nowrap",
     },
 
-    "2xl:flex": {
+    ":2xl:flex": {
         1: "2xl:flex-1",
         auto: "2xl:flex-auto",
         initial: "2xl:flex-initial",
         none: "2xl:flex-none",
     },
 
-    "2xl:flexGrow": {
+    ":2xl:flexGrow": {
         0: "2xl:grow-0",
         1: "2xl:grow",
     },
 
-    "2xl:flexShrink": {
+    ":2xl:flexShrink": {
         0: "2xl:shrink-0",
         1: "2xl:shrink",
     },
 
-    "2xl:flexBasis": {
+    ":2xl:flexBasis": {
         0: "2xl:basis-0",
         1: "2xl:basis-1",
         2: "2xl:basis-2",
@@ -1005,7 +1005,7 @@ export const flexClasses = {
         "11/12": "2xl:basis-11/12",
     },
 
-    "2xl:justifyContent": {
+    ":2xl:justifyContent": {
         normal: "2xl:justify-normal",
         start: "2xl:justify-start",
         end: "2xl:justify-end",
@@ -1016,14 +1016,14 @@ export const flexClasses = {
         stretch: "2xl:justify-stretch",
     },
 
-    "2xl:justifyItems": {
+    ":2xl:justifyItems": {
         start: "2xl:justify-items-start",
         end: "2xl:justify-items-end",
         center: "2xl:justify-items-center",
         stretch: "2xl:justify-items-stretch",
     },
 
-    "2xl:justifySelf": {
+    ":2xl:justifySelf": {
         auto: "2xl:justify-self-auto",
         start: "2xl:justify-self-start",
         end: "2xl:justify-self-end",
@@ -1031,7 +1031,7 @@ export const flexClasses = {
         stretch: "2xl:justify-self-stretch",
     },
 
-    "2xl:alignContent": {
+    ":2xl:alignContent": {
         normal: "2xl:content-normal",
         center: "2xl:content-center",
         start: "2xl:content-start",
@@ -1043,7 +1043,7 @@ export const flexClasses = {
         stretch: "2xl:content-stretch",
     },
 
-    "2xl:alignItems": {
+    ":2xl:alignItems": {
         start: "2xl:items-start",
         end: "2xl:items-end",
         center: "2xl:items-center",
@@ -1051,7 +1051,7 @@ export const flexClasses = {
         stretch: "2xl:items-stretch",
     },
 
-    "2xl:alignSelf": {
+    ":2xl:alignSelf": {
         auto: "2xl:self-auto",
         start: "2xl:self-start",
         end: "2xl:self-end",
@@ -1060,7 +1060,7 @@ export const flexClasses = {
         baseline: "2xl:self-baseline",
     },
 
-    "2xl:placeContent": {
+    ":2xl:placeContent": {
         center: "2xl:place-content-center",
         start: "2xl:place-content-start",
         end: "2xl:place-content-end",
@@ -1071,7 +1071,7 @@ export const flexClasses = {
         stretch: "2xl:place-content-stretch",
     },
 
-    "2xl:placeItems": {
+    ":2xl:placeItems": {
         start: "2xl:place-items-start",
         end: "2xl:place-items-end",
         center: "2xl:place-items-center",
@@ -1079,7 +1079,7 @@ export const flexClasses = {
         stretch: "2xl:place-items-stretch",
     },
 
-    "2xl:placeSelf": {
+    ":2xl:placeSelf": {
         auto: "2xl:place-self-auto",
         start: "2xl:place-self-start",
         end: "2xl:place-self-end",

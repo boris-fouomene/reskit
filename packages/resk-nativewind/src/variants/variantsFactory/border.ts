@@ -191,7 +191,7 @@ export const borderClasses = {
   },
 
   // SM Responsive Breakpoint
-  "sm:borderStyle": {
+  ":sm:borderStyle": {
     solid: "sm:border-solid",
     dashed: "sm:border-dashed",
     dotted: "sm:border-dotted",
@@ -199,7 +199,7 @@ export const borderClasses = {
     none: "sm:web:border-none",
     hidden: "sm:web:border-hidden",
   },
-  "sm:borderWidth": {
+  ":sm:borderWidth": {
     0: "sm:border-0",
     1: "sm:border",
     2: "sm:border-2",
@@ -251,7 +251,7 @@ export const borderClasses = {
     "90": "sm:border-t-[90px]",
     "100": "sm:border-t-[100px]",
   },
-  "sm:borderRightWidth": {
+  ":sm:borderRightWidth": {
     0: "sm:border-r-0",
     1: "sm:border-r",
     2: "sm:border-r-2",
@@ -277,7 +277,7 @@ export const borderClasses = {
     "90px": "sm:border-r-[90px]",
     "100px": "sm:border-r-[100px]",
   },
-  "sm:borderBottomWidth": {
+  ":sm:borderBottomWidth": {
     0: "sm:border-b-0",
     1: "sm:border-b",
     2: "sm:border-b-2",
@@ -303,7 +303,7 @@ export const borderClasses = {
     "90px": "sm:border-b-[90px]",
     "100px": "sm:border-b-[100px]",
   },
-  "sm:borderLeftWidth": {
+  ":sm:borderLeftWidth": {
     0: "sm:border-l-0",
     1: "sm:border-l",
     2: "sm:border-l-2",
@@ -329,7 +329,7 @@ export const borderClasses = {
     "90px": "sm:border-l-[90px]",
     "100px": "sm:border-l-[100px]",
   },
-  "sm:borderXWidth": {
+  ":sm:borderXWidth": {
     0: "sm:border-x-0",
     1: "sm:border-x",
     2: "sm:border-x-2",
@@ -355,7 +355,7 @@ export const borderClasses = {
     "90px": "sm:border-x-[90px]",
     "100px": "sm:border-x-[100px]",
   },
-  "sm:borderYWidth": {
+  ":sm:borderYWidth": {
     0: "sm:border-y-0",
     1: "sm:border-y",
     2: "sm:border-y-2",
@@ -383,7 +383,7 @@ export const borderClasses = {
   },
 
   // MD Responsive Breakpoint
-  "md:borderStyle": {
+  ":md:borderStyle": {
     solid: "md:border-solid",
     dashed: "md:border-dashed",
     dotted: "md:border-dotted",
@@ -391,7 +391,7 @@ export const borderClasses = {
     none: "md:web:border-none",
     hidden: "md:web:border-hidden",
   },
-  "md:borderWidth": {
+  ":md:borderWidth": {
     0: "md:border-0",
     1: "md:border",
     2: "md:border-2",
@@ -417,7 +417,7 @@ export const borderClasses = {
     "90": "md:border-[90px]",
     "100": "md:border-[100px]",
   },
-  "md:borderTopWidth": {
+  ":md:borderTopWidth": {
     0: "md:border-t-0",
     1: "md:border-t",
     2: "md:border-t-2",
@@ -443,7 +443,7 @@ export const borderClasses = {
     "90": "md:border-t-[90px]",
     "100": "md:border-t-[100px]",
   },
-  "md:borderRightWidth": {
+  ":md:borderRightWidth": {
     0: "md:border-r-0",
     1: "md:border-r",
     2: "md:border-r-2",
@@ -469,7 +469,7 @@ export const borderClasses = {
     "90px": "md:border-r-[90px]",
     "100px": "md:border-r-[100px]",
   },
-  "md:borderBottomWidth": {
+  ":md:borderBottomWidth": {
     0: "md:border-b-0",
     1: "md:border-b",
     2: "md:border-b-2",
@@ -495,7 +495,7 @@ export const borderClasses = {
     "90px": "md:border-b-[90px]",
     "100px": "md:border-b-[100px]",
   },
-  "md:borderLeftWidth": {
+  ":md:borderLeftWidth": {
     0: "md:border-l-0",
     1: "md:border-l",
     2: "md:border-l-2",
@@ -521,7 +521,7 @@ export const borderClasses = {
     "90px": "md:border-l-[90px]",
     "100px": "md:border-l-[100px]",
   },
-  "md:borderXWidth": {
+  ":md:borderXWidth": {
     0: "md:border-x-0",
     1: "md:border-x",
     2: "md:border-x-2",
@@ -547,7 +547,7 @@ export const borderClasses = {
     "90px": "md:border-x-[90px]",
     "100px": "md:border-x-[100px]",
   },
-  "md:borderYWidth": {
+  ":md:borderYWidth": {
     0: "md:border-y-0",
     1: "md:border-y",
     2: "md:border-y-2",
@@ -575,7 +575,7 @@ export const borderClasses = {
   },
 
   // LG Responsive Breakpoint
-  "lg:borderStyle": {
+  ":lg:borderStyle": {
     solid: "lg:border-solid",
     dashed: "lg:border-dashed",
     dotted: "lg:border-dotted",
@@ -583,7 +583,7 @@ export const borderClasses = {
     none: "lg:web:border-none",
     hidden: "lg:web:border-hidden",
   },
-  "lg:borderWidth": {
+  ":lg:borderWidth": {
     0: "lg:border-0",
     1: "lg:border",
     2: "lg:border-2",
@@ -609,7 +609,7 @@ export const borderClasses = {
     "90": "lg:border-[90px]",
     "100": "lg:border-[100px]",
   },
-  "lg:borderTopWidth": {
+  ":lg:borderTopWidth": {
     0: "lg:border-t-0",
     1: "lg:border-t",
     2: "lg:border-t-2",
@@ -635,7 +635,7 @@ export const borderClasses = {
     "90": "lg:border-t-[90px]",
     "100": "lg:border-t-[100px]",
   },
-  "lg:borderRightWidth": {
+  ":lg:borderRightWidth": {
     0: "lg:border-r-0",
     1: "lg:border-r",
     2: "lg:border-r-2",
@@ -661,7 +661,7 @@ export const borderClasses = {
     "90px": "lg:border-r-[90px]",
     "100px": "lg:border-r-[100px]",
   },
-  "lg:borderBottomWidth": {
+  ":lg:borderBottomWidth": {
     0: "lg:border-b-0",
     1: "lg:border-b",
     2: "lg:border-b-2",
@@ -687,7 +687,7 @@ export const borderClasses = {
     "90px": "lg:border-b-[90px]",
     "100px": "lg:border-b-[100px]",
   },
-  "lg:borderLeftWidth": {
+  ":lg:borderLeftWidth": {
     0: "lg:border-l-0",
     1: "lg:border-l",
     2: "lg:border-l-2",
@@ -713,7 +713,7 @@ export const borderClasses = {
     "90px": "lg:border-l-[90px]",
     "100px": "lg:border-l-[100px]",
   },
-  "lg:borderXWidth": {
+  ":lg:borderXWidth": {
     0: "lg:border-x-0",
     1: "lg:border-x",
     2: "lg:border-x-2",
@@ -739,7 +739,7 @@ export const borderClasses = {
     "90px": "lg:border-x-[90px]",
     "100px": "lg:border-x-[100px]",
   },
-  "lg:borderYWidth": {
+  ":lg:borderYWidth": {
     0: "lg:border-y-0",
     1: "lg:border-y",
     2: "lg:border-y-2",
@@ -767,7 +767,7 @@ export const borderClasses = {
   },
 
   // XL Responsive Breakpoint
-  "xl:borderStyle": {
+  ":xl:borderStyle": {
     solid: "xl:border-solid",
     dashed: "xl:border-dashed",
     dotted: "xl:border-dotted",
@@ -775,7 +775,7 @@ export const borderClasses = {
     none: "xl:web:border-none",
     hidden: "xl:web:border-hidden",
   },
-  "xl:borderWidth": {
+  ":xl:borderWidth": {
     0: "xl:border-0",
     1: "xl:border",
     2: "xl:border-2",
@@ -801,7 +801,7 @@ export const borderClasses = {
     "90": "xl:border-[90px]",
     "100": "xl:border-[100px]",
   },
-  "xl:borderTopWidth": {
+  ":xl:borderTopWidth": {
     0: "xl:border-t-0",
     1: "xl:border-t",
     2: "xl:border-t-2",
@@ -827,7 +827,7 @@ export const borderClasses = {
     "90": "xl:border-t-[90px]",
     "100": "xl:border-t-[100px]",
   },
-  "xl:borderRightWidth": {
+  ":xl:borderRightWidth": {
     0: "xl:border-r-0",
     1: "xl:border-r",
     2: "xl:border-r-2",
@@ -853,7 +853,7 @@ export const borderClasses = {
     "90px": "xl:border-r-[90px]",
     "100px": "xl:border-r-[100px]",
   },
-  "xl:borderBottomWidth": {
+  ":xl:borderBottomWidth": {
     0: "xl:border-b-0",
     1: "xl:border-b",
     2: "xl:border-b-2",
@@ -879,7 +879,7 @@ export const borderClasses = {
     "90px": "xl:border-b-[90px]",
     "100px": "xl:border-b-[100px]",
   },
-  "xl:borderLeftWidth": {
+  ":xl:borderLeftWidth": {
     0: "xl:border-l-0",
     1: "xl:border-l",
     2: "xl:border-l-2",
@@ -905,7 +905,7 @@ export const borderClasses = {
     "90px": "xl:border-l-[90px]",
     "100px": "xl:border-l-[100px]",
   },
-  "xl:borderXWidth": {
+  ":xl:borderXWidth": {
     0: "xl:border-x-0",
     1: "xl:border-x",
     2: "xl:border-x-2",
@@ -931,7 +931,7 @@ export const borderClasses = {
     "90px": "xl:border-x-[90px]",
     "100px": "xl:border-x-[100px]",
   },
-  "xl:borderYWidth": {
+  ":xl:borderYWidth": {
     0: "xl:border-y-0",
     1: "xl:border-y",
     2: "xl:border-y-2",
@@ -959,7 +959,7 @@ export const borderClasses = {
   },
 
   // 2XL Responsive Breakpoint
-  "2xl:borderStyle": {
+  ":2xl:borderStyle": {
     solid: "2xl:border-solid",
     dashed: "2xl:border-dashed",
     dotted: "2xl:border-dotted",
@@ -967,7 +967,7 @@ export const borderClasses = {
     none: "2xl:web:border-none",
     hidden: "2xl:web:border-hidden",
   },
-  "2xl:borderWidth": {
+  ":2xl:borderWidth": {
     0: "2xl:border-0",
     1: "2xl:border",
     2: "2xl:border-2",

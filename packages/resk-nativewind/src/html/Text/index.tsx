@@ -42,5 +42,5 @@ export const Text = withAsChild(function Text({ numberOfLines, selectable, varia
         style.MozTextSizeAdjust = 'none';
         style.msTextSizeAdjust = 'none';
     }
-    return <Div asHtmlTag="span" {...props} style={StyleSheet.flatten([style, cStyle])} className={cn(classes, textVariant(variant), props.className)} />;
+    return <Div {...props} style={StyleSheet.flatten([style, cStyle])} className={cn("resk-text", classes, textVariant(variant), props.className)} />;
 }, "Html.Text");

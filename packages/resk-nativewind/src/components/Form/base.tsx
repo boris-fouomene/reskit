@@ -1004,11 +1004,275 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
     }
 }
 
-
-
-
-/******************* Form Implementation  ******************/
-
+/**
+ * 🚀 **Advanced Universal Form Component** - The ultimate cross-platform form solution
+ * 
+ * A comprehensive, feature-rich form component that provides enterprise-grade form management
+ * with advanced validation, state management, accessibility, and customization capabilities.
+ * Built for React Native and Web with full TypeScript support and maximum flexibility.
+ * 
+ * ## ✨ **Key Features**
+ * 
+ * - 🎯 **Cross-Platform**: Works seamlessly on React Native and Web
+ * - 🔥 **Type-Safe**: Full TypeScript support with intelligent field type inference
+ * - ⚡ **Performance Optimized**: Smart memoization and efficient re-rendering
+ * - 🎨 **Highly Customizable**: Flexible rendering with `renderFields` and `renderField` props
+ * - 🛡️ **Robust Validation**: Built-in validation with custom rules support
+ * - ♿ **Accessible**: WCAG compliant with screen reader support
+ * - 🎭 **Fragment Support**: Render as fragments for table rows and custom layouts
+ * - 🔄 **State Management**: Advanced form state with submission tracking
+ * - ⌨️ **Keyboard Navigation**: Full keyboard support with custom key handlers
+ * 
+ * ## 🎯 **Use Cases**
+ * 
+ * - User registration and login forms
+ * - Data entry and editing interfaces
+ * - Survey and questionnaire systems
+ * - Settings and configuration panels
+ * - Inline table editing
+ * - Multi-step form wizards
+ * - Dynamic form generation
+ * 
+ * @template Fields - The fields type definition extending IFields for type-safe field access
+ * 
+ * @param {IFormProps<Fields>} props - Comprehensive form configuration object
+ * @param {string} [props.name] - Unique form identifier for state management and testing
+ * @param {React.CSSProperties} [props.style] - Custom CSS styles for the form container
+ * @param {IFormVariant} [props.variant] - Pre-defined styling variant (compact, spacious, minimal)
+ * @param {boolean} [props.validateBeforeFirstSubmit=false] - Enable validation before first submission attempt
+ * @param {string} [props.testID="resk-form"] - Test identifier for automated testing
+ * @param {string} [props.asHtmlTag] - HTML tag for web rendering (div, form, section, etc.)
+ * @param {boolean} [props.asFragment=false] - Render as React Fragment for table rows and custom layouts
+ * @param {IClassName} [props.className] - Additional CSS classes for form container
+ * @param {boolean} [props.isLoading=false] - Loading state for showing skeleton UI
+ * @param {boolean} [props.disabled=false] - Disable all form fields
+ * @param {boolean} [props.readOnly=false] - Make all form fields read-only
+ * @param {Fields} [props.fields] - Field definitions object with type-safe field configurations
+ * @param {React.Ref<IFormContext<Fields>>} [props.ref] - Ref for accessing form context and methods
+ * @param {boolean} [props.isUpdate] - Override update mode detection
+ * @param {ReactNode | ((context: IFormContext<Fields>) => ReactNode)} [props.header] - Form header content
+ * @param {ReactNode | ((context: IFormContext<Fields>) => ReactNode)} [props.children] - Form footer content
+ * @param {(options: {data: IFormData<Fields>, primaryKeys: IFieldName<Fields>[]}) => boolean} [props.isEditingData] - Custom update mode detection
+ * @param {IFormData} [props.data] - Initial form data
+ * @param {(options: IFormSubmitOptions<Fields>) => any} [props.onSubmit] - Form submission handler
+ * @param {(context: IFormContext<Fields>) => ReactNode} [props.renderSkeleton] - Custom loading skeleton renderer
+ * @param {(options: IFormSubmitOptions<Fields>) => any} [props.beforeSubmit] - Pre-submission hook
+ * @param {(field: IField, options: IFormRenderFieldOptions<Fields>) => ReactNode} [props.renderField] - Custom field renderer
+ * @param {(options: IFormRenderFieldOptions<Fields>) => ReactNode} [props.renderFields] - Custom complete form renderer
+ * @param {(options: IFormFieldValidateOptions<IFieldType>) => any} [props.onFormValid] - Form validation success callback
+ * @param {(options: IFormFieldValidateOptions<IFieldType>) => any} [props.onFormInvalid] - Form validation failure callback
+ * @param {(options: IFormFieldValidateOptions<IFieldType>) => any} [props.onValidateField] - Individual field validation success callback
+ * @param {(options: IFormFieldValidateOptions<IFieldType>) => any} [props.onInvalidateField] - Individual field validation failure callback
+ * @param {(options: IFormKeyboardEventHandlerOptions) => any} [props.onFormKeyEvent] - Form-level keyboard event handler
+ * @param {(options: IFormKeyboardEventHandlerOptions) => any} [props.onEnterKeyPress] - Enter key press handler with auto-submit
+ * @param {(formContext: IFormContext<Fields> & {field: IField}) => IField | null} [props.prepareFormField] - Field preparation hook
+ * @param {IClassName} [props.fieldContainerClassName] - CSS classes for all field containers
+ * 
+ * @returns {JSX.Element} The rendered form component with full functionality
+ * 
+ * @example
+ * **🎯 Basic User Registration Form**
+ * ```tsx
+ * const UserRegistrationForm = () => {
+ *   const fields = {
+ *     firstName: { type: 'text', name: 'firstName', label: 'First Name', required: true },
+ *     lastName: { type: 'text', name: 'lastName', label: 'Last Name', required: true },
+ *     email: { type: 'email', name: 'email', label: 'Email Address', required: true },
+ *     password: { type: 'password', name: 'password', label: 'Password', required: true },
+ *     confirmPassword: { type: 'password', name: 'confirmPassword', label: 'Confirm Password', required: true }
+ *   } as const;
+ * 
+ *   return (
+ *     <Form
+ *       name="user-registration"
+ *       fields={fields}
+ *       validateBeforeFirstSubmit={true}
+ *       onSubmit={async ({ data, isUpdate }) => {
+ *         console.log('Submitting user registration:', data);
+ *         await registerUser(data);
+ *       }}
+ *       header={({ isSubmitting }) => (
+ *         <h2 className="text-2xl font-bold mb-6">
+ *           {isSubmitting ? 'Creating Account...' : 'Create Your Account'}
+ *         </h2>
+ *       )}
+ *     >
+ *       {({ form, isSubmitting }) => (
+ *         <div className="flex gap-4 mt-6">
+ *           <Form.Action
+ *             formName="user-registration"
+ *             variant="primary"
+ *             disabled={!form.isValid() || isSubmitting}
+ *           >
+ *             {isSubmitting ? 'Creating...' : 'Create Account'}
+ *           </Form.Action>
+ *           <Button variant="secondary">Cancel</Button>
+ *         </div>
+ *       )}
+ *     </Form>
+ *   );
+ * };
+ * ```
+ * 
+ * @example
+ * **🎨 Advanced Form with Custom Layout**
+ * ```tsx
+ * const ProfileEditForm = () => (
+ *   <Form
+ *     name="profile-edit"
+ *     variant="spacious"
+ *     fields={profileFields}
+ *     data={currentUser}
+ *     isUpdate={true}
+ *     renderFields={({ fields, isUpdate, form }) => (
+ *       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+ *         <div className="space-y-6">
+ *           <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+ *           <Form.FieldRenderer {...fields.firstName} />
+ *           <Form.FieldRenderer {...fields.lastName} />
+ *           <Form.FieldRenderer {...fields.email} />
+ *           <Form.FieldRenderer {...fields.phone} />
+ *         </div>
+ *         
+ *         <div className="space-y-6">
+ *           <h3 className="text-lg font-semibold text-gray-900">Professional Details</h3>
+ *           <Form.FieldRenderer {...fields.company} />
+ *           <Form.FieldRenderer {...fields.position} />
+ *           <Form.FieldRenderer {...fields.bio} />
+ *           
+ *           {form.isValid() && (
+ *             <div className="p-4 bg-green-50 rounded-lg">
+ *               <p className="text-green-700">✓ Profile information is valid</p>
+ *             </div>
+ *           )}
+ *         </div>
+ *       </div>
+ *     )}
+ *     onSubmit={async ({ data }) => {
+ *       await updateUserProfile(data);
+ *       showNotification('Profile updated successfully!');
+ *     }}
+ *   />
+ * );
+ * ```
+ * 
+ * @example
+ * **📊 Table Row Editing with Fragment Support**
+ * ```tsx
+ * const UserTableRow = ({ user, onSave }) => (
+ *   <tr>
+ *     <Form
+ *       asFragment={true}
+ *       name={`user-row-${user.id}`}
+ *       data={user}
+ *       isUpdate={true}
+ *       renderFields={({ fields }) => (
+ *         <React.Fragment>
+ *           <td className="px-4 py-2">
+ *             <Form.FieldRenderer {...fields.name} />
+ *           </td>
+ *           <td className="px-4 py-2">
+ *             <Form.FieldRenderer {...fields.email} />
+ *           </td>
+ *           <td className="px-4 py-2">
+ *             <Form.FieldRenderer {...fields.role} />
+ *           </td>
+ *           <td className="px-4 py-2">
+ *             <Form.Action
+ *               formName={`user-row-${user.id}`}
+ *               size="sm"
+ *               variant="primary"
+ *             >
+ *               Save
+ *             </Form.Action>
+ *           </td>
+ *         </React.Fragment>
+ *       )}
+ *       onSubmit={({ data }) => onSave(user.id, data)}
+ *     />
+ *   </tr>
+ * );
+ * ```
+ * 
+ * @example
+ * **⚡ Dynamic Form with Conditional Fields**
+ * ```tsx
+ * const DynamicSettingsForm = () => (
+ *   <Form
+ *     name="dynamic-settings"
+ *     fields={settingsFields}
+ *     renderField={(field, { form, data }) => {
+ *       // Conditional rendering based on other field values
+ *       if (field.name === 'advancedOptions' && !data.enableAdvanced) {
+ *         return null;
+ *       }
+ *       
+ *       // Enhanced field rendering with validation indicators
+ *       const fieldInstance = form.getFieldInstances()[field.name];
+ *       const isValid = fieldInstance?.isValid();
+ *       
+ *       return (
+ *         <div className={`field-wrapper ${isValid ? 'valid' : 'pending'}`}>
+ *           <div className="flex items-center gap-2">
+ *             <Form.FieldRenderer {...field} />
+ *             {isValid && <CheckCircleIcon className="w-5 h-5 text-green-500" />}
+ *             {field.helpText && <InfoIcon className="w-4 h-4 text-gray-400" />}
+ *           </div>
+ *           {field.helpText && (
+ *             <p className="text-sm text-gray-600 mt-1">{field.helpText}</p>
+ *           )}
+ *         </div>
+ *       );
+ *     }}
+ *     onFormKeyEvent={({ key, form }) => {
+ *       if (key === 'ctrl+s') {
+ *         form.submit();
+ *       }
+ *     }}
+ *   />
+ * );
+ * ```
+ * 
+ * @remarks
+ * ### 🔧 **Technical Architecture**
+ * 
+ * - **State Management**: Uses React hooks with optimized memoization for performance
+ * - **Validation Engine**: Built-in validation with extensible rule system
+ * - **Event System**: Observable pattern for form events and lifecycle management
+ * - **Type Safety**: Full TypeScript support with intelligent field type inference
+ * - **Accessibility**: WCAG 2.1 AA compliant with keyboard navigation and screen reader support
+ * - **Performance**: Smart re-rendering with React.memo and useMemo optimizations
+ * - **Extensibility**: Plugin-based architecture for custom field types and validators
+ * 
+ * ### ⚠️ **Important Considerations**
+ * 
+ * - When using `asFragment={true}`, container props like `style`, `className` are ignored
+ * - The `renderFields` prop takes precedence over `renderField` when both are provided
+ * - Form validation state is preserved across re-renders for optimal user experience
+ * - Field instances are automatically managed and cleaned up on unmount
+ * - Keyboard navigation follows ARIA best practices for accessibility
+ * 
+ * ### 🚀 **Performance Tips**
+ * 
+ * - Use `React.memo()` for custom field components to prevent unnecessary re-renders
+ * - Implement field-level validation instead of form-level for better performance
+ * - Use the `prepareFormField` prop for dynamic field configuration
+ * - Leverage the built-in memoization by keeping field definitions stable
+ * - Consider using `renderFields` for complex layouts to avoid multiple re-renders
+ * 
+ * @see {@link IFormProps} - Complete props interface documentation
+ * @see {@link IFormContext} - Form context interface for accessing form state
+ * @see {@link FormField} - Base field component for creating custom field types
+ * @see {@link FormsManager} - Global form management utilities
+ * @see {@link IField} - Field definition interface
+ * @see {@link FormFieldRenderer} - Default field renderer component
+ * 
+ * @since 1.0.0
+ * @author Resk Development Team
+ * @version 2.1.0
+ * 
+ * @public
+ */
 export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, asFragment, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
@@ -2034,19 +2298,19 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      *       <div className="grid grid-cols-2 gap-6">
      *         <div className="space-y-4">
      *           <h3 className="text-lg font-semibold">Personal Information</h3>
-     *           <FormFieldRenderer {...fields.firstName} />
-     *           <FormFieldRenderer {...fields.lastName} />
-     *           <FormFieldRenderer {...fields.email} />
+     *           <Form.FieldRenderer {...fields.firstName} />
+     *           <Form.FieldRenderer {...fields.lastName} />
+     *           <Form.FieldRenderer {...fields.email} />
      *         </div>
      *         <div className="space-y-4">
      *           <h3 className="text-lg font-semibold">Account Settings</h3>
-     *           <FormFieldRenderer {...fields.username} />
-     *           {!isUpdate && <FormFieldRenderer {...fields.password} />}
-     *           <FormFieldRenderer {...fields.role} disabled={disabled} />
+     *           <Form.FieldRenderer {...fields.username} />
+     *           {!isUpdate && <Form.FieldRenderer {...fields.password} />}
+     *           <Form.FieldRenderer {...fields.role} disabled={disabled} />
      *         </div>
      *         {data.role === 'admin' && (
      *           <div className="col-span-2">
-     *             <FormFieldRenderer {...fields.permissions} />
+     *             <Form.FieldRenderer {...fields.permissions} />
      *           </div>
      *         )}
      *       </div>
@@ -2060,9 +2324,9 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      *     asFragment={true}
      *     renderFields={({ fields }) => (
      *       <React.Fragment>
-     *         <td><FormFieldRenderer {...fields.name} /></td>
-     *         <td><FormFieldRenderer {...fields.email} /></td>
-     *         <td><FormFieldRenderer {...fields.status} /></td>
+     *         <td><Form.FieldRenderer {...fields.name} /></td>
+     *         <td><Form.FieldRenderer {...fields.email} /></td>
+     *         <td><Form.FieldRenderer {...fields.status} /></td>
      *       </React.Fragment>
      *     )}
      *   />
@@ -2112,7 +2376,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      *           {field.required && <span className="text-red-500">*</span>}
      *         </label>
      *         
-     *         <FormFieldRenderer {...field} />
+     *         <Form.FieldRenderer {...field} />
      *         
      *         {form.getFieldInstances()[field.name]?.isValid() && (
      *           <CheckIcon className="text-green-500" />
@@ -2138,7 +2402,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      *       
      *       return (
      *         <div className={fieldClassName}>
-     *           <FormFieldRenderer 
+     *           <Form.FieldRenderer 
      *             {...field} 
      *             disabled={disabled || (field.readOnlyInUpdate && isUpdate)}
      *           />

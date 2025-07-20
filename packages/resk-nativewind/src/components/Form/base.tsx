@@ -1795,16 +1795,20 @@ function FormAction<FormFields extends IFields = IFields, Context = unknown>({ f
         ref={mergedRef}
         onPress={async (event, context) => {
             const form = FormsManager.getForm<FormFields>(formName);
-            const isFormField = form && form?.isValid() || false;
-            const options = Object.assign({}, context, { isFormField }, form ? { form, formData: form?.getData?.() } : {});
-            if (typeof onPress == "function" && await onPress(event, options) === false) {
-                return;
+            const isFormValid = form && form?.isValid() || false;
+            const options = Object.assign({}, context, { isFormValid }, form ? { form, formData: form?.getData?.() } : {});
+            let r = undefined;
+            if (typeof onPress == "function") {
+                r = await onPress(event, options);
+                if (r === false) {
+                    return;
+                }
             }
             if (form) {
-                const cb = !isFormField ? innerRef.current?.disable : undefined;
+                const cb = !isFormValid ? innerRef.current?.disable : undefined;
                 if (submitFormOnPress !== false) {
                     const submitForm = () => {
-                        if (isFormField && context && typeof context?.setIsLoading == "function") {
+                        if (isFormValid && context && typeof context?.setIsLoading == "function") {
                             context.setIsLoading(true, async () => {
                                 try {
                                     await form.submit();
@@ -1827,6 +1831,7 @@ function FormAction<FormFields extends IFields = IFields, Context = unknown>({ f
                     cb?.();
                 }
             }
+            return r;
         }}
     />
 }

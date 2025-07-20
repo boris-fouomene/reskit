@@ -7,6 +7,7 @@ export * from "./Divider";
 export * from "./Avatar";
 export * from "./Badge";
 export * from "./BackHandler";
+export * from "./Backdrop";
 export * from "./Stack";
 export * from "./Tooltip";
 export * from "./Switch";

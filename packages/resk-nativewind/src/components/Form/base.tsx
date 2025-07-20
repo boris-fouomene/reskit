@@ -1009,7 +1009,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, asFragment, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1248,9 +1248,21 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
     };
     useImperativeHandle(ref, () => (formContext));
     const skeleton = isLoading && typeof renderSkeleton == "function" ? renderSkeleton(formContext) : null
+
+    // Determine the form content based on fragment rendering preference
+    const formContent = skeleton ?? !hasRenderFields ? (
+        asFragment ? (
+            <>{formFields}</>
+        ) : (
+            <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, computedVariant.base(), className)}>
+                {formFields}
+            </Div>
+        )
+    ) : formFields;
+
     return <FormContext.Provider value={formContext}>
         {typeof header == "function" ? header(formContext) : header}
-        {skeleton ?? !hasRenderFields ? <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, computedVariant.base(), className)}>{formFields}</Div> : formFields}
+        {formContent}
         {typeof children == "function" ? children(formContext) : children}
     </FormContext.Provider>;
 }
@@ -1891,6 +1903,54 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     style?: IHtmlDivProps["style"];
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
+
+    /**
+     * Renders the form content as a React Fragment instead of a wrapper element.
+     * 
+     * When true, the form fields will be rendered without any surrounding container
+     * element, which is particularly useful for table rows where you need the form
+     * fields to be direct children of a table row element.
+     * 
+     * @type {boolean}
+     * @default false
+     * 
+     * @example
+     * ```tsx
+     * // Render form as fragment for table row usage
+     * <table>
+     *   <tbody>
+     *     <tr>
+     *       <Form
+     *         asFragment={true}
+     *         fields={{
+     *           name: { type: 'text', name: 'name' },
+     *           email: { type: 'email', name: 'email' }
+     *         }}
+     *       />
+     *     </tr>
+     *   </tbody>
+     * </table>
+     * 
+     * // Normal form with wrapper element
+     * <Form
+     *   asFragment={false} // or omit (default)
+     *   fields={myFields}
+     * />
+     * ```
+     * 
+     * @remarks
+     * - When asFragment is true, style, className, asHtmlTag, testID, and id props are ignored
+     * - The form context and field functionality remain fully intact
+     * - Header and children elements are still rendered normally
+     * - Useful for integration with table structures, grid layouts, or custom containers
+     * - Cannot be used together with custom renderFields that expect a container
+     * 
+     * @see {@link React.Fragment} for more information about fragments
+     * @see {@link renderFields} for custom field rendering
+     * 
+     * @since v1.0.0
+     */
+    asFragment?: boolean;
 
     /**
      * Additional CSS class name applied to all form field container wrappers.

@@ -15,7 +15,7 @@ function isNativePromise(p: any): boolean {
   /**
    * If the value is a boolean or falsy, it's not a Promise.
    */
-  if (typeof p === 'boolean' || !p) {
+  if (typeof p === 'boolean' || !p || typeof p === "number" || typeof p === "string" || typeof p == "symbol") {
     return false;
   }
 
@@ -39,15 +39,18 @@ function isNativePromise(p: any): boolean {
   if (p instanceof Promise) {
     return true;
   }
+  if (typeof p?.then == "function" && typeof p?.catch === "function" && typeof p?.finally === "function") {
+    return true;
+  }
 
   /**
    * If the value's constructor is a function that is similar to the Promise constructor, it's a Promise.
    */
   return p && typeof p.constructor === "function"
     && Function.prototype.toString.call(p.constructor).replace(/\(.*\)/, "()")
-      === Function.prototype.toString.call(Function)
-        .replace("Function", "Promise") // replacing Identifier
-        .replace(/\(.*\)/, "()"); // removing possible FormalParameterList
+    === Function.prototype.toString.call(Function)
+      .replace("Function", "Promise") // replacing Identifier
+      .replace(/\(.*\)/, "()"); // removing possible FormalParameterList
 }
 
 /**

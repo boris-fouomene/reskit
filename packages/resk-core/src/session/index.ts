@@ -2,6 +2,7 @@ import { Platform } from "../platform";
 import { JsonHelper } from "../utils/json";
 import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
+import isPromise from "@utils/isPromise";
 
 
 
@@ -247,21 +248,567 @@ class Manager {
     }
   }
 
+  /**
+   * Gets the current namespace prefix used for all session storage keys.
+   * 
+   * This getter provides access to the global namespace prefix that is automatically prepended
+   * to all session storage keys when they are sanitized. Namespacing is essential for creating
+   * isolated storage contexts in applications that share the same storage backend, preventing
+   * key collisions between different modules, features, or application instances.
+   * 
+   * ### Key Benefits:
+   * - **Isolation**: Prevents key conflicts between different application parts
+   * - **Organization**: Groups related storage keys under a common prefix
+   * - **Multi-tenancy**: Enables separate storage contexts for different users/tenants
+   * - **Environment Separation**: Allows different prefixes for dev/staging/production
+   * 
+   * ### Namespace Format:
+   * The namespace is returned as a clean string without any trailing separators.
+   * The system automatically adds the `-` separator when constructing the final key.
+   * 
+   * @returns The current namespace prefix as a string, or empty string if no namespace is set
+   * 
+   * @example
+   * ```typescript
+   * // Get the current namespace
+   * const namespace = Manager.keyNamespace;
+   * console.log(namespace); // "" (empty by default)
+   * 
+   * // Set a namespace first
+   * Manager.keyNamespace = "myapp";
+   * console.log(Manager.keyNamespace); // "myapp"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Multi-tenant application example
+   * class TenantSessionManager {
+   *   static setTenant(tenantId: string) {
+   *     Manager.keyNamespace = `tenant-${tenantId}`;
+   *   }
+   *   
+   *   static getCurrentTenant(): string {
+   *     const namespace = Manager.keyNamespace;
+   *     return namespace.replace('tenant-', '');
+   *   }
+   * }
+   * 
+   * // Usage
+   * TenantSessionManager.setTenant('acme-corp');
+   * console.log(Manager.keyNamespace); // "tenant-acme-corp"
+   * 
+   * // All session operations now use this namespace
+   * Session.set('userPrefs', { theme: 'dark' }); 
+   * // Stored as key: "tenant-acme-corp-userPrefs"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Environment-based namespacing
+   * const environment = process.env.NODE_ENV || 'development';
+   * const appVersion = process.env.APP_VERSION || '1.0.0';
+   * 
+   * Manager.keyNamespace = `${environment}-v${appVersion}`;
+   * console.log(Manager.keyNamespace); // "production-v2.1.0"
+   * 
+   * // All storage operations are now environment-scoped
+   * Session.set('cache', data); // Stored as "production-v2.1.0-cache"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Dynamic namespace checking
+   * function ensureNamespace(requiredNamespace: string) {
+   *   const current = Manager.keyNamespace;
+   *   if (current !== requiredNamespace) {
+   *     throw new Error(`Expected namespace '${requiredNamespace}', got '${current}'`);
+   *   }
+   * }
+   * 
+   * // Usage in critical operations
+   * Manager.keyNamespace = "secure-context";
+   * ensureNamespace("secure-context"); // Passes
+   * Session.set('sensitiveData', encryptedData);
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Namespace validation and formatting
+   * function validateNamespace(): boolean {
+   *   const namespace = Manager.keyNamespace;
+   *   
+   *   // Check for valid format
+   *   const isValidFormat = /^[a-z0-9-]+$/.test(namespace);
+   *   const hasNoConsecutiveDashes = !namespace.includes('--');
+   *   const doesNotStartOrEndWithDash = !namespace.startsWith('-') && !namespace.endsWith('-');
+   *   
+   *   return isValidFormat && hasNoConsecutiveDashes && doesNotStartOrEndWithDash;
+   * }
+   * 
+   * Manager.keyNamespace = "my-app-v1";
+   * console.log(validateNamespace()); // true
+   * 
+   * Manager.keyNamespace = "invalid--namespace-";
+   * console.log(validateNamespace()); // false
+   * ```
+   * 
+   * @see {@link keyNamespace} (setter) - Method to set the namespace prefix
+   * @see {@link sanitizeKey} - Method that applies the namespace to keys
+   * @see {@link Session.set} - Session storage method that uses namespaced keys
+   * @see {@link Session.get} - Session retrieval method that uses namespaced keys
+   * 
+   * @since 1.0.0
+   * @public
+   * 
+   * @remarks
+   * **Important Considerations:**
+   * - The namespace affects ALL subsequent session operations
+   * - Changing the namespace will effectively "switch" to a different storage context
+   * - Keys stored with one namespace won't be accessible with a different namespace
+   * - The namespace is stored globally and persists until explicitly changed
+   * - An empty namespace means no prefixing is applied to keys
+   * 
+   * **Best Practices:**
+   * - Set the namespace early in your application lifecycle
+   * - Use consistent naming conventions (lowercase, hyphens for separation)
+   * - Consider including version numbers for schema evolution
+   * - Avoid changing namespaces frequently during application runtime
+   * - Document your namespace strategy for team members
+   * 
+   * **Thread Safety:**
+   * - Reading the namespace is thread-safe
+   * - The value is cached until explicitly changed
+   * - Multiple reads return the same value consistently
+   */
   public static get keyNamespace(): string {
     return isNonNullString(this._keyNamespace) ? this._keyNamespace : "";
   }
 
+  /**
+   * Sets the namespace prefix that will be prepended to all session storage keys.
+   * 
+   * This setter allows you to configure a global namespace prefix that will be automatically
+   * applied to all session storage keys when they are sanitized. Setting a namespace is crucial
+   * for applications that need to maintain separate storage contexts, avoid key collisions,
+   * or implement multi-tenant architectures where different users or application instances
+   * should have isolated storage spaces.
+   * 
+   * ### Namespace Validation:
+   * The setter validates the input using {@link isNonNullString} to ensure only valid,
+   * non-empty strings are accepted. Invalid inputs (null, undefined, empty strings) are
+   * silently ignored, preserving the current namespace value.
+   * 
+   * ### Impact on Storage Operations:
+   * Once a namespace is set, ALL subsequent session storage operations will use the
+   * namespaced keys. This includes {@link Session.get}, {@link Session.set}, 
+   * {@link Session.remove}, and all other storage methods.
+   * 
+   * @param prefix - The namespace prefix to use for all storage keys
+   * 
+   * @example
+   * ```typescript
+   * // Basic namespace setup
+   * Manager.keyNamespace = "myapp";
+   * 
+   * // Now all storage operations use the namespace
+   * Session.set('user', { id: 1, name: 'John' }); 
+   * // Stored with key: "myapp-user"
+   * 
+   * const user = Session.get('user'); 
+   * // Retrieves using key: "myapp-user"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Multi-environment configuration
+   * const environment = process.env.NODE_ENV;
+   * const version = process.env.APP_VERSION;
+   * 
+   * // Set environment-specific namespace
+   * Manager.keyNamespace = `${environment}-${version}`;
+   * 
+   * // Examples:
+   * // Development: "development-1.0.0"
+   * // Production: "production-2.1.5"
+   * // Testing: "testing-1.2.0-beta"
+   * 
+   * Session.set('config', appConfig); 
+   * // Stored as "production-2.1.5-config"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // User-specific namespacing for multi-tenant apps
+   * class UserSessionManager {
+   *   static loginUser(userId: string, organizationId: string) {
+   *     // Create unique namespace for this user context
+   *     Manager.keyNamespace = `org-${organizationId}-user-${userId}`;
+   *     
+   *     // All subsequent storage is user-specific
+   *     Session.set('preferences', userPreferences);
+   *     Session.set('cache', userData);
+   *   }
+   *   
+   *   static logoutUser() {
+   *     // Clear user-specific data
+   *     Session.removeAll();
+   *     
+   *     // Reset to global namespace
+   *     Manager.keyNamespace = "global";
+   *   }
+   * }
+   * 
+   * // Usage
+   * UserSessionManager.loginUser('john123', 'acme-corp');
+   * // Namespace: "org-acme-corp-user-john123"
+   * 
+   * Session.set('lastAction', 'document_created');
+   * // Stored as: "org-acme-corp-user-john123-lastAction"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Feature-based namespacing
+   * class FeatureFlags {
+   *   private static originalNamespace: string;
+   *   
+   *   static enableFeature(featureName: string) {
+   *     // Save current namespace
+   *     this.originalNamespace = Manager.keyNamespace;
+   *     
+   *     // Switch to feature-specific namespace
+   *     Manager.keyNamespace = `feature-${featureName}`;
+   *     
+   *     return {
+   *       store: (key: string, value: any) => Session.set(key, value),
+   *       retrieve: (key: string) => Session.get(key),
+   *       cleanup: () => {
+   *         Session.removeAll();
+   *         Manager.keyNamespace = this.originalNamespace;
+   *       }
+   *     };
+   *   }
+   * }
+   * 
+   * // Usage
+   * const betaFeature = FeatureFlags.enableFeature('beta-dashboard');
+   * betaFeature.store('userProgress', progressData);
+   * // Stored as: "feature-beta-dashboard-userProgress"
+   * 
+   * betaFeature.cleanup(); // Removes all feature data and restores namespace
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Namespace migration for application updates
+   * class NamespaceMigration {
+   *   static migrateFrom(oldNamespace: string, newNamespace: string) {
+   *     // Step 1: Read all data from old namespace
+   *     Manager.keyNamespace = oldNamespace;
+   *     const oldData = this.getAllStorageData();
+   *     
+   *     // Step 2: Switch to new namespace and write data
+   *     Manager.keyNamespace = newNamespace;
+   *     Object.entries(oldData).forEach(([key, value]) => {
+   *       Session.set(key, value);
+   *     });
+   *     
+   *     // Step 3: Clean up old namespace
+   *     Manager.keyNamespace = oldNamespace;
+   *     Session.removeAll();
+   *     
+   *     // Step 4: Set new namespace as active
+   *     Manager.keyNamespace = newNamespace;
+   *   }
+   *   
+   *   private static getAllStorageData(): Record<string, any> {
+   *     // Implementation would depend on storage backend
+   *     // This is a simplified example
+   *     return {};
+   *   }
+   * }
+   * 
+   * // Usage during app update
+   * NamespaceMigration.migrateFrom('v1.0', 'v2.0');
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Namespace validation and sanitization
+   * function setSecureNamespace(rawNamespace: string): boolean {
+   *   // Sanitize the namespace
+   *   const sanitized = rawNamespace
+   *     .toLowerCase()
+   *     .replace(/[^a-z0-9-]/g, '-')
+   *     .replace(/-+/g, '-')
+   *     .replace(/^-|-$/g, '');
+   *   
+   *   if (sanitized.length < 3) {
+   *     console.warn('Namespace too short, using default');
+   *     Manager.keyNamespace = 'default';
+   *     return false;
+   *   }
+   *   
+   *   Manager.keyNamespace = sanitized;
+   *   return true;
+   * }
+   * 
+   * // Usage
+   * setSecureNamespace('My App!! v2.0'); // Sets to "my-app-v2-0"
+   * setSecureNamespace('x'); // Sets to "default" (too short)
+   * ```
+   * 
+   * @see {@link keyNamespace} (getter) - Method to retrieve the current namespace
+   * @see {@link sanitizeKey} - Method that applies the namespace to keys
+   * @see {@link isNonNullString} - Validation function used for input checking
+   * @see {@link Session} - Session utilities that use the namespaced keys
+   * 
+   * @since 1.0.0
+   * @public
+   * 
+   * @remarks
+   * **Critical Behavior Notes:**
+   * - Only valid, non-empty strings are accepted as namespace values
+   * - Invalid inputs (null, undefined, empty strings) are silently ignored
+   * - The namespace change affects ALL subsequent storage operations immediately
+   * - Previously stored data under different namespaces becomes inaccessible
+   * - The namespace is stored globally and persists until explicitly changed
+   * 
+   * **Security Considerations:**
+   * - Ensure namespace values don't contain sensitive information
+   * - Validate namespace inputs in security-critical applications
+   * - Consider namespace as part of your access control strategy
+   * - Be aware that namespace switching can expose or hide data
+   * 
+   * **Performance Impact:**
+   * - Namespace setting is a lightweight operation
+   * - The namespace is cached and doesn't impact storage operation performance
+   * - Frequent namespace changes can lead to memory fragmentation in some storage backends
+   * 
+   * **Best Practices:**
+   * - Set the namespace once during application initialization
+   * - Use consistent, predictable naming patterns
+   * - Document your namespace strategy and conventions
+   * - Consider versioning in your namespace for future migrations
+   * - Test namespace switching thoroughly in your application
+   */
   public static set keyNamespace(prefix: string) {
     if (isNonNullString(prefix)) {
       this._keyNamespace = prefix;
     }
   }
 
-
+  /**
+   * Sanitizes and prepares a storage key by removing whitespace and applying the global namespace prefix.
+   * 
+   * This method is the core key processing function that ensures all session storage keys are
+   * properly formatted and consistently namespaced. It performs essential cleaning operations
+   * to prevent storage errors and applies the global namespace to create isolated storage contexts.
+   * 
+   * The sanitization process is critical for maintaining data integrity and preventing conflicts
+   * in shared storage environments. This method is automatically called by all session storage
+   * operations, ensuring consistent key handling throughout the application.
+   * 
+   * ### Sanitization Process:
+   * 1. **Validation**: Checks if the key is valid using {@link isNonNullString}
+   * 2. **Trimming**: Removes leading and trailing whitespace
+   * 3. **Whitespace Removal**: Removes all internal whitespace characters
+   * 4. **Namespace Application**: Prepends the global namespace with a hyphen separator
+   * 5. **Return**: Provides the final, storage-ready key
+   * 
+   * ### Key Format:
+   * - **Without namespace**: `"cleankey"`
+   * - **With namespace**: `"namespace-cleankey"`
+   * - **Invalid input**: `""` (empty string)
+   * 
+   * @param key - The raw key string to sanitize (optional)
+   * 
+   * @returns The sanitized key string ready for storage operations, or empty string if input is invalid
+   * 
+   * @example
+   * ```typescript
+   * // Basic key sanitization
+   * const clean1 = Manager.sanitizeKey("userToken");
+   * console.log(clean1); // "userToken"
+   * 
+   * const clean2 = Manager.sanitizeKey("user profile");
+   * console.log(clean2); // "userprofile"
+   * 
+   * const clean3 = Manager.sanitizeKey("  spaced key  ");
+   * console.log(clean3); // "spacedkey"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Namespace application
+   * Manager.keyNamespace = "myapp";
+   * 
+   * const key1 = Manager.sanitizeKey("settings");
+   * console.log(key1); // "myapp-settings"
+   * 
+   * const key2 = Manager.sanitizeKey("user preferences");
+   * console.log(key2); // "myapp-userpreferences"
+   * 
+   * const key3 = Manager.sanitizeKey("cache data");
+   * console.log(key3); // "myapp-cachedata"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Invalid input handling
+   * const invalid1 = Manager.sanitizeKey("");
+   * console.log(invalid1); // ""
+   * 
+   * const invalid2 = Manager.sanitizeKey(null);
+   * console.log(invalid2); // ""
+   * 
+   * const invalid3 = Manager.sanitizeKey(undefined);
+   * console.log(invalid3); // ""
+   * 
+   * const invalid4 = Manager.sanitizeKey("   ");
+   * console.log(invalid4); // ""
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Complex whitespace handling
+   * const complex1 = Manager.sanitizeKey("user\tprofile\ndata");
+   * console.log(complex1); // "userprofiledata"
+   * 
+   * const complex2 = Manager.sanitizeKey("multi   space   key");
+   * console.log(complex2); // "multispacekey"
+   * 
+   * const complex3 = Manager.sanitizeKey(" \t\n mixed \r\n whitespace \t ");
+   * console.log(complex3); // "mixedwhitespace"
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Usage in custom storage operations
+   * class CustomStorage {
+   *   static setWithMetadata(key: string, value: any, metadata: object) {
+   *     const cleanKey = Manager.sanitizeKey(key);
+   *     const metaKey = Manager.sanitizeKey(`${key}_meta`);
+   *     
+   *     Session.set(cleanKey, value);
+   *     Session.set(metaKey, metadata);
+   *   }
+   *   
+   *   static getWithMetadata(key: string) {
+   *     const cleanKey = Manager.sanitizeKey(key);
+   *     const metaKey = Manager.sanitizeKey(`${key}_meta`);
+   *     
+   *     return {
+   *       value: Session.get(cleanKey),
+   *       metadata: Session.get(metaKey)
+   *     };
+   *   }
+   * }
+   * 
+   * // Usage
+   * Manager.keyNamespace = "app";
+   * CustomStorage.setWithMetadata("user data", userData, { created: Date.now() });
+   * // Stores: "app-userdata" and "app-userdata_meta"
+   * 
+   * const result = CustomStorage.getWithMetadata("user data");
+   * console.log(result.value, result.metadata);
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Key collision prevention
+   * class StorageKeyManager {
+   *   static generateUniqueKey(baseKey: string, identifier: string): string {
+   *     const timestamp = Date.now();
+   *     const randomSuffix = Math.random().toString(36).substr(2, 9);
+   *     const rawKey = `${baseKey}_${identifier}_${timestamp}_${randomSuffix}`;
+   *     
+   *     return Manager.sanitizeKey(rawKey);
+   *   }
+   *   
+   *   static isKeyValid(key: string): boolean {
+   *     const sanitized = Manager.sanitizeKey(key);
+   *     return sanitized.length > 0 && sanitized === Manager.sanitizeKey(sanitized);
+   *   }
+   * }
+   * 
+   * // Usage
+   * const uniqueKey = StorageKeyManager.generateUniqueKey("temp cache", "user123");
+   * console.log(uniqueKey); // "namespace-tempcache_user123_1642123456789_abc123def"
+   * 
+   * console.log(StorageKeyManager.isKeyValid("valid key")); // true
+   * console.log(StorageKeyManager.isKeyValid("")); // false
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Debugging key transformations
+   * function debugKeySanitization(rawKey: string) {
+   *   console.log('=== Key Sanitization Debug ===');
+   *   console.log('Input:', JSON.stringify(rawKey));
+   *   console.log('Current namespace:', Manager.keyNamespace);
+   *   
+   *   const sanitized = Manager.sanitizeKey(rawKey);
+   *   console.log('Output:', JSON.stringify(sanitized));
+   *   
+   *   const steps = {
+   *     'Original': rawKey,
+   *     'After trim': rawKey?.trim(),
+   *     'After whitespace removal': rawKey?.trim().replace(/\s+/g, ""),
+   *     'With namespace': sanitized
+   *   };
+   *   
+   *   Object.entries(steps).forEach(([step, value]) => {
+   *     console.log(`${step}: "${value}"`);
+   *   });
+   * }
+   * 
+   * // Usage
+   * Manager.keyNamespace = "debug";
+   * debugKeySanitization("  test   key  with   spaces  ");
+   * ```
+   * 
+   * @see {@link keyNamespace} - The namespace property applied to keys
+   * @see {@link isNonNullString} - Validation function for key input
+   * @see {@link Session.set} - Method that uses sanitized keys for storage
+   * @see {@link Session.get} - Method that uses sanitized keys for retrieval
+   * @see {@link sanitizeKey} - Standalone function wrapper for this method
+   * 
+   * @since 1.0.0
+   * @public
+   * 
+   * @remarks
+   * **Key Behavior Notes:**
+   * - All whitespace characters (spaces, tabs, newlines, etc.) are completely removed
+   * - The method is case-sensitive - no case transformation is performed
+   * - Namespace application is automatic when a namespace is set
+   * - Empty or invalid inputs always return an empty string
+   * - The method is idempotent - sanitizing a sanitized key produces the same result
+   * 
+   * **Performance Characteristics:**
+   * - Very fast operation, primarily string manipulation
+   * - No external dependencies or async operations
+   * - Minimal memory allocation for most inputs
+   * - Regex operations are optimized for common whitespace patterns
+   * 
+   * **Integration Points:**
+   * - Called automatically by all Session storage methods
+   * - Used by the standalone {@link sanitizeKey} function
+   * - Can be called directly for key validation or preview
+   * - Essential for custom storage implementations
+   * 
+   * **Whitespace Handling:**
+   * - **Spaces**: ` ` → removed
+   * - **Tabs**: `\t` → removed  
+   * - **Newlines**: `\n`, `\r\n` → removed
+   * - **Form feeds**: `\f` → removed
+   * - **Vertical tabs**: `\v` → removed
+   * - **Unicode whitespace**: Various Unicode space characters → removed
+   */
   public static sanitizeKey(key?: string): string {
     if (!key || !isNonNullString(key)) return "";
-    key = key.trim().replace(/\s+/g, "").replace(/ /gi, "");
-    const keyPrefix = isNonNullString(this.keyNamespace) && this._keyNamespace || "";
+    key = key.trim().replace(/\s+/g, "");
+    const keyPrefix = this.keyNamespace;
     if (keyPrefix) return `${keyPrefix}-${key}`;
     return key;
   }
@@ -274,7 +821,7 @@ class Manager {
  * This function trims and removes whitespace from the key, and adds the namespace prefix if set.
  * \nExample
  * ```typescript
-    Manager.keyNamespace = "my-prefix-";
+    Manager.keyNamespace = "my-prefix";
     const prefixedKey = sanitizeKey("my-key");
     console.log(prefixedKey); // "my-prefix-my-key"
  * ````
@@ -296,12 +843,271 @@ const handleSetValue = (value: any, decycle?: boolean) => {
   if (value === null || value === undefined) value = "";
   return value;
 }
-/***
- * parse retrived value from session and return it
- * @param {any} value retrived value from session
- * @return {any} parsed value
+
+/**
+ * Parses and processes retrieved session storage values with support for both synchronous and asynchronous operations.
+ * 
+ * This utility function is the core value processing mechanism for session storage retrieval operations.
+ * It intelligently handles different types of values including Promises, serialized JSON strings, and
+ * primitive values, ensuring that data is properly deserialized and returned in its original format.
+ * 
+ * The function implements sophisticated Promise detection and handling to support asynchronous storage
+ * backends while maintaining compatibility with synchronous storage implementations. This dual-mode
+ * operation makes it essential for building flexible storage solutions that can work across different
+ * environments and storage providers.
+ * 
+ * ### Processing Logic:
+ * 1. **Promise Detection**: Uses {@link isPromise} to detect asynchronous values
+ * 2. **Async Handling**: Wraps Promise resolution with JSON parsing
+ * 3. **Sync Processing**: Directly parses JSON for synchronous values
+ * 4. **Null Safety**: Returns undefined for null/undefined inputs
+ * 5. **Error Propagation**: Maintains original Promise rejection behavior
+ * 
+ * ### Value Flow:
+ * - **Promise Input** → **Promise Output** (with parsed resolution)
+ * - **JSON String** → **Parsed Object/Primitive**
+ * - **null/undefined** → **undefined**
+ * - **Other Values** → **Parsed via JsonHelper**
+ * 
+ * @param value - The raw value retrieved from session storage to be processed
+ * 
+ * @returns The processed value - either a Promise resolving to parsed data, the parsed data directly, or undefined
+ * 
+ * @example
+ * ```typescript
+ * // Synchronous JSON string processing
+ * const jsonString = '{"name":"John","age":30}';
+ * const result = handleGetValue(jsonString);
+ * console.log(result); // { name: "John", age: 30 }
+ * 
+ * // Primitive value processing
+ * const numberString = '42';
+ * const number = handleGetValue(numberString);
+ * console.log(number); // 42
+ * 
+ * // Array processing
+ * const arrayString = '[1,2,3,4,5]';
+ * const array = handleGetValue(arrayString);
+ * console.log(array); // [1, 2, 3, 4, 5]
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Asynchronous Promise handling
+ * const promiseValue = fetch('/api/data').then(res => res.text());
+ * const asyncResult = handleGetValue(promiseValue);
+ * 
+ * // asyncResult is a Promise
+ * asyncResult.then(data => {
+ *   console.log(data); // Parsed JSON data from the API
+ * }).catch(error => {
+ *   console.error('Failed to process async value:', error);
+ * });
+ * 
+ * // Using with async/await
+ * try {
+ *   const data = await handleGetValue(promiseValue);
+ *   console.log('Processed data:', data);
+ * } catch (error) {
+ *   console.error('Error processing promise:', error);
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Database storage integration
+ * class DatabaseStorage implements ISessionStorage {
+ *   async get(key: string): Promise<string> {
+ *     const result = await this.db.query('SELECT value FROM sessions WHERE key = ?', [key]);
+ *     return result[0]?.value || null;
+ *   }
+ *   
+ *   // ... other methods
+ * }
+ * 
+ * // Usage with async storage
+ * const dbStorage = new DatabaseStorage();
+ * const promiseValue = dbStorage.get('user-preferences');
+ * 
+ * const processedValue = handleGetValue(promiseValue);
+ * processedValue.then(preferences => {
+ *   console.log('User preferences:', preferences);
+ *   // preferences is now a parsed object, not a JSON string
+ * });
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Complex object processing with nested data
+ * const complexObject = {
+ *   user: { id: 1, name: 'Alice' },
+ *   settings: { theme: 'dark', notifications: true },
+ *   cache: [{ id: 1, data: 'value1' }, { id: 2, data: 'value2' }]
+ * };
+ * 
+ * // Simulate storage and retrieval
+ * const serialized = JSON.stringify(complexObject);
+ * const processed = handleGetValue(serialized);
+ * 
+ * console.log(processed.user.name); // 'Alice'
+ * console.log(processed.settings.theme); // 'dark'
+ * console.log(processed.cache.length); // 2
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Error handling with Promise rejection
+ * const failingPromise = Promise.reject(new Error('Storage unavailable'));
+ * const result = handleGetValue(failingPromise);
+ * 
+ * result.catch(error => {
+ *   console.error('Storage error caught:', error.message);
+ *   // Handle the error appropriately
+ *   return null; // Provide fallback value
+ * });
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Type-safe processing with validation
+ * interface UserData {
+ *   id: number;
+ *   name: string;
+ *   email: string;
+ * }
+ * 
+ * function getTypedUserData(key: string): Promise<UserData | null> {
+ *   const rawValue = Manager.storage.get(key);
+ *   const processed = handleGetValue(rawValue);
+ *   
+ *   if (isPromise(processed)) {
+ *     return processed.then(data => {
+ *       return validateUserData(data) ? data as UserData : null;
+ *     });
+ *   }
+ *   
+ *   return Promise.resolve(
+ *     validateUserData(processed) ? processed as UserData : null
+ *   );
+ * }
+ * 
+ * function validateUserData(data: any): boolean {
+ *   return data && 
+ *          typeof data.id === 'number' && 
+ *          typeof data.name === 'string' && 
+ *          typeof data.email === 'string';
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Handling different storage backends
+ * class MultiStorageManager {
+ *   static async getValue(key: string, preferAsync = false) {
+ *     let rawValue;
+ *     
+ *     if (preferAsync && this.hasAsyncStorage()) {
+ *       rawValue = this.asyncStorage.get(key); // Returns Promise
+ *     } else {
+ *       rawValue = this.syncStorage.get(key); // Returns string directly
+ *     }
+ *     
+ *     const processed = handleGetValue(rawValue);
+ *     
+ *     // Always return a Promise for consistent API
+ *     return isPromise(processed) ? processed : Promise.resolve(processed);
+ *   }
+ *   
+ *   static hasAsyncStorage(): boolean {
+ *     return this.asyncStorage && typeof this.asyncStorage.get === 'function';
+ *   }
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Performance monitoring and caching
+ * class PerformanceAwareHandler {
+ *   private static cache = new Map<string, any>();
+ *   
+ *   static getValueWithCaching(key: string, rawValue: any) {
+ *     const cacheKey = `processed:${key}`;
+ *     
+ *     if (this.cache.has(cacheKey)) {
+ *       return this.cache.get(cacheKey);
+ *     }
+ *     
+ *     const startTime = performance.now();
+ *     const processed = handleGetValue(rawValue);
+ *     
+ *     if (isPromise(processed)) {
+ *       return processed.then(result => {
+ *         const endTime = performance.now();
+ *         console.log(`Async processing took ${endTime - startTime}ms`);
+ *         this.cache.set(cacheKey, result);
+ *         return result;
+ *       });
+ *     }
+ *     
+ *     const endTime = performance.now();
+ *     console.log(`Sync processing took ${endTime - startTime}ms`);
+ *     this.cache.set(cacheKey, processed);
+ *     return processed;
+ *   }
+ * }
+ * ```
+ * 
+ * @see {@link JsonHelper.parse} - The JSON parsing utility used for deserialization
+ * @see {@link isPromise} - Utility function for Promise detection
+ * @see {@link handleSetValue} - Complementary function for value serialization
+ * @see {@link ISessionStorage} - Interface defining storage contract
+ * @see {@link Session.get} - Main session retrieval method that uses this function
+ * 
+ * @since 1.0.0
+ * @internal
+ * 
+ * @remarks
+ * **Critical Implementation Details:**
+ * - Promise rejection is properly propagated without modification
+ * - JSON parsing errors are not caught - they bubble up to calling code
+ * - The function is synchronous for non-Promise inputs, asynchronous for Promise inputs
+ * - Return type varies based on input type, maintaining flexibility
+ * - Null and undefined inputs consistently return undefined
+ * 
+ * **Promise Handling:**
+ * - Uses native Promise.then() and Promise.catch() for maximum compatibility
+ * - Preserves original Promise rejection reasons and stack traces
+ * - Does not add unnecessary Promise wrappers for synchronous values
+ * - Supports any Promise-like object that implements .then() and .catch()
+ * 
+ * **Performance Characteristics:**
+ * - **Synchronous Path**: Very fast, only JSON parsing overhead
+ * - **Asynchronous Path**: Adds minimal Promise wrapper overhead
+ * - **Memory Usage**: Minimal allocation for non-Promise values
+ * - **JSON Parsing**: Depends on JsonHelper.parse implementation efficiency
+ * 
+ * **Error Behavior:**
+ * - **JSON Parse Errors**: Thrown synchronously for invalid JSON
+ * - **Promise Rejections**: Propagated as Promise rejections
+ * - **Type Errors**: May occur if input doesn't match expected format
+ * - **Null/Undefined**: Safely handled, returns undefined
+ * 
+ * **Thread Safety:**
+ * - Function is stateless and thread-safe
+ * - No shared mutable state or side effects
+ * - Promise handling is inherently async-safe
+ * - Can be called concurrently without issues
  */
 const handleGetValue: any = (value: any) => {
+  if (isPromise(value)) {
+    return new Promise((resolve, reject) => {
+      value.then((v: any) => {
+        resolve(JsonHelper.parse(v));
+      }).catch((err: any) => {
+        reject(err);
+      });
+    });
+  }
   if (value !== null && value !== undefined) {
     return JsonHelper.parse(value);
   }

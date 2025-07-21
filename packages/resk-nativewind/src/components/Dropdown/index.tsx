@@ -101,8 +101,8 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         }
         const { item, index } = opts;
         if (item && isObj<ItemType>(item)) {
-            if (isNonNullString(this.props.valueField)) {
-                const v = (item)[this.props.valueField];
+            if (isNonNullString(this.props.itemValueField)) {
+                const v = (item)[this.props.itemValueField];
                 if (!isEmpty(v)) {
                     return v as ValueType;
                 }
@@ -116,8 +116,8 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         return undefined;
     }
     filterItem(options: IDropdownPreparedItem<ItemType, ValueType>, index: number): boolean {
-        if (typeof this.props.filter == "function") {
-            return this.props.filter(options, index);
+        if (typeof this.props.filterItem == "function") {
+            return this.props.filterItem(options, index);
         }
         return true;
     }
@@ -174,9 +174,9 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         }
     }
     getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> } {
-        const { multiple } = this.props;
+        const { allowMultiple } = this.props;
         const sItemsByKeys: Record<string, IDropdownPreparedItem<ItemType, ValueType>> = {};
-        const vals = multiple ? (Array.isArray(defaultValue) ? defaultValue : typeof defaultValue === "string" ? (defaultValue.trim().split(",") as unknown as ValueType[]) : []) : [defaultValue];
+        const vals = allowMultiple ? (Array.isArray(defaultValue) ? defaultValue : typeof defaultValue === "string" ? (defaultValue.trim().split(",") as unknown as ValueType[]) : []) : [defaultValue];
         const selectedValues: ValueType[] = [];
         itemsByHashKey = isObj(itemsByHashKey) && itemsByHashKey ? itemsByHashKey : this.state.itemsByHashKey;
         vals.map((value) => {
@@ -207,12 +207,12 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         return Array.isArray(this.state.preparedItems) ? this.state.preparedItems : [];
     }
     callOnChange(preparedItem?: IDropdownPreparedItem<ItemType, ValueType>) {
-        const { onChange, multiple } = this.props;
+        const { onChange, allowMultiple } = this.props;
         if (typeof onChange == "function") {
             setTimeout(() => {
                 onChange({
                     ...Object.assign({}, preparedItem),
-                    value: multiple ? this.state.selectedValues : this.state.selectedValues[0],
+                    value: allowMultiple ? this.state.selectedValues : this.state.selectedValues[0],
                     dropdown: this
                 });
             }, 10);
@@ -222,8 +222,8 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         if (!isObj(preparedItem) || !isNonNullString(preparedItem.hashKey)) return;
         const newItemStatus = !this.isSelectedByHashKey(preparedItem.hashKey);
         const newState: IDropdownState<ItemType, ValueType> = {} as IDropdownState<ItemType, ValueType>;
-        const { multiple } = this.props;
-        if (multiple) {
+        const { allowMultiple } = this.props;
+        if (allowMultiple) {
             newState.selectedValues = newItemStatus ? [...this.state.selectedValues, preparedItem.value] : this.state.selectedValues.filter((v) => this.getHashKey(v) !== preparedItem.hashKey);
             newState.selectedItemsByHashKey = Object.assign({}, this.state.selectedItemsByHashKey);
             if (newItemStatus) {
@@ -286,12 +286,12 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         return this.state.searchText;
     }
     unselectAll = () => {
-        const { multiple, required } = this.props;
+        const { allowMultiple, required } = this.props;
         if (required) {
             return;
         }
         const nState: Partial<IDropdownState<ItemType, ValueType>> = { selectedItemsByHashKey: {}, selectedValues: [] };
-        if (!multiple) {
+        if (!allowMultiple) {
             nState.visible = false;
         }
         this.setState(nState as IDropdownState<ItemType, ValueType>, () => {
@@ -331,7 +331,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
 }
 
 function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    let { anchorContainerClassName, loadingProgressBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, showAnchorChevron, ...props } = context.props;
+    let { anchorContainerClassName, loadingBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, allowMultiple, value, showAnchorChevron, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
     testID = context.getTestID();
@@ -383,7 +383,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
                 });
             }
         }
-        if (multiple) {
+        if (allowMultiple) {
             if (actions.length) {
                 actions.push({ divider: true })
             }
@@ -421,7 +421,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
             })
         }
         return actions;
-    }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
+    }, [dropdownActions, allowMultiple, context.isOpen(), context, anchorSelectedText]);
     const anchorProps: ITextInputProps = {
         numberOfLines: 1,
         ...props,
@@ -465,8 +465,9 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
         >
             <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable !== false ? () => context.open?.() : undefined}>
                 <>
-                    {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
-                        :
+                    {typeof anchor == "function"
+                        ? anchor({ ...anchorProps, selectedItems, selectedValues, allowMultiple: !!allowMultiple, isLoading, dropdown: context })
+                        : anchor ||
                         <TextInput
                             {...anchorProps}
                             right={showAnchorChevron !== false ? (options) => {
@@ -482,7 +483,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
                                 </>
                             } : anchorProps.right}
                         />}
-                    {isLoading ? <ProgressBar variant={loadingProgressBarVariant} indeterminate testID={testID + "dropdown-progressbar"} /> : null}
+                    {isLoading ? <ProgressBar variant={loadingBarVariant} indeterminate testID={testID + "dropdown-progressbar"} /> : null}
                 </>
             </Tooltip>
         </Div>}
@@ -498,7 +499,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
 
 function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType>[], canRenderSeach: boolean, context: IDropdownContext<ItemType, ValueType> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
-    const { searchInputProps, error, dropdownActionsMenuClassName, dropdownActionsMenuIconName, dropdownActionsMenuIconVariant } = context.props;
+    const { searchInputProps, error, actionsMenuClassName, actionsIconName, actionsIconVariant } = context.props;
     const listProps = Object.assign({}, context.props.listProps);
     const testID = context?.getTestID();
     const menuContext = useMenu();
@@ -550,9 +551,9 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, acti
                         minWidth={150}
                         preferedPositionAxis="vertical"
                         anchor={<FontIcon
-                            name={dropdownActionsMenuIconName || FONT_ICONS.MORE as never}
-                            className={dropdownActionsMenuClassName}
-                            variant={{ size: "25px", ...dropdownActionsMenuIconVariant }}
+                            name={actionsIconName || FONT_ICONS.MORE as never}
+                            className={actionsMenuClassName}
+                            variant={{ size: "25px", ...actionsIconVariant }}
                         />}
                     />
                 )
@@ -588,7 +589,7 @@ const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedI
         dispatch(Object.create(null));
     }, []);
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
-    const { multiple, selectedIconName, itemClassName, itemVariant, itemContainerClassName } = context.props;
+    const { allowMultiple, selectedIconName, itemClassName, itemVariant, itemContainerClassName } = context.props;
     const testID = context.getTestID();
     const computedVariant = dropdownItemVariant(itemVariant);
     const isSelected = useMemo(() => {
@@ -636,7 +637,7 @@ const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedI
             testID={testID + "-item-container-" + hashKey}
         >
             <Div className={cn("px-[10px] flex flex-row items-center justify-start text-left flex-nowrap", computedVariant.base(), itemClassName)} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon className={cn("mr-[5px]", computedVariant.selectedIcon())} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} /> : null}
+                {isSelected ? <FontIcon className={cn("mr-[5px]", computedVariant.selectedIcon())} name={(isNonNullString(selectedIconName) ? selectedIconName : allowMultiple ? "check" : "radiobox-marked") as never} /> : null}
                 {<Text className={cn(isSelected ? computedVariant.selectedLabel() : computedVariant.label())}>{label}</Text>}
             </Div>
         </Tooltip>
@@ -662,92 +663,6 @@ export interface IDropdownContext<ItemType = unknown, ValueType = unknown> exten
     anchorSelectedText?: string;
 }
 
-/**
- * Represents the state of a dropdown component.
- * 
- * This interface defines the structure of the state that manages the items, 
- * selection, visibility, and prepared items within a dropdown. It provides 
- * essential information needed to render the dropdown and handle user interactions.
- * 
- * @interface IDropdownState
- * @template ItemType - The type of the item being represented.
- * @template ValueType - The type of the value associated with the item.
- * 
- * @property {Record<string, IDropdownPreparedItem<ItemType, ValueType>>} itemsByHashKey - 
- * A record of prepared items indexed by their unique hash keys. This allows for 
- * efficient access to items within the dropdown.
- * 
- * @property {ValueType[]} selectedValues - An array of values representing the 
- * currently selected items in the dropdown. This can be used to track user 
- * selections and manage the state of the dropdown.
- * 
- * @property {boolean} visible - A boolean flag indicating whether the dropdown 
- * is currently visible. This is useful for controlling the display of the dropdown 
- * based on user interactions.
- * 
- * @property {Record<string, IDropdownPreparedItem<ItemType, ValueType>>} selectedItemsByHashKey - 
- * A record of selected items indexed by their unique hash keys. This allows for 
- * quick access to the selected items and their associated data.
- * 
- * @property {IDropdownPreparedItem<ItemType, ValueType>[]} preparedItems - 
- * An array of prepared items that are ready to be displayed in the dropdown. 
- * This array contains the items that have been processed and formatted for rendering.
- * 
- * @example
- * // Example usage of the IDropdownState interface
- * 
- * const dropdownState: IDropdownState<{ id: number }, string> = {
- *     itemsByHashKey: {
- *         "item-1-hash": {
- *             value: "item-1",
- *             hashKey: "item-1-hash",
- *             item: { id: 1 },
- *             label: <span>Item 1</span>, // ReactNode
- *             labelText: "Item 1" // Plain text representation
- *         },
- *         "item-2-hash": {
- *             value: "item-2",
- *             hashKey: "item-2-hash",
- *             item: { id: 2 },
- *             label: <span>Item 2</span>, // ReactNode
- *             labelText: "Item 2" // Plain text representation
- *         }
- *     },
- *     selectedValues: ["item-1"],
- *     visible: true,
- *     selectedItemsByHashKey: {
- *         "item-1-hash": {
- *             value: "item-1",
- *             hashKey: "item-1-hash",
- *             item: { id: 1 },
- *             label: <span>Item 1</span>, // ReactNode
- *             labelText: "Item 1" // Plain text representation
- *         }
- *     },
- *     preparedItems: [
- *         {
- *             value: "item-1",
- *             hashKey: "item-1-hash",
- *             item: { id: 1 },
- *             label: <span>Item 1</span>, // ReactNode
- *             labelText: "Item 1" // Plain text representation
- *         },
- *         {
- *             value: "item-2",
- *             hashKey: "item-2-hash",
- *             item: { id: 2 },
- *             label: <span>Item 2</span>, // ReactNode
- *             labelText: "Item 2" // Plain text representation
- *         }
- *     ]
- * };
- * 
- * @remarks
- * - This interface is particularly useful for managing the internal state of 
- *   dropdown components, allowing for efficient rendering and interaction.
- * - Ensure that the `itemsByHashKey` and `selectedItemsByHashKey` are kept 
- *   in sync to avoid inconsistencies in the dropdown state.
- */
 export interface IDropdownState<ItemType = unknown, ValueType = unknown> {
     itemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>>,
     selectedValues: ValueType[]
@@ -869,48 +784,6 @@ export interface IDropdownOnChangeOptions<ItemType = unknown, ValueType = unknow
     dropdown: IDropdownContext<ItemType, ValueType>;
 };
 
-/**
- * Represents the options provided to callback functions in a dropdown component.
- * 
- * This interface defines the structure of the options that are passed to callback 
- * functions when interacting with items in a dropdown. It provides essential 
- * information about the item being interacted with, including its index and 
- * a flag indicating that the context is within a dropdown.
- * 
- * @interface IDropdownCallOptions
- * @template ItemType - The type of the item being represented.
- * @template ValueType - The type of the value associated with the item.
- * 
- * @property {ItemType} item - The item that is being interacted with. This can be any 
- * type of data structure that contains the information needed for the dropdown item.
- * 
- * @property {number} index - The index of the item within the dropdown list. This 
- * can be useful for identifying the position of the item in the list, especially 
- * when multiple items are present.
- * 
- * @property {boolean} isDropdown - A boolean flag that indicates whether the context 
- * is within a dropdown. This is typically set to `true` and can be used to differentiate 
- * between dropdown interactions and other types of interactions in the application.
- * 
- * @example
- * // Example usage of the IDropdownCallOptions interface
- * 
- * const handleDropdownItemClick = (options: IDropdownCallOptions<{ id: number }, string>) => {
- *     console.log(`Item clicked: ${options.item}, Index: ${options.index}`);
- *     // Perform actions based on the clicked item
- * };
- * 
- * // Simulating a dropdown item click
- * const dropdownItem = { id: 1, name: "Item 1" };
- * handleDropdownItemClick({ item: dropdownItem, index: 0, isDropdown: true });
- * // Output: Item clicked: [object Object], Index: 0
- * 
- * @remarks
- * - This interface is particularly useful in dropdown components where callback 
- * functions need to receive contextual information about the item being interacted with.
- * - Ensure that the `isDropdown` property is consistently set to `true` when using this 
- * interface in dropdown-related callbacks.
- */
 export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown> {
     item: ItemType; // The item being interacted with
     index: number; // The index of the item in the dropdown list
@@ -945,11 +818,11 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
      * @returns {string} - The text of the item.
      */
     getItemText?: (options: IDropdownCallOptions<ItemType, ValueType> & { computedLabel: ReactNode }) => string;
-    multiple?: boolean; // Flag for multiple selections
+    allowMultiple?: boolean; // Flag for multiple selections
     onChange?: (options: IDropdownOnChangeOptions<ItemType, ValueType>) => void; // Callback for value changes
     defaultValue?: ValueType | ValueType[]; // Default value(s) for the dropdown
     getHashKey?: (value: ValueType) => string; // Function to get unique hash key
-    filter?: (preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean; // Function to filter items
+    filterItem?: (preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean; // Function to filter items
     listProps?: FlatListProps<IDropdownPreparedItem<ItemType, ValueType>>; // Props for the item list
 
     /**
@@ -984,17 +857,17 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
     /***
         The variants for the dropdown actions menu icon
     */
-    dropdownActionsMenuIconVariant?: IIconVariant;
+    actionsIconVariant?: IIconVariant;
 
     /***
         The icon name for the dropdown actions menu icon
     */
-    dropdownActionsMenuIconName?: IFontIconName;
+    actionsIconName?: IFontIconName;
 
     /***
         The class name for the dropdown actions menu icon
     */
-    dropdownActionsMenuClassName?: IClassName;
+    actionsMenuClassName?: IClassName;
 
     /***
      * The name of the icon to be used for the selected state of the dropdown items.
@@ -1025,20 +898,46 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
     itemContainerClassName?: IClassName;
 
     /***
-     * The props for the anchor component.
-     * This allows for customization of the anchor's appearance and behavior.
-     * By default, it's rendered as a TextInput component.
+     * Custom anchor component for the dropdown.
+     * This allows for complete customization of the dropdown's trigger element.
+     * 
+     * Can be either:
+     * - A function that receives anchor props and returns a ReactElement (recommended for dynamic behavior)
+     * - A direct ReactElement (for static custom anchors)
+     * 
+     * When using a function, you get access to:
+     * - All TextInput props (except onChange)
+     * - dropdown: The dropdown context for accessing methods and state
+     * - isLoading: Current loading state
+     * - allowMultiple: Whether multiple selection is enabled
+     * - selectedItems: Array of currently selected items
+     * - selectedValues: Array of currently selected values
+     * 
+     * By default, it's rendered as a TextInput component with chevron icon.
+     * 
+     * @example
+     * // Function approach (recommended)
+     * anchor={({ selectedItems, dropdown, isLoading, ...textInputProps }) => (
+     *   <TouchableOpacity onPress={() => dropdown.toggle()}>
+     *     <Text>{selectedItems.length} items selected</Text>
+     *   </TouchableOpacity>
+     * )}
+     * 
+     * // Direct element approach
+     * anchor={<CustomButton title="Open Dropdown" />}
      */
-    anchor?: (options: Omit<ITextInputProps, "onChange"> & {
+    anchor?:
+    | ((options: Omit<ITextInputProps, "onChange"> & {
         dropdown: IDropdownContext<ItemType, ValueType>;
         isLoading: boolean;
-        multiple: boolean;
+        allowMultiple: boolean;
         /***
          * The selected items.
          */
         selectedItems: ItemType[];
         selectedValues: ValueType[];
-    }) => ReactElement;
+    }) => ReactElement)
+    | ReactElement;
 
     /***
      * Use When getItemLabel is not specified
@@ -1051,12 +950,12 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
      * Use When getItemValue is not specified
      * It represent the field of the item to be used as value when ItemType is an object
      */
-    valueField?: keyof ItemType | string;
+    itemValueField?: keyof ItemType | string;
 
     /**
      * The variants for the progress bar that is displayed when the dropdown is loading
      */
-    loadingProgressBarVariant?: IProgressBarVariant;
+    loadingBarVariant?: IProgressBarVariant;
 
     /**
      * Controls the visibility of the chevron-down icon displayed on the right side of the dropdown anchor (TextInput).

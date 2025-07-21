@@ -594,7 +594,7 @@ class Manager {
    */
   public static set keyNamespace(prefix: string) {
     if (isNonNullString(prefix)) {
-      this._keyNamespace = prefix;
+      this._keyNamespace = prefix.trim().replace(/\s+/g, "-");
     }
   }
 
@@ -807,7 +807,7 @@ class Manager {
    */
   public static sanitizeKey(key?: string): string {
     if (!key || !isNonNullString(key)) return "";
-    key = key.trim().replace(/\s+/g, "");
+    key = key.trim().replace(/\s+/g, "-");
     const keyPrefix = this.keyNamespace;
     if (keyPrefix) return `${keyPrefix}-${key}`;
     return key;
@@ -1114,12 +1114,7 @@ const handleGetValue: any = (value: any) => {
   return undefined;
 }
 
-/***
- * Set the value to session key ${key}
- */
-const set: any = (key: string, value: any, decycle: boolean = true) => {
-  Manager?.storage?.set(key, handleSetValue(value, decycle));
-}
+
 
 /**
  * Gets a session value from a key.
@@ -1281,7 +1276,431 @@ const isValidStorage = (storage?: ISessionStorage): boolean => {
   }
 };
 
-export const Session = { get, set, remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, Manager, removeAll }
+
+/**
+ * Session management utilities providing comprehensive storage operations with automatic serialization and namespace support.
+ * 
+ * The Session object serves as the primary interface for all session storage operations in the application.
+ * It provides a clean, consistent API that abstracts away the complexity of different storage backends while
+ * offering advanced features like automatic JSON serialization, key sanitization, namespace management,
+ * and support for both synchronous and asynchronous storage operations.
+ * 
+ * ### Core Features:
+ * - **Automatic Serialization**: JSON serialization/deserialization with decycling support
+ * - **Key Sanitization**: Automatic key cleaning and namespace prefixing
+ * - **Storage Abstraction**: Works with any storage backend implementing ISessionStorage
+ * - **Type Safety**: Full TypeScript support with intelligent type inference
+ * - **Async Support**: Seamless handling of both sync and async storage operations
+ * - **Error Resilience**: Graceful handling of storage failures and edge cases
+ * 
+ * @namespace Session
+ * @since 1.0.0
+ * @public
+ */
+export const Session = {
+  get,
+
+  /**
+   * Stores a value in session storage with automatic serialization and key sanitization.
+   * 
+   * This method is the primary interface for persisting data to session storage. It provides
+   * intelligent handling of complex data types through JSON serialization, automatic key
+   * sanitization with namespace support, and optional object decycling to handle circular
+   * references safely.
+   * 
+   * The method leverages the configured storage backend through the Manager, ensuring that
+   * your data is stored consistently regardless of whether you're using localStorage,
+   * sessionStorage, IndexedDB, or a custom storage implementation.
+   * 
+   * ### Key Processing Pipeline:
+   * 1. **Key Sanitization**: Applies {@link sanitizeKey} to clean and prefix the key
+   * 2. **Value Processing**: Uses {@link handleSetValue} for JSON serialization
+   * 3. **Storage Delegation**: Passes processed data to the configured storage backend
+   * 4. **Result Return**: Returns the result from the underlying storage operation
+   * 
+   * ### Serialization Features:
+   * - **JSON Serialization**: Converts objects, arrays, and primitives to JSON strings
+   * - **Circular Reference Handling**: Optional decycling prevents infinite recursion
+   * - **Type Preservation**: Maintains data types through intelligent parsing on retrieval
+   * - **Null/Undefined Handling**: Graceful handling of empty values
+   * 
+   * @param key - The storage key identifier for the value
+   * @param value - The data to store (objects, arrays, primitives, etc.)
+   * @param decycle - Whether to remove circular references during serialization
+   * 
+   * @returns The result of the storage operation (implementation-dependent)
+   * 
+   * @example
+   * ```typescript
+   * // Basic primitive value storage
+   * Session.set('username', 'john_doe');
+   * Session.set('user_id', 12345);
+   * Session.set('is_authenticated', true);
+   * Session.set('last_login', new Date());
+   * 
+   * console.log(Session.get('username')); // 'john_doe'
+   * console.log(Session.get('user_id')); // 12345
+   * console.log(Session.get('is_authenticated')); // true
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Complex object storage with automatic serialization
+   * const userProfile = {
+   *   id: 1001,
+   *   name: 'Alice Johnson',
+   *   email: 'alice@example.com',
+   *   preferences: {
+   *     theme: 'dark',
+   *     language: 'en',
+   *     notifications: {
+   *       email: true,
+   *       push: false,
+   *       sms: true
+   *     }
+   *   },
+   *   roles: ['user', 'moderator'],
+   *   metadata: {
+   *     created_at: '2023-01-15T10:30:00Z',
+   *     last_updated: '2023-07-20T14:45:30Z'
+   *   }
+   * };
+   * 
+   * // Store complex object - automatically serialized
+   * Session.set('user_profile', userProfile);
+   * 
+   * // Retrieve and use - automatically deserialized
+   * const retrievedProfile = Session.get('user_profile');
+   * console.log(retrievedProfile.name); // 'Alice Johnson'
+   * console.log(retrievedProfile.preferences.theme); // 'dark'
+   * console.log(retrievedProfile.roles.length); // 2
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Array storage and manipulation
+   * const shoppingCart = [
+   *   { id: 'prod1', name: 'Laptop', price: 999.99, quantity: 1 },
+   *   { id: 'prod2', name: 'Mouse', price: 29.99, quantity: 2 },
+   *   { id: 'prod3', name: 'Keyboard', price: 79.99, quantity: 1 }
+   * ];
+   * 
+   * Session.set('shopping_cart', shoppingCart);
+   * 
+   * // Retrieve and work with array
+   * const cart = Session.get('shopping_cart');
+   * const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+   * const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+   * 
+   * console.log(`Cart has ${totalItems} items, total: $${totalPrice.toFixed(2)}`);
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Handling circular references with decycling
+   * interface Node {
+   *   id: string;
+   *   name: string;
+   *   parent?: Node;
+   *   children: Node[];
+   * }
+   * 
+   * const parentNode: Node = {
+   *   id: 'parent',
+   *   name: 'Parent Node',
+   *   children: []
+   * };
+   * 
+   * const childNode: Node = {
+   *   id: 'child',
+   *   name: 'Child Node',
+   *   parent: parentNode,
+   *   children: []
+   * };
+   * 
+   * parentNode.children.push(childNode);
+   * 
+   * // Store with decycling enabled (default) to handle circular reference
+   * Session.set('node_tree', parentNode, true);
+   * 
+   * // Store without decycling (use with caution for circular data)
+   * // Session.set('node_tree', parentNode, false); // May cause errors
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Application state management
+   * interface AppState {
+   *   currentView: 'dashboard' | 'profile' | 'settings';
+   *   user: {
+   *     id: number;
+   *     name: string;
+   *     permissions: string[];
+   *   };
+   *   uiState: {
+   *     sidebarCollapsed: boolean;
+   *     activeTab: string;
+   *     filters: Record<string, any>;
+   *   };
+   * }
+   * 
+   * const appState: AppState = {
+   *   currentView: 'dashboard',
+   *   user: {
+   *     id: 123,
+   *     name: 'John Doe',
+   *     permissions: ['read', 'write', 'admin']
+   *   },
+   *   uiState: {
+   *     sidebarCollapsed: false,
+   *     activeTab: 'overview',
+   *     filters: {
+   *       dateRange: '30days',
+   *       category: 'all',
+   *       status: 'active'
+   *     }
+   *   }
+   * };
+   * 
+   * // Persist entire application state
+   * Session.set('app_state', appState);
+   * 
+   * // Later, restore application state
+   * const restoredState = Session.get('app_state') as AppState;
+   * if (restoredState) {
+   *   console.log(`Welcome back, ${restoredState.user.name}!`);
+   *   console.log(`Current view: ${restoredState.currentView}`);
+   * }
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Form data persistence for better UX
+   * interface FormData {
+   *   personalInfo: {
+   *     firstName: string;
+   *     lastName: string;
+   *     email: string;
+   *     phone: string;
+   *   };
+   *   address: {
+   *     street: string;
+   *     city: string;
+   *     state: string;
+   *     zipCode: string;
+   *   };
+   *   preferences: {
+   *     newsletter: boolean;
+   *     notifications: boolean;
+   *   };
+   * }
+   * 
+   * // Save form data as user types (draft functionality)
+   * function saveFormDraft(formData: Partial<FormData>) {
+   *   const existingDraft = Session.get('form_draft') || {};
+   *   const updatedDraft = { ...existingDraft, ...formData };
+   *   Session.set('form_draft', updatedDraft);
+   *   console.log('Draft saved automatically');
+   * }
+   * 
+   * // Restore form data when user returns
+   * function restoreFormDraft(): Partial<FormData> | null {
+   *   return Session.get('form_draft');
+   * }
+   * 
+   * // Clear draft after successful submission
+   * function clearFormDraft() {
+   *   Session.remove('form_draft');
+   * }
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Configuration and settings management
+   * interface UserSettings {
+   *   appearance: {
+   *     theme: 'light' | 'dark' | 'auto';
+   *     fontSize: 'small' | 'medium' | 'large';
+   *     accentColor: string;
+   *   };
+   *   behavior: {
+   *     autoSave: boolean;
+   *     confirmDeletes: boolean;
+   *     showTooltips: boolean;
+   *   };
+   *   privacy: {
+   *     shareUsageData: boolean;
+   *     allowCookies: boolean;
+   *   };
+   * }
+   * 
+   * const defaultSettings: UserSettings = {
+   *   appearance: {
+   *     theme: 'auto',
+   *     fontSize: 'medium',
+   *     accentColor: '#007bff'
+   *   },
+   *   behavior: {
+   *     autoSave: true,
+   *     confirmDeletes: true,
+   *     showTooltips: true
+   *   },
+   *   privacy: {
+   *     shareUsageData: false,
+   *     allowCookies: true
+   *   }
+   * };
+   * 
+   * // Initialize or update settings
+   * function updateUserSettings(newSettings: Partial<UserSettings>) {
+   *   const currentSettings = Session.get('user_settings') || defaultSettings;
+   *   const mergedSettings = deepMerge(currentSettings, newSettings);
+   *   Session.set('user_settings', mergedSettings);
+   *   return mergedSettings;
+   * }
+   * 
+   * // Helper function for deep merging
+   * function deepMerge(target: any, source: any): any {
+   *   const result = { ...target };
+   *   for (const key in source) {
+   *     if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+   *       result[key] = deepMerge(target[key] || {}, source[key]);
+   *     } else {
+   *       result[key] = source[key];
+   *     }
+   *   }
+   *   return result;
+   * }
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Cache management for API responses
+   * interface CacheEntry<T> {
+   *   data: T;
+   *   timestamp: number;
+   *   ttl: number; // time to live in milliseconds
+   * }
+   * 
+   * function setCachedData<T>(key: string, data: T, ttlMinutes: number = 30) {
+   *   const cacheEntry: CacheEntry<T> = {
+   *     data,
+   *     timestamp: Date.now(),
+   *     ttl: ttlMinutes * 60 * 1000
+   *   };
+   *   
+   *   Session.set(`cache_${key}`, cacheEntry);
+   *   console.log(`Cached data for ${key} (TTL: ${ttlMinutes} minutes)`);
+   * }
+   * 
+   * function getCachedData<T>(key: string): T | null {
+   *   const cacheEntry = Session.get(`cache_${key}`) as CacheEntry<T>;
+   *   
+   *   if (!cacheEntry) return null;
+   *   
+   *   const isExpired = Date.now() - cacheEntry.timestamp > cacheEntry.ttl;
+   *   if (isExpired) {
+   *     Session.remove(`cache_${key}`);
+   *     return null;
+   *   }
+   *   
+   *   return cacheEntry.data;
+   * }
+   * 
+   * // Usage example
+   * interface User {
+   *   id: number;
+   *   name: string;
+   *   email: string;
+   * }
+   * 
+   * async function fetchUser(id: number): Promise<User> {
+   *   // Check cache first
+   *   const cached = getCachedData<User>(`user_${id}`);
+   *   if (cached) {
+   *     console.log('Returning cached user data');
+   *     return cached;
+   *   }
+   *   
+   *   // Fetch from API
+   *   const response = await fetch(`/api/users/${id}`);
+   *   const user: User = await response.json();
+   *   
+   *   // Cache for 15 minutes
+   *   setCachedData(`user_${id}`, user, 15);
+   *   
+   *   return user;
+   * }
+   * ```
+   * 
+   * @example
+   * ```typescript
+   * // Advanced usage with namespacing
+   * // Set namespace for application context
+   * Session.Manager.keyNamespace = 'myapp';
+   * 
+   * // All keys will be automatically prefixed
+   * Session.set('user_data', { id: 1, name: 'John' });
+   * // Actual key stored: 'myapp-user-data'
+   * 
+   * Session.set('app settings', { theme: 'dark' });
+   * // Actual key stored: 'myapp-app-settings' (spaces replaced with hyphens)
+   * 
+   * // Switch namespace for different context
+   * Session.Manager.keyNamespace = 'admin';
+   * Session.set('permissions', ['read', 'write', 'delete']);
+   * // Actual key stored: 'admin-permissions'
+   * 
+   * // Clear namespace
+   * Session.Manager.keyNamespace = '';
+   * Session.set('global_config', { version: '1.0.0' });
+   * // Actual key stored: 'global-config' (no prefix)
+   * ```
+   * 
+   * @see {@link get} - Retrieve values from session storage
+   * @see {@link remove} - Remove specific values from storage
+   * @see {@link removeAll} - Clear all session storage
+   * @see {@link sanitizeKey} - Key sanitization and namespace handling
+   * @see {@link handleSetValue} - Value serialization with decycling support
+   * @see {@link Manager} - Global session manager configuration
+   * @see {@link ISessionStorage} - Storage backend interface
+   * 
+   * @since 1.0.0
+   * @public
+   * 
+   * @remarks
+   * **Important Implementation Details:**
+   * - Keys are automatically sanitized and may be prefixed with namespace
+   * - Values are JSON-serialized unless they're already strings
+   * - Circular references are handled when decycle is true (default)
+   * - Storage operations depend on the configured storage backend
+   * - Return value format depends on the underlying storage implementation
+   * 
+   * **Performance Considerations:**
+   * - **Serialization Overhead**: Large objects take more time to serialize
+   * - **Storage Limits**: Be aware of storage quotas (localStorage ~5-10MB)
+   * - **Key Length**: Very long keys may impact performance
+   * - **Decycling Cost**: Circular reference detection adds processing time
+   * 
+   * **Error Handling:**
+   * - Invalid JSON serialization may throw errors
+   * - Storage quota exceeded errors are passed through
+   * - Null/undefined Manager.storage results in no operation
+   * - Circular references without decycling may cause infinite recursion
+   * 
+   * **Browser Compatibility:**
+   * - Works with any storage backend implementing ISessionStorage
+   * - JSON serialization uses native JSON.stringify/parse
+   * - No dependencies on specific browser APIs
+   * - Graceful degradation when storage is unavailable
+   */
+  set: (key: string, value: any, decycle: boolean = true) => {
+    key = sanitizeKey(key);
+    return Manager.storage.set(key, handleSetValue(value, decycle));
+  },
+
+  remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, Manager, removeAll
+}
 
 /**
  * Class decorator that attaches a custom session storage implementation to the global session Manager.

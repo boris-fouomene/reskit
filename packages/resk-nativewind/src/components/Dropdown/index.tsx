@@ -331,7 +331,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
 }
 
 function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    let { anchorContainerClassName, loadingProgressBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = context.props;
+    let { anchorContainerClassName, loadingProgressBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, showAnchorChevron, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
     testID = context.getTestID();
@@ -469,7 +469,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
                         :
                         <TextInput
                             {...anchorProps}
-                            right={(options) => {
+                            right={showAnchorChevron !== false ? (options) => {
                                 const { computedVariant } = options;
                                 const r = typeof anchorProps.right === "function" ? anchorProps.right(options) : anchorProps.right;
                                 return <>
@@ -480,7 +480,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
                                     />
                                     {r ?? null}
                                 </>
-                            }}
+                            } : anchorProps.right}
                         />}
                     {isLoading ? <ProgressBar variant={loadingProgressBarVariant} indeterminate testID={testID + "dropdown-progressbar"} /> : null}
                 </>
@@ -1057,6 +1057,12 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
      * The variants for the progress bar that is displayed when the dropdown is loading
      */
     loadingProgressBarVariant?: IProgressBarVariant;
+
+    /**
+     * Whether to show the chevron icon on the dropdown anchor
+     * @default true
+     */
+    showAnchorChevron?: boolean;
 };
 
 /**

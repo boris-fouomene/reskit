@@ -1698,8 +1698,12 @@ export const Session = {
     key = sanitizeKey(key);
     return Manager.storage.set(key, handleSetValue(value, decycle));
   },
-
-  remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, Manager, removeAll
+  remove,
+  handleGetValue,
+  sanitizeKey,
+  handleSetValue,
+  isValidStorage, Manager,
+  removeAll
 }
 
 /**

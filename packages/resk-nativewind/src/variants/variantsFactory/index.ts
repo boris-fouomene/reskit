@@ -153,6 +153,9 @@ export const VariantsOptionsFactory = {
   createTextColor: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof VariantsColors.text, ResultType>) {
     return VariantsOptionsFactory.create<typeof VariantsColors.text, ResultType>(VariantsColors.text, variantMutator);
   },
+  createFillColor: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof VariantsColors.fillColor, ResultType>) {
+    return VariantsOptionsFactory.create<typeof VariantsColors.fillColor, ResultType>(VariantsColors.fillColor, variantMutator);
+  },
   createHoverTextColor: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof VariantsColors.hoverText, ResultType>) {
     return VariantsOptionsFactory.create<typeof VariantsColors.hoverText, ResultType>(VariantsColors.hoverText, variantMutator);
   },

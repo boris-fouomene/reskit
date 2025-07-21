@@ -41,6 +41,7 @@
         hoverRingColors: Record<IName2Foreground,string>;
         activeRingColors: Record<IName2Foreground,string>;
         focusRingColors: Record<IName2Foreground,string>;
+        fillColor:Record<IName2Foreground,string>;
     }
 export const VariantsColors : IVariantsGeneratedColors = {} as any;
     

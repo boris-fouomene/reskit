@@ -193,6 +193,11 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           return [key, value.split("text-").join("focus:ring-")];
         })
       ),
+      fillColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("fill-")];
+        })
+      ),
       allColors,
     },
     null,
@@ -251,6 +256,7 @@ export const VariantsColors = ${content}
         hoverRingColors: Record<IName2Foreground,string>;
         activeRingColors: Record<IName2Foreground,string>;
         focusRingColors: Record<IName2Foreground,string>;
+        fillColor:Record<IName2Foreground,string>;
     }
 export const VariantsColors : IVariantsGeneratedColors = {} as any;
     `,

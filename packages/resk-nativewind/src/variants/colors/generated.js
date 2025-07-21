@@ -876,6 +876,32 @@ export const VariantsColors = {
     "outline-foreground": "focus:ring-gray-900 dark:focus:ring-gray-100",
     "backdrop-foreground": "focus:ring-white dark:focus:ring-white"
   },
+  "fillColor": {
+    "primary": "fill-primary dark:fill-dark-primary",
+    "secondary": "fill-secondary dark:fill-dark-secondary",
+    "surface": "fill-gray-100 dark:fill-gray-800",
+    "background": "fill-white dark:fill-gray-900",
+    "neutral": "fill-gray-500 dark:fill-gray-600",
+    "error": "fill-red-500 dark:fill-red-600",
+    "info": "fill-blue-500 dark:fill-blue-600",
+    "warning": "fill-yellow-500 dark:fill-yellow-600",
+    "success": "fill-green-500 dark:fill-green-600",
+    "text": "fill-gray-900 dark:fill-gray-100",
+    "outline": "fill-gray-300 dark:fill-gray-700",
+    "backdrop": "fill-gray-900/50 dark:fill-gray-900/80",
+    "primary-foreground": "fill-primary-foreground dark:fill-dark-primary-foreground",
+    "secondary-foreground": "fill-secondary-foreground dark:fill-dark-secondary-foreground",
+    "surface-foreground": "fill-gray-900 dark:fill-gray-100",
+    "background-foreground": "fill-gray-900 dark:fill-gray-100",
+    "neutral-foreground": "fill-white dark:fill-gray-50",
+    "error-foreground": "fill-white dark:fill-red-50",
+    "info-foreground": "fill-white dark:fill-blue-50",
+    "warning-foreground": "fill-yellow-900 dark:fill-yellow-50",
+    "success-foreground": "fill-white dark:fill-green-50",
+    "text-foreground": "fill-gray-100 dark:fill-gray-900",
+    "outline-foreground": "fill-gray-900 dark:fill-gray-100",
+    "backdrop-foreground": "fill-white dark:fill-white"
+  },
   "allColors": {}
 }
     

@@ -59,7 +59,7 @@ export function TelInput(props: ITelInputProps) {
         displayPhoneDialCode={false}
         renderTextInput={(inputProps, { formatValue, updateInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
             return <>
-                <CountrySelector
+                <CountrySelector<false>
                     disabled={disabled}
                     readOnly={!editable}
                     allowMultiple={false}

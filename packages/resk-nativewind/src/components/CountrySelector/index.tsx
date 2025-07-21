@@ -10,7 +10,7 @@ import { cn } from "@utils/cn";
 import { ICountrySelectorProps } from "./types";
 
 
-export function CountrySelector({ countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }: ICountrySelectorProps) {
+export function CountrySelector<AllowMultiple = any>({ countryFlagProps: customCountryFlagProps, defaultValue, displayDialCode, label, anchorProps, ...props }: ICountrySelectorProps) {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
@@ -21,8 +21,9 @@ export function CountrySelector({ countryFlagProps: customCountryFlagProps, disp
     props.menuProps.bottomSheetVariant = { minHeight: "threeQuarters", ...props.menuProps.bottomSheetVariant }
     const canDisplayDialCode = displayDialCode !== false;
 
-    return <Dropdown<ICountry, ICountryCode>
+    return <Dropdown<ICountry, ICountryCode, any>
         items={countries}
+        defaultValue={defaultValue as any}
         allowMultiple={false}
         label={label}
         getItemValue={({ item }) => item.code}

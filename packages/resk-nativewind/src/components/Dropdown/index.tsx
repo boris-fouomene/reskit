@@ -24,7 +24,7 @@ import { IIconVariant } from "@variants/icon";
 import { IProgressBarVariant } from "@variants/progressBar";
 
 
-export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends ObservableComponent<IDropdownProps<ItemType, ValueType, AllowMultiple>, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
+export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown> extends ObservableComponent<IDropdownProps<ItemType, ValueType, AllowMultiple>, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
     constructor(props: IDropdownProps<ItemType, ValueType, AllowMultiple>) {
         super(props);
         this.isSelectedByHashKey = this.isSelectedByHashKey.bind(this);
@@ -153,7 +153,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple ext
                 preparedItems.push(preparedItem);
             }
         });
-        return { visible: !!this.state?.visible, itemsByHashKey, preparedItems, ...this.applySearchFilter(this.state?.searchText, preparedItems), ...this.getSelectedValuesAndHashKey(props?.defaultValue, itemsByHashKey) }
+        return { visible: !!this.state?.visible, itemsByHashKey, preparedItems, ...this.applySearchFilter(this.state?.searchText, preparedItems), ...this.getSelectedValuesAndHashKey(props?.defaultValue as any, itemsByHashKey) }
     }
     applySearchFilter(searchText: string, preparedItems?: IDropdownPreparedItem<ItemType, ValueType>[]) {
         searchText = defaultStr(searchText);
@@ -174,7 +174,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple ext
             this.setState(state);
         }
     }
-    getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> } {
+    getSelectedValuesAndHashKey(defaultValue?: IDropdownItemValue<ValueType>, itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> } {
         const { allowMultiple } = this.props;
         const sItemsByKeys: Record<string, IDropdownPreparedItem<ItemType, ValueType>> = {};
         const vals = allowMultiple ? (Array.isArray(defaultValue) ? defaultValue : typeof defaultValue === "string" ? (defaultValue.trim().split(",") as unknown as ValueType[]) : []) : [defaultValue];
@@ -320,7 +320,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple ext
         if (this.props.items !== prevProps.items && !areEquals(this.props.items, prevProps.items)) {
             this.setState(this.prepareState(this.props));
         } else if (prevProps.defaultValue !== this.props.defaultValue && !areEquals(this.props.defaultValue, prevProps.defaultValue)) {
-            this.setState({ ...this.getSelectedValuesAndHashKey(this.props.defaultValue, this.state.itemsByHashKey) });
+            this.setState({ ...this.getSelectedValuesAndHashKey(this.props.defaultValue as any, this.state.itemsByHashKey) });
         }
     }
     getTestID(): string {
@@ -331,7 +331,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple ext
     };
 }
 
-function DropdownRenderer<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean>({ context }: { context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
+function DropdownRenderer<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown>({ context }: { context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
     let { anchorContainerClassName, loadingBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, allowMultiple, value, showAnchorChevron, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
@@ -498,7 +498,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown, AllowMultiple
     </Menu>
 }
 
-function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType, AllowMultiple>[], canRenderSeach: boolean, context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
+function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType, AllowMultiple>[], canRenderSeach: boolean, context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const { searchInputProps, error, actionsMenuClassName, actionsIconName, actionsIconVariant } = context.props;
     const listProps = Object.assign({}, context.props.listProps);
@@ -669,7 +669,7 @@ export interface IDropdownState<ItemType = unknown, ValueType = unknown> {
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export interface IDropdownAction<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends INavItemProps<{ dropdown: Dropdown<ItemType, ValueType, AllowMultiple> }> { }
+export interface IDropdownAction<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown> extends INavItemProps<{ dropdown: Dropdown<ItemType, ValueType, AllowMultiple> }> { }
 
 /**
  * Represents a collection of prepared items in a dropdown component.
@@ -725,14 +725,14 @@ export interface IDropdownAction<ItemType = unknown, ValueType = unknown, AllowM
 export type IDropdownPreparedItems<ItemType = unknown, ValueType = unknown> = Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
 
 
-export interface IDropdownOnChangeOptions<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'> {
+export interface IDropdownOnChangeOptions<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown> extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'> {
     value: IDropdownItemValue<ValueType, AllowMultiple>;
     dropdown: Dropdown<ItemType, ValueType, AllowMultiple>;
 };
 
-export type IDropdownItemValue<ValueType = unknown, AllowMultiple extends boolean = boolean> = AllowMultiple extends true ? ValueType[] : ValueType;
+export type IDropdownItemValue<ValueType = unknown, AllowMultiple = unknown> = AllowMultiple extends true ? ValueType[] : ValueType;
 
-export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> {
+export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown> {
     item: ItemType; // The item being interacted with
     index: number; // The index of the item in the dropdown list
     isDropdown: true; // Indicates that the context is within a dropdown
@@ -798,7 +798,7 @@ export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown, A
  * @see {@link Dropdown} Main dropdown component class
  * @see {@link IDropdownState} Dropdown state interface
  */
-export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends Omit<ITextInputProps, "onChange" | "type" | "ref" | "multiline"> {
+export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMultiple = unknown> extends Omit<ITextInputProps, "onChange" | "type" | "ref" | "multiline"> {
 
     /**
      * Collection of items to be displayed in the dropdown menu.
@@ -2009,17 +2009,3 @@ export interface IDropdownPreparedItem<ItemType = unknown, ValueType = unknown> 
  *   of the dropdown based on these events.
  */
 export type IDropdownEvent = "toggleVisibility" | "selectItem" | "open" | "close" | "toggleItem" | "unselectItem" | "selectAll" | "unselectAll";
-
-function Test() {
-    return <Dropdown<{ a: number, b: number }, number>
-        itemLabelField="a"
-        allowMultiple={true}
-        items={[{
-            a: 1,
-            b: 2
-        }]}
-        onChange={({ value }) => {
-            console.log(value, " i value ")
-        }}
-    />
-}

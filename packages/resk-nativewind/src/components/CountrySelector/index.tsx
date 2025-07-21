@@ -23,7 +23,7 @@ export function CountrySelector({ countryFlagProps: customCountryFlagProps, disp
 
     return <Dropdown<ICountry, ICountryCode>
         items={countries}
-        multiple={false}
+        allowMultiple={false}
         label={label}
         getItemValue={({ item }) => item.code}
         getItemText={({ item }) => `[${item.code}] ${item.name} ( ${item.dialCode.ltrim("+")})`}

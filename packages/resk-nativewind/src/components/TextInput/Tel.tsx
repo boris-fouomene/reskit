@@ -62,7 +62,7 @@ export function TelInput(props: ITelInputProps) {
                 <CountrySelector
                     disabled={disabled}
                     readOnly={!editable}
-                    multiple={false}
+                    allowMultiple={false}
                     defaultValue={phoneCountryCode}
                     menuProps={{ bottomSheetTitle: label }}
                     required

@@ -192,8 +192,9 @@ The framework automatically generates the `IResourceName` and `IResourceActionNa
 To define custom resources and actions in your application, you need to augment the `IResources` interface. This interface defines both resources and their available actions:
 
 ```typescript
+import "IResourceAction" from "@resk/core/resources";
 // In your project's type definitions file (e.g., types/auth.d.ts)
-declare module '@resk/core' {
+declare module '@resk/core/resources' {
   interface IResources {
     documents: {
       actions: {

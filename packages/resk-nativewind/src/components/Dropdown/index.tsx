@@ -17,7 +17,7 @@ import { FONT_ICONS } from '../Icon/Font/icons';
 import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
-import { IFontIconName } from "@components/Icon";
+import { Icon, IFontIconName } from "@components/Icon";
 import { INavItemProps, INavItems } from "@components/Nav";
 import { dropdownItemVariant, IDropdownItemVariant } from "@variants/dropdownItem";
 import { IIconVariant } from "@variants/icon";
@@ -469,6 +469,18 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
                         :
                         <TextInput
                             {...anchorProps}
+                            right={(options) => {
+                                const { computedVariant } = options;
+                                const r = typeof anchorProps.right === "function" ? anchorProps.right(options) : anchorProps.right;
+                                return <>
+                                    <FontIcon
+                                        name={"chevron-down" as never}
+                                        className={cn("resk-dropdown-anchor-cheveron", computedVariant.icon())}
+                                        size={20}
+                                    />
+                                    {r ?? null}
+                                </>
+                            }}
                         />}
                     {isLoading ? <ProgressBar variant={loadingProgressBarVariant} indeterminate testID={testID + "dropdown-progressbar"} /> : null}
                 </>
@@ -512,6 +524,18 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, acti
                 affix={false}
                 debounceTimeout={preparedItems?.length > 500 ? 1000 : preparedItems?.length > 200 ? 100 : 0}
                 {...searchProps}
+                left={(options) => {
+                    const { computedVariant } = options;
+                    const left = typeof searchProps.left === "function" ? searchProps.left(options) : searchProps.left;
+                    return <>
+                        {left ?? null}
+                        <FontIcon
+                            name={"chevron-down" as never}
+                            className={cn("resk-dropdown-anchor-cheveron", computedVariant.icon())}
+                            size={20}
+                        />
+                    </>
+                }}
                 containerClassName={(cn("w-full", searchProps.containerClassName))}
                 //variant={{ borderWidth: 1, borderColor: "surface", borderStyle: "solid", rounded: "10px", ...searchProps.variant }}
                 defaultValue={searchText}

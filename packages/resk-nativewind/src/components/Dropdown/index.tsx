@@ -1059,8 +1059,29 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends
     loadingProgressBarVariant?: IProgressBarVariant;
 
     /**
-     * Whether to show the chevron icon on the dropdown anchor
-     * @default true
+     * Controls the visibility of the chevron-down icon displayed on the right side of the dropdown anchor (TextInput).
+     * 
+     * The chevron icon serves as a visual indicator to users that the element is a dropdown and can be clicked
+     * to reveal additional options. This is a common UI pattern that helps with user experience and accessibility.
+     * 
+     * When set to `false`, the chevron icon will be hidden, which can be useful in scenarios where:
+     * - You want a cleaner, minimalist appearance
+     * - The dropdown nature is already clear from context
+     * - You're using a custom anchor component that provides its own indicator
+     * - You want to save horizontal space in the input field
+     * 
+     * Note: This only affects the default TextInput anchor. If you're using a custom `anchor` function,
+     * this prop has no effect and you'll need to handle the chevron visibility within your custom anchor.
+     * 
+     * @default true - The chevron icon is shown by default
+     * 
+     * @example
+     * // Show chevron (default behavior)
+     * <Dropdown items={items} />
+     * <Dropdown items={items} showAnchorChevron={true} />
+     * 
+     * // Hide chevron for a cleaner look
+     * <Dropdown items={items} showAnchorChevron={false} />
      */
     showAnchorChevron?: boolean;
 };

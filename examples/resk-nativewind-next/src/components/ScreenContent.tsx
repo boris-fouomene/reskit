@@ -99,7 +99,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           />
           <Dropdown
             label="Multi Select"
-            multiple
+            allowMultiple
             items={Array.from({ length: 10000 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
           />
           <CountrySelector

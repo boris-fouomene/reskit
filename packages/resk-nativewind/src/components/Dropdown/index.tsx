@@ -24,8 +24,8 @@ import { IIconVariant } from "@variants/icon";
 import { IProgressBarVariant } from "@variants/progressBar";
 
 
-export class Dropdown<ItemType = unknown, ValueType = unknown> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
-    constructor(props: IDropdownProps<ItemType, ValueType>) {
+export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends ObservableComponent<IDropdownProps<ItemType, ValueType, AllowMultiple>, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
+    constructor(props: IDropdownProps<ItemType, ValueType, AllowMultiple>) {
         super(props);
         this.isSelectedByHashKey = this.isSelectedByHashKey.bind(this);
         this.isSelected = this.isSelected.bind(this);
@@ -39,6 +39,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         };
     }
     private menuContext?: IMenuContext;
+    anchorSelectedText?: string;
     getMenuRef(value: IMenuContext<any>) {
         this.menuContext = value;
     }
@@ -121,7 +122,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
         }
         return true;
     }
-    prepareState(props?: IDropdownProps<ItemType, ValueType>): IDropdownState<ItemType, ValueType> {
+    prepareState(props?: IDropdownProps<ItemType, ValueType, AllowMultiple>): IDropdownState<ItemType, ValueType> {
         const items: ItemType[] = [];
         const itemsByHashKey: IDropdownPreparedItems<ItemType, ValueType> = {};
         const preparedItems: IDropdownPreparedItem<ItemType, ValueType>[] = [];
@@ -212,7 +213,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
             setTimeout(() => {
                 onChange({
                     ...Object.assign({}, preparedItem),
-                    value: allowMultiple ? this.state.selectedValues : this.state.selectedValues[0],
+                    value: (allowMultiple ? this.state.selectedValues : this.state.selectedValues[0]) as any,
                     dropdown: this
                 });
             }, 10);
@@ -312,10 +313,10 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
     }
 
     render() {
-        return <DropdownRenderer<ItemType, ValueType> context={this} />
+        return <DropdownRenderer<ItemType, ValueType, AllowMultiple> context={this} />
     }
 
-    componentDidUpdate(prevProps: Readonly<IDropdownProps<ItemType, ValueType>>, nextContext: any): void {
+    componentDidUpdate(prevProps: Readonly<IDropdownProps<ItemType, ValueType, AllowMultiple>>, nextContext: any): void {
         if (this.props.items !== prevProps.items && !areEquals(this.props.items, prevProps.items)) {
             this.setState(this.prepareState(this.props));
         } else if (prevProps.defaultValue !== this.props.defaultValue && !areEquals(this.props.defaultValue, prevProps.defaultValue)) {
@@ -330,7 +331,7 @@ export class Dropdown<ItemType = unknown, ValueType = unknown> extends Observabl
     };
 }
 
-function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
+function DropdownRenderer<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean>({ context }: { context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
     let { anchorContainerClassName, loadingBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, allowMultiple, value, showAnchorChevron, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
@@ -366,7 +367,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
     }, [selectedItemsByHashKey]);
     context.anchorSelectedText = anchorSelectedText;
     const actions = useMemo(() => {
-        const actions: IDropdownAction<ItemType, ValueType>[] = [];
+        const actions: IDropdownAction<ItemType, ValueType, AllowMultiple>[] = [];
         if (dropdownActions) {
             const actProps = (typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions);
             if (Array.isArray(actProps)) {
@@ -488,7 +489,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
             </Tooltip>
         </Div>}
     >
-        <DropdownMenu<ItemType, ValueType>
+        <DropdownMenu<ItemType, ValueType, AllowMultiple>
             maxHeight={maxDropdownHeight}
             context={context}
             canRenderSeach={canRenderSeach}
@@ -497,7 +498,7 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: 
     </Menu>
 }
 
-function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType>[], canRenderSeach: boolean, context: IDropdownContext<ItemType, ValueType> }) {
+function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType, AllowMultiple>[], canRenderSeach: boolean, context: Dropdown<ItemType, ValueType, AllowMultiple> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const { searchInputProps, error, actionsMenuClassName, actionsIconName, actionsIconVariant } = context.props;
     const listProps = Object.assign({}, context.props.listProps);
@@ -582,7 +583,7 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, acti
     </Div>;
 }
 
-const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) {
+const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedItem & { index: number, context: Dropdown }): IReactNullableElement {
     const { label, hashKey, labelText, context } = preparedItem;
     const [state, dispatch] = useState(Object.create(null));
     const forceRender = useCallback(() => {
@@ -650,19 +651,6 @@ DropdownItem.displayName = "Dropdown.Item";
 
 
 
-
-
-/****** Dropdown types */
-
-
-
-export interface IDropdownContext<ItemType = unknown, ValueType = unknown> extends Dropdown<ItemType, ValueType> {
-    /***
-     * the corresponding selected text calculated from selected items
-     */
-    anchorSelectedText?: string;
-}
-
 export interface IDropdownState<ItemType = unknown, ValueType = unknown> {
     itemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>>,
     selectedValues: ValueType[]
@@ -681,7 +669,7 @@ export interface IDropdownState<ItemType = unknown, ValueType = unknown> {
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export interface IDropdownAction<ItemType = unknown, ValueType = unknown> extends INavItemProps<{ dropdown: IDropdownContext<ItemType, ValueType> }> { }
+export interface IDropdownAction<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends INavItemProps<{ dropdown: Dropdown<ItemType, ValueType, AllowMultiple> }> { }
 
 /**
  * Represents a collection of prepared items in a dropdown component.
@@ -736,56 +724,19 @@ export interface IDropdownAction<ItemType = unknown, ValueType = unknown> extend
  */
 export type IDropdownPreparedItems<ItemType = unknown, ValueType = unknown> = Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
 
-/**
- * Represents the options provided to callback functions when the dropdown value changes.
- * 
- * This interface extends the `Partial<IDropdownPreparedItem<ItemType, ValueType>>` 
- * interface, omitting the `value` property, and includes additional properties 
- * necessary for handling changes in the dropdown selection.
- * 
- * @interface IDropdownOnChangeOptions
- * @template ItemType - The type of the item being represented.
- * @template ValueType - The type of the value associated with the item.
- * 
- * @extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'>
- * 
- * @property {ValueType | ValueType[] | undefined} value - The new value(s) selected 
- * from the dropdown. This can be a single value, an array of values (for multi-select), 
- * or `undefined` if no value is selected.
- * 
- * @property {IDropdownContext<ItemType, ValueType>} dropdown - The context of 
- * the dropdown, providing access to methods and state management for the dropdown component.
- * 
- * @example
- * // Example usage of the IDropdownOnChangeOptions interface
- * 
- * // Single selection handler - value is guaranteed to be a single ValueType
- * const handleSingleChange = (options: IDropdownOnChangeOptions<User, string, false>) => {
- *     console.log('Selected user ID:', options.value); // Type: string
- * };
- * 
- * // Multiple selection handler - value is guaranteed to be ValueType[]
- * const handleMultipleChange = (options: IDropdownOnChangeOptions<User, string, true>) => {
- *     console.log('Selected user IDs:', options.value); // Type: string[]
- *     console.log('Count:', options.value.length);
- * };
- * 
- * @remarks
- * - This interface is particularly useful for managing the change events in dropdown components, 
- *   allowing for efficient handling of user selections.
- * - Ensure that the `dropdown` is properly passed to access the necessary methods 
- *   and state related to the dropdown.
- */
+
 export interface IDropdownOnChangeOptions<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'> {
-    value: AllowMultiple extends true ? ValueType[] : ValueType | undefined;
-    dropdown: IDropdownContext<ItemType, ValueType>;
+    value: IDropdownItemValue<ValueType, AllowMultiple>;
+    dropdown: Dropdown<ItemType, ValueType, AllowMultiple>;
 };
 
-export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown> {
+export type IDropdownItemValue<ValueType = unknown, AllowMultiple extends boolean = boolean> = AllowMultiple extends true ? ValueType[] : ValueType;
+
+export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> {
     item: ItemType; // The item being interacted with
     index: number; // The index of the item in the dropdown list
     isDropdown: true; // Indicates that the context is within a dropdown
-    dropdown: IDropdownContext<ItemType, ValueType>;
+    dropdown: Dropdown<ItemType, ValueType, AllowMultiple>;
     value: ValueType;
 }
 
@@ -846,7 +797,6 @@ export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown> {
  * @author Resk Framework Team
  * @see {@link Dropdown} Main dropdown component class
  * @see {@link IDropdownState} Dropdown state interface
- * @see {@link IDropdownContext} Dropdown context interface
  */
 export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMultiple extends boolean = boolean> extends Omit<ITextInputProps, "onChange" | "type" | "ref" | "multiline"> {
 
@@ -896,7 +846,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * @param {Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'>} options - Item processing context
      * @param {ItemType} options.item - The current item being processed
      * @param {number} options.index - The index of the item in the items array
-     * @param {IDropdownContext<ItemType, ValueType>} options.dropdown - Dropdown context instance
+     * @param {Dropdown<ItemType,ValueType,AllowMultiple>} options.dropdown - Dropdown context instance
      * @param {boolean} options.isDropdown - Always true, indicates dropdown context
      * 
      * @returns {ValueType | undefined} The extracted value or undefined if extraction fails
@@ -934,7 +884,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * @param {ItemType} options.item - The current item being rendered
      * @param {number} options.index - The index of the item in the items array
      * @param {ValueType} options.value - The extracted value for this item
-     * @param {IDropdownContext<ItemType, ValueType>} options.dropdown - Dropdown context instance
+     * @param {Dropdown<ItemType,ValueType,AllowMultiple>} options.dropdown - Dropdown context instance
      * 
      * @returns {ReactNode} The visual representation of the item
      * 
@@ -978,7 +928,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * @param {number} options.index - The index of the item in the items array
      * @param {ValueType} options.value - The extracted value for this item
      * @param {ReactNode} options.computedLabel - The visual label generated by getItemLabel
-     * @param {IDropdownContext<ItemType, ValueType>} options.dropdown - Dropdown context instance
+     * @param {Dropdown<ItemType,ValueType,AllowMultiple>} options.dropdown - Dropdown context instance
      * 
      * @returns {string} Plain text representation of the item
      * 
@@ -1046,7 +996,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * />
      * ```
      */
-    allowMultiple?: AllowMultiple;
+    allowMultiple?: AllowMultiple | undefined;
 
     /**
      * Callback function triggered when the dropdown selection changes.
@@ -1060,9 +1010,9 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * - Multiple selection (`AllowMultiple = true`): `value` is `ValueType[]`
      * 
      * @param {IDropdownOnChangeOptions<ItemType, ValueType, AllowMultiple>} options - Change event context
-     * @param {AllowMultiple extends true ? ValueType[] : ValueType} options.value - Selected value(s) with conditional typing
+     * @param {IDropdownItemValue<ValueType,AllowMultiple>} options.value - Selected value(s) with conditional typing
      * @param {ItemType[]} options.selectedItems - Array of selected items
-     * @param {IDropdownContext<ItemType, ValueType>} options.dropdown - Dropdown context
+     * @param {Dropdown<ItemType,ValueType,AllowMultiple>} options.dropdown - Dropdown context
      * 
      * @returns {void}
      * 
@@ -1141,7 +1091,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * - `AllowMultiple extends true` → expects `ValueType[]`
      * - `AllowMultiple extends false` → expects `ValueType`
      * 
-     * @type {AllowMultiple extends true ? ValueType[] : ValueType}
+     * @type {IDropdownItemValue<ValueType, AllowMultiple>}
      * @optional
      * 
      * @example
@@ -1174,7 +1124,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * />
      * ```
      */
-    defaultValue?: AllowMultiple extends true ? ValueType[] : ValueType;
+    defaultValue?: IDropdownItemValue<ValueType, AllowMultiple>;
 
     /**
      * Generates unique hash keys for efficient item identification and rendering.
@@ -1478,7 +1428,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * static array or a function that receives the dropdown context and returns
      * an array. Common actions include "Select All", "Clear Selection", "Refresh", etc.
      * 
-     * @type {INavItems<IDropdownAction<ItemType, ValueType>> | ((options: IDropdownContext<any, any>) => INavItems<IDropdownAction<ItemType, ValueType>>)}
+     * @type {INavItems<IDropdownAction<ItemType, ValueType, AllowMultiple>> | ((options: Dropdown<ItemType,ValueType,AllowMultiple>) => INavItems<IDropdownAction<ItemType, ValueType,AllowMultiple>>)}
      * @optional
      * 
      * @example
@@ -1525,7 +1475,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
      * }}
      * ```
      */
-    dropdownActions?: INavItems<IDropdownAction<ItemType, ValueType>> | ((options: IDropdownContext<any, any>) => INavItems<IDropdownAction<ItemType, ValueType>>);
+    dropdownActions?: INavItems<IDropdownAction<ItemType, ValueType, AllowMultiple>> | ((options: Dropdown<ItemType, ValueType, AllowMultiple>) => INavItems<IDropdownAction<ItemType, ValueType, AllowMultiple>>);
 
     /**
      * Visual styling variant for the dropdown actions menu icon.
@@ -1790,7 +1740,7 @@ export interface IDropdownProps<ItemType = unknown, ValueType = unknown, AllowMu
     anchor?:
     | ((options: Omit<ITextInputProps, "onChange"> & {
         /** The dropdown context providing access to methods and state */
-        dropdown: IDropdownContext<ItemType, ValueType>;
+        dropdown: Dropdown<ItemType, ValueType, AllowMultiple>;
         /** Current loading state of the dropdown */
         isLoading: boolean;
         /** Whether multiple selection is enabled */
@@ -2059,3 +2009,17 @@ export interface IDropdownPreparedItem<ItemType = unknown, ValueType = unknown> 
  *   of the dropdown based on these events.
  */
 export type IDropdownEvent = "toggleVisibility" | "selectItem" | "open" | "close" | "toggleItem" | "unselectItem" | "selectAll" | "unselectAll";
+
+function Test() {
+    return <Dropdown<{ a: number, b: number }, number>
+        itemLabelField="a"
+        allowMultiple={true}
+        items={[{
+            a: 1,
+            b: 2
+        }]}
+        onChange={({ value }) => {
+            console.log(value, " i value ")
+        }}
+    />
+}

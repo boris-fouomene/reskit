@@ -94,11 +94,10 @@ function AppBar<Context = unknown>({
       context={{ ...Object.assign({}, context), appBarVariant: Object.assign({}, variant) }}
       {...actionsProps}
       actions={actions}
-      appBarVariant={variant}
       className={cn("resk-app-bar-actions", computedVariant.actions(), actionsProps?.className, actionsClassName)}
       maxVisibleActions={isNumber(maxVisibleActions) && maxVisibleActions > 0 ? maxVisibleActions : actionsProps?.maxVisibleActions}
-      actionClassName={cn(computedVariant.action(), actionsProps?.actionClassName)}
-      actionMenuItemClassName={cn(computedVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
+      onAppBarActionClassName={cn(computedVariant.actionOnAppBar(), actionsProps?.onAppBarActionClassName)}
+      onMenuActionClassNamee={cn(computedVariant.actionOnMenu(), actionsProps?.onMenuActionClassNamee)}
       menuProps={{
         ...actionsProps?.menuProps,
         anchorClassName: cn(computedVariant.icon(), actionsProps?.menuProps?.anchorClassName),

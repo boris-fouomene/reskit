@@ -656,7 +656,7 @@ export interface IAppBarProps<Context = unknown> extends
      *   actions: actionList,
      *   viewportWidth: containerWidth,
      *   responsiveConfig: customConfig,
-     *   actionClassName: "mx-1",
+     *   onAppBarActionClassName: "mx-1",
      *   menuProps: {
      *     anchorClassName: "text-primary",
      *     preferredPosition: "bottom-end"
@@ -752,8 +752,8 @@ export interface IAppBarProps<Context = unknown> extends
  *   renderAction: (action, index) => (
  *     <CustomActionButton key={action.id} {...action} />
  *   ),
- *   actionClassName: "custom-action-style",
- *   actionMenuItemClassName: "custom-menu-item-style"
+ *   onAppBarActionClassName: "custom-action-style",
+ *   onMenuActionClassNamee: "custom-menu-item-style"
  * };
  * ```
  */
@@ -870,11 +870,11 @@ export interface IAppBarActionsProps<Context = unknown> {
      * 
      * @example
      * ```tsx
-     * actionClassName: "mx-1 hover:bg-gray-100"
-     * actionClassName: "rounded-lg transition-colors"
+     * onAppBarActionClassName: "mx-1 hover:bg-gray-100"
+     * onAppBarActionClassName: "rounded-lg transition-colors"
      * ```
      */
-    actionClassName?: IClassName;
+    onAppBarActionClassName?: IClassName;
 
     /** 
      * CSS class name applied to actions rendered inside the overflow menu.
@@ -882,11 +882,11 @@ export interface IAppBarActionsProps<Context = unknown> {
      * 
      * @example
      * ```tsx
-     * actionMenuItemClassName: "px-4 py-2 text-left"
-     * actionMenuItemClassName: "hover:bg-primary/10"
+     * onMenuActionClassNamee: "px-4 py-2 text-left"
+     * onMenuActionClassNamee: "hover:bg-primary/10"
      * ```
      */
-    actionMenuItemClassName?: IClassName;
+    onMenuActionClassNamee?: IClassName;
 
     // Action Rendering
     /** 
@@ -1070,13 +1070,6 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     overflowMenuAccessibilityLabel?: string;
-
-    /**
-     * The variant of the AppBar to use.
-     * This determines the overall appearance and color scheme of the AppBar.
-     * This props is populated automatically by the AppBar component
-     */
-    appBarVariant?: IAppBarVariant;
 }
 /**
  * Context type for AppBar components with enhanced functionality.

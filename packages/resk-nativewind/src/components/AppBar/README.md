@@ -372,8 +372,8 @@ const customResponsiveConfig = {
   title="Styled Actions"
   actions={actions}
   actionsProps={{
-    actionClassName: "mx-1 hover:bg-gray-100 rounded-lg transition-colors",
-    actionMenuItemClassName: "px-4 py-2 text-left hover:bg-primary/10"
+    onAppBarActionClassName: "mx-1 hover:bg-gray-100 rounded-lg transition-colors",
+    onMenuActionClassNamee: "px-4 py-2 text-left hover:bg-primary/10"
   }}
   actionsClassName="gap-2 px-4 border-l border-gray-200"
 />
@@ -689,7 +689,7 @@ const modernConfig = {
 <AppBar
   actionsClassName="flex items-center gap-2"
   actionsProps={{
-    actionClassName: "flex-none", // Prevent action size changes
+    onAppBarActionClassName: "flex-none", // Prevent action size changes
   }}
 />
 ```

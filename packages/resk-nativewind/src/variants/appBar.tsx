@@ -10,10 +10,8 @@ export const appBarVariant = tv({
         base: "",
         title: "",
         subtitle: "",
-        action: "",
         actionOnAppBar: "",
         actionOnMenu: "",
-        actionMenuItem: "",
         backAction: "",
         actions: "",
         icon: "",
@@ -33,12 +31,6 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createTextVariants<IAppBarVariantSlot, "subtitle">((value, colorName) => {
             return { subtitle: value }
         }, "subtitle"),
-        ...VariantsOptionsFactory.createTextVariants<IAppBarVariantSlot, "action">((value, colorName) => {
-            return { action: value }
-        }, "action"),
-        ...VariantsOptionsFactory.createAllRounded<IAppBarVariantSlot, "action">((value, colorName) => {
-            return { action: value }
-        }, "action"),
         ...VariantsOptionsFactory.createIconVariants<IAppBarVariantSlot, "icon">((value, colorName) => {
             return { icon: value }
         }, "icon"),
@@ -75,15 +67,12 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createAllBorders<IAppBarVariantSlot, "actionOnAppBar">((value, colorName) => {
             return { actionOnAppBar: value }
         }, "actionOnAppBar"),
-        ...VariantsOptionsFactory.createAllBorders<IAppBarVariantSlot, "actionMenuItem">((value, colorName) => {
-            return { actionMenuItem: value }
-        }, "actionMenuItem"),
         colorScheme: Object.fromEntries(typedEntries(VariantsColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
                 title: (VariantsColors.textForeground as any)[key],
                 subtitle: cn((VariantsColors.textForeground as any)[key], "opacity-95"),
-                action: cn((VariantsColors.textForeground as any)[key]),
+                actionOnAppBar: cn((VariantsColors.textForeground as any)[key]),
                 icon: cn((VariantsColors.iconForeground as any)[key]),
                 backAction: cn((VariantsColors.iconForeground as any)[key]),
             }]
@@ -105,9 +94,7 @@ type IAppBarVariantSlot = {
     base?: string;
     title?: string;
     subtitle?: string;
-    action?: string;
     icon?: string;
-    actionMenuItem?: string;
     content?: string;
     actions?: string;
     backAction?: string;

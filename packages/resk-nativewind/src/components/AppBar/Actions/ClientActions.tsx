@@ -24,8 +24,8 @@ export function AppBarClientActions<Context = unknown>({
     renderExpandableAction,
     hydrationFallback,
     testID,
-    actionClassName,
-    actionMenuItemClassName,
+    onAppBarActionClassName,
+    onMenuActionClassNamee,
     actions: items,
     viewportWidth,
     maxVisibleActions,
@@ -34,13 +34,11 @@ export function AppBarClientActions<Context = unknown>({
     enableVirtualization = false,
     accessibilityLabel,
     overflowMenuAccessibilityLabel = "More actions",
-    appBarVariant: _appBarVariant,
     ...props
 }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
-    const computedVariant = appBarVariant(_appBarVariant);
-    const actionOnMenuClx = cn(computedVariant.actionOnMenu(), "resk-app-bar-action-menu-item", actionMenuItemClassName);
-    const actionOnAppBarClx = cn(computedVariant.actionOnAppBar(), "resk-app-bar-action", actionClassName);
+    const actionOnMenuClx = cn("resk-app-bar-action-menu-item", onMenuActionClassNamee);
+    const actionOnAppBarClx = cn("resk-app-bar-action", onAppBarActionClassName);
     // Destructure menu props with updated property names for open/closed icon states
     const {
         anchorClosedIconName,
@@ -138,12 +136,14 @@ export function AppBarClientActions<Context = unknown>({
                 renderExpandableAction,
                 testID,
                 actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, onAppBarClassName, onMenuClassName, ...props }, index): IReactNullableElement {
-                    const { level } = props;
+                    const { level, className } = props;
                     // Handle nested actions (don't count towards limit)
                     if (level) {
                         props.className = cn(
                             "appbar-action-menu-item",
                             actionOnMenuClx,
+                            "app-bar-action-menu-item-level-" + level,
+                            className,
                             onMenuClassName // Apply individual action's menu className
                         );
                         const renderedAction = (renderer as any)(props, index);
@@ -167,16 +167,18 @@ export function AppBarClientActions<Context = unknown>({
                     }
 
                     props.className = cn(
-                        canRenderDirectly && cn(
+                        canRenderDirectly ? [
                             "appbar-action flex-none",
                             actionOnAppBarClx,
+                            className,
                             onAppBarClassName // Apply individual action's AppBar className
-                        ),
-                        !canRenderDirectly && cn(
+                        ] : [
                             "appbar-action-menu-item",
+                            "app-bar-action-menu-item-level-" + level,
                             actionOnMenuClx,
+                            className,
                             onMenuClassName // Apply individual action's menu className
-                        )
+                        ]
                     ); const renderedAction = (renderer as any)(props, index);
                     if (!renderedAction) return null;
 

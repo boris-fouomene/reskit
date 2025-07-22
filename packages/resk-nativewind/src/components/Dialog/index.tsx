@@ -181,7 +181,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
         backAction={!isFullScreen ? false : undefined}
         onBackActionPress={handleRequestClose}
         {...appBarProps}
-        actionsProps={{ ...appBarProps?.actionsProps, actionClassName: cn("resk-dialog-actions", computedVariant.action(), appBarProps?.actionsProps?.actionClassName) }}
+        actionsProps={{ ...appBarProps?.actionsProps, onAppBarActionClassName: cn("resk-dialog-actions", computedVariant.action(), appBarProps?.actionsProps?.onAppBarActionClassName) }}
         context={context}
         actions={appBarActions}
         title={isFullScreen ? title : undefined}

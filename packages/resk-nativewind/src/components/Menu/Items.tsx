@@ -26,12 +26,6 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
     {...props}
     className={cn("w-full", props.className)}
     onPress={async (event, context) => {
-      if (typeof event?.stopPropagation == "function") {
-        event.stopPropagation();
-      }
-      if (typeof event?.preventDefault == "function") {
-        event.preventDefault();
-      }
       if (typeof props.onPress == "function" && await props.onPress(event, context) === false) {
         return;
       }

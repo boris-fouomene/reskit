@@ -33,7 +33,6 @@ export function RippleContent({ rippleDuration, targetSelector, className }: IWe
     });
     const handleRipple = useCallback((event: MouseEvent) => {
         if (!event || !event.currentTarget) return;
-        event?.stopPropagation()
         const { pageX, pageY, currentTarget } = event;
         const rect = currentTarget.getBoundingClientRect()
         const left = pageX - (rect.left + window.scrollX)

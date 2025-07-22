@@ -293,6 +293,9 @@ export function Menu<Context = unknown>({
     const MenuComponent = useMemo(() => {
         return renderedAsNavigationMenu ? Animated.View : View;
     }, [renderedAsNavigationMenu]);
+    const backdropContent = dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
+        onPress={() => close()}
+    /> : null;
     return <>
         <MenuContext.Provider value={context}>
             <AnchorComponent
@@ -321,7 +324,7 @@ export function Menu<Context = unknown>({
             )}
         >
             <MenuContext.Provider value={context}>
-
+                {renderedAsNavigationMenu ? backdropContent : null}
                 <MenuComponent
                     testID={testID}
                     {...props}
@@ -339,9 +342,7 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
-                        onPress={() => close()}
-                    /> : null}
+                    {!renderedAsNavigationMenu ? backdropContent : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navContentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">

@@ -54,18 +54,11 @@ export function AppBarClientActions<Context = unknown>({
         return Math.max(windowWidth, 320); // Minimum 320px width
     }, [viewportWidth, windowWidth]);
 
-    // Sort and process actions based on priority first
+    // Process and filter valid actions (don't sort by priority here)
     const processedActions = useMemo(() => {
         if (!Array.isArray(items) || !items.length) return [];
-        // Filter out null/undefined items and sort by priority if priority is being used
-        const validItems = items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null);
-        const hasPriority = validItems.some(action => isNumber(action.visibilityPriority));
-
-        if (hasPriority) {
-            return sortActionsByPriority(validItems);
-        }
-
-        return validItems;
+        // Filter out null/undefined items but preserve original order
+        return items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null);
     }, [items]);
 
     // Calculate max actions based on responsive configuration
@@ -99,8 +92,17 @@ export function AppBarClientActions<Context = unknown>({
         const menuItems: IAppBarActionProps<Context>[] = [];
         const actions: IReactNullableElement[] = [];
 
+        // Check if we have priority-based actions and will need overflow
+        const hasPriorityActions = processedActions.some(action => isNumber(action.visibilityPriority));
+        const needsOverflow = processedActions.length > calculatedMaxActions;
+
+        // Only sort by priority if we have priority actions AND there will be overflow
+        const actionsToProcess = (hasPriorityActions && needsOverflow)
+            ? sortActionsByPriority(processedActions)
+            : processedActions;
+
         renderActions<Context>({
-            actions: processedActions,
+            actions: actionsToProcess,
             context,
             ...props,
             renderAction,

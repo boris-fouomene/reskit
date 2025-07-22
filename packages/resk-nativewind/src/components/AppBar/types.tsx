@@ -6,6 +6,7 @@ import { ITextVariant } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
 import { appBarVariant, IAppBarVariant } from "@variants/appBar";
 import { IIconButtonVariant } from "@variants/iconButton";
+import { IMenuProps } from "@components/Menu/types";
 
 /**
  * Configuration for responsive action display breakpoints.
@@ -184,19 +185,12 @@ export interface IAppBarActionsProps<Context = unknown> {
      */
     hydrationFallback?: ReactNode;
 
-    // Menu Configuration
-    /** Class name for the overflow menu anchor button. */
-    menuAnchorClassName?: IClassName;
-    /** Icon properties for the overflow menu anchor button. */
-    menuAnchorIconProps?: IIconButtonProps;
     /** Custom overflow menu configuration. */
-    menuProps?: {
-        /** Position preference for the overflow menu. */
-        position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
-        /** Maximum height for the overflow menu. */
-        maxHeight?: number;
-        /** Custom class name for the menu container. */
-        className?: IClassName;
+    menuProps?: Omit<IMenuProps<IAppBarContext<Context>>,"context" | "items" | "anchor"> & { 
+        /** Icon properties for the overflow menu anchor button. */
+        anchorIconProps?: IIconButtonProps;
+        anchorClassName?: IClassName;
+        anchor?: IMenuProps<IAppBarContext<Context>>["anchor"];
     };
 
     // Performance and Accessibility

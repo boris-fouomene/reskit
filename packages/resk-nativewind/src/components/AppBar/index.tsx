@@ -5,7 +5,7 @@ import isValidElement from '@utils/isValidElement';
 import ExpandableAppBarAction from './ExpandableAction';
 import { AppBarAction } from './Action';
 import { BackAction } from "./BackAction";
-import { ReactNode } from 'react';
+import { act, ReactNode } from 'react';
 import { defaultStr, isNumber } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { Div } from '@html/Div';
@@ -98,7 +98,10 @@ function AppBar<Context = unknown>({
       maxVisibleActions={isNumber(maxVisibleActions) && maxVisibleActions > 0 ? maxVisibleActions : actionsProps?.maxVisibleActions}
       actionClassName={cn(computedVariant.action(), actionsProps?.actionClassName)}
       actionMenuItemClassName={cn(computedVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
-      menuAnchorClassName={cn(computedVariant.icon(), actionsProps?.menuAnchorClassName)}
+      menuProps={{
+        ...actionsProps?.menuProps,
+        anchorClassName : cn(computedVariant.icon(), actionsProps?.menuProps?.anchorClassName),
+      }}
     />
     {isValidElement(rightContent) ? rightContent : null}
     {!isBackActionLeft ? backActionContent : null}

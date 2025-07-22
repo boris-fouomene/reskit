@@ -20,8 +20,6 @@ import { Div } from "@html/Div";
 export function AppBarClientActions<Context = unknown>({ 
     context, 
     className, 
-    menuAnchorClassName, 
-    menuAnchorIconProps, 
     renderAction, 
     renderExpandableAction, 
     hydrationFallback, 
@@ -40,7 +38,7 @@ export function AppBarClientActions<Context = unknown>({
     ...props 
 }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
-    
+    const {anchorIconProps,anchorClassName,...restMenuProps} = Object.assign({},menuProps);
     // Use viewport width if provided, otherwise fall back to window width
     const effectiveViewportWidth = useMemo(() => {
         if (isNumber(viewportWidth) && viewportWidth > 0) {
@@ -154,8 +152,8 @@ export function AppBarClientActions<Context = unknown>({
                         return <Icon.Button
                             size={28}
                             fontIconName={FONT_ICONS.MORE as any}
-                            {...menuAnchorIconProps}
-                            className={cn("flex-none mx-[7px]", menuAnchorClassName, menuAnchorIconProps?.className)}
+                            {...anchorIconProps}
+                            className={cn("flex-none mx-[7px]", anchorClassName, anchorIconProps?.className)}
                             accessibilityLabel={overflowMenuAccessibilityLabel}
                             onPress={() => {
                                 menu?.open();
@@ -163,6 +161,8 @@ export function AppBarClientActions<Context = unknown>({
                         />
                     }}
                     items={menuItems}
+                    context={context}
+                    {...menuProps}
                 />
             ) : null}
         </Div>

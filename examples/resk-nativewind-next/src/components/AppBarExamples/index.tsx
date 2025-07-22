@@ -2,19 +2,18 @@
 import { 
     AppBar, 
     IAppBarActionProps, 
-    IAppBarActionPriority,
     IAppBarResponsiveConfig,
 } from '@resk/nativewind/components/appBar';
 
 
 
-// Example 1: Basic AppBar with priority-based actions
+// Example 1: Basic AppBar with visibilityPriority-based actions
 export function BasicAppBarExample() {
     const actions: IAppBarActionProps[] = [
         {
             id: 'save',
             label: 'Save',
-            priority: IAppBarActionPriority.CRITICAL,
+            visibilityPriority:100,
             alwaysVisible: true,
             onPress: () => console.log('Save pressed'),
             accessibility: {
@@ -25,28 +24,28 @@ export function BasicAppBarExample() {
         {
             id: 'share',
             label: 'Share',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             onPress: () => console.log('Share pressed'),
             minViewportWidth: 480 // Only show on viewports >= 480px
         },
         {
             id: 'export',
             label: 'Export',
-            priority: IAppBarActionPriority.NORMAL,
+            visibilityPriority: 20,
             onPress: () => console.log('Export pressed'),
             group: 'file-operations'
         },
         {
             id: 'print',
             label: 'Print',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             onPress: () => console.log('Print pressed'),
             group: 'file-operations'
         },
         {
             id: 'help',
             label: 'Help',
-            priority: IAppBarActionPriority.OPTIONAL,
+            visibilityPriority: 15,
             onPress: () => console.log('Help pressed')
         }
     ];
@@ -68,14 +67,14 @@ export function DrawerAppBarExample() {
         {
             id: 'close',
             label: 'Close',
-            priority: IAppBarActionPriority.CRITICAL,
+            visibilityPriority: 100,
             alwaysVisible: true,
             onPress: () => console.log('Close drawer')
         },
         {
             id: 'settings',
             label: 'Settings',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             onPress: () => console.log('Settings pressed')
         }
     ];
@@ -99,7 +98,7 @@ export function MobileAppBarExample() {
         {
             id: 'search',
             label: 'Search',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             onPress: () => console.log('Search pressed'),
             accessibility: {
                 label: 'Search content',
@@ -109,13 +108,13 @@ export function MobileAppBarExample() {
         {
             id: 'filter',
             label: 'Filter',
-            priority: IAppBarActionPriority.NORMAL,
+            visibilityPriority: 20,
             onPress: () => console.log('Filter pressed')
         },
         {
             id: 'sort',
             label: 'Sort',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             onPress: () => console.log('Sort pressed')
         }
     ];
@@ -147,25 +146,25 @@ export function CustomResponsiveAppBarExample() {
         {
             id: 'edit',
             label: 'Edit',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             onPress: () => console.log('Edit pressed')
         },
         {
             id: 'duplicate',
             label: 'Duplicate',
-            priority: IAppBarActionPriority.NORMAL,
+            visibilityPriority: 20,
             onPress: () => console.log('Duplicate pressed')
         },
         {
             id: 'archive',
             label: 'Archive',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             onPress: () => console.log('Archive pressed')
         },
         {
             id: 'delete',
             label: 'Delete',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             onPress: () => console.log('Delete pressed')
         }
     ];
@@ -193,14 +192,14 @@ export function GroupedActionsAppBarExample() {
         {
             id: 'undo',
             label: 'Undo',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             group: 'edit',
             onPress: () => console.log('Undo pressed')
         },
         {
             id: 'redo',
             label: 'Redo',
-            priority: IAppBarActionPriority.HIGH,
+            visibilityPriority: 100,
             group: 'edit',
             onPress: () => console.log('Redo pressed')
         },
@@ -208,14 +207,14 @@ export function GroupedActionsAppBarExample() {
         {
             id: 'bold',
             label: 'Bold',
-            priority: IAppBarActionPriority.NORMAL,
+            visibilityPriority: 20,
             group: 'format',
             onPress: () => console.log('Bold pressed')
         },
         {
             id: 'italic',
             label: 'Italic',
-            priority: IAppBarActionPriority.NORMAL,
+            visibilityPriority: 20,
             group: 'format',
             onPress: () => console.log('Italic pressed')
         },
@@ -223,7 +222,7 @@ export function GroupedActionsAppBarExample() {
         {
             id: 'zoom-in',
             label: 'Zoom In',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             group: 'view',
             minViewportWidth: 768,
             onPress: () => console.log('Zoom in pressed')
@@ -231,7 +230,7 @@ export function GroupedActionsAppBarExample() {
         {
             id: 'zoom-out',
             label: 'Zoom Out',
-            priority: IAppBarActionPriority.LOW,
+            visibilityPriority: 10,
             group: 'view',
             minViewportWidth: 768,
             onPress: () => console.log('Zoom out pressed')
@@ -242,14 +241,6 @@ export function GroupedActionsAppBarExample() {
         <AppBar
             title="Text Editor"
             actions={actions}
-            actionsProps={{
-                actionPriority: {
-                    'undo': 100,
-                    'redo': 95,
-                    'bold': 50,
-                    'italic': 45
-                }
-            }}
         />
     );
 }

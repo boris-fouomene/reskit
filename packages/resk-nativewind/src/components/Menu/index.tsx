@@ -321,6 +321,7 @@ export function Menu<Context = unknown>({
             )}
         >
             <MenuContext.Provider value={context}>
+
                 <MenuComponent
                     testID={testID}
                     {...props}
@@ -338,10 +339,10 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
+                    {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
+                        onPress={() => close()}
+                    /> : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navContentContainer(), contentContainerClassName)}>
-                        {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
-                            onPress={() => close()}
-                        /> : null}
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">

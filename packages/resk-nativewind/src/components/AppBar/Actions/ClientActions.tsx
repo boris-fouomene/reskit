@@ -126,11 +126,9 @@ export function AppBarClientActions<Context = unknown>({
                 } else {
                     menuItems.push(props);
                 }
-                
                 return null;
             },
         });
-        
         return { actions, menuItems };
     }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName, effectiveViewportWidth]);
     

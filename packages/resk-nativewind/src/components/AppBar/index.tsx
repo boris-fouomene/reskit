@@ -120,6 +120,8 @@ AppBar.Action.displayName = 'AppBar.Action';
 AppBar.BackAction.displayName = 'AppBar.BackAction';
 (AppBar.ExpandableAction as any).displayName = 'AppBar.ExpandableAction';
 
+export {DEFAULT_APPBAR_RESPONSIVE_CONFIG} from './Actions/utils';
+
 export { AppBar };
 
 export * from "./types";

@@ -57,7 +57,7 @@ export function BasicAppBarExample() {
             subtitle="Edited 5 minutes ago"
             actions={actions}
             onBackActionPress={() => console.log('Back pressed')}
-            responsiveConfig={createDesktopResponsiveConfig()}
+            actionsProps={{responsiveConfig:createDesktopResponsiveConfig()}}
         />
     );
 }
@@ -124,7 +124,6 @@ export function MobileAppBarExample() {
         <AppBar
             title="Items"
             actions={actions}
-            responsiveConfig={createMobileResponsiveConfig()}
             actionsProps={{
                 enableVirtualization: true,
                 accessibilityLabel: "Item management actions"
@@ -176,8 +175,8 @@ export function CustomResponsiveAppBarExample() {
             title="Custom Responsive"
             subtitle="Breakpoints: 1000px, 600px, 400px"
             actions={actions}
-            responsiveConfig={customConfig}
             actionsProps={{
+                responsiveConfig: customConfig,
                 menuProps: {
                     position: "bottom-left" as any, // Note: This would need proper typing
                     className: "custom-menu-style"

@@ -632,7 +632,7 @@ export interface IAppBarProps<Context = unknown> extends
      *     label: 'Save',
      *     fontIconName: 'save',
      *     onPress: handleSave,
-     *     priority: IAppBarActionPriority.HIGH
+     *     visibilityPriority:100,
      *   },
      *   {
      *     id: 'share',
@@ -831,7 +831,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      *     label: 'Save Document',
      *     fontIconName: 'save',
      *     onPress: handleSave,
-     *     priority: IAppBarActionPriority.HIGH,
+     *     visibilityPriority: 100, // High priority
      *     accessibility: { label: 'Save the current document' }
      *   },
      *   {
@@ -1185,123 +1185,6 @@ export type IAppBarContext<Context = unknown> = Context & {
     };
 }
 
-/**
- * Action priority levels for organizing and managing AppBar action visibility.
- * 
- * This enum defines a hierarchical priority system that determines which actions
- * remain visible when screen space is limited. Higher priority actions stay visible
- * longer as the viewport shrinks, while lower priority actions move to the overflow
- * menu first. The system follows UX best practices for progressive disclosure.
- * 
- * @enum IAppBarActionPriority
- * @since 1.1.0
- * 
- * @example
- * ```tsx
- * // Using priority levels in actions
- * const actions: IAppBarActionProps[] = [
- *   {
- *     id: 'save',
- *     label: 'Save',
- *     onPress: handleSave,
- *     priority: IAppBarActionPriority.CRITICAL  // Always visible
- *   },
- *   {
- *     id: 'share',
- *     label: 'Share',
- *     onPress: handleShare,
- *     priority: IAppBarActionPriority.HIGH      // High priority
- *   },
- *   {
- *     id: 'export',
- *     label: 'Export',
- *     onPress: handleExport,
- *     priority: IAppBarActionPriority.NORMAL    // Default priority
- *   },
- *   {
- *     id: 'archive',
- *     label: 'Archive',
- *     onPress: handleArchive,
- *     priority: IAppBarActionPriority.LOW       // Lower priority
- *   },
- *   {
- *     id: 'debug',
- *     label: 'Debug Info',
- *     onPress: showDebug,
- *     priority: IAppBarActionPriority.OPTIONAL  // Optional feature
- *   }
- * ];
- * ```
- * 
- * @example
- * ```tsx
- * // Custom priority values (extending the enum)
- * const customAction: IAppBarActionProps = {
- *   id: 'emergency',
- *   label: 'Emergency Stop',
- *   onPress: emergencyStop,
- *   priority: 200  // Higher than CRITICAL (custom value)
- * };
- * ```
- * 
- * @example
- * ```tsx
- * // Priority-based conditional rendering
- * const conditionalAction: IAppBarActionProps = {
- *   id: 'advanced',
- *   label: 'Advanced Options',
- *   onPress: showAdvanced,
- *   priority: user.isExpert ? IAppBarActionPriority.HIGH : IAppBarActionPriority.OPTIONAL
- * };
- * ```
- */
-export enum IAppBarActionPriority {
-    /** 
-     * Critical actions that should always be visible regardless of viewport size.
-     * Use sparingly for essential functionality like save, emergency actions, or primary workflows.
-     * These actions bypass the responsive system and remain visible even in very constrained spaces.
-     * 
-     * @example Save, Submit, Emergency Stop, Primary Action
-     */
-    CRITICAL = 100,
-    
-    /** 
-     * High priority actions shown when space allows.
-     * Important secondary actions that users frequently need but aren't absolutely critical.
-     * These stay visible longer than normal priority actions as viewport shrinks.
-     * 
-     * @example Share, Edit, Delete, Refresh, Search
-     */
-    HIGH = 75,
-    
-    /** 
-     * Normal priority actions (default level).
-     * Standard actions that provide useful functionality but can be moved to overflow menu
-     * when space is limited. This is the default priority when none is specified.
-     * 
-     * @example Export, Print, Copy, View Details, Settings
-     */
-    NORMAL = 50,
-    
-    /** 
-     * Low priority actions, first to be moved to overflow menu.
-     * Useful but non-essential actions that can be hidden in smaller viewports.
-     * These actions are the first candidates for moving to the overflow menu.
-     * 
-     * @example Archive, Duplicate, Move, Rename, Tags
-     */
-    LOW = 25,
-    
-    /** 
-     * Optional actions, hidden on smaller viewports.
-     * Nice-to-have features that enhance the experience but aren't necessary
-     * for core functionality. Only visible on larger screens with ample space.
-     * 
-     * @example Debug Info, Advanced Options, Statistics, Metadata, Experimental Features
-     */
-    OPTIONAL = 10
-}
-
 
 
 /**
@@ -1310,7 +1193,7 @@ export enum IAppBarActionPriority {
  * The `IAppBarActionProps` type extends the properties of {@link INavItemProps}, allowing
  * developers to define actions that can be performed from the AppBar. This type
  * can be used to create buttons or interactive elements within the AppBar that 
- * respond to user interactions.
+ * respond to user interactions with intelligent responsive behavior.
  *
  * @template Context - A generic type parameter that allows 
  * extending the context for AppBar actions. This enables customization of the 
@@ -1322,58 +1205,175 @@ export enum IAppBarActionPriority {
  * 
  * @example
  * ```tsx
- * // Basic action
+ * // Basic action with visibility priority
  * const saveAction: IAppBarActionProps = {
  *   id: 'save',
  *   label: 'Save',
  *   onPress: () => handleSave(),
- *   priority: IAppBarActionPriority.HIGH
+ *   visibilityPriority: 90  // High visibility priority (stays visible longer)
  * };
  * 
- * // Action with custom rendering
- * const customAction: IAppBarActionProps = {
- *   id: 'custom',
- *   priority: IAppBarActionPriority.NORMAL,
- *   render: ({ context }) => (
- *     <CustomButton variant={context.appBarVariant} />
- *   )
+ * // Action with custom priority based on context
+ * const contextualAction: IAppBarActionProps = {
+ *   id: 'share',
+ *   label: 'Share',
+ *   onPress: handleShare,
+ *   visibilityPriority: user.isPremium ? 80 : 30,  // Dynamic priority
+ *   minViewportWidth: 768
  * };
+ * 
+ * // Critical action that's always visible
+ * const criticalAction: IAppBarActionProps = {
+ *   id: 'emergency',
+ *   label: 'Emergency Stop',
+ *   onPress: handleEmergency,
+ *   alwaysVisible: true  // Bypasses all responsive hiding
+ * };
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Using predefined priority constants for consistency
+ * const VISIBILITY_PRIORITIES = {
+ *   CRITICAL: 100,
+ *   HIGH: 75,
+ *   NORMAL: 50,
+ *   LOW: 25,
+ *   OPTIONAL: 10
+ * } as const;
+ * 
+ * const actions: IAppBarActionProps[] = [
+ *   { id: 'save', label: 'Save', visibilityPriority: VISIBILITY_PRIORITIES.CRITICAL },
+ *   { id: 'edit', label: 'Edit', visibilityPriority: VISIBILITY_PRIORITIES.HIGH },
+ *   { id: 'export', label: 'Export', visibilityPriority: VISIBILITY_PRIORITIES.NORMAL },
+ *   { id: 'archive', label: 'Archive', visibilityPriority: VISIBILITY_PRIORITIES.LOW }
+ * ];
  * ```
  */
 export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAppBarContext<Context>> {
     /** 
-     * Priority level for this action (affects visibility order and overflow behavior).
-     * Higher priority actions remain visible longer as viewport shrinks.
+     * Visibility priority level for responsive display management.
+     * 
+     * Determines the order in which actions are hidden when viewport space is limited.
+     * Higher numbers mean higher priority - these actions stay visible longer as the 
+     * screen shrinks. Lower priority actions are moved to the overflow menu first.
+     * 
+     * **Recommended Priority Ranges:**
+     * - `90-100`: Critical actions (save, submit, emergency)
+     * - `70-89`: High priority actions (share, edit, delete, search)
+     * - `40-69`: Normal priority actions (export, print, copy, settings)
+     * - `20-39`: Low priority actions (archive, duplicate, rename)
+     * - `1-19`: Optional actions (debug, advanced options, metadata)
+     * 
+     * @defaultValue 50 (normal priority)
+     * 
+     * @example
+     * ```tsx
+     * // Critical action - always among the last to be hidden
+     * visibilityPriority: 95
+     * 
+     * // High priority - important but not critical
+     * visibilityPriority: 80
+     * 
+     * // Normal priority - standard action
+     * visibilityPriority: 50
+     * 
+     * // Low priority - first to move to overflow menu  
+     * visibilityPriority: 25
+     * 
+     * // Fine-grained custom priority
+     * visibilityPriority: 73  // Slightly higher than normal, lower than high
+     * 
+     * // Dynamic priority based on context
+     * visibilityPriority: user.isAdmin ? 85 : 40
+     * ```
      */
-    priority?: IAppBarActionPriority | number;
+    visibilityPriority?: number;
     
     /** 
      * Whether this action should always be visible regardless of viewport constraints.
-     * Use sparingly for critical actions only.
+     * When true, the action bypasses all responsive hiding and overflow menu behavior.
+     * Use sparingly for critical actions only (emergency stops, primary save actions).
+     * 
+     * @defaultValue false
+     * 
+     * @example
+     * ```tsx
+     * // Emergency action that must always be visible
+     * alwaysVisible: true
+     * 
+     * // Conditional always-visible based on context
+     * alwaysVisible: action.type === 'emergency' || user.role === 'safety-officer'
+     * ```
      */
     alwaysVisible?: boolean;
     
     /**
-     * Minimum viewport width required to show this action directly in the AppBar.
-     * Below this width, the action moves to overflow menu.
+     * Minimum viewport width (in pixels) required to show this action directly in the AppBar.
+     * Below this width, the action is automatically moved to the overflow menu regardless
+     * of its visibility priority. Useful for actions that need specific screen real estate.
+     * 
+     * @example
+     * ```tsx
+     * // Only show search bar on larger screens
+     * minViewportWidth: 768  // Hide on mobile, show on tablet+
+     * 
+     * // Show detailed actions only on desktop
+     * minViewportWidth: 1024  // Hide on mobile/tablet, show on desktop
+     * 
+     * // Context-aware minimum width
+     * minViewportWidth: isComplexAction ? 640 : 320
+     * ```
      */
     minViewportWidth?: number;
     
     /**
      * Group identifier for related actions.
-     * Actions in the same group are shown/hidden together.
+     * Actions within the same group are shown/hidden together as a unit.
+     * Useful for maintaining logical groupings of related functionality.
+     * 
+     * @example
+     * ```tsx
+     * // File operations group
+     * group: 'file-operations'
+     * 
+     * // User management group  
+     * group: 'user-management'
+     * 
+     * // All actions in 'editing' group hide/show together
+     * group: 'editing'
+     * ```
      */
     group?: string;
     
     /**
      * Accessibility configuration for the action.
+     * Provides enhanced accessibility support for screen readers and assistive technologies.
+     * 
+     * @example
+     * ```tsx
+     * accessibility: {
+     *   label: "Save the current document to disk",
+     *   hint: "Press to save your changes permanently", 
+     *   role: "button"
+     * }
+     * ```
      */
     accessibility?: {
-        /** Accessibility label for screen readers. */
+        /** 
+         * Detailed accessibility label for screen readers.
+         * Should describe what the action does in detail.
+         */
         label?: string;
-        /** Accessibility hint describing the action's behavior. */
+        /** 
+         * Accessibility hint describing the action's behavior or outcome.
+         * Provides additional context for users with disabilities.
+         */
         hint?: string;
-        /** Accessibility role override. */
+        /** 
+         * Accessibility role override for the action element.
+         * Defaults to appropriate role based on action type.
+         */
         role?: string;
     };
 }

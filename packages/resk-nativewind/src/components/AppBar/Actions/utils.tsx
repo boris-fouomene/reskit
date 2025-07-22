@@ -1,4 +1,4 @@
-import {IAppBarActionPriority, IAppBarActionProps, IAppBarActionsProps, IAppBarContext, IAppBarProps, IAppBarResponsiveConfig } from "../types";
+import {IAppBarActionProps, IAppBarActionsProps, IAppBarContext, IAppBarProps, IAppBarResponsiveConfig } from "../types";
 import { IReactNullableElement } from "@src/types";
 import { renderNavItems } from "@components/Nav/utils";
 import { AppBarAction } from "../Action";
@@ -73,19 +73,35 @@ export function calculateMaxVisibleActions(
 }
 
 /**
- * Utility function to sort actions by priority.
+ * Utility function to sort actions by visibility priority.
+ * 
+ * Sorts actions in descending order of visibility priority, meaning actions with
+ * higher priority values appear first and stay visible longer in responsive scenarios.
  * 
  * @param actions - Array of actions to sort
- * @returns Actions sorted by priority (highest first)
+ * @returns Actions sorted by visibility priority (highest first)
  * 
  * @since 1.1.0
+ * 
+ * @example
+ * ```tsx
+ * const actions = [
+ *   { id: 'save', visibilityPriority: 90 },
+ *   { id: 'share', visibilityPriority: 75 },
+ *   { id: 'archive', visibilityPriority: 25 }
+ * ];
+ * 
+ * const sorted = sortActionsByPriority(actions);
+ * // Result: [save(90), share(75), archive(25)]
+ * ```
  */
 export function sortActionsByPriority<Context = unknown>(
     actions: IAppBarActionProps<Context>[]
 ): IAppBarActionProps<Context>[] {
     return [...actions].sort((a, b) => {
-        const priorityA = a.priority ?? IAppBarActionPriority.NORMAL;
-        const priorityB = b.priority ?? IAppBarActionPriority.NORMAL;
+        // Default to 50 (normal priority) if not specified
+        const priorityA = isNumber(a?.visibilityPriority) ? a.visibilityPriority : 0;
+        const priorityB = isNumber(b?.visibilityPriority) ? b.visibilityPriority : 0;
         return priorityB - priorityA;
     });
 }

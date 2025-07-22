@@ -2,8 +2,7 @@
 import { useDimensions } from "@utils/dimensions/hooks";
 import { 
     IAppBarActionProps, 
-    IAppBarActionsProps, 
-    IAppBarActionPriority
+    IAppBarActionsProps,
 } from "../types";
 import { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from "./utils";
 import { calculateMaxVisibleActions,sortActionsByPriority} from "./utils";
@@ -52,8 +51,8 @@ export function AppBarClientActions<Context = unknown>({
         if (!Array.isArray(items) || !items.length) return [];
         // Filter out null/undefined items and sort by priority if priority is being used
         const validItems = items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null);
-        const hasPriority = validItems.some(action => action.priority !== undefined);
-        
+        const hasPriority = validItems.some(action => isNumber(action.visibilityPriority));
+
         if (hasPriority) {
             return sortActionsByPriority(validItems);
         }
@@ -113,7 +112,8 @@ export function AppBarClientActions<Context = unknown>({
                 }
                 
                 // Check if action should always be visible
-                const shouldAlwaysShow = alwaysVisible || props.priority === IAppBarActionPriority.CRITICAL;
+                const shouldAlwaysShow = alwaysVisible || 
+                    props.visibilityPriority === 100; // Critical actions should always be visible
                 
                 // Check viewport constraints
                 const meetsViewportRequirement = !(isNumber(minViewportWidth) && minViewportWidth > 0) || effectiveViewportWidth >= minViewportWidth;

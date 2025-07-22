@@ -236,11 +236,13 @@ export function Menu<Context = unknown>({
     }, [children, context]);
 
     const maxHeightStyle = maxMenuHeight ? { maxHeight: maxMenuHeight } : undefined;
-    const computedVariant = menuVariant(Object.assign({}, variant, { visible: isVisible }));
+    const computedVariant = menuVariant(Object.assign({}, variant, { visible: isVisible }, { renderedAsNavigationMenu: shouldRenderAsNavigationMenu }));
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", style: maxHeightStyle, className: cn("max-w-full flex-1", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
     itemsProps.className = cn(computedVariant.items(), itemsProps.className);
+    itemsProps.itemClassName = cn(computedVariant.item(), "resk-menu-items", shouldRenderAsNavigationMenu && computedVariant.navigationMenuItems())
+    itemsProps.itemClassName = cn(computedVariant.item(), "resk-menu-item", itemsProps.itemClassName, shouldRenderAsNavigationMenu && computedVariant.navigationMenuItem());
     const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
     const anchorProps = typeof customAnchor == "function" ? {} : {
         onPress: () => {
@@ -278,7 +280,7 @@ export function Menu<Context = unknown>({
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), className)}
+                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.navigationMenu(), className)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,
@@ -293,7 +295,7 @@ export function Menu<Context = unknown>({
                     {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
                         onPress={() => close()}
                     /> : null}
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navigationMenuContentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">

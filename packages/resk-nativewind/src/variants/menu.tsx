@@ -9,9 +9,14 @@ type IMenuVariantSlots = {
     anchorContainer?: string;
     contentContainer?: string;
     items?: string;
+    item?: string;
     scrollView?: string;
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
+    navigationMenu?: string;
+    navigationMenuContentContainer?: string;
+    navigationMenuItems?: string;
+    navigationMenuItem?: string;
 }
 export const menuVariant = tv({
     slots: {
@@ -20,11 +25,21 @@ export const menuVariant = tv({
         base: "",
         contentContainer: "",
         items: "",
+        item: "",
         scrollView: "",
         scrollViewContentContainer: "",
         bottomSheetTitle: "",
+        navigationMenu: "resk-menu-navigation",
+        navigationMenuContentContainer: "resk-menu-navigation-content-container",
+        navigationMenuItems: "resk-menu-navigation-items",
+        navigationMenuItem: "resk-menu-navigation-item",
     },
     variants: {
+        renderedAsNavigationMenu: {
+            true: {
+
+            }
+        },
         withBackdrop: {
             true: {
                 modalBackdrop: classes.backdrop,
@@ -40,6 +55,16 @@ export const menuVariant = tv({
                 contentContainer: value,
             }
         }),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "items">((value) => {
+            return {
+                items: value,
+            }
+        }, "items"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "item">((value) => {
+            return {
+                item: value,
+            }
+        }, "item"),
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),

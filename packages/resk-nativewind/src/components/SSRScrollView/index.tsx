@@ -899,6 +899,7 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
                 style={contentStyle as any}
                 testID={`${testID}-content`}
             >
+                {children}
                 {enableWindowScrollBridge && (
                     <WindowScrollBridge
                         onScroll={onWindowScroll}
@@ -909,7 +910,6 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
                         enableSmoothScroll={enableWindowSmoothScroll}
                     />
                 )}
-                {children}
             </Div>
         </Div>
     );

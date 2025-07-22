@@ -15,6 +15,7 @@ import { cn } from "@utils/cn";
 import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import { Div } from "@html/Div";
+import { appBarVariant } from "@variants/appBar";
 
 export function AppBarClientActions<Context = unknown>({
     context,
@@ -33,9 +34,13 @@ export function AppBarClientActions<Context = unknown>({
     enableVirtualization = false,
     accessibilityLabel,
     overflowMenuAccessibilityLabel = "More actions",
+    appBarVariant: _appBarVariant,
     ...props
 }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
+    const computedVariant = appBarVariant(_appBarVariant);
+    const actionOnMenuClx = cn(computedVariant.actionOnMenu(), "resk-app-bar-action-menu-item", actionMenuItemClassName);
+    const actionOnAppBarClx = cn(computedVariant.actionOnAppBar(), "resk-app-bar-action", actionClassName);
     // Destructure menu props with updated property names for open/closed icon states
     const {
         anchorClosedIconName,
@@ -132,19 +137,21 @@ export function AppBarClientActions<Context = unknown>({
                 renderAction,
                 renderExpandableAction,
                 testID,
-                actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, ...props }, index): IReactNullableElement {
+                actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, onAppBarClassName, onMenuClassName, ...props }, index): IReactNullableElement {
                     const { level } = props;
                     // Handle nested actions (don't count towards limit)
                     if (level) {
-                        props.className = cn("appbar-action-menu-item", actionMenuItemClassName);
+                        props.className = cn(
+                            "appbar-action-menu-item",
+                            actionOnMenuClx,
+                            onMenuClassName // Apply individual action's menu className
+                        );
                         const renderedAction = (renderer as any)(props, index);
                         if (renderedAction) {
                             menuItems.push(props);
                         }
                         return null;
-                    }
-
-                    // Check if action should always be visible
+                    }                    // Check if action should always be visible
                     const shouldAlwaysShow = alwaysVisible;
 
                     // Check viewport constraints
@@ -160,11 +167,17 @@ export function AppBarClientActions<Context = unknown>({
                     }
 
                     props.className = cn(
-                        canRenderDirectly && cn("appbar-action flex-none", actionClassName),
-                        !canRenderDirectly && cn("appbar-action-menu-item", actionMenuItemClassName)
-                    );
-
-                    const renderedAction = (renderer as any)(props, index);
+                        canRenderDirectly && cn(
+                            "appbar-action flex-none",
+                            actionOnAppBarClx,
+                            onAppBarClassName // Apply individual action's AppBar className
+                        ),
+                        !canRenderDirectly && cn(
+                            "appbar-action-menu-item",
+                            actionOnMenuClx,
+                            onMenuClassName // Apply individual action's menu className
+                        )
+                    ); const renderedAction = (renderer as any)(props, index);
                     if (!renderedAction) return null;
 
                     if (canRenderDirectly) {
@@ -176,7 +189,7 @@ export function AppBarClientActions<Context = unknown>({
                 },
             });
         return { actions, menuItems };
-    }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName, effectiveViewportWidth]);
+    }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionOnAppBarClx, actionOnMenuClx, effectiveViewportWidth]);
 
     if (!isHydrated) {
         if (isValidElement(hydrationFallback)) {

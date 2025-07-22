@@ -11,6 +11,8 @@ export const appBarVariant = tv({
         title: "",
         subtitle: "",
         action: "",
+        actionOnAppBar: "",
+        actionOnMenu: "",
         actionMenuItem: "",
         backAction: "",
         actions: "",
@@ -34,6 +36,9 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createTextVariants<IAppBarVariantSlot, "action">((value, colorName) => {
             return { action: value }
         }, "action"),
+        ...VariantsOptionsFactory.createAllRounded<IAppBarVariantSlot, "action">((value, colorName) => {
+            return { action: value }
+        }, "action"),
         ...VariantsOptionsFactory.createIconVariants<IAppBarVariantSlot, "icon">((value, colorName) => {
             return { icon: value }
         }, "icon"),
@@ -55,6 +60,24 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createAllGaps<IAppBarVariantSlot, "actions">((value) => {
             return { actions: value }
         }, "actions"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IAppBarVariantSlot, "actionOnAppBar">((value, colorName) => {
+            return { actionOnAppBar: value }
+        }, "actionOnAppBar"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IAppBarVariantSlot, "actionOnMenu">((value, colorName) => {
+            return { actionOnMenu: value }
+        }, "actionOnMenu"),
+        ...VariantsOptionsFactory.createAllRounded<IAppBarVariantSlot, "actionOnAppBar">((value, colorName) => {
+            return { actionOnAppBar: value }
+        }, "actionOnAppBar"),
+        ...VariantsOptionsFactory.createAllRounded<IAppBarVariantSlot, "actionOnMenu">((value, colorName) => {
+            return { actionOnMenu: value }
+        }, "actionOnMenu"),
+        ...VariantsOptionsFactory.createAllBorders<IAppBarVariantSlot, "actionOnAppBar">((value, colorName) => {
+            return { actionOnAppBar: value }
+        }, "actionOnAppBar"),
+        ...VariantsOptionsFactory.createAllBorders<IAppBarVariantSlot, "actionMenuItem">((value, colorName) => {
+            return { actionMenuItem: value }
+        }, "actionMenuItem"),
         colorScheme: Object.fromEntries(typedEntries(VariantsColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
@@ -88,4 +111,6 @@ type IAppBarVariantSlot = {
     content?: string;
     actions?: string;
     backAction?: string;
+    actionOnAppBar?: string;
+    actionOnMenu?: string;
 }

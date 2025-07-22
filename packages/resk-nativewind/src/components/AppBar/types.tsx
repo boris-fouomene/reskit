@@ -1070,6 +1070,13 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     overflowMenuAccessibilityLabel?: string;
+
+    /**
+     * The variant of the AppBar to use.
+     * This determines the overall appearance and color scheme of the AppBar.
+     * This props is populated automatically by the AppBar component
+     */
+    appBarVariant?: IAppBarVariant;
 }
 /**
  * Context type for AppBar components with enhanced functionality.
@@ -1354,6 +1361,44 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     minViewportWidth?: number;
+
+    /**
+     * Custom CSS class names to apply when this action is rendered directly on the AppBar.
+     * These classes are applied in addition to the default AppBar action styling.
+     * Use for context-specific styling when the action is visible in the main bar.
+     * 
+     * @example
+     * ```tsx
+     * // Different styling when shown directly on AppBar
+     * onAppBarClassName: "bg-primary text-white px-4 py-2 rounded-md"
+     * 
+     * // Responsive AppBar styling
+     * onAppBarClassName: "hidden sm:flex items-center space-x-2"
+     * 
+     * // Brand-specific styling for primary actions
+     * onAppBarClassName: "bg-brand-500 hover:bg-brand-600 text-white font-medium"
+     * ```
+     */
+    onAppBarClassName?: string;
+
+    /**
+     * Custom CSS class names to apply when this action is rendered in the overflow menu.
+     * These classes are applied in addition to the default menu item styling.
+     * Use for context-specific styling when the action is in the dropdown menu.
+     * 
+     * @example
+     * ```tsx
+     * // Different styling when shown in overflow menu
+     * onMenuClassName: "text-gray-700 hover:bg-gray-50 px-3 py-2"
+     * 
+     * // Menu-specific layout styling
+     * onMenuClassName: "flex items-center justify-between w-full"
+     * 
+     * // Danger action styling in menu context
+     * onMenuClassName: "text-red-600 hover:bg-red-50 hover:text-red-700"
+     * ```
+     */
+    onMenuClassName?: string;
 
     /**
      * Group identifier for related actions.

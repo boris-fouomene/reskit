@@ -32,4 +32,5 @@ export * from "./Dialog";
 export * from "./Drawer";
 export * from "./Expandable";
 export * from "./Form";
-export * from "./SSRcrollView";
+export * from "./SSRScrollView";
+// WindowScrollBridge is available as: import { WindowScrollBridge } from '@resk/nativewind/components/SSRcrollView'

@@ -122,6 +122,9 @@
       "components/form": [
         "./build/components/Form/index.d.ts"
       ],
+      "components/ssrScrollView": [
+        "./build/components/SSRScrollView/index.d.ts"
+      ],
       "components": [
         "./build/components/index.d.ts"
       ],

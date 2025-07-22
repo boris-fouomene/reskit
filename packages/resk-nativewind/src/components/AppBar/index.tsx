@@ -100,7 +100,7 @@ function AppBar<Context = unknown>({
       actionMenuItemClassName={cn(computedVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
       menuProps={{
         ...actionsProps?.menuProps,
-        anchorClassName : cn(computedVariant.icon(), actionsProps?.menuProps?.anchorClassName),
+        anchorClassName: cn(computedVariant.icon(), actionsProps?.menuProps?.anchorClassName),
       }}
     />
     {isValidElement(rightContent) ? rightContent : null}
@@ -123,7 +123,7 @@ AppBar.Action.displayName = 'AppBar.Action';
 AppBar.BackAction.displayName = 'AppBar.BackAction';
 (AppBar.ExpandableAction as any).displayName = 'AppBar.ExpandableAction';
 
-export {DEFAULT_APPBAR_RESPONSIVE_CONFIG} from './Actions/utils';
+export { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from './Actions/utils';
 
 export { AppBar };
 

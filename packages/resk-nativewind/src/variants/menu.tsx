@@ -80,7 +80,7 @@ export const menuVariant = tv({
 
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "item">((value) => {
             return {
-                navItem: value,
+                item: value,
             }
         }, "item"),
         ...VariantsOptionsFactory.createAllBorders<IMenuVariantSlots, "item">((value) => {
@@ -107,6 +107,30 @@ export const menuVariant = tv({
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),
+        ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        itemShadowColor: VariantsOptionsFactory.createShadowColor<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
+        ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "navItem">((value) => {
+            return { navItem: value }
+        }, "navItem"),
+        ...VariantsOptionsFactory.createAllOutline<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllOutline<IMenuVariantSlots, "navItem">((value) => {
+            return { navItem: value }
+        }, "navItem"),
+        ...VariantsOptionsFactory.createAllOpacity<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllOpacity<IMenuVariantSlots, "navItem">((value) => {
+            return { navItem: value }
+        }, "navItem"),
+        navItemShadowColor: VariantsOptionsFactory.createShadowColor<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
         itemRingWidth: VariantsOptionsFactory.createRingWidth<IMenuVariantSlots>((value) => {
             return { item: value }
         }),

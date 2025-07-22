@@ -550,7 +550,7 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple = u
                         items={actions}
                         testID={`${testID}-dropdown-menu-actions`}
                         minWidth={150}
-                        preferedPositionAxis="vertical"
+                        preferredPositionAxis="vertical"
                         anchor={<FontIcon
                             name={actionsIconName || FONT_ICONS.MORE as never}
                             className={actionsMenuClassName}

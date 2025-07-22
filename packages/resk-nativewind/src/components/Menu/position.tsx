@@ -14,7 +14,7 @@ export const useMenuPosition = ({
     fullScreenOnMobile,
     fullScreenOnTablet,
     sameWidth,
-    preferedPositionAxis,
+    preferredPositionAxis,
     anchorMeasurements,
     menuWidth,
     menuHeight,
@@ -63,8 +63,8 @@ export const useMenuPosition = ({
                 left: pageX,
                 right: Math.max(0, windowWidth - (pageX + anchorWidth)),
             };
-            const isPreferedHorizontal = preferedPositionAxis == "horizontal";
-            const isPreferedVertical = preferedPositionAxis == "vertical";
+            const isPreferedHorizontal = preferredPositionAxis == "horizontal";
+            const isPreferedVertical = preferredPositionAxis == "vertical";
             const maxVerticalSpace = Math.max(spaces.top, spaces.bottom);
             const maxHorizontalSpace = Math.max(spaces.left, spaces.right);
             const isMaxVerticalSpaceTop = maxVerticalSpace === spaces.top;
@@ -160,7 +160,7 @@ export const useMenuPosition = ({
 
             // Check if preferred position fits
             const preferredFits = checkFits(bestPosition);
-            const toCheck = preferedPositionAxis == "horizontal" ? ["left", "right"] : preferedPositionAxis == "vertical" ? ["bottom", "top"] : ["bottom", "left", "top", "right"];
+            const toCheck = preferredPositionAxis == "horizontal" ? ["left", "right"] : preferredPositionAxis == "vertical" ? ["bottom", "top"] : ["bottom", "left", "top", "right"];
             // If preferred position doesn't fit, try alternatives
             if (!Object.values(preferredFits).every(fit => fit)) {
                 const alternatives: IMenuPosition[] = toCheck as IMenuPosition[];

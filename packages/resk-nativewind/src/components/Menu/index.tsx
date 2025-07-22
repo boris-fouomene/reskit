@@ -36,7 +36,7 @@ export function Menu<Context = unknown>({
     sameWidth = true,
     visible,
     minWidth,
-    preferedPositionAxis,
+    preferredPositionAxis,
     style,
     dismissible,
     onRequestClose,
@@ -58,7 +58,6 @@ export function Menu<Context = unknown>({
     disabled,
     contentContainerClassName,
     ref,
-    animationDuration,
     bottomSheetTitleClassName,
     bottomSheetTitleVariant,
     ...props
@@ -97,7 +96,7 @@ export function Menu<Context = unknown>({
         sameWidth,
         minWidth,
         anchorMeasurements: state.anchorMeasurements,
-        preferedPositionAxis,
+        preferredPositionAxis,
     });
 
     // Handle menu layout changes
@@ -180,16 +179,6 @@ export function Menu<Context = unknown>({
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
     const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
-
-    /* const {
-        menuTranslateY,
-        menuScale,
-        menuOpacity,
-        showMenu,
-        hideMenu,
-        shouldRender,
-    } = useMenuAnimations({ isDesktop, windowHeight, windowWidth, renderedAsBottomSheet, animationDuration, isVisible }); */
-
     useImperativeHandle(ref, () => context as any);
     menuContextRef.current = context;
     let anchor = null;

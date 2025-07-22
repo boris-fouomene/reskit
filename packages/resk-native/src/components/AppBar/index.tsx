@@ -171,7 +171,7 @@ function AppBar<AppBarActionContext = any>({
         {isValidElement(children) ? children : null}
         {actions as any}
         {menuItems.length ? <Menu
-          preferedPositionAxis='vertical'
+          preferredPositionAxis='vertical'
           testID={`${testID}-menu`}
           anchor={({ closeMenu, openMenu }) => {
             return <IconButton

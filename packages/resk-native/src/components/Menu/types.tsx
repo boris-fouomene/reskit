@@ -395,7 +395,7 @@ export interface IUseMenuPositionProps {
      * If specified, the menu position will be calculated based on the specified axis.
      * Default is undefined, which means the menu will be displayed in the preferred axis.
      */
-    preferedPositionAxis?: "horizontal" | "vertical";
+    preferredPositionAxis?: "horizontal" | "vertical";
 
 
 

@@ -303,7 +303,7 @@ export interface IUseMenuPositionProps {
      * If specified, the menu position will be calculated based on the specified axis.
      * Default is undefined, which means the menu will be displayed in the preferred axis.
      */
-    preferedPositionAxis?: "horizontal" | "vertical";
+    preferredPositionAxis?: "horizontal" | "vertical";
 }
 
 export interface IMenuState {
@@ -311,144 +311,951 @@ export interface IMenuState {
     visible: boolean
 }
 
+/**
+ * Comprehensive configuration interface for the Menu component.
+ * 
+ * The Menu component is a highly versatile, responsive menu solution that adapts
+ * to different screen sizes and provides both controlled and uncontrolled modes.
+ * It supports desktop dropdowns, mobile bottom sheets, and tablet-optimized layouts.
+ * 
+ * @template Context - Custom context type to pass additional data to menu items and children
+ * 
+ * @since 1.0.0
+ * @public
+ * 
+ * @example
+ * ```tsx
+ * // Basic uncontrolled menu
+ * <Menu
+ *   anchor={<Button>Open Menu</Button>}
+ *   onOpen={() => console.log('Menu opened')}
+ *   onClose={() => console.log('Menu closed')}
+ * >
+ *   <Text>Menu Content</Text>
+ * </Menu>
+ * 
+ * // Controlled menu with custom context
+ * interface UserContext {
+ *   user: { id: string; name: string };
+ *   permissions: string[];
+ * }
+ * 
+ * const [menuVisible, setMenuVisible] = useState(false);
+ * const userContext: UserContext = {
+ *   user: { id: '1', name: 'John Doe' },
+ *   permissions: ['read', 'write']
+ * };
+ * 
+ * <Menu<UserContext>
+ *   visible={menuVisible}
+ *   context={userContext}
+ *   onRequestClose={() => setMenuVisible(false)}
+ *   anchor={(context) => (
+ *     <Button>
+ *       {context.user.name}'s Menu
+ *     </Button>
+ *   )}
+ *   items={[
+ *     { id: 'profile', label: 'Profile', icon: 'user' },
+ *     { id: 'settings', label: 'Settings', icon: 'settings' }
+ *   ]}
+ *   bottomSheetTitle="User Actions"
+ *   fullScreenOnMobile={true}
+ * />
+ * 
+ * // Menu with dynamic content based on context
+ * <Menu
+ *   anchor={<Icon name="more" />}
+ *   sameWidth={false}
+ *   minWidth={200}
+ *   position="bottom"
+ * >
+ *   {(context) => (
+ *     <View>
+ *       <Text>Screen: {context.menu.isDesktop ? 'Desktop' : 'Mobile'}</Text>
+ *       <Text>Position: {context.menu.position.computedPlacement}</Text>
+ *     </View>
+ *   )}
+ * </Menu>
+ * ```
+ */
 export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "className" | "ref">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
-    /** Optional callback that is invoked when the menu opens.
-     * It's only considered when the menu is not controlled externally by providing the visible prop.
+    // ========================================
+    // CORE CONTROL PROPERTIES
+    // ========================================
+
+    /**
+     * Controls the visibility of the menu for external state management.
+     * 
+     * When provided, the menu operates in **controlled mode**. In this mode:
+     * - The parent component manages visibility state
+     * - Use `onRequestOpen` and `onRequestClose` callbacks
+     * - `onOpen` and `onClose` callbacks are ignored
+     * 
+     * When undefined, the menu operates in **uncontrolled mode**:
+     * - Menu manages its own visibility state internally
+     * - Use `onOpen` and `onClose` callbacks
+     * - `onRequestOpen` and `onRequestClose` are ignored
+     * 
+     * @since 1.0.0
+     * @default undefined (uncontrolled mode)
+     * 
+     * @example
+     * ```tsx
+     * // Controlled mode
+     * const [visible, setVisible] = useState(false);
+     * <Menu
+     *   visible={visible}
+     *   onRequestOpen={() => setVisible(true)}
+     *   onRequestClose={() => setVisible(false)}
+     *   anchor={<Button>Toggle Menu</Button>}
+     * />
+     * 
+     * // Uncontrolled mode
+     * <Menu
+     *   onOpen={() => console.log('Menu opened')}
+     *   onClose={() => console.log('Menu closed')}
+     *   anchor={<Button>Toggle Menu</Button>}
+     * />
+     * ```
+     */
+    visible?: boolean;
+
+    /**
+     * Ref object to access the menu context and imperative methods.
+     * 
+     * The ref provides access to the complete menu context including:
+     * - Menu state (isVisible, isOpen)
+     * - Control methods (open, close, measureAnchor)
+     * - Layout information (windowWidth, windowHeight, position)
+     * - Device detection (isDesktop, isMobile, isTablet)
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * const menuRef = useRef<View & IMenuContext>();
+     * 
+     * <Menu
+     *   ref={menuRef}
+     *   anchor={<Button>Menu</Button>}
+     * />
+     * 
+     * // Access menu context
+     * const openMenu = () => menuRef.current?.menu.open();
+     * const checkPosition = () => console.log(menuRef.current?.menu.position);
+     * ```
+     */
+    ref?: React.Ref<View & IMenuContext<Context>>;
+
+    // ========================================
+    // EVENT HANDLERS
+    // ========================================
+
+    /**
+     * Callback invoked when the menu opens in uncontrolled mode.
+     * 
+     * This callback is only triggered when:
+     * - Menu is in uncontrolled mode (`visible` prop is undefined)
+     * - Menu opens via user interaction or imperative API
+     * 
+     * For controlled mode, use `onRequestOpen` instead.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Open</Button>}
+     *   onOpen={() => {
+     *     console.log('Menu opened');
+     *     analytics.track('menu_opened');
+     *   }}
+     * />
+     * ```
      */
     onOpen?: () => void;
 
-    ref?: React.Ref<View & IMenuContext<Context>>;
-
-    /** Required callback that is invoked when the menu closes.
-     * It's only considered when the menu is not controlled externally by providing the visible prop.
+    /**
+     * Callback invoked when the menu closes in uncontrolled mode.
+     * 
+     * This callback is only triggered when:
+     * - Menu is in uncontrolled mode (`visible` prop is undefined)
+     * - Menu closes via user interaction, backdrop click, or imperative API
+     * 
+     * For controlled mode, use `onRequestClose` instead.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Open</Button>}
+     *   onClose={() => {
+     *     console.log('Menu closed');
+     *     analytics.track('menu_closed');
+     *   }}
+     * />
+     * ```
      */
     onClose?: () => void;
 
-    /** The anchor element or function associated with the Menu component. */
+    /**
+     * Callback invoked when the menu requests to open in controlled mode.
+     * 
+     * This callback is only triggered when:
+     * - Menu is in controlled mode (`visible` prop is provided)
+     * - User attempts to open the menu via anchor interaction
+     * 
+     * Use this to update your external visibility state.
+     * 
+     * @param menuContext - Current menu context with state and methods
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * const [visible, setVisible] = useState(false);
+     * 
+     * <Menu
+     *   visible={visible}
+     *   onRequestOpen={(context) => {
+     *     console.log('Menu wants to open', context.menu.anchorMeasurements);
+     *     setVisible(true);
+     *   }}
+     *   anchor={<Button>Open Menu</Button>}
+     * />
+     * ```
+     */
+    onRequestOpen?: (menuContext: IMenuContext<Context>) => void;
+
+    /**
+     * Callback invoked when the menu requests to close in controlled mode.
+     * 
+     * This callback is triggered when:
+     * - Menu is in controlled mode (`visible` prop is provided)
+     * - User attempts to close via backdrop click, escape key, or menu item selection
+     * - Dismissible behavior is enabled (default)
+     * 
+     * Use this to update your external visibility state.
+     * 
+     * @param menuContext - Current menu context with state and methods
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * const [visible, setVisible] = useState(false);
+     * 
+     * <Menu
+     *   visible={visible}
+     *   onRequestClose={(context) => {
+     *     console.log('Menu wants to close', context.menu.position);
+     *     setVisible(false);
+     *   }}
+     *   anchor={<Button>Open Menu</Button>}
+     * />
+     * ```
+     */
+    onRequestClose?: (menuContext: IMenuContext<Context>) => void;
+
+    // ========================================
+    // ANCHOR CONFIGURATION
+    // ========================================
+
+    /**
+     * The anchor element or render function that triggers the menu.
+     * 
+     * The anchor serves as the reference point for menu positioning and
+     * the interactive element that opens the menu (unless using controlled mode).
+     * 
+     * **Static Anchor:**
+     * - Any React element (button, icon, text, etc.)
+     * - Automatically becomes clickable to open menu
+     * - Menu positions relative to this element
+     * 
+     * **Dynamic Anchor:**
+     * - Function receiving menu context
+     * - Enables conditional rendering based on menu state
+     * - Useful for complex anchor designs
+     * 
+     * @param menuContext - Available when using function form
+     * @returns React element to render as anchor
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Static anchor
+     * <Menu anchor={<Button>Open Menu</Button>} />
+     * 
+     * // Icon anchor
+     * <Menu anchor={<Icon name="more-vertical" />} />
+     * 
+     * // Dynamic anchor with context
+     * <Menu
+     *   anchor={(context) => (
+     *     <Button 
+     *       variant={context.menu.isVisible ? 'pressed' : 'default'}
+     *       disabled={context.menu.fullScreen}
+     *     >
+     *       {context.menu.isVisible ? 'Close' : 'Open'} Menu
+     *     </Button>
+     *   )}
+     * />
+     * 
+     * // Complex anchor with badges
+     * <Menu
+     *   anchor={(context) => (
+     *     <View>
+     *       <Avatar src={user.avatar} />
+     *       {unreadCount > 0 && (
+     *         <Badge count={unreadCount} />
+     *       )}
+     *     </View>
+     *   )}
+     * />
+     * ```
+     */
     anchor: ReactNode | ((menuContext: IMenuContext<Context>) => ReactNode);
 
-    /***
-     * The class name for the touchable component.
+    /**
+     * CSS classes for styling the anchor container wrapper.
+     * 
+     * The anchor container is the touchable wrapper around your anchor element.
+     * Use this to customize spacing, positioning, or interaction states.
+     * 
+     * Applied classes:
+     * - Your custom classes
+     * - Built-in cursor pointer styles
+     * - Common variant styles (disabled state)
+     * - Relative positioning class
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Icon name="menu" />}
+     *   anchorContainerClassName="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+     * />
+     * 
+     * // Custom button-like anchor container
+     * <Menu
+     *   anchor={<Text>Menu</Text>}
+     *   anchorContainerClassName="
+     *     px-4 py-2 border border-gray-300 rounded-md
+     *     hover:border-blue-500 focus:ring-2 focus:ring-blue-200
+     *     active:bg-gray-50
+     *   "
+     * />
+     * ```
      */
     anchorContainerClassName?: IClassName;
 
+    // ========================================
+    // CONTENT CONFIGURATION
+    // ========================================
 
-    /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
-    children?: IReactNullableElement | ((options: IMenuContext<Context>) => IReactNullableElement);
+    /**
+     * Menu content that can be static JSX or dynamic function.
+     * 
+     * **Static Content:**
+     * - Any React elements (Text, View, Image, etc.)
+     * - Rendered as-is within the menu
+     * 
+     * **Dynamic Content:**
+     * - Function receiving menu context
+     * - Access to menu state, device info, positioning data
+     * - Enables responsive and context-aware content
+     * 
+     * @param context - Menu context with state and device information
+     * @returns React elements to render in menu
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Static content
+     * <Menu anchor={<Button>Menu</Button>}>
+     *   <Text>Static menu content</Text>
+     *   <Button>Action 1</Button>
+     *   <Button>Action 2</Button>
+     * </Menu>
+     * 
+     * // Dynamic content with context
+     * <Menu anchor={<Button>Menu</Button>}>
+     *   {(context) => (
+     *     <View>
+     *       <Text>Device: {context.menu.isDesktop ? 'Desktop' : 'Mobile'}</Text>
+     *       <Text>Position: {context.menu.position.computedPlacement}</Text>
+     *       <Text>Window Size: {context.menu.windowWidth}x{context.menu.windowHeight}</Text>
+     *       
+     *       {context.menu.isDesktop ? (
+     *         <DesktopMenuItems />
+     *       ) : (
+     *         <MobileMenuItems />
+     *       )}
+     *       
+     *       <Button onPress={() => context.menu.close()}>
+     *         Close Menu
+     *       </Button>
+     *     </View>
+     *   )}
+     * </Menu>
+     * 
+     * // Conditional content based on user permissions
+     * <Menu<{user: User}> 
+     *   context={{user: currentUser}}
+     *   anchor={<Avatar />}
+     * >
+     *   {(context) => (
+     *     <View>
+     *       <Text>Welcome, {context.user.name}</Text>
+     *       {context.user.isAdmin && (
+     *         <Button>Admin Panel</Button>
+     *       )}
+     *       <Button onPress={() => context.menu.close()}>
+     *         Logout
+     *       </Button>
+     *     </View>
+     *   )}
+     * </Menu>
+     * ```
+     */
+    children?: IReactNullableElement | ((context: IMenuContext<Context>) => IReactNullableElement);
 
-    /***
-     * Default true
-     * if true, the menu content will be wrapped in a ScrollView
-     * if false, the menu content will be rendered directly
+    /**
+     * Pre-configured navigation items for quick menu setup.
+     * 
+     * When provided, these items are automatically rendered using the
+     * internal MenuItems component with proper styling and interactions.
+     * Items support icons, labels, nested menus, and custom actions.
+     * 
+     * Items automatically close the menu when selected (unless closeOnPress is false).
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>User Menu</Button>}
+     *   items={[
+     *     {
+     *       id: 'profile',
+     *       label: 'Profile',
+     *       icon: 'user',
+     *       onPress: () => navigation.navigate('Profile')
+     *     },
+     *     {
+     *       id: 'settings',
+     *       label: 'Settings', 
+     *       icon: 'settings',
+     *       onPress: () => navigation.navigate('Settings')
+     *     },
+     *     { type: 'divider' },
+     *     {
+     *       id: 'logout',
+     *       label: 'Logout',
+     *       icon: 'log-out',
+     *       onPress: handleLogout,
+     *       closeOnPress: true // default behavior
+     *     }
+     *   ]}
+     * />
+     * 
+     * // Nested menu items
+     * <Menu
+     *   anchor={<Button>Tools</Button>}
+     *   items={[
+     *     {
+     *       id: 'export',
+     *       label: 'Export',
+     *       icon: 'download',
+     *       children: [
+     *         { id: 'pdf', label: 'PDF', onPress: () => exportPDF() },
+     *         { id: 'csv', label: 'CSV', onPress: () => exportCSV() },
+     *         { id: 'json', label: 'JSON', onPress: () => exportJSON() }
+     *       ]
+     *     }
+     *   ]}
+     * />
+     * ```
+     */
+    items?: INavItemsProps<Context>["items"];
+
+    /**
+     * Additional configuration for the items rendering.
+     * 
+     * Customize how navigation items are displayed, including styling,
+     * behavior, and layout options. This extends the base Nav.Items props
+     * excluding items and context which are handled separately.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Menu</Button>}
+     *   items={menuItems}
+     *   itemsProps={{
+     *     className: "space-y-1 p-2",
+     *     size: "large",
+     *     showIcons: true,
+     *     variant: "ghost"
+     *   }}
+     * />
+     * ```
+     */
+    itemsProps?: Omit<INavItemsProps<Context>, "items">;
+
+    // ========================================
+    // SCROLL BEHAVIOR
+    // ========================================
+
+    /**
+     * Controls whether menu content is wrapped in a ScrollView.
+     * 
+     * **When true (default):**
+     * - Content scrollable if it exceeds menu height
+     * - Respects maxHeight constraints
+     * - Better for long content lists
+     * - ScrollView props can be customized
+     * 
+     * **When false:**
+     * - Content rendered directly without scroll wrapper
+     * - Better performance for simple content
+     * - Content may overflow if too tall
+     * - Use for simple, short content
+     * 
+     * @default true
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Long scrollable content (default)
+     * <Menu
+     *   anchor={<Button>Long Menu</Button>}
+     *   withScrollView={true} // default
+     *   maxHeight={300}
+     * >
+     *   {longContentList.map(item => (
+     *     <MenuItem key={item.id} {...item} />
+     *   ))}
+     * </Menu>
+     * 
+     * // Simple non-scrollable content
+     * <Menu
+     *   anchor={<Button>Simple Menu</Button>}
+     *   withScrollView={false}
+     * >
+     *   <Button>Action 1</Button>
+     *   <Button>Action 2</Button>
+     *   <Button>Action 3</Button>
+     * </Menu>
+     * ```
      */
     withScrollView?: boolean;
 
-    /***
-        The class name for the content container.
-        This is used to apply style to the content container.
-        The content container is the flex-1 container that wraps the menu content and items.
-    */
+    /**
+     * CSS classes for the main content container.
+     * 
+     * The content container is the flex-1 wrapper that holds all menu content
+     * including items and children. It sits between the backdrop and the actual
+     * content, providing the main structural layout.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Menu</Button>}
+     *   contentContainerClassName="
+     *     bg-white dark:bg-gray-800 
+     *     border border-gray-200 dark:border-gray-700
+     *     rounded-lg shadow-lg
+     *     max-w-sm
+     *   "
+     * />
+     * ```
+     */
     contentContainerClassName?: IClassName;
 
-    /***
-     * The class name for the scroll view.
-     * This is used to apply style to the scroll view.
+    /**
+     * CSS classes for the ScrollView wrapper when `withScrollView` is true.
+     * 
+     * Applied to the ScrollView component that wraps the menu content.
+     * Use this to control scrolling behavior, styling, and constraints.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Menu</Button>}
+     *   withScrollView={true}
+     *   scrollViewClassName="
+     *     max-h-64 overflow-y-auto
+     *     scrollbar-thin scrollbar-thumb-gray-300
+     *   "
+     * />
+     * ```
      */
     scrollViewClassName?: IClassName;
 
-    /***
-     * The class name for the scroll view content container.
-     * This is used to apply contentContainerStyle to the scroll view.
+    /**
+     * CSS classes for the ScrollView's content container.
+     * 
+     * Applied to the contentContainerStyle of the ScrollView.
+     * Use this to control padding, spacing, and layout of scrollable content.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Menu</Button>}
+     *   withScrollView={true}
+     *   scrollViewContentContainerClassName="
+     *     p-4 space-y-2
+     *     pb-safe-area-bottom
+     *   "
+     * />
+     * ```
      */
     scrollViewContentContainerClassName?: IClassName;
 
-    /***
-     * Whether the menu should be dismissible
+    // ========================================
+    // INTERACTION BEHAVIOR
+    // ========================================
+
+    /**
+     * Controls whether the menu can be dismissed by user interaction.
+     * 
+     * **When true (default):**
+     * - Menu closes on backdrop click
+     * - Menu closes on escape key press
+     * - onRequestClose callback is triggered
+     * 
+     * **When false:**
+     * - Menu stays open until explicitly closed
+     * - Backdrop clicks are ignored
+     * - Escape key is ignored
+     * - Use for critical confirmations or forced interactions
+     * 
+     * @default true
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Normal dismissible menu
+     * <Menu
+     *   anchor={<Button>Regular Menu</Button>}
+     *   dismissible={true} // default
+     * />
+     * 
+     * // Non-dismissible confirmation menu
+     * <Menu
+     *   anchor={<Button>Delete Account</Button>}
+     *   dismissible={false}
+     * >
+     *   <Text>Are you sure you want to delete your account?</Text>
+     *   <View style={{flexDirection: 'row', gap: 8}}>
+     *     <Button variant="destructive" onPress={confirmDelete}>
+     *       Delete
+     *     </Button>
+     *     <Button onPress={() => menuRef.current?.menu.close()}>
+     *       Cancel
+     *     </Button>
+     *   </View>
+     * </Menu>
+     * ```
      */
     dismissible?: boolean;
 
-    /***
-        The callback function that is called when the menu is dismissed.
-        This is considered when the menu is controlled externally by providing the visible prop.
-        @param {IMenuContext<Context>} menuContext The current menu context.
-        @remarks
-        This function is called when the menu is dismissed, either by clicking outside the menu or by pressing the escape key.
-        It is used to update the visible state of the menu.
-        This is useful when the menu is controlled externally by providing the visible prop.
-        If the menu is not controlled externally, this function is not called.
-    */
-    onRequestClose?: (menuContext: IMenuContext<Context>) => void;
+    /**
+     * Disables the menu and its anchor interaction.
+     * 
+     * When true:
+     * - Anchor becomes non-interactive
+     * - Menu cannot be opened
+     * - Visual disabled styling is applied
+     * - Useful for loading states or permission restrictions
+     * 
+     * @default false
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * const [loading, setLoading] = useState(false);
+     * 
+     * <Menu
+     *   anchor={<Button>User Actions</Button>}
+     *   disabled={loading || !hasPermission}
+     *   items={userMenuItems}
+     * />
+     * ```
+     */
+    disabled?: boolean;
 
-    /***
-        The callback function that is called when the menu is opened.
-        This is considered when the menu is controlled externally by providing the visible prop.
-        @param {IMenuContext<Context>} menuContext The current menu context.
-        @remarks
-        This function is called when the menu is opened, either by clicking on the anchor element or by pressing the menu button.
-        It is used to update the visible state of the menu.
-        This is useful when the menu is controlled externally by providing the visible prop.
-        If the menu is not controlled externally, this function is not called.
-    */
-    onRequestOpen?: (menuContext: IMenuContext<Context>) => void;
+    // ========================================
+    // RESPONSIVE & MOBILE CONFIGURATION
+    // ========================================
 
-
-    /***
-     * Whether the menu should be rendered as a bottom sheet in full screen mode.
-     * If set to true, the menu will be rendered as a bottom sheet on mobile (when the fullScreenOnMobile prop is set to true) or tablet (when the fullScreenOnTablet pros is set to true) devices, and as a regular menu on desktop.
+    /**
+     * Whether to render as bottom sheet on mobile devices.
+     * 
+     * When true and `fullScreenOnMobile` is also true:
+     * - Menu renders as slide-up bottom sheet on mobile
+     * - Includes title header with close button
+     * - Better UX for touch interactions
+     * - Automatic transition animations
+     * 
+     * @default false
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Mobile-Friendly Menu</Button>}
+     *   renderAsBottomSheetInFullScreen={true}
+     *   fullScreenOnMobile={true}
+     *   bottomSheetTitle="User Actions"
+     * />
+     * ```
      */
     renderAsBottomSheetInFullScreen?: boolean;
 
-    /***
-     * The title of the bottom sheet when the menu is rendered as a bottom sheet.
+    /**
+     * Title displayed in bottom sheet header on mobile.
+     * 
+     * Only visible when:
+     * - `renderAsBottomSheetInFullScreen` is true
+     * - `fullScreenOnMobile` is true  
+     * - Currently on mobile device
+     * 
+     * Can be string, JSX, or any React node.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Simple string title
+     * <Menu
+     *   bottomSheetTitle="User Menu"
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * 
+     * // Custom JSX title
+     * <Menu
+     *   bottomSheetTitle={
+     *     <View style={{flexDirection: 'row', alignItems: 'center'}}>
+     *       <Avatar size="sm" src={user.avatar} />
+     *       <Text style={{marginLeft: 8}}>{user.name}</Text>
+     *     </View>
+     *   }
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * ```
      */
     bottomSheetTitle?: ReactNode;
 
     /**
-     * The variant for the bottom sheet title
+     * Text styling variant for the bottom sheet title.
+     * 
+     * Controls typography, color, and styling of the title text.
+     * Uses the same variant system as other text components.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   bottomSheetTitle="Menu Title"
+     *   bottomSheetTitleVariant={{
+     *     size: 'xl',
+     *     weight: 'bold',
+     *     color: 'primary'
+     *   }}
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * ```
      */
     bottomSheetTitleVariant?: ITextVariant;
 
-    /***
-     * The className to use for the bottom sheet title.
+    /**
+     * CSS classes for styling the bottom sheet title.
+     * 
+     * Custom classes to apply to the title text element.
+     * Combined with variant styles and default title styling.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   bottomSheetTitle="Settings"
+     *   bottomSheetTitleClassName="
+     *     text-xl font-semibold text-gray-900 dark:text-white
+     *     tracking-tight
+     *   "
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * ```
      */
     bottomSheetTitleClassName?: IClassName;
 
-    /***
-     * Whether to show a divider between the title and the content when the menu is rendered as a bottom sheet.
+    /**
+     * Whether to show a divider line below the bottom sheet title.
+     * 
+     * **When true (default):**
+     * - Horizontal divider separates title from content
+     * - Better visual hierarchy
+     * - Recommended for most cases
+     * 
+     * **When false:**
+     * - No divider line
+     * - Seamless title-to-content transition
+     * - Use for minimal designs
+     * 
+     * @default true
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // With divider (default)
+     * <Menu
+     *   bottomSheetTitle="Actions"
+     *   displayBottomSheetTitleDivider={true}
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * 
+     * // Without divider for minimal look
+     * <Menu
+     *   bottomSheetTitle="Quick Actions"
+     *   displayBottomSheetTitleDivider={false}
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * ```
      */
     displayBottomSheetTitleDivider?: boolean;
 
-    items?: INavItemsProps<Context>["items"];
+    // ========================================
+    // STYLING & VARIANTS
+    // ========================================
 
-    itemsProps?: Omit<INavItemsProps<Context>, "items">;
-
-    /***
-     * The variant to use for the menu.
+    /**
+     * Visual styling variant for the menu in desktop/popup mode.
+     * 
+     * Controls colors, shadows, borders, spacing, and other visual aspects
+     * of the menu when rendered as a desktop dropdown or popup.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Styled Menu</Button>}
+     *   variant={{
+     *     colorScheme: 'primary',
+     *     shadow: 'xl',
+     *     rounded: 'lg',
+     *     padding: 4
+     *   }}
+     * />
+     * ```
      */
     variant?: IMenuVariant;
 
-    /***
-        The variant to use for the bottom sheet.
-        It will be used only if the menu is rendered as a bottom sheet.
-    */
+    /**
+     * Visual styling variant for the menu in mobile bottom sheet mode.
+     * 
+     * Controls the appearance when menu is rendered as a bottom sheet
+     * on mobile devices. Separate from desktop variant to allow
+     * different styling approaches for different form factors.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * <Menu
+     *   anchor={<Button>Responsive Menu</Button>}
+     *   variant={{colorScheme: 'surface'}} // Desktop styling
+     *   bottomSheetVariant={{
+     *     colorScheme: 'primary',
+     *     elevation: 'high'
+     *   }} // Mobile bottom sheet styling
+     *   renderAsBottomSheetInFullScreen={true}
+     * />
+     * ```
+     */
     bottomSheetVariant?: IBottomSheetVariant;
 
-    /***
-     * Additional context options to pass to each item, enabling customization of the properties passed to item.
+    // ========================================
+    // CONTEXT & DATA
+    // ========================================
+
+    /**
+     * Additional context data passed to menu items and children functions.
+     * 
+     * This custom context is merged with the menu's internal context,
+     * allowing you to pass user data, permissions, state, or any other
+     * information that menu items or dynamic content might need.
+     * 
+     * Type-safe when using the generic Context parameter.
+     * 
+     * @since 1.0.0
+     * 
+     * @example
+     * ```tsx
+     * // Define custom context type
+     * interface AppMenuContext {
+     *   user: User;
+     *   permissions: Permission[];
+     *   currentTheme: 'light' | 'dark';
+     *   onNavigate: (route: string) => void;
+     * }
+     * 
+     * const appContext: AppMenuContext = {
+     *   user: currentUser,
+     *   permissions: userPermissions,
+     *   currentTheme: theme,
+     *   onNavigate: navigate
+     * };
+     * 
+     * <Menu<AppMenuContext>
+     *   context={appContext}
+     *   anchor={<Avatar src={currentUser.avatar} />}
+     *   items={[
+     *     {
+     *       id: 'profile',
+     *       label: 'Profile',
+     *       onPress: (event, context) => {
+     *         context.onNavigate(`/users/${context.user.id}`);
+     *       }
+     *     },
+     *     {
+     *       id: 'admin',
+     *       label: 'Admin Panel',
+     *       visible: (context) => context.permissions.includes('admin'),
+     *       onPress: (event, context) => {
+     *         context.onNavigate('/admin');
+     *       }
+     *     }
+     *   ]}
+     * >
+     *   {(context) => (
+     *     <View>
+     *       <Text>Welcome, {context.user.name}</Text>
+     *       <Text>Theme: {context.currentTheme}</Text>
+     *       <Text>Screen: {context.menu.isDesktop ? 'Desktop' : 'Mobile'}</Text>
+     *     </View>
+     *   )}
+     * </Menu>
+     * ```
      */
     context?: Context;
-
-    /***
-        Whether the menu is disabled or not.
-    */
-    disabled?: boolean;
-
-    /***
-     * The Bottom Sheet Animation Duration in milli seconds
-     * @default 300
-     */
-    animationDuration?: number;
 }
 
 

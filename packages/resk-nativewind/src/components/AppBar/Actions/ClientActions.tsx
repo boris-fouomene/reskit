@@ -55,7 +55,7 @@ export function AppBarClientActions<Context = unknown>({ context, className, men
     return <Div className={cn("appbar-actions", className, "flex flex-row items-center grow-0 justify-start")}>
         {actions}
         {menuItems.length ? <Menu
-            preferedPositionAxis='vertical'
+            preferredPositionAxis='vertical'
             testID={`${testID}-menu`}
             className={cn("appbar-menu")}
             anchor={({ menu }) => {

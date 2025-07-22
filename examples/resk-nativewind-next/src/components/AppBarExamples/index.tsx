@@ -255,11 +255,11 @@ export function GroupedActionsAppBarExample() {
 }
 export function AppBarExamples(){
     return <>
-        <BasicAppBarExample />
+        {/* <BasicAppBarExample />
         <DrawerAppBarExample />
         <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
-        <GroupedActionsAppBarExample />
+         */}<GroupedActionsAppBarExample />
     </>
 }
 /**

@@ -8,7 +8,7 @@ import {
 import { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from "./utils";
 import { calculateMaxVisibleActions,sortActionsByPriority} from "./utils";
 import { IReactNullableElement } from "@src/types";
-import { isNumber } from "@resk/core/utils";
+import { isNumber, isObj } from "@resk/core/utils";
 import { Menu } from "@components/Menu";
 import { FONT_ICONS, Icon } from "@components/Icon";
 import { renderActions } from "./utils";
@@ -45,7 +45,7 @@ export function AppBarClientActions<Context = unknown>({
             return viewportWidth;
         }
         // For constrained containers (drawer, modal), use a more conservative approach
-        return Math.max(windowWidth - 100, 320); // Minimum 320px width
+        return Math.max(windowWidth, 320); // Minimum 320px width
     }, [viewportWidth, windowWidth]);
     
     // Calculate max actions based on responsive configuration
@@ -55,13 +55,13 @@ export function AppBarClientActions<Context = unknown>({
         }
         return calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
     }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig]);
+
     
     // Sort and process actions based on priority
     const processedActions = useMemo(() => {
-        if (!items?.length) return [];
-        
+        if (!Array.isArray(items) || !items.length) return [];
         // Filter out null/undefined items and sort by priority if priority is being used
-        const validItems = items.filter((action): action is IAppBarActionProps<Context> => action != null);
+        const validItems = items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null);
         const hasPriority = validItems.some(action => action.priority !== undefined);
         
         if (hasPriority) {

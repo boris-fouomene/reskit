@@ -76,73 +76,73 @@ export const VariantsColors = {
   },
   "buttonOutline": {
     "primary": {
-      "base": "group web:hover:bg-primary web:dark:hover:bg-dark-primary p-[5px] border-2 border-primary dark:border-dark-primary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-primary web:dark:hover:bg-dark-primary border-2 border-primary dark:border-dark-primary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-primary-foreground web:dark:hover:text-dark-primary-foreground web:group-hover:text-primary-foreground web:dark:group-hover:text-dark-primary-foreground text-primary dark:text-dark-primary",
       "icon": "web:hover:!text-primary-foreground web:dark:hover:!text-dark-primary-foreground web:group-hover:!text-primary-foreground web:dark:group-hover:!text-dark-primary-foreground !text-primary dark:!text-dark-primary",
       "activityIndicator": "web:hover:border-t-primary-foregund web:dark:hover:border-t-dark-primary-foreground web:group-hover:border-t-primary-foreground web:dark:group-hover:border-t-dark-primary-foreground border-t-primary dark:border-t-dark-primary"
     },
     "secondary": {
-      "base": "group web:hover:bg-secondary web:dark:hover:bg-dark-secondary p-[5px] border-2 border-secondary dark:border-dark-secondary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-secondary web:dark:hover:bg-dark-secondary border-2 border-secondary dark:border-dark-secondary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-secondary-foreground web:dark:hover:text-dark-secondary-foreground web:group-hover:text-secondary-foreground web:dark:group-hover:text-dark-secondary-foreground text-secondary dark:text-dark-secondary",
       "icon": "web:hover:!text-secondary-foreground web:dark:hover:!text-dark-secondary-foreground web:group-hover:!text-secondary-foreground web:dark:group-hover:!text-dark-secondary-foreground !text-secondary dark:!text-dark-secondary",
       "activityIndicator": "web:hover:border-t-secondary-foregund web:dark:hover:border-t-dark-secondary-foreground web:group-hover:border-t-secondary-foreground web:dark:group-hover:border-t-dark-secondary-foreground border-t-secondary dark:border-t-dark-secondary"
     },
     "surface": {
-      "base": "group web:hover:bg-gray-100 web:dark:hover:bg-gray-800 p-[5px] border-2 border-gray-100 dark:border-gray-800 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-gray-100 web:dark:hover:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-gray-100 dark:text-gray-800",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-gray-100 dark:!text-gray-800",
       "activityIndicator": "web:hover:border-t-gray-100-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-gray-100 dark:border-t-gray-800"
     },
     "background": {
-      "base": "group web:hover:bg-white web:dark:hover:bg-gray-900 p-[5px] border-2 border-white dark:border-gray-900 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-white web:dark:hover:bg-gray-900 border-2 border-white dark:border-gray-900 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-white dark:text-gray-900",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-white dark:!text-gray-900",
       "activityIndicator": "web:hover:border-t-white-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-white dark:border-t-gray-900"
     },
     "neutral": {
-      "base": "group web:hover:bg-gray-500 web:dark:hover:bg-gray-600 p-[5px] border-2 border-gray-500 dark:border-gray-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-gray-500 web:dark:hover:bg-gray-600 border-2 border-gray-500 dark:border-gray-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-gray-50 web:group-hover:text-white web:dark:group-hover:text-gray-50 text-gray-500 dark:text-gray-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-gray-50 web:group-hover:!text-white web:dark:group-hover:!text-gray-50 !text-gray-500 dark:!text-gray-600",
       "activityIndicator": "web:hover:border-t-gray-500-foregund web:dark:hover:border-t-gray-50 web:group-hover:border-t-white web:dark:group-hover:border-t-gray-50 border-t-gray-500 dark:border-t-gray-600"
     },
     "error": {
-      "base": "group web:hover:bg-red-500 web:dark:hover:bg-red-600 p-[5px] border-2 border-red-500 dark:border-red-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-red-500 web:dark:hover:bg-red-600 border-2 border-red-500 dark:border-red-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-red-50 web:group-hover:text-white web:dark:group-hover:text-red-50 text-red-500 dark:text-red-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-red-50 web:group-hover:!text-white web:dark:group-hover:!text-red-50 !text-red-500 dark:!text-red-600",
       "activityIndicator": "web:hover:border-t-red-500-foregund web:dark:hover:border-t-red-50 web:group-hover:border-t-white web:dark:group-hover:border-t-red-50 border-t-red-500 dark:border-t-red-600"
     },
     "info": {
-      "base": "group web:hover:bg-blue-500 web:dark:hover:bg-blue-600 p-[5px] border-2 border-blue-500 dark:border-blue-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-blue-500 web:dark:hover:bg-blue-600 border-2 border-blue-500 dark:border-blue-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-blue-50 web:group-hover:text-white web:dark:group-hover:text-blue-50 text-blue-500 dark:text-blue-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-blue-50 web:group-hover:!text-white web:dark:group-hover:!text-blue-50 !text-blue-500 dark:!text-blue-600",
       "activityIndicator": "web:hover:border-t-blue-500-foregund web:dark:hover:border-t-blue-50 web:group-hover:border-t-white web:dark:group-hover:border-t-blue-50 border-t-blue-500 dark:border-t-blue-600"
     },
     "warning": {
-      "base": "group web:hover:bg-yellow-500 web:dark:hover:bg-yellow-600 p-[5px] border-2 border-yellow-500 dark:border-yellow-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-yellow-500 web:dark:hover:bg-yellow-600 border-2 border-yellow-500 dark:border-yellow-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-yellow-900 web:dark:hover:text-yellow-50 web:group-hover:text-yellow-900 web:dark:group-hover:text-yellow-50 text-yellow-500 dark:text-yellow-600",
       "icon": "web:hover:!text-yellow-900 web:dark:hover:!text-yellow-50 web:group-hover:!text-yellow-900 web:dark:group-hover:!text-yellow-50 !text-yellow-500 dark:!text-yellow-600",
       "activityIndicator": "web:hover:border-t-yellow-500-foregund web:dark:hover:border-t-yellow-50 web:group-hover:border-t-yellow-900 web:dark:group-hover:border-t-yellow-50 border-t-yellow-500 dark:border-t-yellow-600"
     },
     "success": {
-      "base": "group web:hover:bg-green-500 web:dark:hover:bg-green-600 p-[5px] border-2 border-green-500 dark:border-green-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-green-500 web:dark:hover:bg-green-600 border-2 border-green-500 dark:border-green-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-green-50 web:group-hover:text-white web:dark:group-hover:text-green-50 text-green-500 dark:text-green-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-green-50 web:group-hover:!text-white web:dark:group-hover:!text-green-50 !text-green-500 dark:!text-green-600",
       "activityIndicator": "web:hover:border-t-green-500-foregund web:dark:hover:border-t-green-50 web:group-hover:border-t-white web:dark:group-hover:border-t-green-50 border-t-green-500 dark:border-t-green-600"
     },
     "text": {
-      "base": "group web:hover:bg-gray-900 web:dark:hover:bg-gray-100 p-[5px] border-2 border-gray-900 dark:border-gray-100 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-gray-900 web:dark:hover:bg-gray-100 border-2 border-gray-900 dark:border-gray-100 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-100 web:dark:hover:text-gray-900 web:group-hover:text-gray-100 web:dark:group-hover:text-gray-900 text-gray-900 dark:text-gray-100",
       "icon": "web:hover:!text-gray-100 web:dark:hover:!text-gray-900 web:group-hover:!text-gray-100 web:dark:group-hover:!text-gray-900 !text-gray-900 dark:!text-gray-100",
       "activityIndicator": "web:hover:border-t-gray-900-foregund web:dark:hover:border-t-gray-900 web:group-hover:border-t-gray-100 web:dark:group-hover:border-t-gray-900 border-t-gray-900 dark:border-t-gray-100"
     },
     "outline": {
-      "base": "group web:hover:bg-gray-300 web:dark:hover:bg-gray-700 p-[5px] border-2 border-gray-300 dark:border-gray-700 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-gray-300 web:dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-700 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-gray-300 dark:text-gray-700",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-gray-300 dark:!text-gray-700",
       "activityIndicator": "web:hover:border-t-gray-300-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-gray-300 dark:border-t-gray-700"
     },
     "backdrop": {
-      "base": "group web:hover:bg-gray-900/50 web:dark:hover:bg-gray-900/80 p-[5px] border-2 border-gray-900/50 dark:border-gray-900/80 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "base": "group web:hover:bg-gray-900/50 web:dark:hover:bg-gray-900/80 border-2 border-gray-900/50 dark:border-gray-900/80 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-white web:group-hover:text-white web:dark:group-hover:text-white text-gray-900/50 dark:text-gray-900/80",
       "icon": "web:hover:!text-white web:dark:hover:!text-white web:group-hover:!text-white web:dark:group-hover:!text-white !text-gray-900/50 dark:!text-gray-900/80",
       "activityIndicator": "web:hover:border-t-gray-900/50-foregund web:dark:hover:border-t-white web:group-hover:border-t-white web:dark:group-hover:border-t-white border-t-gray-900/50 dark:border-t-gray-900/80"

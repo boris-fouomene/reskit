@@ -343,8 +343,9 @@ const customResponsiveConfig = {
       // Anchor button customization
       anchorClassName: "text-primary hover:bg-primary/10",
       anchorIconSize: 24,
-      anchorIconName: "more-vertical",
-      anchorIconVarint: "ghost",
+      anchorClosedIconName: "more-vertical",  // Icon when menu is closed
+      anchorOpenIconName: "x",               // Icon when menu is open
+      anchorIconVariant: "ghost",
     
       // Menu behavior
       preferredPosition: "bottom-end",

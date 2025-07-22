@@ -11,8 +11,10 @@ const MENU_MIN_WIDTH = 120;
 export const useMenuPosition = ({
     position,
     visible,
-    fullScreenOnMobile,
-    fullScreenOnTablet,
+    renderAsBottomSheetOnMobile,
+    renderAsBottomSheetOnTablet,
+    renderAsNavigationMenuOnMobile,
+    renderAsNavigationMenuOnTablet,
     sameWidth,
     preferredPositionAxis,
     anchorMeasurements,
@@ -24,7 +26,12 @@ export const useMenuPosition = ({
 }: IUseMenuPositionProps) => {
     const padding = 0;
     const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useDimensions();
-    const fullScreen = !!(isMobile && fullScreenOnMobile || isTablet && fullScreenOnTablet);
+
+    // Calculate fullScreen mode based on any device-specific rendering mode
+    const fullScreen = !!(
+        (isMobile && (renderAsBottomSheetOnMobile || renderAsNavigationMenuOnMobile)) ||
+        (isTablet && (renderAsBottomSheetOnTablet || renderAsNavigationMenuOnTablet))
+    );
     const computedMinWidth = computWidthOrHeight(windowWidth, customMinWidth);
     const computedMinHeight = computWidthOrHeight(windowHeight, customMinHeight);
     const computedMaxHeight = Math.max(computWidthOrHeight(windowHeight, customMaxHeight), 0, computedMinHeight);

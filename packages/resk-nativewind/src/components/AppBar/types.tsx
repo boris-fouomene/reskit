@@ -81,7 +81,7 @@ export interface IAppBarResponsiveConfig {
          */
         maxActions: number;
     }[];
-    
+
     /** 
      * Default maximum visible actions when viewport width is smaller than the smallest
      * breakpoint or when viewport width cannot be determined.
@@ -157,7 +157,7 @@ export interface IAppBarContent {
      * ```
      */
     title?: ReactNode;
-    
+
     /** 
      * An optional subtitle displayed below or alongside the title.
      * Used for additional context, user information, or secondary details.
@@ -170,7 +170,7 @@ export interface IAppBarContent {
      * ```
      */
     subtitle?: ReactNode;
-    
+
     /** 
      * CSS class name applied to the title element for custom styling.
      * 
@@ -181,7 +181,7 @@ export interface IAppBarContent {
      * ```
      */
     titleClassName?: IClassName;
-    
+
     /** 
      * Typography variant for the title text styling.
      * Uses the design system's text variants for consistent typography.
@@ -194,7 +194,7 @@ export interface IAppBarContent {
      * ```
      */
     titleVariant?: ITextVariant;
-    
+
     /** 
      * CSS class name applied to the subtitle element for custom styling.
      * 
@@ -205,7 +205,7 @@ export interface IAppBarContent {
      * ```
      */
     subtitleClassName?: IClassName;
-    
+
     /** 
      * Typography variant for the subtitle text styling.
      * Typically smaller and less prominent than the title variant.
@@ -218,7 +218,7 @@ export interface IAppBarContent {
      * ```
      */
     subtitleVariant?: ITextVariant;
-    
+
     /** 
      * CSS class name applied to the entire content container of the AppBar.
      * Affects the layout and styling of the title/subtitle area.
@@ -307,7 +307,7 @@ export interface IAppBarNavigation<Context = unknown> {
      * ```
      */
     onBackActionPress?: (event: any) => any;
-    
+
     /**
      * The position of the back action button within the AppBar layout.
      * Determines whether the back button appears on the left or right side.
@@ -320,7 +320,7 @@ export interface IAppBarNavigation<Context = unknown> {
      * ```
      */
     backActionPosition?: "left" | "right";
-    
+
     /** 
      * CSS class name applied to the BackAction component when rendered.
      * Used for custom styling of the back button container.
@@ -332,7 +332,7 @@ export interface IAppBarNavigation<Context = unknown> {
      * ```
      */
     backActionClassName?: IClassName;
-    
+
     /** 
      * Properties passed to the underlying IconButton component for the back action.
      * Excludes 'onPress' as it's handled by the onBackActionPress callback.
@@ -348,7 +348,7 @@ export interface IAppBarNavigation<Context = unknown> {
      * ```
      */
     backActionProps?: Omit<IIconButtonProps, "onPress">;
-    
+
     /** 
      * Custom back action element or render function for complete customization.
      * When provided, this overrides the default back button implementation.
@@ -381,7 +381,7 @@ export interface IAppBarNavigation<Context = unknown> {
      * )
      * ```
      */
-    backAction?: JSX.Element | null | false | ((context: Context & { 
+    backAction?: JSX.Element | null | false | ((context: Context & {
         /** Properties for the default back action button */
         backActionProps?: Omit<IIconButtonProps, "onPress">;
         /** CSS class name for the back action */
@@ -478,13 +478,13 @@ export interface IAppBarLayout<Context = unknown> {
      * )
      * ```
      */
-    left?: ReactNode | ((context: Context & { 
+    left?: ReactNode | ((context: Context & {
         /** Computed AppBar variant for consistent styling */
         computedAppBarVariant: ReturnType<typeof appBarVariant>;
         /** Pre-configured back press handler */
         handleBackPress: (event: any) => void;
     }) => ReactNode);
-    
+
     /** 
      * Content for the right side of the AppBar.
      * Can be static ReactNode content or a dynamic render function that receives context.
@@ -506,7 +506,7 @@ export interface IAppBarLayout<Context = unknown> {
      * )
      * ```
      */
-    right?: ReactNode | ((context: Context & { 
+    right?: ReactNode | ((context: Context & {
         /** Computed AppBar variant for consistent styling */
         computedAppBarVariant: ReturnType<typeof appBarVariant>;
         /** Pre-configured back press handler */
@@ -584,12 +584,12 @@ export interface IAppBarLayout<Context = unknown> {
  * />
  * ```
  */
-export interface IAppBarProps<Context = unknown> extends 
+export interface IAppBarProps<Context = unknown> extends
     Omit<ISurfaceProps, "title" | "variant">,
     IAppBarContent,
     IAppBarNavigation<Context>,
-    IAppBarLayout<Context>{
-    
+    IAppBarLayout<Context> {
+
     /** 
      * Context object passed to actions and render functions.
      * Provides additional data and functionality to action handlers and custom renderers.
@@ -604,7 +604,7 @@ export interface IAppBarProps<Context = unknown> extends
      * ```
      */
     context?: Context;
-    
+
     /** 
      * Visual variant for the AppBar styling.
      * Determines the overall appearance and color scheme of the AppBar.
@@ -645,7 +645,7 @@ export interface IAppBarProps<Context = unknown> extends
      * ```
      */
     actions?: IAppBarActionsProps<Context>["actions"];
-    
+
     /** 
      * Comprehensive properties for the actions container.
      * Provides full control over action rendering, responsive behavior, and styling.
@@ -666,7 +666,7 @@ export interface IAppBarProps<Context = unknown> extends
      * ```
      */
     actionsProps?: IAppBarActionsProps<Context>;
-    
+
     /** 
      * The maximum visible number of actions to display directly on the AppBar.
      * When exceeded, additional actions move to the overflow menu.
@@ -679,7 +679,7 @@ export interface IAppBarProps<Context = unknown> extends
      * ```
      */
     maxVisibleActions?: IAppBarActionsProps<Context>["maxVisibleActions"];
-    
+
     /** 
      * CSS class name applied to the actions container.
      * Used for custom styling of the entire actions area.
@@ -769,7 +769,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     testID?: string;
-    
+
     /** 
      * CSS class name applied to the actions container.
      * Controls the styling and layout of the entire actions area.
@@ -797,7 +797,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     viewportWidth?: number;
-    
+
     /** 
      * Responsive configuration for action display breakpoints.
      * Defines how many actions to show at different viewport widths.
@@ -846,7 +846,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     actions?: INavItems<IAppBarActionProps<Context>>;
-    
+
     /** 
      * Maximum number of actions to display directly in the AppBar.
      * When not specified, uses responsive configuration for automatic calculation.
@@ -861,7 +861,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     maxVisibleActions?: number;
-    
+
 
     // Action Styling
     /** 
@@ -875,7 +875,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     actionClassName?: IClassName;
-    
+
     /** 
      * CSS class name applied to actions rendered inside the overflow menu.
      * Used for styling menu items differently from direct actions.
@@ -909,7 +909,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     renderAction?: INavItemsProps<IAppBarContext<Context>>["renderItem"];
-    
+
     /** 
      * Custom function to render expandable/nested actions.
      * Used for actions that contain sub-actions or dropdowns.
@@ -973,8 +973,9 @@ export interface IAppBarActionsProps<Context = unknown> {
      *   // Anchor customization
      *   anchorClassName: "text-primary hover:bg-primary/10",
      *   anchorIconSize: 24,
-     *   anchorIconName: "more-vertical",
-     *   anchorIconVarint: "ghost",
+     *   anchorClosedIconName: "more-vertical",  // Icon when menu is closed
+     *   anchorOpenIconName: "x",               // Icon when menu is open
+     *   anchorIconVariant: "ghost",
      *   
      *   // Menu behavior
      *   preferredPosition: "bottom-end",
@@ -992,15 +993,42 @@ export interface IAppBarActionsProps<Context = unknown> {
      * }
      * ```
      */
-    menuProps?: Omit<IMenuProps<IAppBarContext<Context>>,"context" | "items" | "anchor"> & { 
+    menuProps?: Omit<IMenuProps<IAppBarContext<Context>>, "context" | "items" | "anchor"> & {
         /** CSS class name for the overflow menu anchor button */
         anchorClassName?: IClassName;
         /** Size of the overflow menu anchor icon */
         anchorIconSize?: IIconButtonProps["size"];
-        /** Icon name for the overflow menu anchor button */
-        anchorIconName?:IFontIconName;
+        /** 
+         * Icon name for the overflow menu anchor button when the menu is closed.
+         * This is the default state icon that users see before opening the menu.
+         * Common examples: "more-horizontal", "more-vertical", "menu", "dots-three"
+         * 
+         * @defaultValue "more-vertical"
+         * @example
+         * ```tsx
+         * anchorClosedIconName: "more-horizontal"  // Three horizontal dots
+         * anchorClosedIconName: "menu"             // Hamburger menu icon
+         * anchorClosedIconName: "dots-three"       // Three vertical dots
+         * ```
+         */
+        anchorClosedIconName?: IFontIconName;
+        /**
+         * Icon name for the overflow menu anchor button when the menu is open.
+         * This icon provides visual feedback that the menu is currently active/open.
+         * Common examples: "x", "close", "chevron-up", "minus"
+         * 
+         * @defaultValue Same as anchorClosedIconName (no state change)
+         * @example
+         * ```tsx
+         * anchorOpenIconName: "x"              // X icon when menu is open
+         * anchorOpenIconName: "close"          // Close icon when menu is open  
+         * anchorOpenIconName: "chevron-up"     // Up arrow when menu is open
+         * anchorOpenIconName: "minus"          // Minus icon when menu is open
+         * ```
+         */
+        anchorOpenIconName?: IFontIconName;
         /** Visual variant for the overflow menu anchor button */
-        anchorIconVarint?: IIconButtonVariant;
+        anchorIconVariant?: IIconButtonVariant;
         /** Custom anchor element (overrides default icon button) */
         anchor?: IMenuProps<IAppBarContext<Context>>["anchor"];
     };
@@ -1017,7 +1045,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     enableVirtualization?: boolean;
-    
+
     /** 
      * Accessibility label for the entire actions container.
      * Used by screen readers to describe the actions area.
@@ -1029,7 +1057,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     accessibilityLabel?: string;
-    
+
     /** 
      * Accessibility label for the overflow menu button.
      * Helps users understand what the overflow menu contains.
@@ -1115,7 +1143,7 @@ export type IAppBarContext<Context = unknown> = Context & {
      * ```
      */
     appBarVariant: IAppBarVariant;
-    
+
     /** 
      * Current viewport dimensions for responsive behavior.
      * Provides real-time viewport size information for dynamic layouts.
@@ -1141,7 +1169,7 @@ export type IAppBarContext<Context = unknown> = Context & {
         /** Current viewport height in pixels */
         height: number;
     };
-    
+
     /** 
      * Indicates whether the AppBar is rendered in a constrained container.
      * True for contexts like drawers, modals, or sidebars with limited space.
@@ -1161,7 +1189,7 @@ export type IAppBarContext<Context = unknown> = Context & {
      * ```
      */
     isConstrained?: boolean;
-    
+
     /** 
      * Performance optimization flags and settings.
      * Controls various performance features like virtualization and memoization.
@@ -1289,7 +1317,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     visibilityPriority?: number;
-    
+
     /** 
      * Whether this action should always be visible regardless of viewport constraints.
      * When true, the action bypasses all responsive hiding and overflow menu behavior.
@@ -1307,7 +1335,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     alwaysVisible?: boolean;
-    
+
     /**
      * Minimum viewport width (in pixels) required to show this action directly in the AppBar.
      * Below this width, the action is automatically moved to the overflow menu regardless
@@ -1326,7 +1354,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     minViewportWidth?: number;
-    
+
     /**
      * Group identifier for related actions.
      * Actions within the same group are shown/hidden together as a unit.
@@ -1345,7 +1373,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     group?: string;
-    
+
     /**
      * Accessibility configuration for the action.
      * Provides enhanced accessibility support for screen readers and assistive technologies.

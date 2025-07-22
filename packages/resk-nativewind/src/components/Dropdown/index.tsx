@@ -451,7 +451,8 @@ function DropdownRenderer<ItemType = unknown, ValueType = unknown, AllowMultiple
         bottomSheetTitle={context.props?.label}
         displayBottomSheetTitleDivider={!canRenderSeach}
         testID={testID + "-menu"}
-        renderAsBottomSheetInFullScreen
+        renderAsBottomSheetOnMobile
+        renderAsBottomSheetOnTablet
         visible={visible}
         onRequestClose={() => context?.close?.()}
         onRequestOpen={() => context?.open?.()}

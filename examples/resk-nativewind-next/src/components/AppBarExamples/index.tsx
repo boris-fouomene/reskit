@@ -1,7 +1,7 @@
 "use client";
-import { 
-    AppBar, 
-    IAppBarActionProps, 
+import {
+    AppBar,
+    IAppBarActionProps,
     IAppBarResponsiveConfig,
 } from '@resk/nativewind/components/appBar';
 
@@ -13,7 +13,7 @@ export function BasicAppBarExample() {
         {
             id: 'save',
             label: 'Save',
-            visibilityPriority:100,
+            visibilityPriority: 100,
             alwaysVisible: true,
             onPress: () => console.log('Save pressed'),
             accessibility: {
@@ -56,7 +56,7 @@ export function BasicAppBarExample() {
             subtitle="Edited 5 minutes ago"
             actions={actions}
             onBackActionPress={() => console.log('Back pressed')}
-            actionsProps={{responsiveConfig:createDesktopResponsiveConfig()}}
+            actionsProps={{ responsiveConfig: createDesktopResponsiveConfig() }}
         />
     );
 }
@@ -91,6 +91,8 @@ export function DrawerAppBarExample() {
         />
     );
 }
+
+
 
 // Example 3: Mobile-optimized AppBar
 export function MobileAppBarExample() {
@@ -244,13 +246,68 @@ export function GroupedActionsAppBarExample() {
         />
     );
 }
-export function AppBarExamples(){
+export function AppBarExamples() {
     return <>
         {/* <BasicAppBarExample />
         <DrawerAppBarExample />
         <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
          */}<GroupedActionsAppBarExample />
+        <AppBar
+            backAction={false}
+            actionsProps={{
+                menuProps: {
+                    fullScreenOnMobile: true,
+                    renderAsBottomSheetInFullScreen: false,
+                    anchorOpenIconName: "close",
+                    anchorClosedIconName: "menu",
+                }
+            }}
+            actions={[
+                {
+                    id: 'home',
+                    label: 'Home',
+                    icon: 'home'
+                },
+                {
+                    id: 'send-money',
+                    label: 'Send Money',
+                    icon: 'send',
+                },
+                {
+                    id: 'receive-money',
+                    label: 'Receive Money',
+                    icon: 'download'
+                },
+                {
+                    id: 'rates',
+                    label: 'Exchange Rates',
+                    icon: 'trending-up'
+                },
+                {
+                    id: 'business',
+                    label: 'Business',
+                    icon: 'briefcase',
+                    items: [
+                        {
+                            id: 'business-send',
+                            label: 'Mass Payments',
+                            icon: 'account-multiple'
+                        },
+                        {
+                            id: 'business-reports',
+                            label: 'Reports',
+                            icon: 'chart-bar'
+                        }
+                    ]
+                },
+                {
+                    id: 'help',
+                    label: 'Help & Support',
+                    icon: 'help-circle'
+                }
+            ]}
+        />
     </>
 }
 /**

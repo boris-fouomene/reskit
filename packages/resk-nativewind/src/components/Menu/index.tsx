@@ -40,7 +40,10 @@ export function Menu<Context = unknown>({
     style,
     dismissible,
     onRequestClose,
-    renderAsBottomSheetInFullScreen,
+    renderAsBottomSheetOnMobile,
+    renderAsBottomSheetOnTablet,
+    renderAsNavigationMenuOnMobile,
+    renderAsNavigationMenuOnTablet,
     bottomSheetTitle,
     displayBottomSheetTitleDivider,
     maxHeight,
@@ -52,8 +55,6 @@ export function Menu<Context = unknown>({
     itemsProps,
     variant,
     bottomSheetVariant: bVariant,
-    fullScreenOnMobile,
-    fullScreenOnTablet,
     onRequestOpen,
     disabled,
     contentContainerClassName,
@@ -64,8 +65,6 @@ export function Menu<Context = unknown>({
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
     const menuContextRef = useRef<IMenuContext<Context> | null>(null);
-    fullScreenOnMobile = typeof fullScreenOnMobile === "boolean" ? fullScreenOnMobile : !!(renderAsBottomSheetInFullScreen);
-    fullScreenOnTablet = typeof fullScreenOnTablet === "boolean" ? fullScreenOnTablet : !!(renderAsBottomSheetInFullScreen);
     const [state, setState] = useStateCallback({
         visible: isControlled ? !!visible : false,
         anchorMeasurements: {
@@ -86,8 +85,10 @@ export function Menu<Context = unknown>({
     }, [state.visible, isControlled, visible]);
     const { menuPosition, menuStyle, isDesktop, isMobile, isTablet, windowWidth, windowHeight, fullScreen } = useMenuPosition({
         ...props,
-        fullScreenOnMobile,
-        fullScreenOnTablet,
+        renderAsBottomSheetOnMobile,
+        renderAsBottomSheetOnTablet,
+        renderAsNavigationMenuOnMobile,
+        renderAsNavigationMenuOnTablet,
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
         maxHeight,
@@ -98,6 +99,19 @@ export function Menu<Context = unknown>({
         anchorMeasurements: state.anchorMeasurements,
         preferredPositionAxis,
     });
+
+    // Calculate rendering modes based on device-specific props and current device
+    const shouldRenderAsBottomSheet = useMemo(() => {
+        if (isMobile && renderAsBottomSheetOnMobile) return true;
+        if (isTablet && renderAsBottomSheetOnTablet) return true;
+        return false;
+    }, [isMobile, isTablet, renderAsBottomSheetOnMobile, renderAsBottomSheetOnTablet]);
+
+    const shouldRenderAsNavigationMenu = useMemo(() => {
+        if (isMobile && renderAsNavigationMenuOnMobile) return true;
+        if (isTablet && renderAsNavigationMenuOnTablet) return true;
+        return false;
+    }, [isMobile, isTablet, renderAsNavigationMenuOnMobile, renderAsNavigationMenuOnTablet]);
 
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
@@ -174,7 +188,7 @@ export function Menu<Context = unknown>({
             }
         });
     };
-    const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
+    const renderedAsBottomSheet = fullScreen && shouldRenderAsBottomSheet;
     const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
@@ -208,6 +222,9 @@ export function Menu<Context = unknown>({
         onPress: () => {
             open();
         }
+    }
+    if (visible && fullScreen && !renderedAsBottomSheet) {
+        console.log(menuStyle, " is menu style heeein ", menuPosition, windowWidth, " is window width ", windowHeight, " is window height")
     }
     return <>
         <MenuContext.Provider value={context}>

@@ -253,13 +253,177 @@ export interface IUseMenuPositionProps {
     /** Current height of the menu */
     menuHeight: number;
 
-    /** Whether the menu should be responsive or not. If set to true, the menu will fill the entire screeen on mobile devices, and will be fixed on desktop. */
-    fullScreenOnMobile?: boolean;
-
-    /***
-     * Whether the menu should be responsive on tablet devices or not. If set to true, the menu will fill the entire screeen on tablet devices, and will be fixed on desktop.
+    /**
+     * Whether to render the menu as a bottom sheet on mobile devices.
+     * 
+     * When enabled on mobile devices:
+     * - Menu slides up from the bottom of the screen
+     * - Covers the full viewport width
+     * - Includes swipe-to-dismiss gestures
+     * - Better touch interaction for mobile users
+     * - Automatically includes a title header with close button
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Enable bottom sheet only on mobile
+     * <Menu
+     *   renderAsBottomSheetOnMobile={true}
+     *   renderAsBottomSheetOnTablet={false}
+     *   bottomSheetTitle="Mobile Actions"
+     * />
+     * ```
      */
-    fullScreenOnTablet?: boolean;
+    renderAsBottomSheetOnMobile?: boolean;
+
+    /**
+     * Whether to render the menu as a bottom sheet on tablet devices.
+     * 
+     * When enabled on tablet devices:
+     * - Menu slides up from the bottom of the screen
+     * - Covers the full viewport width
+     * - Includes swipe-to-dismiss gestures
+     * - Better touch interaction for tablet users
+     * - Automatically includes a title header with close button
+     * 
+     * Note: Tablets typically have more screen space, so consider whether
+     * bottom sheet is the best UX compared to standard dropdown menus.
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Enable bottom sheet on both mobile and tablet
+     * <Menu
+     *   renderAsBottomSheetOnMobile={true}
+     *   renderAsBottomSheetOnTablet={true}
+     *   bottomSheetTitle="Touch-Friendly Menu"
+     * />
+     * 
+     * // Different behavior per device
+     * <Menu
+     *   renderAsBottomSheetOnMobile={true}
+     *   renderAsBottomSheetOnTablet={false} // Use dropdown on tablet
+     *   bottomSheetTitle="Mobile Actions"
+     * />
+     * ```
+     */
+    renderAsBottomSheetOnTablet?: boolean;
+
+    /**
+     * Whether to render the menu as a navigation menu on mobile devices.
+     * 
+     * Navigation menu mode on mobile provides:
+     * - Full-screen overlay presentation
+     * - Optimized for primary navigation items
+     * - Hierarchical menu structure support
+     * - Touch-friendly spacing and sizing
+     * - Slide-in animations from left/right
+     * - Proper focus management for accessibility
+     * - Breadcrumb navigation for nested items
+     * 
+     * Perfect for main app navigation, user menus, or complex menu structures
+     * that need more space than a standard dropdown can provide.
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Main navigation menu for mobile
+     * <Menu
+     *   renderAsNavigationMenuOnMobile={true}
+     *   anchor={<Icon name="menu" />}
+     *   items={[
+     *     { id: 'home', label: 'Home', icon: 'home' },
+     *     { id: 'profile', label: 'Profile', icon: 'user' },
+     *     { 
+     *       id: 'settings', 
+     *       label: 'Settings', 
+     *       icon: 'settings',
+     *       children: [
+     *         { id: 'account', label: 'Account Settings' },
+     *         { id: 'privacy', label: 'Privacy' },
+     *         { id: 'notifications', label: 'Notifications' }
+     *       ]
+     *     }
+     *   ]}
+     * />
+     * 
+     * // User menu with navigation structure
+     * <Menu
+     *   renderAsNavigationMenuOnMobile={true}
+     *   anchor={<Avatar src={user.avatar} />}
+     *   items={userNavigationItems}
+     *   className="navigation-menu-mobile"
+     * />
+     * ```
+     */
+    renderAsNavigationMenuOnMobile?: boolean;
+
+    /**
+     * Whether to render the menu as a navigation menu on tablet devices.
+     * 
+     * Navigation menu mode on tablet provides:
+     * - Full-screen or large overlay presentation
+     * - Optimized spacing for tablet touch targets
+     * - Support for multi-column layouts
+     * - Hierarchical menu structure with breadcrumbs
+     * - Optimized for both portrait and landscape orientations
+     * - Better utilization of available tablet screen space
+     * 
+     * Consider tablet-specific design patterns:
+     * - Tablets have more screen real estate than phones
+     * - Users may prefer sidebar/drawer patterns
+     * - Touch targets can be smaller than mobile but larger than desktop
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Navigation menu optimized for tablets
+     * <Menu
+     *   renderAsNavigationMenuOnTablet={true}
+     *   renderAsNavigationMenuOnMobile={true}
+     *   anchor={<Button>Main Menu</Button>}
+     *   items={mainNavigationItems}
+     *   className="tablet:grid tablet:grid-cols-2 tablet:gap-4"
+     * />
+     * 
+     * // Different layouts per device
+     * <Menu
+     *   renderAsNavigationMenuOnMobile={true}  // Full overlay on mobile
+     *   renderAsNavigationMenuOnTablet={false} // Standard dropdown on tablet
+     *   anchor={<Icon name="menu" />}
+     *   items={navigationItems}
+     * />
+     * 
+     * // Advanced tablet navigation with sections
+     * <Menu
+     *   renderAsNavigationMenuOnTablet={true}
+     *   anchor={<Button>Browse</Button>}
+     *   items={[
+     *     {
+     *       id: 'products',
+     *       label: 'Products',
+     *       children: productCategories,
+     *       className: 'tablet:col-span-1'
+     *     },
+     *     {
+     *       id: 'services', 
+     *       label: 'Services',
+     *       children: serviceCategories,
+     *       className: 'tablet:col-span-1'
+     *     }
+     *   ]}
+     * />
+     * ```
+     */
+    renderAsNavigationMenuOnTablet?: boolean;
 
     /***
      * If true, the menu will have the same width as the anchor element.
@@ -360,7 +524,7 @@ export interface IMenuState {
  *     { id: 'settings', label: 'Settings', icon: 'settings' }
  *   ]}
  *   bottomSheetTitle="User Actions"
- *   fullScreenOnMobile={true}
+ *   renderAsBottomSheetOnMobile={true}
  * />
  * 
  * // Menu with dynamic content based on context
@@ -1004,36 +1168,298 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     // ========================================
 
     /**
-     * Whether to render as bottom sheet on mobile devices.
+     * Whether to render the menu as a bottom sheet on mobile devices.
      * 
-     * When true and `fullScreenOnMobile` is also true:
-     * - Menu renders as slide-up bottom sheet on mobile
-     * - Includes title header with close button
-     * - Better UX for touch interactions
-     * - Automatic transition animations
+     * Bottom sheet mode provides a mobile-optimized menu experience:
+     * - Slides up from the bottom of the screen
+     * - Full-width presentation for easy touch interaction
+     * - Native-feeling swipe gestures for dismissal
+     * - Automatic title header with close button
+     * - Better accessibility for mobile screen readers
+     * - Respects safe area insets (notches, home indicators)
+     * 
+     * Best for:
+     * - Action sheets and quick actions
+     * - User account menus
+     * - Settings and preferences
+     * - Any menu with 3-8 primary actions
      * 
      * @default false
-     * @since 1.0.0
+     * @since 1.1.0
      * 
      * @example
      * ```tsx
+     * // Mobile-first action menu
      * <Menu
-     *   anchor={<Button>Mobile-Friendly Menu</Button>}
-     *   renderAsBottomSheetInFullScreen={true}
-     *   fullScreenOnMobile={true}
-     *   bottomSheetTitle="User Actions"
+     *   anchor={<Button>Actions</Button>}
+     *   renderAsBottomSheetOnMobile={true}
+     *   bottomSheetTitle="Quick Actions"
+     *   items={[
+     *     { id: 'edit', label: 'Edit', icon: 'edit' },
+     *     { id: 'share', label: 'Share', icon: 'share' },
+     *     { id: 'delete', label: 'Delete', icon: 'trash', variant: 'destructive' }
+     *   ]}
+     * />
+     * 
+     * // User account menu with custom title
+     * <Menu
+     *   anchor={<Avatar src={user.avatar} />}
+     *   renderAsBottomSheetOnMobile={true}
+     *   bottomSheetTitle={
+     *     <View className="flex-row items-center">
+     *       <Avatar size="sm" src={user.avatar} />
+     *       <Text className="ml-2 font-medium">{user.name}</Text>
+     *     </View>
+     *   }
+     *   items={userMenuItems}
      * />
      * ```
      */
-    renderAsBottomSheetInFullScreen?: boolean;
+    renderAsBottomSheetOnMobile?: boolean;
 
     /**
-     * Title displayed in bottom sheet header on mobile.
+     * Whether to render the menu as a bottom sheet on tablet devices.
+     * 
+     * Bottom sheet mode on tablets provides:
+     * - Optimized for touch interaction with larger targets
+     * - Full-width or constrained-width presentation options
+     * - Better for complex forms or detailed content
+     * - Works well in both portrait and landscape orientations
+     * - Can utilize more vertical space than mobile
+     * 
+     * Consider tablet-specific UX patterns:
+     * - Tablets have more screen space - bottom sheets might not always be optimal
+     * - Users may expect more traditional dropdown/popover behavior
+     * - Consider using only for specific use cases like media selection
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Media picker optimized for tablets
+     * <Menu
+     *   anchor={<Button>Select Media</Button>}
+     *   renderAsBottomSheetOnMobile={true}
+     *   renderAsBottomSheetOnTablet={true}
+     *   bottomSheetTitle="Choose Media"
+     *   contentContainerClassName="tablet:max-w-2xl tablet:mx-auto"
+     * >
+     *   <MediaGrid />
+     * </Menu>
+     * 
+     * // Different behavior per device
+     * <Menu
+     *   anchor={<Button>Options</Button>}
+     *   renderAsBottomSheetOnMobile={true}   // Bottom sheet on mobile
+     *   renderAsBottomSheetOnTablet={false}  // Standard dropdown on tablet
+     *   items={menuItems}
+     * />
+     * ```
+     */
+    renderAsBottomSheetOnTablet?: boolean;
+
+    /**
+     * Whether to render the menu as a navigation menu on mobile devices.
+     * 
+     * Navigation menu mode transforms the menu into a full-screen navigation interface
+     * optimized for mobile devices. This mode provides:
+     * 
+     * **Mobile Navigation Features:**
+     * - Full-screen overlay with proper backdrop
+     * - Slide-in animation from left or right edge
+     * - Large touch targets optimized for thumbs
+     * - Hierarchical navigation with breadcrumbs
+     * - Search functionality for large menu sets
+     * - Proper focus management for accessibility
+     * - Support for nested menu structures
+     * - Mobile-optimized typography and spacing
+     * 
+     * **Perfect for:**
+     * - Main application navigation
+     * - Complex menu hierarchies (e.g., product catalogs)
+     * - User account management sections
+     * - Multi-level settings menus
+     * - E-commerce category browsing
+     * 
+     * **UX Considerations:**
+     * - Use for primary navigation, not quick actions
+     * - Ensure clear "back" navigation for nested items
+     * - Consider limiting depth to 3-4 levels maximum
+     * - Include search for menus with 20+ items
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Main app navigation
+     * <Menu
+     *   anchor={<Icon name="menu" size={24} />}
+     *   renderAsNavigationMenuOnMobile={true}
+     *   items={[
+     *     { 
+     *       id: 'dashboard', 
+     *       label: 'Dashboard', 
+     *       icon: 'home',
+     *       onPress: () => navigate('/dashboard')
+     *     },
+     *     {
+     *       id: 'products',
+     *       label: 'Products',
+     *       icon: 'package',
+     *       children: [
+     *         { id: 'electronics', label: 'Electronics' },
+     *         { id: 'clothing', label: 'Clothing' },
+     *         { id: 'books', label: 'Books' }
+     *       ]
+     *     },
+     *     {
+     *       id: 'account',
+     *       label: 'My Account',
+     *       icon: 'user',
+     *       children: [
+     *         { id: 'profile', label: 'Profile Settings' },
+     *         { id: 'orders', label: 'Order History' },
+     *         { id: 'preferences', label: 'Preferences' }
+     *       ]
+     *     }
+     *   ]}
+     *   className="mobile-nav-menu"
+     * />
+     * 
+     * // E-commerce category navigation
+     * <Menu
+     *   anchor={<Button>Browse Categories</Button>}
+     *   renderAsNavigationMenuOnMobile={true}
+     *   items={categoryHierarchy}
+     *   searchable={true}
+     *   placeholder="Search categories..."
+     * />
+     * 
+     * // User settings navigation
+     * <Menu
+     *   anchor={<Button>Settings</Button>}
+     *   renderAsNavigationMenuOnMobile={true}
+     *   items={[
+     *     {
+     *       id: 'general',
+     *       label: 'General',
+     *       children: [
+     *         { id: 'language', label: 'Language & Region' },
+     *         { id: 'timezone', label: 'Time Zone' }
+     *       ]
+     *     },
+     *     {
+     *       id: 'privacy',
+     *       label: 'Privacy & Security',
+     *       children: [
+     *         { id: 'data', label: 'Data Management' },
+     *         { id: 'permissions', label: 'App Permissions' }
+     *       ]
+     *     }
+     *   ]}
+     * />
+     * ```
+     */
+    renderAsNavigationMenuOnMobile?: boolean;
+
+    /**
+     * Whether to render the menu as a navigation menu on tablet devices.
+     * 
+     * Navigation menu mode on tablets provides a rich navigation interface that
+     * takes advantage of the larger screen real estate while maintaining touch-friendly
+     * interaction patterns.
+     * 
+     * **Tablet Navigation Features:**
+     * - Full-screen or large overlay presentation
+     * - Multi-column layouts for better space utilization
+     * - Larger touch targets optimized for tablet interaction
+     * - Support for both portrait and landscape orientations
+     * - Enhanced visual hierarchy with icons and descriptions
+     * - Side-panel or drawer-style navigation options
+     * - Better accommodation of complex menu structures
+     * 
+     * **Tablet-Specific Considerations:**
+     * - More screen space allows for richer content presentation
+     * - Users may expect desktop-like interaction patterns
+     * - Consider hybrid approaches (drawer + dropdown)
+     * - Optimize for both one-handed and two-handed use
+     * - Take advantage of landscape mode for wider layouts
+     * 
+     * **Optimal Use Cases:**
+     * - Complex application navigation with multiple sections
+     * - Content management interfaces
+     * - Dashboard navigation with data visualization
+     * - Educational apps with course/lesson hierarchies
+     * - Creative tools with feature categorization
+     * 
+     * @default false
+     * @since 1.1.0
+     * 
+     * @example
+     * ```tsx
+     * // Dashboard navigation optimized for tablets
+     * <Menu
+     *   anchor={<Button>Navigation</Button>}
+     *   renderAsNavigationMenuOnTablet={true}
+     *   items={[
+     *     {
+     *       id: 'analytics',
+     *       label: 'Analytics',
+     *       icon: 'bar-chart',
+     *       description: 'View reports and insights',
+     *       children: [
+     *         { id: 'overview', label: 'Overview', icon: 'eye' },
+     *         { id: 'reports', label: 'Custom Reports', icon: 'file-text' },
+     *         { id: 'exports', label: 'Data Exports', icon: 'download' }
+     *       ]
+     *     },
+     *     {
+     *       id: 'content',
+     *       label: 'Content Management',
+     *       icon: 'edit',
+     *       description: 'Manage your content',
+     *       children: contentManagementItems
+     *     }
+     *   ]}
+     *   className="tablet:grid tablet:grid-cols-2 tablet:gap-6"
+     * />
+     * 
+     * // Multi-level navigation with visual enhancements
+     * <Menu
+     *   renderAsNavigationMenuOnTablet={true}
+     *   anchor={<Icon name="apps" />}
+     *   items={applicationSections}
+     *   itemsProps={{
+     *     showDescriptions: true,
+     *     variant: 'card',
+     *     size: 'large'
+     *   }}
+     *   className="tablet:max-w-4xl tablet:mx-auto"
+     * />
+     * 
+     * // Responsive navigation (different per device)
+     * <Menu
+     *   anchor={<Button>Menu</Button>}
+     *   renderAsNavigationMenuOnMobile={true}   // Full overlay on mobile
+     *   renderAsNavigationMenuOnTablet={true}   // Enhanced layout on tablet
+     *   items={navigationItems}
+     *   className="
+     *     mobile:w-full 
+     *     tablet:w-3/4 tablet:max-w-3xl tablet:mx-auto
+     *   "
+     * />
+     * ```
+     */
+    renderAsNavigationMenuOnTablet?: boolean;
+
+    /**
+     * Title displayed in bottom sheet header on mobile/tablet.
      * 
      * Only visible when:
-     * - `renderAsBottomSheetInFullScreen` is true
-     * - `fullScreenOnMobile` is true  
-     * - Currently on mobile device
+     * - `renderAsBottomSheetOnMobile` is true and currently on mobile device
+     * - `renderAsBottomSheetOnTablet` is true and currently on tablet device
      * 
      * Can be string, JSX, or any React node.
      * 
@@ -1044,7 +1470,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * // Simple string title
      * <Menu
      *   bottomSheetTitle="User Menu"
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * 
      * // Custom JSX title
@@ -1055,7 +1481,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *       <Text style={{marginLeft: 8}}>{user.name}</Text>
      *     </View>
      *   }
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * ```
      */
@@ -1078,7 +1504,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *     weight: 'bold',
      *     color: 'primary'
      *   }}
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * ```
      */
@@ -1100,7 +1526,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *     text-xl font-semibold text-gray-900 dark:text-white
      *     tracking-tight
      *   "
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * ```
      */
@@ -1128,14 +1554,14 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * <Menu
      *   bottomSheetTitle="Actions"
      *   displayBottomSheetTitleDivider={true}
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * 
      * // Without divider for minimal look
      * <Menu
      *   bottomSheetTitle="Quick Actions"
      *   displayBottomSheetTitleDivider={false}
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * ```
      */
@@ -1186,7 +1612,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *     colorScheme: 'primary',
      *     elevation: 'high'
      *   }} // Mobile bottom sheet styling
-     *   renderAsBottomSheetInFullScreen={true}
+     *   renderAsBottomSheetOnMobile={true}
      * />
      * ```
      */

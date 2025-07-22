@@ -26,13 +26,14 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
     {...props}
     className={cn("w-full", props.className)}
     onPress={async (event, context) => {
-      if (typeof props.onPress == "function" && await props.onPress(event, context) === false) {
-        return;
+      const r = typeof props.onPress === "function" ? await props.onPress(event, context) : undefined;
+      if (r === false) {
+        return false;
       }
       if (closeOnPress !== false && typeof menu?.close == "function") {
         menu.close();
       }
-      return false;
+      return r;
     }}
   />;
 }

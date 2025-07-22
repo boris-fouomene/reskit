@@ -47,12 +47,38 @@ export const useMenuPosition = ({
                 const navMenuWidth = Math.min(windowWidth * 0.85, 320); // Max 85% of screen width or 320px
                 const preferredSide = anchorMeasurements?.pageX && anchorMeasurements.pageX > windowWidth / 2 ? "right" : "left";
 
-                calculatedPosition.height = windowHeight;
+                // Calculate navigation menu positioning considering anchor
+                let navTop = 0;
+                let navHeight = windowHeight;
+                const minGap = 8; // Minimum gap between anchor and navigation menu
+
+                if (anchorMeasurements) {
+                    const { pageY, height: anchorHeight } = anchorMeasurements;
+                    const anchorBottom = pageY + anchorHeight;
+
+                    // If anchor is in the top portion of the screen (first 20%), start navigation menu below it
+                    if (pageY <= windowHeight * 0.2) {
+                        navTop = anchorBottom + minGap;
+                        navHeight = windowHeight - navTop;
+                    }
+                    // If anchor is in the bottom portion (last 20%), end navigation menu above it
+                    else if (pageY >= windowHeight * 0.8) {
+                        navTop = 0;
+                        navHeight = pageY - minGap;
+                    }
+                    // For middle positions, use full height but consider anchor visibility
+                    else {
+                        navTop = 0;
+                        navHeight = windowHeight;
+                    }
+                }
+
+                calculatedPosition.height = navHeight;
                 calculatedPosition.width = navMenuWidth;
                 calculatedPosition.computedPlacement = preferredSide;
                 calculatedPosition.xPlacement = preferredSide;
-                calculatedPosition.yPlacement = "top";
-                calculatedPosition.top = 0;
+                calculatedPosition.yPlacement = "bottom";
+                calculatedPosition.top = navTop;
                 calculatedPosition.bottom = undefined;
 
                 if (preferredSide === "left") {
@@ -237,6 +263,10 @@ export const useMenuPosition = ({
     const navigationMenuSide: 'left' | 'right' | undefined = shouldRenderAsNavigationMenu ? (menuPosition.computedPlacement === "right" ? "right" : "left") : undefined;
     const navigationMenuWidth = shouldRenderAsNavigationMenu ? menuPosition.width : undefined;
 
+    // Check if navigation menu is avoiding the anchor
+    const navigationMenuAvoidingAnchor = shouldRenderAsNavigationMenu && anchorMeasurements ?
+        (menuPosition.top !== 0 || menuPosition.height !== windowHeight) : false;
+
     return {
         calculatePosition,
         menuPosition,
@@ -248,6 +278,7 @@ export const useMenuPosition = ({
         shouldRenderAsNavigationMenu,
         navigationMenuSide,
         navigationMenuWidth,
+        navigationMenuAvoidingAnchor,
         computedMinWidth,
         computedMinHeight,
         computedMaxHeight,

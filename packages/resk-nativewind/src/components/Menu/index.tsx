@@ -94,7 +94,8 @@ export function Menu<Context = unknown>({
         shouldRenderAsBottomSheet,
         shouldRenderAsNavigationMenu,
         navigationMenuSide,
-        navigationMenuWidth
+        navigationMenuWidth,
+        navigationMenuAvoidingAnchor
     } = useMenuPosition({
         ...props,
         renderAsBottomSheetOnMobile,
@@ -205,6 +206,7 @@ export function Menu<Context = unknown>({
             renderedAsNavigationMenu,
             navigationMenuSide,
             navigationMenuWidth,
+            navigationMenuAvoidingAnchor,
             isDesktop,
             anchorMeasurements: state.anchorMeasurements,
             position: menuPosition,

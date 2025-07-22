@@ -242,6 +242,12 @@ export type IMenuContext<Context = unknown> = Context & {
          */
         navigationMenuWidth?: number;
 
+        /**
+         * Whether the navigation menu is positioned to avoid covering the anchor
+         * Only available when renderedAsNavigationMenu is true
+         */
+        navigationMenuAvoidingAnchor?: boolean;
+
         /***
             Whether the menu is rendered as a bottom sheet
         */

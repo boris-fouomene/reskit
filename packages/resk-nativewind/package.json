@@ -35,6 +35,9 @@
       "components/alert": [
         "./build/components/Alert/index.d.ts"
       ],
+      "components/appBar": [
+        "./build/components/AppBar/index.d.ts"
+      ],
       "components/avatar": [
         "./build/components/Avatar/index.d.ts"
       ],

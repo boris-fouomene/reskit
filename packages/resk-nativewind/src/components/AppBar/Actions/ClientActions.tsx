@@ -1,6 +1,12 @@
 "use client";
 import { useDimensions } from "@utils/dimensions/hooks";
-import { IAppBarActionProps, IAppBarActionsProps } from "../types";
+import { 
+    IAppBarActionProps, 
+    IAppBarActionsProps, 
+    IAppBarActionPriority
+} from "../types";
+import { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from "./utils";
+import { calculateMaxVisibleActions,sortActionsByPriority} from "./utils";
 import { IReactNullableElement } from "@src/types";
 import { isNumber } from "@resk/core/utils";
 import { Menu } from "@components/Menu";
@@ -11,70 +17,156 @@ import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import { Div } from "@html/Div";
 
-export function AppBarClientActions<Context = unknown>({ context, className, menuAnchorClassName, menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+export function AppBarClientActions<Context = unknown>({ 
+    context, 
+    className, 
+    menuAnchorClassName, 
+    menuAnchorIconProps, 
+    renderAction, 
+    renderExpandableAction, 
+    hydrationFallback, 
+    testID, 
+    actionClassName, 
+    actionMenuItemClassName, 
+    actions: items, 
+    viewportWidth, 
+    maxVisibleActions,
+    responsiveConfig = DEFAULT_APPBAR_RESPONSIVE_CONFIG,
+    actionPriority,
+    menuProps,
+    enableVirtualization = false,
+    accessibilityLabel,
+    overflowMenuAccessibilityLabel = "More actions",
+    ...props 
+}: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
-    const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
+    
+    // Use viewport width if provided, otherwise fall back to window width
+    const effectiveViewportWidth = useMemo(() => {
+        if (isNumber(viewportWidth) && viewportWidth > 0) {
+            return viewportWidth;
+        }
+        // For constrained containers (drawer, modal), use a more conservative approach
+        return Math.max(windowWidth - 100, 320); // Minimum 320px width
+    }, [viewportWidth, windowWidth]);
+    
+    // Calculate max actions based on responsive configuration
+    const calculatedMaxActions = useMemo(() => {
+        if (isNumber(maxVisibleActions) && maxVisibleActions > 0) {
+            return Math.trunc(maxVisibleActions);
+        }
+        return calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
+    }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig]);
+    
+    // Sort and process actions based on priority
+    const processedActions = useMemo(() => {
+        if (!items?.length) return [];
+        
+        // Filter out null/undefined items and sort by priority if priority is being used
+        const validItems = items.filter((action): action is IAppBarActionProps<Context> => action != null);
+        const hasPriority = validItems.some(action => action.priority !== undefined);
+        
+        if (hasPriority) {
+            return sortActionsByPriority(validItems);
+        }
+        
+        return validItems;
+    }, [items]);
+    
     const { actions, menuItems } = useMemo(() => {
         const actionCounter = { current: 0 };
         const menuItems: IAppBarActionProps<Context>[] = [];
         const actions: IReactNullableElement[] = [];
+        
         renderActions<Context>({
-            actions: items,
+            actions: processedActions,
             context,
             ...props,
             renderAction,
             renderExpandableAction,
             testID,
-            actionMutator: function (renderer, props, index): IReactNullableElement {
+            actionMutator: function (renderer, {alwaysVisible,minViewportWidth,...props}, index): IReactNullableElement {
                 const { level } = props;
-                if (!level && actionCounter.current <= mAction + 1) {
+                
+                // Handle nested actions (don't count towards limit)
+                if (level) {
+                    props.className = cn("appbar-action-menu-item", actionMenuItemClassName);
+                    const renderedAction = (renderer as any)(props, index);
+                    if (renderedAction) {
+                        menuItems.push(props);
+                    }
+                    return null;
+                }
+                
+                // Check if action should always be visible
+                const shouldAlwaysShow = alwaysVisible || props.priority === IAppBarActionPriority.CRITICAL;
+                
+                // Check viewport constraints
+                const meetsViewportRequirement = !(isNumber(minViewportWidth) && minViewportWidth > 0) || effectiveViewportWidth >= minViewportWidth;
+                
+                // Determine if action can be rendered directly
+                const canRenderDirectly = shouldAlwaysShow || 
+                    (actionCounter.current < calculatedMaxActions && meetsViewportRequirement) ||
+                    (processedActions?.length === 1); // Always show single action
+                
+                if (!level && !shouldAlwaysShow) {
                     actionCounter.current++;
                 }
-                const canRenderAction = !level && (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
-                const canAddAction = canRenderAction;
-                const canAddMenu = !canRenderAction && !level;
-                props.className = cn(canAddAction && cn("appbar-action flex-none", actionClassName), canAddMenu && cn("appbar-action-menu-item", actionMenuItemClassName));
+                
+                props.className = cn(
+                    canRenderDirectly && cn("appbar-action flex-none", actionClassName),
+                    !canRenderDirectly && cn("appbar-action-menu-item", actionMenuItemClassName)
+                );
+                
                 const renderedAction = (renderer as any)(props, index);
                 if (!renderedAction) return null;
-                if (canAddAction) {
+                
+                if (canRenderDirectly) {
                     actions.push(renderedAction);
-                } else if (canAddMenu) {
+                } else {
                     menuItems.push(props);
                 }
+                
                 return null;
             },
         });
-        return { actions, menuItems }
-    }, [mAction, items, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName]);
+        
+        return { actions, menuItems };
+    }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName, effectiveViewportWidth]);
+    
     if (!isHydrated) {
         if (isValidElement(hydrationFallback)) {
             return hydrationFallback;
         }
         return <ActivityIndicator size="small" className="flex-none" />;
     }
-    return <Div className={cn("appbar-actions", className, "flex flex-row items-center grow-0 justify-start")}>
-        {actions}
-        {menuItems.length ? <Menu
-            preferredPositionAxis='vertical'
-            testID={`${testID}-menu`}
-            className={cn("appbar-menu")}
-            anchor={({ menu }) => {
-                return <Icon.Button
-                    size={28}
-                    fontIconName={FONT_ICONS.MORE as any}
-                    {...menuAnchorIconProps}
-                    className={cn("flex-none mx-[7px]", menuAnchorClassName, menuAnchorIconProps?.className)}
-                    onPress={() => {
-                        menu?.open();
+    
+    return (
+        <Div 
+            className={cn("appbar-actions", className, "flex flex-row items-center grow-0 justify-start")}
+            accessibilityLabel={accessibilityLabel}
+        >
+            {actions}
+            {menuItems.length ? (
+                <Menu
+                    preferredPositionAxis='vertical'
+                    testID={`${testID}-menu`}
+                    className={cn("appbar-menu")}
+                    anchor={({ menu }) => {
+                        return <Icon.Button
+                            size={28}
+                            fontIconName={FONT_ICONS.MORE as any}
+                            {...menuAnchorIconProps}
+                            className={cn("flex-none mx-[7px]", menuAnchorClassName, menuAnchorIconProps?.className)}
+                            accessibilityLabel={overflowMenuAccessibilityLabel}
+                            onPress={() => {
+                                menu?.open();
+                            }}
+                        />
                     }}
+                    items={menuItems}
                 />
-            }}
-            items={menuItems}
-        /> : null}
-    </Div>;
+            ) : null}
+        </Div>
+    );
 }
-
-const getAppBarMaxActions = (windowWidth: number, viewportWidth?: number): number => {
-    let iWidth = isNumber(viewportWidth) && viewportWidth > 200 ? viewportWidth : windowWidth - 100;
-    return iWidth >= 3000 ? 8 : iWidth >= 2500 ? 7 : iWidth >= 2000 ? 6 : iWidth >= 1600 ? 5 : iWidth >= 1300 ? 4 : iWidth >= 800 ? 2 : iWidth >= 600 ? 1 : 0;
-};

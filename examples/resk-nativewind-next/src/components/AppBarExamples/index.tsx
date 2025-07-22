@@ -1,0 +1,316 @@
+"use client";
+import { 
+    AppBar, 
+    IAppBarActionProps, 
+    IAppBarActionPriority,
+    IAppBarResponsiveConfig,
+} from '@resk/nativewind/components/appBar';
+
+
+
+// Example 1: Basic AppBar with priority-based actions
+export function BasicAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'save',
+            label: 'Save',
+            priority: IAppBarActionPriority.CRITICAL,
+            alwaysVisible: true,
+            onPress: () => console.log('Save pressed'),
+            accessibility: {
+                label: 'Save document',
+                hint: 'Saves the current document'
+            }
+        },
+        {
+            id: 'share',
+            label: 'Share',
+            priority: IAppBarActionPriority.HIGH,
+            onPress: () => console.log('Share pressed'),
+            minViewportWidth: 480 // Only show on viewports >= 480px
+        },
+        {
+            id: 'export',
+            label: 'Export',
+            priority: IAppBarActionPriority.NORMAL,
+            onPress: () => console.log('Export pressed'),
+            group: 'file-operations'
+        },
+        {
+            id: 'print',
+            label: 'Print',
+            priority: IAppBarActionPriority.LOW,
+            onPress: () => console.log('Print pressed'),
+            group: 'file-operations'
+        },
+        {
+            id: 'help',
+            label: 'Help',
+            priority: IAppBarActionPriority.OPTIONAL,
+            onPress: () => console.log('Help pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="My Document"
+            subtitle="Edited 5 minutes ago"
+            actions={actions}
+            onBackActionPress={() => console.log('Back pressed')}
+            responsiveConfig={createDesktopResponsiveConfig()}
+        />
+    );
+}
+
+// Example 2: AppBar in a drawer context with constrained width
+export function DrawerAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'close',
+            label: 'Close',
+            priority: IAppBarActionPriority.CRITICAL,
+            alwaysVisible: true,
+            onPress: () => console.log('Close drawer')
+        },
+        {
+            id: 'settings',
+            label: 'Settings',
+            priority: IAppBarActionPriority.HIGH,
+            onPress: () => console.log('Settings pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Navigation"
+            actions={actions}
+            actionsProps={{
+                viewportWidth: 350, // Drawer width
+                responsiveConfig: createConstrainedResponsiveConfig(),
+                overflowMenuAccessibilityLabel: "More navigation options"
+            }}
+        />
+    );
+}
+
+// Example 3: Mobile-optimized AppBar
+export function MobileAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'search',
+            label: 'Search',
+            priority: IAppBarActionPriority.HIGH,
+            onPress: () => console.log('Search pressed'),
+            accessibility: {
+                label: 'Search content',
+                hint: 'Opens search interface'
+            }
+        },
+        {
+            id: 'filter',
+            label: 'Filter',
+            priority: IAppBarActionPriority.NORMAL,
+            onPress: () => console.log('Filter pressed')
+        },
+        {
+            id: 'sort',
+            label: 'Sort',
+            priority: IAppBarActionPriority.LOW,
+            onPress: () => console.log('Sort pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Items"
+            actions={actions}
+            responsiveConfig={createMobileResponsiveConfig()}
+            actionsProps={{
+                enableVirtualization: true,
+                accessibilityLabel: "Item management actions"
+            }}
+        />
+    );
+}
+
+// Example 4: Custom responsive configuration
+export function CustomResponsiveAppBarExample() {
+    const customConfig = {
+        breakpoints: [
+            { width: 1000, maxActions: 5 },
+            { width: 600, maxActions: 3 },
+            { width: 400, maxActions: 2 }
+        ],
+        defaultMaxActions: 1
+    };
+
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'edit',
+            label: 'Edit',
+            priority: IAppBarActionPriority.HIGH,
+            onPress: () => console.log('Edit pressed')
+        },
+        {
+            id: 'duplicate',
+            label: 'Duplicate',
+            priority: IAppBarActionPriority.NORMAL,
+            onPress: () => console.log('Duplicate pressed')
+        },
+        {
+            id: 'archive',
+            label: 'Archive',
+            priority: IAppBarActionPriority.LOW,
+            onPress: () => console.log('Archive pressed')
+        },
+        {
+            id: 'delete',
+            label: 'Delete',
+            priority: IAppBarActionPriority.LOW,
+            onPress: () => console.log('Delete pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Custom Responsive"
+            subtitle="Breakpoints: 1000px, 600px, 400px"
+            actions={actions}
+            responsiveConfig={customConfig}
+            actionsProps={{
+                menuProps: {
+                    position: "bottom-left" as any, // Note: This would need proper typing
+                    className: "custom-menu-style"
+                }
+            }}
+        />
+    );
+}
+
+// Example 5: AppBar with grouped actions
+export function GroupedActionsAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        // Edit group
+        {
+            id: 'undo',
+            label: 'Undo',
+            priority: IAppBarActionPriority.HIGH,
+            group: 'edit',
+            onPress: () => console.log('Undo pressed')
+        },
+        {
+            id: 'redo',
+            label: 'Redo',
+            priority: IAppBarActionPriority.HIGH,
+            group: 'edit',
+            onPress: () => console.log('Redo pressed')
+        },
+        // Format group
+        {
+            id: 'bold',
+            label: 'Bold',
+            priority: IAppBarActionPriority.NORMAL,
+            group: 'format',
+            onPress: () => console.log('Bold pressed')
+        },
+        {
+            id: 'italic',
+            label: 'Italic',
+            priority: IAppBarActionPriority.NORMAL,
+            group: 'format',
+            onPress: () => console.log('Italic pressed')
+        },
+        // View group
+        {
+            id: 'zoom-in',
+            label: 'Zoom In',
+            priority: IAppBarActionPriority.LOW,
+            group: 'view',
+            minViewportWidth: 768,
+            onPress: () => console.log('Zoom in pressed')
+        },
+        {
+            id: 'zoom-out',
+            label: 'Zoom Out',
+            priority: IAppBarActionPriority.LOW,
+            group: 'view',
+            minViewportWidth: 768,
+            onPress: () => console.log('Zoom out pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Text Editor"
+            actions={actions}
+            actionsProps={{
+                actionPriority: {
+                    'undo': 100,
+                    'redo': 95,
+                    'bold': 50,
+                    'italic': 45
+                }
+            }}
+        />
+    );
+}
+export function AppBarExamples(){
+    return <>
+        <BasicAppBarExample />
+        <DrawerAppBarExample />
+        <MobileAppBarExample />
+        <CustomResponsiveAppBarExample />
+        <GroupedActionsAppBarExample />
+    </>
+}
+/**
+ * Creates a responsive configuration for drawer/modal contexts.
+ * 
+ * @returns IAppBarResponsiveConfig optimized for constrained containers
+ */
+export function createConstrainedResponsiveConfig(): IAppBarResponsiveConfig {
+    return {
+        breakpoints: [
+            { width: 600, maxActions: 3 },
+            { width: 400, maxActions: 2 },
+            { width: 300, maxActions: 1 }
+        ],
+        defaultMaxActions: 1
+    };
+}
+
+/**
+ * Creates a responsive configuration for mobile-first design.
+ * 
+ * @returns IAppBarResponsiveConfig optimized for mobile devices
+ */
+export function createMobileResponsiveConfig(): IAppBarResponsiveConfig {
+    return {
+        breakpoints: [
+            { width: 768, maxActions: 4 },
+            { width: 576, maxActions: 3 },
+            { width: 480, maxActions: 2 },
+            { width: 320, maxActions: 1 }
+        ],
+        defaultMaxActions: 1
+    };
+}
+
+/**
+ * Creates a responsive configuration for desktop-first design.
+ * 
+ * @returns IAppBarResponsiveConfig optimized for desktop environments
+ */
+export function createDesktopResponsiveConfig(): IAppBarResponsiveConfig {
+    return {
+        breakpoints: [
+            { width: 1400, maxActions: 10 },
+            { width: 1200, maxActions: 8 },
+            { width: 992, maxActions: 6 },
+            { width: 768, maxActions: 4 },
+            { width: 576, maxActions: 3 },
+            { width: 480, maxActions: 2 }
+        ],
+        defaultMaxActions: 3
+    };
+}

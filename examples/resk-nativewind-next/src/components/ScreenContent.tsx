@@ -5,6 +5,7 @@ import { AlertExamples } from './AlertExamples';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, CountrySelector, TelInput, Expandable, SSRScrollView, cn } from "@resk/nativewind";
 import { buttonVariant } from "@resk/nativewind/variants";
 import { FormExamples } from './FormExamples';
+import { AppBarExamples } from './AppBarExamples';
 
 type ScreenContentProps = {
   title: string;
@@ -13,6 +14,7 @@ type ScreenContentProps = {
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <SSRScrollView>
+      <AppBarExamples/>
       <DialogExample />
       <BottomSheetExample />
       <FormExamples />

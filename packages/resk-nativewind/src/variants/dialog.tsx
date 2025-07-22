@@ -26,7 +26,7 @@ export const dialogVariant = tv({
                 base: value,
             }
         }),
-        backgroundColor: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
+        background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 base: value,
             }
@@ -79,7 +79,7 @@ export const dialogVariant = tv({
     },
     defaultVariants: {
         withBackdrop: true,
-        backgroundColor: "surface",
+        background: "surface",
         shadow: "lg",
         modalTitleWeight: "bold",
         modalTitleSize: "lg",

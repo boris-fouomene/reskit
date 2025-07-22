@@ -80,16 +80,6 @@ export const buttonVariant = tv({
         },
         colorScheme: VariantsColors.button,
         outline: VariantsColors.buttonOutline,
-        hoverBackgroundColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
-            return {
-                base: value,
-            }
-        }),
-        activeBackgroundColor: VariantsOptionsFactory.createActiveBackgroundColor<{ base: string }>((value, variantName) => {
-            return {
-                base: value,
-            }
-        }),
     },
     defaultVariants: {
         activeOpacity: 80,

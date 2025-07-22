@@ -119,13 +119,13 @@ export const menuVariant = tv({
         navItemHoverRingWidth: VariantsOptionsFactory.createHoverRingWidth<IMenuVariantSlots>((value) => {
             return { navItem: value }
         }),
-        itemBackgroundColor: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
+        itemBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
             return { item: value }
         }),
-        navItemBackgroundColor: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
+        navItemBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
             return { navItem: value }
         }),
-        itemHoverBackgroundColor: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
+        itemHoverBackground: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
             return {
                 item: value,
             }
@@ -133,7 +133,7 @@ export const menuVariant = tv({
         itemActiveColor: VariantsOptionsFactory.createActiveBackgroundColor<IMenuVariantSlots>((value) => {
             return { item: value }
         }),
-        navItemHoverBackgroundColor: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
+        navItemHoverBackground: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
             return { navItem: value }
         }),
         navItemActiveColor: VariantsOptionsFactory.createActiveBackgroundColor<IMenuVariantSlots>((value) => {

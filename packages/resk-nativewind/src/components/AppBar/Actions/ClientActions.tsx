@@ -67,9 +67,6 @@ export function AppBarClientActions<Context = unknown>({
             ? Math.trunc(maxVisibleActions)
             : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
 
-        // Account for the menu button taking up one action slot
-        // If we have space for N actions and need a menu, we can only show N-1 direct actions + 1 menu button
-        // Special case: if we only have 1 action total, show it directly (no menu needed)
         const totalActions = processedActions.length;
 
         if (totalActions <= 1) {
@@ -82,9 +79,26 @@ export function AppBarClientActions<Context = unknown>({
             return 0; // 0 direct actions + 1 menu button = 1 total slot used
         }
 
-        // Normal case: reserve one slot for menu button if we need overflow
-        // If all actions fit in baseMaxActions, no need to reserve slot for menu
-        return totalActions <= baseMaxActions ? baseMaxActions : baseMaxActions - 1;
+        // Smart overflow calculation:
+        // If we can fit all actions, show all directly
+        if (totalActions <= baseMaxActions) {
+            return baseMaxActions;
+        }
+
+        // SMART PREVENTION: If overflow would result in only 1 action in menu, 
+        // it's better to show that action directly instead of wasting space on menu button
+        // Example: 3 actions, space for 2 → instead of [Action1] [Menu▼] with 1 item,
+        // show [Action1] [Action2] [Action3] directly (same space usage, better UX)
+        const potentialDirectActions = baseMaxActions - 1; // Reserve slot for menu
+        const potentialMenuActions = totalActions - potentialDirectActions;
+
+        if (potentialMenuActions === 1) {
+            // Only one action would go to menu, better to show it directly
+            return Math.min(totalActions, baseMaxActions);
+        }
+
+        // Normal case: reserve one slot for menu button
+        return baseMaxActions - 1;
     }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig, processedActions.length]);
 
     const { actions, menuItems } = useMemo(() => {
@@ -94,63 +108,73 @@ export function AppBarClientActions<Context = unknown>({
 
         // Check if we have priority-based actions and will need overflow
         const hasPriorityActions = processedActions.some(action => isNumber(action.visibilityPriority));
-        const needsOverflow = processedActions.length > calculatedMaxActions;
 
-        // Only sort by priority if we have priority actions AND there will be overflow
+        // Calculate if we truly need overflow (consistent with calculatedMaxActions logic)
+        const totalActions = processedActions.length;
+        const baseMaxActions = isNumber(maxVisibleActions) && maxVisibleActions > 0
+            ? Math.trunc(maxVisibleActions)
+            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
+
+        // SMART OVERFLOW DETECTION: Only apply priority sorting when it makes sense
+        // We need overflow if we exceed space AND it would result in more than 1 menu item
+        // This prevents the inefficient scenario of having a menu with just 1 item
+        const needsOverflow = totalActions > baseMaxActions &&
+            totalActions > calculatedMaxActions &&
+            (totalActions - calculatedMaxActions) > 1;
+
+        // Only sort by priority if we have priority actions AND there will be meaningful overflow
         const actionsToProcess = (hasPriorityActions && needsOverflow)
             ? sortActionsByPriority(processedActions)
-            : processedActions;
+            : processedActions; renderActions<Context>({
+                actions: actionsToProcess,
+                context,
+                ...props,
+                renderAction,
+                renderExpandableAction,
+                testID,
+                actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, ...props }, index): IReactNullableElement {
+                    const { level } = props;
+                    // Handle nested actions (don't count towards limit)
+                    if (level) {
+                        props.className = cn("appbar-action-menu-item", actionMenuItemClassName);
+                        const renderedAction = (renderer as any)(props, index);
+                        if (renderedAction) {
+                            menuItems.push(props);
+                        }
+                        return null;
+                    }
 
-        renderActions<Context>({
-            actions: actionsToProcess,
-            context,
-            ...props,
-            renderAction,
-            renderExpandableAction,
-            testID,
-            actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, ...props }, index): IReactNullableElement {
-                const { level } = props;
-                // Handle nested actions (don't count towards limit)
-                if (level) {
-                    props.className = cn("appbar-action-menu-item", actionMenuItemClassName);
+                    // Check if action should always be visible
+                    const shouldAlwaysShow = alwaysVisible;
+
+                    // Check viewport constraints
+                    const meetsViewportRequirement = !(isNumber(minViewportWidth) && minViewportWidth > 0) || effectiveViewportWidth >= minViewportWidth;
+
+                    // Determine if action can be rendered directly
+                    const canRenderDirectly = shouldAlwaysShow ||
+                        (actionCounter.current < calculatedMaxActions && meetsViewportRequirement) ||
+                        (processedActions?.length === 1); // Always show single action directly (no menu needed)
+
+                    if (!level && !shouldAlwaysShow) {
+                        actionCounter.current++;
+                    }
+
+                    props.className = cn(
+                        canRenderDirectly && cn("appbar-action flex-none", actionClassName),
+                        !canRenderDirectly && cn("appbar-action-menu-item", actionMenuItemClassName)
+                    );
+
                     const renderedAction = (renderer as any)(props, index);
-                    if (renderedAction) {
+                    if (!renderedAction) return null;
+
+                    if (canRenderDirectly) {
+                        actions.push(renderedAction);
+                    } else {
                         menuItems.push(props);
                     }
                     return null;
-                }
-
-                // Check if action should always be visible
-                const shouldAlwaysShow = alwaysVisible;
-
-                // Check viewport constraints
-                const meetsViewportRequirement = !(isNumber(minViewportWidth) && minViewportWidth > 0) || effectiveViewportWidth >= minViewportWidth;
-
-                // Determine if action can be rendered directly
-                const canRenderDirectly = shouldAlwaysShow ||
-                    (actionCounter.current < calculatedMaxActions && meetsViewportRequirement) ||
-                    (processedActions?.length === 1); // Always show single action directly (no menu needed)
-
-                if (!level && !shouldAlwaysShow) {
-                    actionCounter.current++;
-                }
-
-                props.className = cn(
-                    canRenderDirectly && cn("appbar-action flex-none", actionClassName),
-                    !canRenderDirectly && cn("appbar-action-menu-item", actionMenuItemClassName)
-                );
-
-                const renderedAction = (renderer as any)(props, index);
-                if (!renderedAction) return null;
-
-                if (canRenderDirectly) {
-                    actions.push(renderedAction);
-                } else {
-                    menuItems.push(props);
-                }
-                return null;
-            },
-        });
+                },
+            });
         return { actions, menuItems };
     }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName, effectiveViewportWidth]);
 

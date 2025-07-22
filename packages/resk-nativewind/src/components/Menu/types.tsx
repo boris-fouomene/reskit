@@ -225,10 +225,10 @@ export type IMenuContext<Context = unknown> = Context & {
          */
         position: IMenuCalculatedPosition;
 
-        /***
-         * Wheather the menu is rendering on fullScreen
+        /**
+         * Whether the menu is rendered as a navigation menu
          */
-        fullScreen: boolean;
+        renderedAsNavigationMenu: boolean;
 
         /***
             Whether the menu is rendered as a bottom sheet

@@ -257,8 +257,7 @@ export function AppBarExamples() {
             backAction={false}
             actionsProps={{
                 menuProps: {
-                    fullScreenOnMobile: true,
-                    renderAsBottomSheetInFullScreen: false,
+                    renderAsNavigationMenuOnMobile: true,
                     anchorOpenIconName: "close",
                     anchorClosedIconName: "menu",
                 }

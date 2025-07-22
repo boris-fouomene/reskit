@@ -508,8 +508,8 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple = u
     const { menu } = Object.assign({}, menuContext);
     const menuPosition = menu?.position;
     const isTopPosition = menuPosition?.yPlacement === "top";
-    const fullScreen = !!menu?.fullScreen;
-    const canReverse = isTopPosition && !fullScreen;
+    const renderedAsBottomSheet = !!menu?.renderedAsBottomSheet;
+    const canReverse = isTopPosition && !renderedAsBottomSheet;
     const preparedItems = context.getPreparedItems();
     const visible = context.isOpen();
     const maxMenuHeight = isNumber(menu?.maxHeight) && menu?.maxHeight > (Math.min(menu.maxHeight, maxHeight)) ? menu.maxHeight : maxHeight;
@@ -567,7 +567,7 @@ function DropdownMenu<ItemType = unknown, ValueType = unknown, AllowMultiple = u
         disabled={context?.props?.disabled}
         testID={testID + "-dropdown-list-container"}
         className={cn("w-full max-h-full relative flex flex-col web:bg-inherit", canReverse ? "pt-[10px]" : "pb-[10px]")}
-        style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
+        style={renderedAsBottomSheet ? undefined : { maxHeight: maxMenuHeight }}
     >
         {canReverse ? null : searchInput}
         <FlatList<IDropdownPreparedItem<ItemType, ValueType>>

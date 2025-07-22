@@ -26,12 +26,8 @@ export const useMenuPosition = ({
 }: IUseMenuPositionProps) => {
     const padding = 0;
     const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useDimensions();
-
-    // Calculate fullScreen mode based on any device-specific rendering mode
-    const fullScreen = !!(
-        (isMobile && (renderAsBottomSheetOnMobile || renderAsNavigationMenuOnMobile)) ||
-        (isTablet && (renderAsBottomSheetOnTablet || renderAsNavigationMenuOnTablet))
-    );
+    const shouldRenderAsBottomSheet = isMobile && renderAsBottomSheetOnMobile || isTablet && renderAsBottomSheetOnTablet;
+    const shouldRenderAsNavigationMenu = isMobile && renderAsNavigationMenuOnMobile || isTablet && renderAsNavigationMenuOnTablet;
     const computedMinWidth = computWidthOrHeight(windowWidth, customMinWidth);
     const computedMinHeight = computWidthOrHeight(windowHeight, customMinHeight);
     const computedMaxHeight = Math.max(computWidthOrHeight(windowHeight, customMaxHeight), 0, computedMinHeight);
@@ -45,7 +41,7 @@ export const useMenuPosition = ({
             top: 0,
         };
         // Handle null measurements or fullscreen mode
-        if (!isObj(anchorMeasurements) || !anchorMeasurements || fullScreen) {
+        if (!isObj(anchorMeasurements) || !anchorMeasurements || shouldRenderAsBottomSheet) {
             calculatedPosition.height = windowHeight;
             calculatedPosition.width = windowWidth;
         } else {
@@ -184,7 +180,7 @@ export const useMenuPosition = ({
             calculatedPosition = bestPosition;
         }
         return calculatedPosition;
-    }, [anchorMeasurements?.width, fullScreen, computedMaxHeight, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, computedMinWidth, visible, menuWidth, menuHeight, padding, position, windowWidth, windowHeight]);
+    }, [anchorMeasurements?.width, shouldRenderAsBottomSheet, shouldRenderAsNavigationMenu, computedMaxHeight, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, computedMinWidth, visible, menuWidth, menuHeight, padding, position, windowWidth, windowHeight]);
     const menuPosition = calculatePosition();
     const menuAnchorStyle = useMemo(() => {
         if (!isNumber(anchorMeasurements?.width)) return {};
@@ -201,26 +197,27 @@ export const useMenuPosition = ({
     }, [anchorMeasurements?.width, anchorMeasurements?.height, position, menuPosition]);
     const touchableBackdropStyle = useMemo(() => {
         return {
-            maxWidth: windowWidth - (fullScreen ? 0 : Math.max(sizeToRemove.width, 10)),
-            maxHeight: windowHeight - (fullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
+            maxWidth: windowWidth - (shouldRenderAsBottomSheet || shouldRenderAsNavigationMenu ? 0 : Math.max(sizeToRemove.width, 10)),
+            maxHeight: windowHeight - (shouldRenderAsBottomSheet ? 0 : Math.max(sizeToRemove.height, 10)),
         }
-    }, [menuPosition, fullScreen, windowWidth, windowHeight, sizeToRemove.width, sizeToRemove.height]);
+    }, [menuPosition, shouldRenderAsBottomSheet, shouldRenderAsNavigationMenu, windowWidth, windowHeight, sizeToRemove.width, sizeToRemove.height]);
     const { xPlacement, computedPlacement, yPlacement, ...positionStyle } = menuPosition;
     return {
         calculatePosition,
         menuPosition,
         windowWidth,
         windowHeight,
-        fullScreen,
         isTablet,
         isMobile,
+        shouldRenderAsBottomSheet,
+        shouldRenderAsNavigationMenu,
         computedMinWidth,
         computedMinHeight,
         computedMaxHeight,
         ...rest,
         menuStyle: StyleSheet.flatten({
             ...touchableBackdropStyle,
-            ...(!fullScreen ? {
+            ...(!shouldRenderAsBottomSheet ? {
                 ...menuAnchorStyle,
                 ...positionStyle,
             } : {}),

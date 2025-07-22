@@ -75,7 +75,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           activityIndicator: `web:hover:border-t-${lightColor}-foregund web:dark:hover:border-t-${darkForeground} web:group-hover:border-t-${lightForeground} web:dark:group-hover:border-t-${darkForeground}`,
         };
         return {
-          base: `${groupClassName.base} p-[5px] border-2 border-${lightColor} dark:border-${darkColor} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]`,
+          base: `${groupClassName.base} border-2 border-${lightColor} dark:border-${darkColor} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]`,
           label: `${groupClassName.label} text-${lightColor} dark:text-${darkColor}`,
           icon: `${groupClassName.icon} !text-${lightColor} dark:!text-${darkColor}`,
           activityIndicator: cn(groupClassName.activityIndicator, `border-t-${lightColor} dark:border-t-${darkColor}`),

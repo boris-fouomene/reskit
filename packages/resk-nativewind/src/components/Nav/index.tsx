@@ -38,10 +38,11 @@ export class Nav {
             />
         </Nav.Link>
     }
-    static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, testID, ...rest }: INavItemsProps<Context>) {
+    static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, itemClassName, testID, ...rest }: INavItemsProps<Context>) {
         testID = defaultStr(testID, "resk-nav-item");
         const items = useRenderNavItems<Context>({
             ...rest,
+            itemClassName,
             items: (Array.isArray(customItems) ? customItems : []),
             renderItem: typeof renderItem === "function" ? renderItem : renderNavItem,
             renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem,

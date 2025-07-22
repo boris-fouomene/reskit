@@ -44,7 +44,7 @@ export const useMenuPosition = ({
         if (!isObj(anchorMeasurements) || !anchorMeasurements || shouldRenderAsBottomSheet || shouldRenderAsNavigationMenu) {
             if (shouldRenderAsNavigationMenu) {
                 // Navigation menu positioning - typically slides in from left or right
-                const navMenuWidth = Math.min(windowWidth * 0.85, 320); // Max 85% of screen width or 320px
+                const navMenuWidth = Math.min(Math.max(windowWidth, 320), windowWidth); // Max 85% of screen width or 320px
                 const preferredSide = anchorMeasurements?.pageX && anchorMeasurements.pageX > windowWidth / 2 ? "right" : "left";
 
                 // Calculate navigation menu positioning considering anchor

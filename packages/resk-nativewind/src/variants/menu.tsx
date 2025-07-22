@@ -13,10 +13,10 @@ type IMenuVariantSlots = {
     scrollView?: string;
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
-    navigationMenu?: string;
-    navigationMenuContentContainer?: string;
-    navigationMenuItems?: string;
-    navigationMenuItem?: string;
+    navigation?: string;
+    navigationContentContainer?: string;
+    navigationItems?: string;
+    navigationItem?: string;
 }
 export const menuVariant = tv({
     slots: {
@@ -29,15 +29,18 @@ export const menuVariant = tv({
         scrollView: "",
         scrollViewContentContainer: "",
         bottomSheetTitle: "",
-        navigationMenu: "resk-menu-navigation",
-        navigationMenuContentContainer: "resk-menu-navigation-content-container",
-        navigationMenuItems: "resk-menu-navigation-items",
-        navigationMenuItem: "resk-menu-navigation-item",
+        navigation: "resk-menu-navigation",
+        navigationContentContainer: "resk-menu-navigation-content-container",
+        navigationItems: "resk-menu-navigation-items",
+        navigationItem: "resk-menu-navigation-item",
     },
     variants: {
         renderedAsNavigationMenu: {
             true: {
-
+                navigation: `h-full`,
+                navigationContentContainer: ``,
+                navigationItems: ``,
+                navigationItem: ``
             }
         },
         withBackdrop: {
@@ -60,11 +63,27 @@ export const menuVariant = tv({
                 items: value,
             }
         }, "items"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navigationItems">((value) => {
+            return {
+                navigationItems: value,
+            }
+        }, "navigationItems"),
+
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "item">((value) => {
             return {
-                item: value,
+                navigationItem: value,
             }
         }, "item"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navigationItem">((value) => {
+            return {
+                navigationItem: value,
+            }
+        }, "navigationItem"),
+        ...VariantsOptionsFactory.createAllBorders<IMenuVariantSlots, "navigationItem">((value) => {
+            return {
+                navigationItem: value,
+            }
+        }, "navigationItem"),
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),
@@ -73,7 +92,9 @@ export const menuVariant = tv({
         colorScheme: "surface",
         paddingBottom: 4,
         shadow: "xl",
-        bottomSheetTitleWeight: "bold"
+        bottomSheetTitleWeight: "bold",
+        navigationItemsPadding: 2,
+        navigationItemPadding: 2,
     }
 });
 

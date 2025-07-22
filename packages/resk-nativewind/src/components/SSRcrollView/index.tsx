@@ -38,6 +38,15 @@ import { defaultStr } from '@resk/core/utils';
  *   id: "product-gallery"
  * };
  * ```
+ * 
+ * @example Window Scroll Mode
+ * ```tsx
+ * const windowScrollProps: ISSRScrollViewProps = {
+ *   useWindowScroll: true,
+ *   className: "min-h-screen",
+ *   children: <div>Full page content that triggers window scroll events</div>
+ * };
+ * ```
  */
 export interface ISSRScrollViewProps {
     /**
@@ -69,6 +78,41 @@ export interface ISSRScrollViewProps {
     children?: React.ReactNode;
 
     /**
+     * Uses window scroll instead of container scroll to enable window scroll events.
+     * 
+     * @remarks
+     * When enabled, the component renders content that uses the browser window's
+     * native scroll instead of creating an internal scrollable container. This allows
+     * window scroll events to trigger and enables window.scrollTo() functionality.
+     * 
+     * Note: When useWindowScroll is true, horizontal scrolling and some container-specific
+     * properties like bounces, snapScrolling are not available as they require container scroll.
+     * 
+     * @defaultValue false
+     * 
+     * @example
+     * ```tsx
+     * // Full page scroll that triggers window scroll events
+     * <SSRScrollView 
+     *   useWindowScroll={true}
+     *   className="min-h-screen"
+     * >
+     *   <div className="max-w-4xl mx-auto py-8 space-y-8">
+     *     <section className="h-screen">Section 1</section>
+     *     <section className="h-screen">Section 2</section>
+     *     <section className="h-screen">Section 3</section>
+     *   </div>
+     * </SSRScrollView>
+     * 
+     * // Works with window.scrollTo()
+     * <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+     *   Scroll to top
+     * </button>
+     * ```
+     */
+    useWindowScroll?: boolean;
+
+    /**
      * Enables horizontal scrolling instead of the default vertical scrolling.
      * 
      * @remarks
@@ -76,11 +120,14 @@ export interface ISSRScrollViewProps {
      * container will automatically use flexbox row layout. Vertical scrolling is
      * disabled when this option is true.
      * 
+     * Note: This property is ignored when useWindowScroll is true, as window scroll
+     * is always vertical.
+     * 
      * @defaultValue false
      * 
      * @example
      * ```tsx
-     * // Horizontal image gallery
+     * // Horizontal image gallery (only works with container scroll)
      * <SSRScrollView horizontal className="w-full h-64">
      *   <div className="flex flex-row gap-4">
      *     <img src="image1.jpg" className="flex-shrink-0 w-64 h-full object-cover" />
@@ -98,6 +145,7 @@ export interface ISSRScrollViewProps {
      * @remarks
      * When set to false, the overflow is hidden and no scrolling is possible.
      * This is useful for temporarily disabling scroll while maintaining layout.
+     * When useWindowScroll is true, this affects the document body's overflow.
      * 
      * @defaultValue true
      * 
@@ -277,15 +325,17 @@ export interface ISSRScrollViewProps {
      * @remarks
      * When enabled, adds the `scroll-smooth` CSS class which provides smooth
      * scrolling animations when programmatically scrolling to elements.
+     * Works with both container scroll and window scroll modes.
      * 
      * @defaultValue true
      * 
      * @example
      * ```tsx
-     * // Smooth scrolling for navigation
+     * // Smooth scrolling for navigation with window scroll
      * <SSRScrollView 
+     *   useWindowScroll={true}
      *   smoothScrolling={true}
-     *   className="h-screen"
+     *   className="min-h-screen"
      *   id="main-content"
      * >
      *   <section id="section1" className="h-screen">Section 1</section>
@@ -293,8 +343,8 @@ export interface ISSRScrollViewProps {
      *   <section id="section3" className="h-screen">Section 3</section>
      * </SSRScrollView>
      * 
-     * // Navigation button (external to component)
-     * <button onClick={() => document.getElementById('section2')?.scrollIntoView()}>
+     * // Navigation button (works with window scroll)
+     * <button onClick={() => window.scrollTo({ top: document.getElementById('section2')?.offsetTop, behavior: 'smooth' })}>
      *   Go to Section 2
      * </button>
      * ```
@@ -307,6 +357,7 @@ export interface ISSRScrollViewProps {
      * @remarks
      * Controls the overscroll behavior. When true, allows content to bounce
      * past the scroll boundaries. When false, stops scrolling at boundaries.
+     * Note: This property is ignored when useWindowScroll is true.
      * 
      * @defaultValue true
      * 
@@ -339,6 +390,7 @@ export interface ISSRScrollViewProps {
      * - `'auto'`: Default browser behavior
      * - `'always'`: Always allow overscroll
      * - `'never'`: Never allow overscroll
+     * Note: This property is ignored when useWindowScroll is true.
      * 
      * @defaultValue 'auto'
      * 
@@ -364,37 +416,32 @@ export interface ISSRScrollViewProps {
      * @remarks
      * When enabled, scrolling will snap to defined points, creating a
      * carousel or pagination effect. Works with both horizontal and vertical scrolling.
+     * Note: When useWindowScroll is true, snap scrolling is applied to the window.
      * 
      * @defaultValue false
      * 
      * @example
      * ```tsx
-     * // Horizontal carousel with snap scrolling
+     * // Full page snap scrolling with window scroll
+     * <SSRScrollView 
+     *   useWindowScroll={true}
+     *   snapScrolling={true}
+     *   className="min-h-screen"
+     * >
+     *   <section className="h-screen snap-start">Page 1</section>
+     *   <section className="h-screen snap-start">Page 2</section>
+     *   <section className="h-screen snap-start">Page 3</section>
+     * </SSRScrollView>
+     * 
+     * // Container snap scrolling
      * <SSRScrollView 
      *   horizontal
      *   snapScrolling={true}
      *   className="w-full h-64"
      *   containerClassName="flex flex-row"
      * >
-     *   <div className="min-w-full h-full bg-red-500 snap-start flex items-center justify-center">
-     *     <h2>Slide 1</h2>
-     *   </div>
-     *   <div className="min-w-full h-full bg-blue-500 snap-start flex items-center justify-center">
-     *     <h2>Slide 2</h2>
-     *   </div>
-     *   <div className="min-w-full h-full bg-green-500 snap-start flex items-center justify-center">
-     *     <h2>Slide 3</h2>
-     *   </div>
-     * </SSRScrollView>
-     * 
-     * // Vertical page snap scrolling
-     * <SSRScrollView 
-     *   snapScrolling={true}
-     *   className="h-screen"
-     * >
-     *   <section className="h-screen snap-start">Page 1</section>
-     *   <section className="h-screen snap-start">Page 2</section>
-     *   <section className="h-screen snap-start">Page 3</section>
+     *   <div className="min-w-full h-full bg-red-500 snap-start">Slide 1</div>
+     *   <div className="min-w-full h-full bg-blue-500 snap-start">Slide 2</div>
      * </SSRScrollView>
      * ```
      */
@@ -582,6 +629,49 @@ export interface ISSRScrollViewProps {
  * }
  * ```
  * 
+ * @example Full-Screen Window Scroll with Events
+ * ```tsx
+ * import { SSRScrollView } from '@resk/nativewind/components';
+ * 
+ * function LandingPage() {
+ *   // This will trigger window scroll events and work with window.scrollTo()
+ *   return (
+ *     <SSRScrollView 
+ *       useWindowScroll={true}
+ *       snapScrolling={true}
+ *       smoothScrolling={true}
+ *       className="min-h-screen"
+ *       aria-label="Landing page sections"
+ *       id="main-content"
+ *     >
+ *       <section id="hero" className="h-screen snap-start bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+ *         <div className="text-center text-white">
+ *           <h1 className="text-6xl font-bold mb-4">Welcome</h1>
+ *           <button 
+ *             onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+ *             className="bg-white text-blue-600 px-6 py-3 rounded-lg"
+ *           >
+ *             Scroll to Features
+ *           </button>
+ *         </div>
+ *       </section>
+ *       
+ *       <section id="features" className="h-screen snap-start bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
+ *         <div className="text-center text-white">
+ *           <h2 className="text-4xl font-bold mb-4">Features</h2>
+ *           <p className="text-xl opacity-90">Window scroll events work here!</p>
+ *         </div>
+ *       </section>
+ *     </SSRScrollView>
+ *   );
+ * }
+ * 
+ * // Elsewhere in your app, you can listen to window scroll events
+ * window.addEventListener('scroll', () => {
+ *   console.log('Window scrolled!', window.scrollY);
+ * });
+ * ```
+ * 
  * @example Full-Screen Snap Scrolling Experience
  * ```tsx
  * import { SSRScrollView } from '@resk/nativewind/components';
@@ -615,6 +705,95 @@ export interface ISSRScrollViewProps {
  *         </section>
  *       ))}
  *     </SSRScrollView>
+ *   );
+ * }
+ * ```
+ * 
+ * @example Window Scroll Events and scrollTo() Support
+ * ```tsx
+ * import { SSRScrollView } from '@resk/nativewind/components';
+ * import { useEffect } from 'react';
+ * 
+ * function ScrollAwarePage() {
+ *   useEffect(() => {
+ *     // This will now work because we're using window scroll
+ *     const handleScroll = () => {
+ *       console.log('Page scrolled!', window.scrollY);
+ *       
+ *       // Show/hide scroll-to-top button based on scroll position
+ *       const scrollButton = document.getElementById('scroll-to-top');
+ *       if (scrollButton) {
+ *         scrollButton.style.display = window.scrollY > 200 ? 'block' : 'none';
+ *       }
+ *     };
+ * 
+ *     window.addEventListener('scroll', handleScroll);
+ *     return () => window.removeEventListener('scroll', handleScroll);
+ *   }, []);
+ * 
+ *   const scrollToTop = () => {
+ *     // This will now work because we're using window scroll
+ *     window.scrollTo({ top: 0, behavior: 'smooth' });
+ *   };
+ * 
+ *   const scrollToSection = (sectionId: string) => {
+ *     // This will also work with window scroll
+ *     const element = document.getElementById(sectionId);
+ *     if (element) {
+ *       window.scrollTo({
+ *         top: element.offsetTop,
+ *         behavior: 'smooth'
+ *       });
+ *     }
+ *   };
+ * 
+ *   return (
+ *     <>
+ *       <SSRScrollView 
+ *         useWindowScroll={true}
+ *         className="min-h-screen"
+ *         smoothScrolling={true}
+ *       >
+ *         <nav className="fixed top-0 w-full bg-white shadow-lg z-50 p-4">
+ *           <div className="flex gap-4">
+ *             <button onClick={() => scrollToSection('section1')}>
+ *               Go to Section 1
+ *             </button>
+ *             <button onClick={() => scrollToSection('section2')}>
+ *               Go to Section 2
+ *             </button>
+ *             <button onClick={() => scrollToSection('section3')}>
+ *               Go to Section 3
+ *             </button>
+ *           </div>
+ *         </nav>
+ * 
+ *         <div className="pt-20">
+ *           <section id="section1" className="h-screen bg-red-100 flex items-center justify-center">
+ *             <h2 className="text-4xl">Section 1</h2>
+ *           </section>
+ *           
+ *           <section id="section2" className="h-screen bg-blue-100 flex items-center justify-center">
+ *             <h2 className="text-4xl">Section 2</h2>
+ *           </section>
+ *           
+ *           <section id="section3" className="h-screen bg-green-100 flex items-center justify-center">
+ *             <h2 className="text-4xl">Section 3</h2>
+ *           </section>
+ *         </div>
+ *       </SSRScrollView>
+ * 
+ *       {}
+ *       <button
+ *         id="scroll-to-top"
+ *         onClick={scrollToTop}
+ *         className="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700"
+ *         style={{ display: 'none' }}
+ *         aria-label="Scroll to top"
+ *       >
+ *         ↑
+ *       </button>
+ *     </>
  *   );
  * }
  * ```
@@ -720,6 +899,7 @@ export interface ISSRScrollViewProps {
  */
 export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     children,
+    useWindowScroll = false,
     horizontal = false,
     scrollEnabled = true,
     showsHorizontalScrollIndicator = true,
@@ -738,6 +918,86 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     ...htmlProps
 }) => {
     testID = defaultStr(testID, "resk-ssr-scroll-view");
+
+    // When useWindowScroll is true, render content directly for window scrolling
+    if (useWindowScroll) {
+        // Window scroll mode - ignore horizontal and container-specific properties
+        const windowScrollClasses = cn(
+            // Base classes
+            'w-full',
+
+            // Smooth scrolling for the document
+            smoothScrolling && 'scroll-smooth',
+
+            // Snap scrolling for window
+            snapScrolling && 'snap-y snap-mandatory',
+
+            className
+        );
+
+        const windowContentClasses = cn(
+            // Content container
+            'w-full',
+
+            // Snap children if snap scrolling is enabled
+            snapScrolling && '[&>*]:snap-start',
+
+            containerClassName
+        );
+
+        // Apply smooth scrolling to html element via style
+        const windowScrollStyle = {
+            ...(smoothScrolling && { scrollBehavior: 'smooth' as const }),
+            ...(style || {}),
+        } as React.CSSProperties;
+
+        return (
+            <>
+                {/* Apply scroll behavior to HTML element for window scroll */}
+                {smoothScrolling && (
+                    <style
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                                html {
+                                    scroll-behavior: smooth;
+                                }
+                                ${snapScrolling ? `
+                                html {
+                                    scroll-snap-type: y mandatory;
+                                }
+                                ` : ''}
+                                ${!scrollEnabled ? `
+                                body {
+                                    overflow: hidden;
+                                }
+                                ` : ''}
+                            `
+                        }}
+                    />
+                )}
+
+                <Div
+                    id={id}
+                    testID={testID}
+                    className={cn(windowScrollClasses, "resk-ssr-scrollview", "resk-ssr-scrollview-window-mode")}
+                    style={windowScrollStyle as any}
+                    aria-label={ariaLabel || 'Page content with window scroll'}
+                    role="main"
+                    {...htmlProps}
+                >
+                    <Div
+                        className={cn(windowContentClasses, "resk-ssr-scrollview-content")}
+                        style={contentContainerStyle as any}
+                        testID={`${testID}-content`}
+                    >
+                        {children}
+                    </Div>
+                </Div>
+            </>
+        );
+    }
+
+    // Container scroll mode (original behavior)
     // Generate CSS classes for scroll behavior
     const scrollClasses = cn(
         // Base scroll styles
@@ -812,7 +1072,7 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
         <Div
             id={id}
             testID={testID}
-            className={cn(scrollClasses, "resk-ssr-scrollview")}
+            className={cn(scrollClasses, "resk-ssr-scrollview", "resk-ssr-scrollview-container-mode")}
             style={containerStyle as any}
             aria-label={ariaLabel || (horizontal ? 'Horizontal scroll area' : 'Vertical scroll area')}
             role="region"

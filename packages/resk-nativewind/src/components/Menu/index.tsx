@@ -83,7 +83,19 @@ export function Menu<Context = unknown>({
     const isVisible = useMemo(() => {
         return isControlled ? !!visible : state.visible;
     }, [state.visible, isControlled, visible]);
-    const { menuPosition, menuStyle, isDesktop, isMobile, isTablet, windowWidth, windowHeight, shouldRenderAsBottomSheet, shouldRenderAsNavigationMenu } = useMenuPosition({
+    const {
+        menuPosition,
+        menuStyle,
+        isDesktop,
+        isMobile,
+        isTablet,
+        windowWidth,
+        windowHeight,
+        shouldRenderAsBottomSheet,
+        shouldRenderAsNavigationMenu,
+        navigationMenuSide,
+        navigationMenuWidth
+    } = useMenuPosition({
         ...props,
         renderAsBottomSheetOnMobile,
         renderAsBottomSheetOnTablet,
@@ -180,7 +192,29 @@ export function Menu<Context = unknown>({
     const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
-    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, windowHeight, windowWidth, isMobile, isTablet, renderedAsBottomSheet, renderedAsNavigationMenu, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+    const context: IMenuContext<Context> = {
+        ...Object.assign({}, props.context),
+        menu: {
+            maxHeight: maxMenuHeight,
+            measureAnchor,
+            windowHeight,
+            windowWidth,
+            isMobile,
+            isTablet,
+            renderedAsBottomSheet,
+            renderedAsNavigationMenu,
+            navigationMenuSide,
+            navigationMenuWidth,
+            isDesktop,
+            anchorMeasurements: state.anchorMeasurements,
+            position: menuPosition,
+            testID,
+            isOpen,
+            open,
+            close,
+            isVisible: isVisible
+        }
+    };
     useImperativeHandle(ref, () => context as any);
     menuContextRef.current = context;
     let anchor = null;

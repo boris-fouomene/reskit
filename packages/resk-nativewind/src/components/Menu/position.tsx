@@ -40,10 +40,33 @@ export const useMenuPosition = ({
             left: 0,
             top: 0,
         };
-        // Handle null measurements or fullscreen mode
-        if (!isObj(anchorMeasurements) || !anchorMeasurements || shouldRenderAsBottomSheet) {
-            calculatedPosition.height = windowHeight;
-            calculatedPosition.width = windowWidth;
+        // Handle null measurements, fullscreen mode, or navigation menu
+        if (!isObj(anchorMeasurements) || !anchorMeasurements || shouldRenderAsBottomSheet || shouldRenderAsNavigationMenu) {
+            if (shouldRenderAsNavigationMenu) {
+                // Navigation menu positioning - typically slides in from left or right
+                const navMenuWidth = Math.min(windowWidth * 0.85, 320); // Max 85% of screen width or 320px
+                const preferredSide = anchorMeasurements?.pageX && anchorMeasurements.pageX > windowWidth / 2 ? "right" : "left";
+
+                calculatedPosition.height = windowHeight;
+                calculatedPosition.width = navMenuWidth;
+                calculatedPosition.computedPlacement = preferredSide;
+                calculatedPosition.xPlacement = preferredSide;
+                calculatedPosition.yPlacement = "top";
+                calculatedPosition.top = 0;
+                calculatedPosition.bottom = undefined;
+
+                if (preferredSide === "left") {
+                    calculatedPosition.left = 0;
+                    calculatedPosition.right = undefined;
+                } else {
+                    calculatedPosition.left = undefined;
+                    calculatedPosition.right = 0;
+                }
+            } else {
+                // Bottom sheet or no anchor measurements
+                calculatedPosition.height = windowHeight;
+                calculatedPosition.width = windowWidth;
+            }
         } else {
             const { pageX: pX, pageY: pY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             const pageX = Math.max(0, pX), pageY = Math.max(0, pY);
@@ -196,12 +219,24 @@ export const useMenuPosition = ({
         }
     }, [anchorMeasurements?.width, anchorMeasurements?.height, position, menuPosition]);
     const touchableBackdropStyle = useMemo(() => {
+        if (shouldRenderAsNavigationMenu) {
+            // Navigation menu should not have backdrop size restrictions
+            return {
+                maxWidth: windowWidth,
+                maxHeight: windowHeight,
+            };
+        }
         return {
-            maxWidth: windowWidth - (shouldRenderAsBottomSheet || shouldRenderAsNavigationMenu ? 0 : Math.max(sizeToRemove.width, 10)),
+            maxWidth: windowWidth - (shouldRenderAsBottomSheet ? 0 : Math.max(sizeToRemove.width, 10)),
             maxHeight: windowHeight - (shouldRenderAsBottomSheet ? 0 : Math.max(sizeToRemove.height, 10)),
         }
     }, [menuPosition, shouldRenderAsBottomSheet, shouldRenderAsNavigationMenu, windowWidth, windowHeight, sizeToRemove.width, sizeToRemove.height]);
     const { xPlacement, computedPlacement, yPlacement, ...positionStyle } = menuPosition;
+
+    // Navigation menu specific properties
+    const navigationMenuSide: 'left' | 'right' | undefined = shouldRenderAsNavigationMenu ? (menuPosition.computedPlacement === "right" ? "right" : "left") : undefined;
+    const navigationMenuWidth = shouldRenderAsNavigationMenu ? menuPosition.width : undefined;
+
     return {
         calculatePosition,
         menuPosition,
@@ -211,14 +246,19 @@ export const useMenuPosition = ({
         isMobile,
         shouldRenderAsBottomSheet,
         shouldRenderAsNavigationMenu,
+        navigationMenuSide,
+        navigationMenuWidth,
         computedMinWidth,
         computedMinHeight,
         computedMaxHeight,
         ...rest,
         menuStyle: StyleSheet.flatten({
             ...touchableBackdropStyle,
-            ...(!shouldRenderAsBottomSheet ? {
+            ...(!shouldRenderAsBottomSheet && !shouldRenderAsNavigationMenu ? {
                 ...menuAnchorStyle,
+                ...positionStyle,
+            } : shouldRenderAsNavigationMenu ? {
+                // Navigation menu specific styles
                 ...positionStyle,
             } : {}),
         }),

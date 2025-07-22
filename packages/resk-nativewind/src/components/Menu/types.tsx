@@ -230,6 +230,18 @@ export type IMenuContext<Context = unknown> = Context & {
          */
         renderedAsNavigationMenu: boolean;
 
+        /**
+         * The side where the navigation menu appears (left or right)
+         * Only available when renderedAsNavigationMenu is true
+         */
+        navigationMenuSide?: 'left' | 'right';
+
+        /**
+         * The width of the navigation menu
+         * Only available when renderedAsNavigationMenu is true
+         */
+        navigationMenuWidth?: number;
+
         /***
             Whether the menu is rendered as a bottom sheet
         */

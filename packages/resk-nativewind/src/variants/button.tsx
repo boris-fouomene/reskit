@@ -80,7 +80,12 @@ export const buttonVariant = tv({
         },
         colorScheme: VariantsColors.button,
         outline: VariantsColors.buttonOutline,
-        hoverColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
+        hoverBackgroundColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
+            return {
+                base: value,
+            }
+        }),
+        activeBackgroundColor: VariantsOptionsFactory.createActiveBackgroundColor<{ base: string }>((value, variantName) => {
             return {
                 base: value,
             }

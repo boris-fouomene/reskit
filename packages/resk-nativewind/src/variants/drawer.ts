@@ -25,14 +25,14 @@ export const drawerVariant = tv({
                 base: value,
             }
         }),
-        background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
+        backgroundColor: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 base: value,
             }
         }),
     },
     defaultVariants: {
-        background: "surface",
+        backgroundColor: "surface",
         shadow: "lg",
     }
 })

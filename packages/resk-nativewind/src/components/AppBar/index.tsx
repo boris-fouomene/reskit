@@ -5,7 +5,7 @@ import isValidElement from '@utils/isValidElement';
 import ExpandableAppBarAction from './ExpandableAction';
 import { AppBarAction } from './Action';
 import { BackAction } from "./BackAction";
-import { act, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { defaultStr, isNumber } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { Div } from '@html/Div';

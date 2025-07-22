@@ -1,5 +1,5 @@
 import { JSX, ReactNode } from "react";
-import { IIconButtonProps } from "@components/Icon/types";
+import { IFontIconName, IIconButtonProps } from "@components/Icon/types";
 import { INavItemProps, INavItems, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { ITextVariant } from "@variants/text";
@@ -187,9 +187,10 @@ export interface IAppBarActionsProps<Context = unknown> {
 
     /** Custom overflow menu configuration. */
     menuProps?: Omit<IMenuProps<IAppBarContext<Context>>,"context" | "items" | "anchor"> & { 
-        /** Icon properties for the overflow menu anchor button. */
-        anchorIconProps?: IIconButtonProps;
         anchorClassName?: IClassName;
+        anchorIconSize?: IIconButtonProps["size"];
+        anchorIconName?:IFontIconName;
+        anchorIconVarint?: IIconButtonVariant;
         anchor?: IMenuProps<IAppBarContext<Context>>["anchor"];
     };
 

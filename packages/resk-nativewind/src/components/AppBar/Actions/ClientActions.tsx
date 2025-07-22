@@ -38,7 +38,7 @@ export function AppBarClientActions<Context = unknown>({
     ...props 
 }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
-    const {anchorIconProps,anchorClassName,...restMenuProps} = Object.assign({},menuProps);
+    const {anchorIconName,anchorClassName,anchorIconVarint,anchorIconSize,...restMenuProps} = Object.assign({},menuProps);
     // Use viewport width if provided, otherwise fall back to window width
     const effectiveViewportWidth = useMemo(() => {
         if (isNumber(viewportWidth) && viewportWidth > 0) {
@@ -150,10 +150,10 @@ export function AppBarClientActions<Context = unknown>({
                     className={cn("appbar-menu")}
                     anchor={({ menu }) => {
                         return <Icon.Button
-                            size={28}
-                            fontIconName={FONT_ICONS.MORE as any}
-                            {...anchorIconProps}
-                            className={cn("flex-none mx-[7px]", anchorClassName, anchorIconProps?.className)}
+                            variant={anchorIconVarint}
+                            size={anchorIconSize || 28}
+                            fontIconName={(anchorIconName || FONT_ICONS.MORE) as any}
+                            className={cn("flex-none mx-[7px]", anchorClassName)}
                             accessibilityLabel={overflowMenuAccessibilityLabel}
                             onPress={() => {
                                 menu?.open();
@@ -162,7 +162,7 @@ export function AppBarClientActions<Context = unknown>({
                     }}
                     items={menuItems}
                     context={context}
-                    {...menuProps}
+                    {...restMenuProps}
                 />
             ) : null}
         </Div>

@@ -17,6 +17,7 @@ type IMenuVariantSlots = {
     navContentContainer?: string;
     navItems?: string;
     navItem?: string;
+    navModalBackdrop?: string;
 }
 export const menuVariant = tv({
     slots: {
@@ -29,6 +30,7 @@ export const menuVariant = tv({
         scrollView: "",
         scrollViewContentContainer: "",
         bottomSheetTitle: "",
+        navModalBackdrop: "resk-nav-menu-modal-backdrop",
         nav: "resk-menu-nav",
         navContentContainer: "resk-menu-nav-content-container",
         navItems: "resk-menu-nav-items",
@@ -45,7 +47,7 @@ export const menuVariant = tv({
         },
         navWithBackdrop: {
             true: {
-                modalBackdrop: classes.backdrop,
+                navModalBackdrop: classes.backdrop,
             },
             false: {}
         },

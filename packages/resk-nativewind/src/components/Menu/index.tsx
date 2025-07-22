@@ -321,6 +321,7 @@ export function Menu<Context = unknown>({
             backdropClassName={cn(
                 "menu-backdrop",
                 renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop(),
+                renderedAsNavigationMenu && computedVariant.navModalBackdrop()
             )}
         >
             <MenuContext.Provider value={context}>

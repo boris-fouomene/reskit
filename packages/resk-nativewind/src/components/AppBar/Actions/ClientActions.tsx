@@ -30,7 +30,6 @@ export function AppBarClientActions<Context = unknown>({
     viewportWidth, 
     maxVisibleActions,
     responsiveConfig = DEFAULT_APPBAR_RESPONSIVE_CONFIG,
-    actionPriority,
     menuProps,
     enableVirtualization = false,
     accessibilityLabel,

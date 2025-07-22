@@ -48,16 +48,7 @@ export function AppBarClientActions<Context = unknown>({
         return Math.max(windowWidth, 320); // Minimum 320px width
     }, [viewportWidth, windowWidth]);
     
-    // Calculate max actions based on responsive configuration
-    const calculatedMaxActions = useMemo(() => {
-        if (isNumber(maxVisibleActions) && maxVisibleActions > 0) {
-            return Math.trunc(maxVisibleActions);
-        }
-        return calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
-    }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig]);
-
-    
-    // Sort and process actions based on priority
+    // Sort and process actions based on priority first
     const processedActions = useMemo(() => {
         if (!Array.isArray(items) || !items.length) return [];
         // Filter out null/undefined items and sort by priority if priority is being used
@@ -70,6 +61,32 @@ export function AppBarClientActions<Context = unknown>({
         
         return validItems;
     }, [items]);
+    
+    // Calculate max actions based on responsive configuration
+    const calculatedMaxActions = useMemo(() => {
+        const baseMaxActions = isNumber(maxVisibleActions) && maxVisibleActions > 0
+            ? Math.trunc(maxVisibleActions)
+            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
+        
+        // Account for the menu button taking up one action slot
+        // If we have space for N actions and need a menu, we can only show N-1 direct actions + 1 menu button
+        // Special case: if we only have 1 action total, show it directly (no menu needed)
+        const totalActions = processedActions.length;
+        
+        if (totalActions <= 1) {
+            // Single action or no actions: show directly, no menu needed
+            return baseMaxActions;
+        }
+        
+        if (baseMaxActions <= 1) {
+            // Very constrained space: can only show menu button
+            return 0; // 0 direct actions + 1 menu button = 1 total slot used
+        }
+        
+        // Normal case: reserve one slot for menu button if we need overflow
+        // If all actions fit in baseMaxActions, no need to reserve slot for menu
+        return totalActions <= baseMaxActions ? baseMaxActions : baseMaxActions - 1;
+    }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig, processedActions.length]);
     
     const { actions, menuItems } = useMemo(() => {
         const actionCounter = { current: 0 };
@@ -105,7 +122,7 @@ export function AppBarClientActions<Context = unknown>({
                 // Determine if action can be rendered directly
                 const canRenderDirectly = shouldAlwaysShow || 
                     (actionCounter.current < calculatedMaxActions && meetsViewportRequirement) ||
-                    (processedActions?.length === 1); // Always show single action
+                    (processedActions?.length === 1); // Always show single action directly (no menu needed)
                 
                 if (!level && !shouldAlwaysShow) {
                     actionCounter.current++;

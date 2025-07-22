@@ -22,7 +22,12 @@ import { Icon } from '@components/Icon';
 import { Divider } from '@components/Divider';
 import { Backdrop } from '@components/Backdrop';
 import { Modal } from '@components/Modal';
+import { remapProps } from 'nativewind';
 
+
+remapProps(Animated.View, {
+    className: "style",
+})
 
 export function Menu<Context = unknown>({
     onClose,
@@ -242,17 +247,52 @@ export function Menu<Context = unknown>({
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", style: maxHeightStyle, className: cn("max-w-full flex-1", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
-    itemsProps.className = cn(computedVariant.items(), "resk-menu-items", shouldRenderAsNavigationMenu && computedVariant.navigationItems(), itemsProps.className);
-    itemsProps.itemClassName = cn(computedVariant.item(), "resk-menu-item", shouldRenderAsNavigationMenu && computedVariant.navigationItem())
+    itemsProps.className = cn(computedVariant.items(), "resk-menu-items", shouldRenderAsNavigationMenu && computedVariant.navItems(), itemsProps.className);
+    itemsProps.itemClassName = cn(computedVariant.item(), "resk-menu-item", shouldRenderAsNavigationMenu && computedVariant.navItem())
     const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
     const anchorProps = typeof customAnchor == "function" ? {} : {
         onPress: () => {
             open();
         }
     }
-    if (isVisible && renderedAsNavigationMenu) {
-        console.log(menuStyle, " is menu style heeein ", menuPosition, windowWidth, " is window width ", windowHeight, " is window height")
-    }
+    // Navigation menu slide animation
+    const slideAnim = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+        if (renderedAsNavigationMenu) {
+            if (isVisible) {
+                // Slide in
+                Animated.timing(slideAnim, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }).start();
+            } else {
+                // Slide out
+                Animated.timing(slideAnim, {
+                    toValue: 0,
+                    duration: 250,
+                    useNativeDriver: true,
+                }).start();
+            }
+        }
+    }, [isVisible, renderedAsNavigationMenu, slideAnim]);
+
+    // Calculate slide transform based on navigation side
+    const slideTransform = useMemo(() => {
+        if (!renderedAsNavigationMenu) return {};
+        const translateX = slideAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: navigationMenuSide === 'right'
+                ? [navigationMenuWidth || 320, 0]
+                : [-(navigationMenuWidth || 320), 0],
+        });
+        return {
+            transform: [{ translateX }]
+        };
+    }, [slideAnim, renderedAsNavigationMenu, navigationMenuSide, navigationMenuWidth]);
+    const MenuComponent = useMemo(() => {
+        return renderedAsNavigationMenu ? Animated.View : View;
+    }, [renderedAsNavigationMenu]);
     return <>
         <MenuContext.Provider value={context}>
             <AnchorComponent
@@ -281,14 +321,15 @@ export function Menu<Context = unknown>({
             )}
         >
             <MenuContext.Provider value={context}>
-                <View
+                <MenuComponent
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.navigation(), className)}
+                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.nav(), className)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,
+                        slideTransform,
                     ]}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
@@ -297,10 +338,10 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
-                        onPress={() => close()}
-                    /> : null}
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navigationContentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navContentContainer(), contentContainerClassName)}>
+                        {dismissible !== false ? <Backdrop transparent testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
+                            onPress={() => close()}
+                        /> : null}
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">
@@ -327,7 +368,7 @@ export function Menu<Context = unknown>({
                             {child}
                         </Wrapper>
                     </Div>
-                </View>
+                </MenuComponent>
             </MenuContext.Provider>
         </Modal>}
     </>

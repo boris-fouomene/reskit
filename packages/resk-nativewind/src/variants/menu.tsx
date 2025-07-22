@@ -13,10 +13,10 @@ type IMenuVariantSlots = {
     scrollView?: string;
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
-    navigation?: string;
-    navigationContentContainer?: string;
-    navigationItems?: string;
-    navigationItem?: string;
+    nav?: string;
+    navContentContainer?: string;
+    navItems?: string;
+    navItem?: string;
 }
 export const menuVariant = tv({
     slots: {
@@ -29,24 +29,31 @@ export const menuVariant = tv({
         scrollView: "",
         scrollViewContentContainer: "",
         bottomSheetTitle: "",
-        navigation: "resk-menu-navigation",
-        navigationContentContainer: "resk-menu-navigation-content-container",
-        navigationItems: "resk-menu-navigation-items",
-        navigationItem: "resk-menu-navigation-item",
+        nav: "resk-menu-nav",
+        navContentContainer: "resk-menu-nav-content-container",
+        navItems: "resk-menu-nav-items",
+        navItem: "resk-menu-nav-item",
     },
     variants: {
         renderedAsNavigationMenu: {
             true: {
-                navigation: `h-full`,
-                navigationContentContainer: ``,
-                navigationItems: ``,
-                navigationItem: ``
+                nav: `h-full`,
+                navContentContainer: ``,
+                navItems: ``,
+                navItem: ``
             }
+        },
+        navWithBackdrop: {
+            true: {
+                modalBackdrop: classes.backdrop,
+            },
+            false: {}
         },
         withBackdrop: {
             true: {
                 modalBackdrop: classes.backdrop,
-            }
+            },
+            false: {}
         },
         ...VariantsOptionsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
@@ -63,38 +70,82 @@ export const menuVariant = tv({
                 items: value,
             }
         }, "items"),
-        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navigationItems">((value) => {
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navItems">((value) => {
             return {
-                navigationItems: value,
+                navItems: value,
             }
-        }, "navigationItems"),
+        }, "navItems"),
 
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "item">((value) => {
             return {
-                navigationItem: value,
+                navItem: value,
             }
         }, "item"),
-        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navigationItem">((value) => {
+        ...VariantsOptionsFactory.createAllBorders<IMenuVariantSlots, "item">((value) => {
             return {
-                navigationItem: value,
+                navItem: value,
             }
-        }, "navigationItem"),
-        ...VariantsOptionsFactory.createAllBorders<IMenuVariantSlots, "navigationItem">((value) => {
+        }, "item"),
+        ...VariantsOptionsFactory.createAllRounded<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navItem">((value) => {
             return {
-                navigationItem: value,
+                navItem: value,
             }
-        }, "navigationItem"),
+        }, "navItem"),
+        ...VariantsOptionsFactory.createAllBorders<IMenuVariantSlots, "navItem">((value) => {
+            return {
+                navItem: value,
+            }
+        }, "navItem"),
+        ...VariantsOptionsFactory.createAllRounded<IMenuVariantSlots, "navItem">((value) => {
+            return { item: value }
+        }, "navItem"),
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),
+        itemRingWidth: VariantsOptionsFactory.createRingWidth<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
+        navItemRingWidth: VariantsOptionsFactory.createRingWidth<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
+        itemHoverRingWidth: VariantsOptionsFactory.createHoverRingWidth<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
+        navItemHoverRingWidth: VariantsOptionsFactory.createHoverRingWidth<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
+        itemBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
+        navItemBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
+        itemHoverBackground: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
+            return {
+                item: value,
+            }
+        }),
+        itemActiveColor: VariantsOptionsFactory.createActiveBackgroundColor<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
+        navItemHoverBackground: VariantsOptionsFactory.createHoverBackgroundColor<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
+        navItemActiveColor: VariantsOptionsFactory.createActiveBackgroundColor<IMenuVariantSlots>((value) => {
+            return { navItem: value }
+        }),
     },
     defaultVariants: {
         colorScheme: "surface",
         paddingBottom: 4,
         shadow: "xl",
         bottomSheetTitleWeight: "bold",
-        navigationItemsPadding: 2,
-        navigationItemPadding: 2,
+        navItemsPadding: 2,
+        navItemPadding: 2,
+        navWithBackdrop: true,
     }
 });
 

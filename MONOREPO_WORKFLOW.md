@@ -26,6 +26,7 @@ git commit -m "test(nest): add integration tests"
 ```
 
 **Commit Types:**
+
 - `feat:` → 🚀 New features
 - `fix:` → 🐛 Bug fixes
 - `docs:` → 📝 Documentation
@@ -120,8 +121,9 @@ npm run changelog -- --from=v1.0.0 --to=v2.0.0
 ```
 
 **GitHub Labels for Categorization:**
+
 - `tag: breaking change` → 💥 Breaking Change
-- `tag: enhancement` → 🚀 Enhancement  
+- `tag: enhancement` → 🚀 Enhancement
 - `tag: bug fix` → 🐛 Bug Fix
 - `tag: documentation` → 📝 Documentation
 - `tag: internal` → 🏠 Internal
@@ -129,6 +131,7 @@ npm run changelog -- --from=v1.0.0 --to=v2.0.0
 ## 🔧 Package-Specific Information
 
 ### @resk/core (v1.23.2)
+
 ```bash
 # Build: tsup + TypeScript + alias resolution
 # Tests: ✅ 433 tests passing
@@ -139,6 +142,7 @@ npm run clean:core
 ```
 
 ### @resk/nativewind (v1.0.1-canary.99)
+
 ```bash
 # Build: Complex multi-step (variants + TypeScript + CSS)  
 # Lint: ✅ ESLint + Prettier
@@ -149,6 +153,7 @@ npm run clean:nativewind
 ```
 
 ### @resk/nest (v1.11.0)
+
 ```bash
 # Build: TypeScript + tsc-alias
 # Tests: ✅ Jest testing
@@ -163,23 +168,29 @@ npm run clean:nest
 ## 🏗️ Lerna Architecture Features
 
 ### ✅ Independent Versioning
+
 - Each package maintains its own version number
 - Versions bump independently based on changes
 - `lerna.json` configured with `"version": "independent"`
 
 ### ✅ Dependency-Aware Building
+
 Lerna automatically handles build order:
+
 1. **@resk/core** (builds first - no dependencies)
-2. **@resk/nativewind** (depends on @resk/core)  
+2. **@resk/nativewind** (depends on @resk/core)
 3. **@resk/nest** (depends on @resk/core)
 
 ### ✅ Conventional Commits Integration
+
 - Automatic version bumping based on commit messages
 - Changelog generation from commit history
 - GitHub release creation with release notes
 
 ### ✅ Smart Change Detection
+
 Ignores these files for version bumping:
+
 - Documentation files (`**/*.md`)
 - Test files (`**/test/**`, `**/*.test.*`)
 - Example files (`**/examples/**`)
@@ -187,11 +198,13 @@ Ignores these files for version bumping:
 ## 🔄 CI/CD Pipeline with Lerna
 
 ### On Pull Request:
+
 - ✅ Build verification (`lerna run build --stream`)
 - ✅ Test suite (`lerna run test --stream`)
 - ✅ Lint check (`lerna run lint --stream`)
 
 ### On Main Branch Push:
+
 - 🚀 Dual release strategy: **Changesets OR Lerna**
 - 📦 Automatic package publishing to npm
 - 📝 Automatic changelog generation
@@ -224,6 +237,7 @@ fix(nativewind)!: remove deprecated component props
 ## 🛠️ Advanced Troubleshooting
 
 ### Lerna Issues
+
 ```bash
 # Check which packages exist
 lerna ls
@@ -239,6 +253,7 @@ npm run clean:install
 ```
 
 ### Version/Release Issues
+
 ```bash
 # Preview what would be released
 lerna changed
@@ -253,6 +268,7 @@ npm install
 ```
 
 ### Build Issues
+
 ```bash
 # Clean everything and rebuild
 npm run clean
@@ -261,6 +277,7 @@ npm run build
 ```
 
 ### Publishing Issues
+
 ```bash
 # Check publish status
 lerna ls --json
@@ -275,6 +292,7 @@ lerna publish --skip-git
 ## 📦 Environment Variables
 
 ### Required for Full Functionality:
+
 ```bash
 # For changelog generation
 export GITHUB_AUTH=your_github_token
@@ -287,21 +305,7 @@ export GITHUB_TOKEN=your_github_token
 ```
 
 ### GitHub Secrets Setup:
+
 1. Go to repository Settings > Secrets and variables > Actions
 2. Add `NPM_TOKEN` (from npm access tokens)
 3. `GITHUB_TOKEN` is automatically provided
-
-## 🎯 What's Working Now
-
-✅ **Lerna 8.x** - Latest version with modern features  
-✅ **Independent Versioning** - Each package has its own version  
-✅ **Conventional Commits** - Automatic changelog generation  
-✅ **GitHub Releases** - Automatic release creation  
-✅ **Build Pipeline** - Dependency-aware building  
-✅ **Test Pipeline** - Targeted testing per package  
-✅ **Clean Commands** - Remove build artifacts  
-✅ **Watch Mode** - Development with automatic rebuilding  
-✅ **Scoped Commands** - Target specific packages  
-✅ **Dual Release Strategy** - Changesets OR Lerna workflow  
-
-Your ResKit monorepo is now a **production-ready** Lerna-powered development environment! 🚀

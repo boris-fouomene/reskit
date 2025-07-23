@@ -175,6 +175,8 @@ export const menuVariant = tv({
         navItemsPadding: 2,
         navItemPadding: 2,
         navWithBackdrop: true,
+        itemWidth: "full",
+        itemsPadding: 2,
     }
 });
 

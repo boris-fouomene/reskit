@@ -25,6 +25,21 @@ export const drawerVariant = tv({
                 base: value,
             }
         }),
+        ...VariantsOptionsFactory.createAllWidth2Height<{ item: string }, "item">((value) => {
+            return {
+                item: value,
+            }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ items: string }, "items">((value) => {
+            return {
+                items: value,
+            }
+        }, "items"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ item: string }, "item">((value) => {
+            return {
+                item: value,
+            }
+        }, "item"),
         background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 base: value,
@@ -34,6 +49,8 @@ export const drawerVariant = tv({
     defaultVariants: {
         background: "surface",
         shadow: "lg",
+        itemWidth: "full",
+        itemsPadding: 2,
     }
 })
 

@@ -21,6 +21,7 @@ import { iconVariants, textVariants } from "./text2icons";
 import { positionClasses } from "./position";
 import { activityIndicatorVariantOptions } from "./activityIndicator";
 import { sizesClasses } from "./sizes";
+import { textDecorations } from "./textDecorations";
 
 const breakpoints: IVariantOptionResponsiveBreakpoint[] = ["sm", "md", "lg", "xl", "2xl"];
 
@@ -381,6 +382,9 @@ export const VariantsOptionsFactory = {
   },
   createIconVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof iconVariants)[keyof typeof iconVariants], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof iconVariants, ResultType, CompositePrefix>(iconVariants, variantMutator, args[0] as CompositePrefix);
+  },
+  createAllTextDecorations: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof textDecorations)[keyof typeof textDecorations], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof textDecorations, ResultType, CompositePrefix>(textDecorations, variantMutator, args[0] as CompositePrefix);
   },
 };
 

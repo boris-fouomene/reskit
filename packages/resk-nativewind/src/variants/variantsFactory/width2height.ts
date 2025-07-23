@@ -1,4 +1,34 @@
 export const width2heightClasses = {
+  ":web:width": {
+    min: 'web:w-min',
+    max: 'web:w-max',
+    fit: 'web:w-fit',
+  },
+  ":web:height": {
+    min: 'web:h-min',
+    max: 'web:h-max',
+    fit: 'web:h-fit',
+  },
+  ":web:minWidth": {
+    min: 'web:min-w-min',
+    max: 'web:min-w-max',
+    fit: 'web:min-w-fit',
+  },
+  ":web:maxWidth": {
+    min: 'web:max-w-min',
+    max: 'web:max-w-max',
+    fit: 'web:max-w-fit',
+  },
+  ":web:minHeight": {
+    min: 'web:min-h-min',
+    max: 'web:min-h-max',
+    fit: 'web:min-h-fit',
+  },
+  ":web:maxHeight": {
+    min: 'web:max-h-min',
+    max: 'web:max-h-max',
+    fit: 'web:max-h-fit',
+  },
   // Base Classes
   maxHeight: {
     // Fixed Heights - Pixel Values (0-10)

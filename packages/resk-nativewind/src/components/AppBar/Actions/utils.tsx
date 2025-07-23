@@ -1,4 +1,4 @@
-import {IAppBarActionProps, IAppBarActionsProps, IAppBarContext, IAppBarProps, IAppBarResponsiveConfig } from "../types";
+import { IAppBarActionProps, IAppBarActionsProps, IAppBarContext, IAppBarProps, IAppBarResponsiveConfig } from "../types";
 import { IReactNullableElement } from "@src/types";
 import { renderNavItems } from "@components/Nav/utils";
 import { AppBarAction } from "../Action";
@@ -7,32 +7,32 @@ import { isNumber, isObj } from "@resk/core/utils";
 
 
 export function renderActions<Context = unknown>({ context, actionMutator, testID, renderAction, renderExpandableAction, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context> & {
-  actionMutator?: (renderer: IAppBarActionsProps<Context>["renderAction"], _props: IAppBarActionProps<Context>, index: number, isExpandable: boolean) => IReactNullableElement;
+    actionMutator?: (renderer: IAppBarActionsProps<Context>["renderAction"], _props: IAppBarActionProps<Context>, index: number, isExpandable: boolean) => IReactNullableElement;
 }) {
-  renderAction = typeof renderAction === 'function' ? renderAction : renderAppBarAction;
-  renderExpandableAction = typeof renderExpandableAction === 'function' ? renderExpandableAction : renderExpandableAppBarAction;
-  const mutatedActionMutator = typeof actionMutator === 'function' ? actionMutator : (renderer: IAppBarActionsProps<Context>["renderAction"], props: IAppBarActionProps<Context>, index: number, isExpandable: boolean) => (renderer as any)(props, index);
-  return renderNavItems<IAppBarContext<Context>>({
-    ...props,
-    context,
-    items,
-    renderItem: function (props, index) {
-      return mutatedActionMutator(renderAction, props, index, false);
-    },
-    renderExpandableItem: function (props, index) {
-      return mutatedActionMutator(renderExpandableAction, props, index, true);
-    },
-  });
+    renderAction = typeof renderAction === 'function' ? renderAction : renderAppBarAction;
+    renderExpandableAction = typeof renderExpandableAction === 'function' ? renderExpandableAction : renderExpandableAppBarAction;
+    const mutatedActionMutator = typeof actionMutator === 'function' ? actionMutator : (renderer: IAppBarActionsProps<Context>["renderAction"], props: IAppBarActionProps<Context>, index: number, isExpandable: boolean) => (renderer as any)(props, index);
+    return renderNavItems<IAppBarContext<Context>>({
+        ...props,
+        context,
+        items,
+        renderItem: function (props, index) {
+            return mutatedActionMutator(renderAction, props, index, false);
+        },
+        renderExpandableItem: function (props, index) {
+            return mutatedActionMutator(renderExpandableAction, props, index, true);
+        },
+    });
 }
 
 function renderAppBarAction<Context = unknown>(props: IAppBarActionProps<Context>, index: number) {
-  return <AppBarAction {...props} key={index} />;
+    return <AppBarAction {...props} key={index} />;
 }
 function renderExpandableAppBarAction<Context = unknown>(props: IAppBarActionProps<Context>, index: number) {
-  return <ExpandableAppBarAction
-    {...props}
-    key={index}
-  />;
+    return <ExpandableAppBarAction
+        {...props}
+        key={index}
+    />;
 }
 
 /**
@@ -51,24 +51,24 @@ function renderExpandableAppBarAction<Context = unknown>(props: IAppBarActionPro
  * @since 1.1.0
  */
 export function calculateMaxVisibleActions(
-    viewportWidth: number, 
+    viewportWidth: number,
     config: IAppBarResponsiveConfig = DEFAULT_APPBAR_RESPONSIVE_CONFIG
 ): number {
-    if(!isObj(config) || !Array.isArray(config.breakpoints) || config.breakpoints.length === 0) {
-      config = DEFAULT_APPBAR_RESPONSIVE_CONFIG;
+    if (!isObj(config) || !Array.isArray(config.breakpoints) || config.breakpoints.length === 0) {
+        config = DEFAULT_APPBAR_RESPONSIVE_CONFIG;
     }
-    
+
     // Sort breakpoints in descending order (largest to smallest) to ensure we find
     // the largest breakpoint that fits within the viewport width
     const sortedBreakpoints = [...config.breakpoints]
         .filter(breakpoint => breakpoint && isNumber(breakpoint?.width))
         .sort((a, b) => b.width - a.width);
-    
+
     // Find the first (largest) breakpoint where viewport width is >= breakpoint width
     const matchingBreakpoint = sortedBreakpoints.find(
         breakpoint => viewportWidth >= breakpoint.width
     );
-    
+
     return matchingBreakpoint?.maxActions ?? config.defaultMaxActions;
 }
 
@@ -160,64 +160,64 @@ export function sortActionsByPriority<Context = unknown>(
 export const DEFAULT_APPBAR_RESPONSIVE_CONFIG: IAppBarResponsiveConfig = {
     breakpoints: [
         // === ULTRA-LARGE DISPLAYS (8 actions max) ===
-        { 
-            width: 3840, 
-            maxActions: 10 
-        },  
-        { 
-            width: 2560, 
-            maxActions: 8 
-        },  
+        {
+            width: 3840,
+            maxActions: 20
+        },
+        {
+            width: 2560,
+            maxActions: 12
+        },
         // === LARGE DESKTOP DISPLAYS (6-7 actions) ===
-        { 
-            width: 1920, 
-            maxActions: 7 
-        },  
+        {
+            width: 1920,
+            maxActions: 10
+        },
 
-        { 
-            width: 1680, 
-            maxActions: 6 
-        },  
+        {
+            width: 1680,
+            maxActions: 9
+        },
 
-        { 
-            width: 1440, 
-            maxActions: 6 
-        },  
+        {
+            width: 1440,
+            maxActions: 8
+        },
 
         // === STANDARD DESKTOP/LAPTOP (5 actions) ===
-        { 
-            width: 1366, 
-            maxActions: 5 
-        },  
+        {
+            width: 1366,
+            maxActions: 7
+        },
         /* Common Laptop Resolution (1366px+)
          * Devices: Most budget/mid-range laptops, older displays
         
         */
 
-        { 
-            width: 1280, 
-            maxActions: 5 
-        },  
-        // === TABLET LANDSCAPE (4 actions) ===
-        { 
-            width: 1024, 
-            maxActions: 4 
-        },  
-        // === TABLET PORTRAIT/SMALL LANDSCAPE (3 actions) ===
-        { 
-            width: 834, 
-            maxActions: 3 
-        },  
-        { 
-            width: 768, 
-            maxActions: 2 
+        {
+            width: 1280,
+            maxActions: 6
         },
-        { 
-            width: 320, 
-            maxActions: 1 
-        },  
+        // === TABLET LANDSCAPE (4 actions) ===
+        {
+            width: 1024,
+            maxActions: 5
+        },
+        // === TABLET PORTRAIT/SMALL LANDSCAPE (3 actions) ===
+        {
+            width: 834,
+            maxActions: 3
+        },
+        {
+            width: 768,
+            maxActions: 2
+        },
+        {
+            width: 320,
+            maxActions: 1
+        },
     ],
-    
+
     /**
      * Conservative default for screens smaller than 320px or when viewport width cannot be determined.
      * Ensures the interface remains functional even on very constrained displays or unknown contexts.

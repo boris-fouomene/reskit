@@ -4,6 +4,7 @@ import { fontWeightClasses } from "./fontWeight";
 import { textSizes } from "./textSizes";
 import { iconSizes } from "./iconSizes";
 import { sizesClasses } from "./sizes";
+import { textDecorations } from "./textDecorations";
 
 export const textVariants = {
   color: VariantsColors.text,
@@ -13,6 +14,18 @@ export const textVariants = {
   align: textAlignClasses,
   weight: fontWeightClasses,
   ...textSizes,
+  ...textDecorations,
+  transform: {
+    uppercase: "uppercase",
+    lowercase: "lowercase",
+    capitalize: "capitalize",
+    "normal-case": "normal-case",
+  },
+  overflow: {
+    truncate: "truncate",
+    ellipsis: "text-ellipsis",
+    clip: "text-clip",
+  }
 } as const;
 
 export const iconVariants = {

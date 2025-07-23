@@ -3,7 +3,6 @@ import { Div } from '@html/Div';
 import { cn } from '@utils';
 import { IClassName } from '@src/types';
 import { defaultStr } from '@resk/core/utils';
-import { WindowScrollBridge, IWindowScrollBridgeProps } from './WindowScrollBridge';
 
 /**
  * Props interface for the SSRScrollView component optimized for server-side rendering.
@@ -473,72 +472,6 @@ export interface ISSRScrollViewProps {
     'aria-label'?: string;
 
     /**
-     * Enable window scroll bridge for client-side window scroll events.
-     * 
-     * @remarks
-     * When enabled, automatically renders a WindowScrollBridge component as a child
-     * that provides window-like scroll event handling. This allows external libraries
-     * or code that expects window scroll events to work with the SSRScrollView.
-     * 
-     * @defaultValue false
-     * 
-     * @example
-     * ```tsx
-     * <SSRScrollView 
-     *   enableWindowScrollBridge={true}
-     *   onWindowScroll={(scrollTop) => {
-     *     console.log('Scroll position:', scrollTop);
-     *     // Sync with window.scrollY for external libraries
-     *     Object.defineProperty(window, 'scrollY', { value: scrollTop });
-     *   }}
-     *   className="h-screen"
-     * >
-     *   <div>Your scrollable content</div>
-     * </SSRScrollView>
-     * ```
-     */
-    enableWindowScrollBridge?: boolean;
-
-    /**
-     * Callback function that fires on scroll events when WindowScrollBridge is enabled.
-     * 
-     * @param scrollTop - The current scroll position
-     * @param event - The scroll event object
-     */
-    onWindowScroll?: (scrollTop: number, event: Event) => void;
-
-    /**
-     * Callback function that fires when scrolling reaches the top (WindowScrollBridge).
-     */
-    onWindowScrollToTop?: () => void;
-
-    /**
-     * Callback function that fires when scrolling reaches the bottom (WindowScrollBridge).
-     */
-    onWindowScrollToBottom?: () => void;
-
-    /**
-     * Threshold in pixels for determining when scroll has reached top/bottom (WindowScrollBridge).
-     * 
-     * @defaultValue 10
-     */
-    windowScrollThreshold?: number;
-
-    /**
-     * Throttle delay in milliseconds for scroll event handling (WindowScrollBridge).
-     * 
-     * @defaultValue 16 (roughly 60fps)
-     */
-    windowScrollThrottleDelay?: number;
-
-    /**
-     * Enable smooth scrolling behavior on the container (WindowScrollBridge).
-     * 
-     * @defaultValue false
-     */
-    enableWindowSmoothScroll?: boolean;
-
-    /**
      * Additional HTML attributes that will be passed through to the scroll container.
      * 
      * @remarks
@@ -801,13 +734,6 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     snapScrolling = false,
     id,
     'aria-label': ariaLabel,
-    enableWindowScrollBridge = true,
-    onWindowScroll,
-    onWindowScrollToTop,
-    onWindowScrollToBottom,
-    windowScrollThreshold = 10,
-    windowScrollThrottleDelay = 16,
-    enableWindowSmoothScroll = false,
     testID,
     ...htmlProps
 }) => {
@@ -900,16 +826,6 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
                 testID={`${testID}-content`}
             >
                 {children}
-                {enableWindowScrollBridge && (
-                    <WindowScrollBridge
-                        onScroll={onWindowScroll}
-                        onScrollToTop={onWindowScrollToTop}
-                        onScrollToBottom={onWindowScrollToBottom}
-                        threshold={windowScrollThreshold}
-                        throttleDelay={windowScrollThrottleDelay}
-                        enableSmoothScroll={enableWindowSmoothScroll}
-                    />
-                )}
             </Div>
         </Div>
     );

@@ -110,7 +110,7 @@ export function Button<Context = unknown>({
                 return onPress(event, buttonContext);
             } : undefined}
         >
-            <Div id={buttonId ? `${buttonId}-content` : undefined} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
+            <Div id={buttonId ? `${buttonId}-content` : undefined} testID={testID + "-button-content"} className={cn("button-content flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer(), leftContainerClassName)} testID={testID + "-button-left-container"}>
                     {leftContent}
                     {!displayIconAtRight ? iconContent : null}

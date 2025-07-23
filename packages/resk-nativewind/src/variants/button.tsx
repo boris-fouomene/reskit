@@ -38,6 +38,12 @@ export const buttonVariant = tv({
         ...VariantsOptionsFactory.createAllPadding2Margin<{ icon: string }, "icon">((value) => {
             return { icon: value }
         }, "icon"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ content: string }, "content">((value) => {
+            return { content: value }
+        }, "content"),
+        ...VariantsOptionsFactory.createAllWidth2Height<{ content: string }, "content">((value) => {
+            return { content: value }
+        }, "content"),
         ...VariantsOptionsFactory.createAllPadding2Margin<{ leftContainer: string }, "leftContainer">((value) => {
             return { leftContainer: value }
         }, "leftContainer"),
@@ -83,7 +89,7 @@ export const buttonVariant = tv({
     },
     defaultVariants: {
         activeOpacity: 80,
-        rippleContained: true
+        rippleContained: true,
     }
 });
 export type IButtonVariant = VariantProps<typeof buttonVariant>;

@@ -12,6 +12,7 @@
         hoverIcon : Record<IName2Foreground,string>;
         activeIcon : Record<IName2Foreground,string>;
         text : Record<IName2Foreground ,string>;
+        textDecoration: Record<IName2Foreground ,string>;
         hoverText : Record<IName2Foreground ,string>;
         activeText : Record<IName2Foreground ,string>;
         background : Record<IName,string>;

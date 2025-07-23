@@ -47,7 +47,7 @@ export class Nav {
             renderItem: typeof renderItem === "function" ? renderItem : renderNavItem,
             renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem,
         });
-        return <Div testID={testID} {...rest} className={cn("w-full nav-items", rest.className)}>
+        return <Div testID={testID} {...rest} className={cn("nav-items", rest.className)}>
             {items}
         </Div>
     }
@@ -57,7 +57,7 @@ export class Nav {
             testID={testID + "-expandable-item"}
             iconPosition="right"
             {...expandableProps}
-            className={cn("w-full", expandableProps?.className)}
+            className={cn(expandableProps?.className)}
             label={<ExpandableItemLabel as={as} {...props} ref={ref} />}
             children={<>
                 {children}

@@ -104,6 +104,9 @@ export const menuVariant = tv({
         ...VariantsOptionsFactory.createAllRounded<IMenuVariantSlots, "navItem">((value) => {
             return { item: value }
         }, "navItem"),
+        ...VariantsOptionsFactory.createAllWidth2Height<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),

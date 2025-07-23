@@ -3,6 +3,14 @@ import { IBreakpoints } from './types';
 import { Dimensions } from 'react-native';
 
 export class Breakpoints {
+    /***
+     * 
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+     */
     static mobileMaxWidth: number = 768;
     static tabletMaxWidth: number = 1024;
     static update(options: Partial<IBreakpoints>) {

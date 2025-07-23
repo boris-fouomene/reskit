@@ -57,6 +57,9 @@ export const menuVariant = tv({
             },
             false: {}
         },
+        ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
+            return { bottomSheetTitle: value }
+        }, "bottomSheetTitle"),
         ...VariantsOptionsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
                 contentContainer: value,
@@ -67,6 +70,14 @@ export const menuVariant = tv({
                 contentContainer: value,
             }
         }),
+        ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "nav">((value) => {
+            return {
+                nav: value,
+            }
+        }, "nav"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "nav">((value) => {
+            return { nav: value }
+        }, "nav"),
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "items">((value) => {
             return {
                 items: value,
@@ -77,7 +88,6 @@ export const menuVariant = tv({
                 navItems: value,
             }
         }, "navItems"),
-
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "item">((value) => {
             return {
                 item: value,
@@ -91,6 +101,18 @@ export const menuVariant = tv({
         ...VariantsOptionsFactory.createAllRounded<IMenuVariantSlots, "item">((value) => {
             return { item: value }
         }, "item"),
+        ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllOutline<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllOpacity<IMenuVariantSlots, "item">((value) => {
+            return { item: value }
+        }, "item"),
+        itemShadowColor: VariantsOptionsFactory.createShadowColor<IMenuVariantSlots>((value) => {
+            return { item: value }
+        }),
         ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "navItem">((value) => {
             return {
                 navItem: value,
@@ -104,30 +126,12 @@ export const menuVariant = tv({
         ...VariantsOptionsFactory.createAllRounded<IMenuVariantSlots, "navItem">((value) => {
             return { item: value }
         }, "navItem"),
-        ...VariantsOptionsFactory.createAllWidth2Height<IMenuVariantSlots, "item">((value) => {
-            return { item: value }
-        }, "item"),
-        ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
-            return { bottomSheetTitle: value }
-        }, "bottomSheetTitle"),
-        ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "item">((value) => {
-            return { item: value }
-        }, "item"),
-        itemShadowColor: VariantsOptionsFactory.createShadowColor<IMenuVariantSlots>((value) => {
-            return { item: value }
-        }),
         ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "navItem">((value) => {
             return { navItem: value }
         }, "navItem"),
-        ...VariantsOptionsFactory.createAllOutline<IMenuVariantSlots, "item">((value) => {
-            return { item: value }
-        }, "item"),
         ...VariantsOptionsFactory.createAllOutline<IMenuVariantSlots, "navItem">((value) => {
             return { navItem: value }
         }, "navItem"),
-        ...VariantsOptionsFactory.createAllOpacity<IMenuVariantSlots, "item">((value) => {
-            return { item: value }
-        }, "item"),
         ...VariantsOptionsFactory.createAllOpacity<IMenuVariantSlots, "navItem">((value) => {
             return { navItem: value }
         }, "navItem"),
@@ -171,6 +175,7 @@ export const menuVariant = tv({
         colorScheme: "surface",
         paddingBottom: 4,
         shadow: "xl",
+        navShadow: "none",
         bottomSheetTitleWeight: "bold",
         navItemsPadding: 2,
         navItemPadding: 2,

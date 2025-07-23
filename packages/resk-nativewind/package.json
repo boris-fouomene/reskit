@@ -155,6 +155,7 @@
     "build": "npm run build-color-variants && npm run generate-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts && npm run generate-icon-types && npm run copy-css",
     "copy-css": "copyfiles -u 1 src/**/*.css build/",
     "build:dts": "tsc -p tsconfig.dts.json --emitDeclarationOnly && npx tsc-alias -p tsconfig.dts.json",
+    "clean": "rm -rf build dist *.tgz",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "css:dev": "npx tailwindcss -i ./global-src.css -o ./global.css --watch",

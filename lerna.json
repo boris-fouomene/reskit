@@ -1,0 +1,52 @@
+{
+  "version": "independent",
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "conventionalCommits": true,
+      "message": "chore(release): publish packages [skip ci]",
+      "registry": "https://registry.npmjs.org/",
+      "ignoreChanges": [
+        "**/*.md",
+        "**/test/**",
+        "**/tests/**",
+        "**/*.test.ts",
+        "**/*.test.js",
+        "**/examples/**"
+      ]
+    },
+    "version": {
+      "allowBranch": ["main", "release/*", "dev"],
+      "conventionalCommits": true,
+      "exact": true,
+      "message": "chore(release): version packages",
+      "ignoreChanges": [
+        "**/*.md",
+        "**/test/**",
+        "**/tests/**",
+        "**/*.test.ts",
+        "**/*.test.js",
+        "**/examples/**"
+      ],
+      "createRelease": "github"
+    },
+    "run": {
+      "npmClient": "npm"
+    }
+  },
+  "packages": [
+    "packages/*"
+  ],
+  "granularPathspec": false,
+  "changelog": {
+    "repo": "boris-fouomene/reskit",
+    "labels": {
+      "tag: breaking change": ":boom: Breaking Change",
+      "tag: enhancement": ":rocket: Enhancement",
+      "tag: bug fix": ":bug: Bug Fix",
+      "tag: documentation": ":memo: Documentation",
+      "tag: internal": ":house: Internal"
+    },
+    "cacheDir": ".changelog"
+  }
+}

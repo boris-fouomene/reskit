@@ -81,6 +81,7 @@
     "build": "tsup --config tsup.config.build.ts",
     "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
     "build-test": "tsup --config tsup.config.test.ts",
+    "clean": "rm -rf build dist *.tgz",
     "dev": "tsup --config tsup.config.build.ts --watch",
     "test": "npx jest",
     "start": "node build/test/index",

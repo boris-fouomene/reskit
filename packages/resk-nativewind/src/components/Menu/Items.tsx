@@ -24,7 +24,7 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
   return <Nav.Item
     role='menuitem'
     {...props}
-    className={cn("w-full", props.className)}
+    className={cn(props.className)}
     onPress={async (event, context) => {
       const r = typeof props.onPress === "function" ? await props.onPress(event, context) : undefined;
       if (r === false) {

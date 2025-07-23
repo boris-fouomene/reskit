@@ -70,6 +70,9 @@ export const menuVariant = tv({
                 contentContainer: value,
             }
         }),
+        navBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {
+            return { nav: value }
+        }),
         ...VariantsOptionsFactory.createAllShadow<IMenuVariantSlots, "nav">((value) => {
             return {
                 nav: value,
@@ -170,6 +173,16 @@ export const menuVariant = tv({
         navItemActiveColor: VariantsOptionsFactory.createActiveBackgroundColor<IMenuVariantSlots>((value) => {
             return { navItem: value }
         }),
+        ...VariantsOptionsFactory.createAllWidth2Height<IMenuVariantSlots, "item">((value) => {
+            return {
+                item: value,
+            }
+        }, "item"),
+        ...VariantsOptionsFactory.createAllWidth2Height<IMenuVariantSlots, "navItem">((value) => {
+            return {
+                navItem: value,
+            }
+        }, "navItem"),
     },
     defaultVariants: {
         colorScheme: "surface",
@@ -177,8 +190,7 @@ export const menuVariant = tv({
         shadow: "xl",
         navShadow: "none",
         bottomSheetTitleWeight: "bold",
-        navItemsPadding: 2,
-        navItemPadding: 2,
+        itemPadding: 2,
         itemWidth: "full",
         itemsPadding: 2,
     }

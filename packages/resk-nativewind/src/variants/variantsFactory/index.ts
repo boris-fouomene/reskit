@@ -22,6 +22,7 @@ import { positionClasses } from "./position";
 import { activityIndicatorVariantOptions } from "./activityIndicator";
 import { sizesClasses } from "./sizes";
 import { textDecorations } from "./textDecorations";
+import { responsiveWidth2height } from "./responsiveWidth2height";
 
 const breakpoints: IVariantOptionResponsiveBreakpoint[] = ["sm", "md", "lg", "xl", "2xl"];
 
@@ -51,6 +52,7 @@ const allVariantsOptions = {
   activeBorderColor: VariantsColors.activeBorderColor,
 
   ...width2heightClasses,
+  ...responsiveWidth2height,
 
   ringColor: VariantsColors.ringColors,
   activeRingColor: VariantsColors.activeRingColors,
@@ -386,6 +388,9 @@ export const VariantsOptionsFactory = {
   createAllTextDecorations: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof textDecorations)[keyof typeof textDecorations], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof textDecorations, ResultType, CompositePrefix>(textDecorations, variantMutator, args[0] as CompositePrefix);
   },
+  createAllResponiveWidth2Height: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsiveWidth2height)[keyof typeof responsiveWidth2height], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof responsiveWidth2height, ResultType, CompositePrefix>(responsiveWidth2height, variantMutator, args[0] as CompositePrefix);
+  }
 };
 
 type IVariantOptionResponsiveBreakpoint = "sm" | "md" | "lg" | "xl" | "2xl";
@@ -407,11 +412,6 @@ export type IVariantCompositeResult<T extends Record<string, Record<IVariantKey,
 type IVariantPrefixKeys<T extends Record<IVariantKey, any>, P extends string> = {
   [K in keyof T as `${P}${IUcFirst<K & string>}`]: T[K];
 };
-
-type IVariantResponsivePrefixKeys<T extends Record<IVariantKey, unknown>, P extends string> = {
-  [K in keyof T as `${IVariantOptionResponsiveBreakpoint}${IUcFirst<K & string>}`]: `${IVariantOptionResponsiveBreakpoint}:${T[K] & string}`;
-};
-
 /**
  * Conditional parameter type that makes a parameter required when a generic extends a non-empty string.
  *

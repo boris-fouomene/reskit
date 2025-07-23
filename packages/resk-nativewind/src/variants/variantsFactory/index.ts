@@ -23,8 +23,9 @@ import { activityIndicatorVariantOptions } from "./activityIndicator";
 import { sizesClasses } from "./sizes";
 import { textDecorations } from "./textDecorations";
 import { responsiveWidth2height } from "./responsiveWidth2height";
+import { responsivesPadding } from "./responsivePadding";
+import { responsivesBorders } from "./responsivesBorders";
 
-const breakpoints: IVariantOptionResponsiveBreakpoint[] = ["sm", "md", "lg", "xl", "2xl"];
 
 const allShadowColors = {
   shadowColor: VariantsColors.shadow,
@@ -39,6 +40,7 @@ const allVariantsOptions = {
   ...opacityClasses,
   ...shadowClasses,
   ...borderClasses,
+  ...responsivesBorders,
   ...outlineClasses,
   ...allShadowColors,
   ...flexClasses,
@@ -63,12 +65,12 @@ const allVariantsOptions = {
   ...scalesClasses,
   ...borderClasses,
   ...padding2marginClasses,
+  ...responsivesPadding,
   ...positionClasses,
 } as const;
 
 export const VariantsOptionsFactory = {
   allVariantsOptions,
-  breakpoints,
   create: function <InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = unknown>(input: InputType, variantMutator?: IVariantOptionMutator<InputType, ResultType, VariantGroupName>, compositeKey?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
@@ -295,22 +297,6 @@ export const VariantsOptionsFactory = {
   createOutlineWidth: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof outlineClasses.outlineWidth, ResultType>) {
     return VariantsOptionsFactory.create<typeof outlineClasses.outlineWidth, ResultType>(outlineClasses.outlineWidth, variantMutator);
   },
-
-  createResponsive: function <Variants extends Record<IVariantKey, string>>(variants: Variants): IVariantOptionResponsiveResult<Variants> {
-    const responsiveVariants: IVariantOptionResponsiveResult<Variants> = {} as any;
-    typedEntries(variants).forEach(([property, value]) => {
-      // Add responsive variants for each breakpoint
-      breakpoints.forEach((breakpoint) => {
-        const responsiveKey = `${breakpoint}${String(property).upperFirst()}`;
-        (responsiveVariants as any)[responsiveKey] = String(value).replace(/^([a-z-]+)/, `${breakpoint}:$1`); /* Object.entries(values).reduce((acc, [key, className]) => {
-          acc[key] = className.replace(/^([a-z-]+)/, `${breakpoint}:$1`);
-          return acc;
-        }, {}); */
-      });
-    });
-    return responsiveVariants;
-  },
-
   createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string, CompositePrefix extends string = "">(composite: T, variantMutator?: IVariantOptionMutator<T[keyof T], ResultType, keyof T>, ...args: IConditionalCompositePrefix<CompositePrefix>): IVariantCompositeResult<T, CompositePrefix> {
     const r = {} as any;
     const compositePrefix = args[0];
@@ -388,13 +374,16 @@ export const VariantsOptionsFactory = {
   createAllTextDecorations: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof textDecorations)[keyof typeof textDecorations], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof textDecorations, ResultType, CompositePrefix>(textDecorations, variantMutator, args[0] as CompositePrefix);
   },
-  createAllResponiveWidth2Height: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsiveWidth2height)[keyof typeof responsiveWidth2height], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+  createResponivesWidth2Height: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsiveWidth2height)[keyof typeof responsiveWidth2height], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof responsiveWidth2height, ResultType, CompositePrefix>(responsiveWidth2height, variantMutator, args[0] as CompositePrefix);
-  }
+  },
+  createResponsivesPadding: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsivesPadding)[keyof typeof responsivesPadding], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof responsivesPadding, ResultType, CompositePrefix>(responsivesPadding, variantMutator, args[0] as CompositePrefix);
+  },
+  createResponsivesBorder: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsivesBorders)[keyof typeof responsivesBorders], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof responsivesBorders, ResultType, CompositePrefix>(responsivesBorders, variantMutator, args[0] as CompositePrefix);
+  },
 };
-
-type IVariantOptionResponsiveBreakpoint = "sm" | "md" | "lg" | "xl" | "2xl";
-type IVariantOptionResponsiveResult<Variants extends Record<IVariantKey, string>> = IVariantPrefixKeys<Variants, IVariantOptionResponsiveBreakpoint>;
 
 type IVariantOptionAll<ResultType = string> = {
   [key in keyof typeof allVariantsOptions]: Record<keyof (typeof allVariantsOptions)[key], ResultType>;

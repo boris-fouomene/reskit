@@ -14,11 +14,11 @@ type ScreenContentProps = {
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <SSRScrollView>
-      <AppBarExamples />
-      <DialogExample />
-      <BottomSheetExample />
-      <FormExamples />
       <Div className="p-5">
+        <AppBarExamples />
+        <DialogExample />
+        <BottomSheetExample />
+        <FormExamples />
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
           <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}

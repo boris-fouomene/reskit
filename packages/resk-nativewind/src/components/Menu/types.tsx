@@ -1,7 +1,7 @@
 
 import { IClassName, IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { View, ViewProps } from "react-native";
+import { View, ViewProps, ViewStyle } from "react-native";
 import { IMenuVariant } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IBottomSheetVariant } from "@variants/bottomSheet";
@@ -1043,7 +1043,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /**
      * CSS classes for the main content container.
      * 
-     * The content container is the flex-1 wrapper that holds all menu content
+     * The container is the flex-1 wrapper that holds all menu content
      * including items and children. It sits between the backdrop and the actual
      * content, providing the main structural layout.
      * 
@@ -1053,7 +1053,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * ```tsx
      * <Menu
      *   anchor={<Button>Menu</Button>}
-     *   contentContainerClassName="
+     *   containerClassName="
      *     bg-white dark:bg-gray-800 
      *     border border-gray-200 dark:border-gray-700
      *     rounded-lg shadow-lg
@@ -1062,7 +1062,9 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * />
      * ```
      */
-    contentContainerClassName?: IClassName;
+    containerClassName?: IClassName;
+
+    containerStyle?: ViewStyle;
 
     /**
      * CSS classes for the ScrollView wrapper when `withScrollView` is true.
@@ -1089,7 +1091,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /**
      * CSS classes for the ScrollView's content container.
      * 
-     * Applied to the contentContainerStyle of the ScrollView.
+     * Applied to the containerStyle of the ScrollView.
      * Use this to control padding, spacing, and layout of scrollable content.
      * 
      * @since 1.0.0
@@ -1261,7 +1263,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *   renderAsBottomSheetOnMobile={true}
      *   renderAsBottomSheetOnTablet={true}
      *   bottomSheetTitle="Choose Media"
-     *   contentContainerClassName="tablet:max-w-2xl tablet:mx-auto"
+     *   containerClassName="tablet:max-w-2xl tablet:mx-auto"
      * >
      *   <MediaGrid />
      * </Menu>

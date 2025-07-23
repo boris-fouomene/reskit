@@ -4,7 +4,7 @@ import { VariantsOptionsFactory } from "./variantsFactory";
 import { classes } from "./classes";
 
 type IMenuVariantSlots = {
-    contentContainer?: string;
+    container?: string;
     modalBackdrop?: string;
     anchorContainer?: string;
     base?: string;
@@ -14,7 +14,7 @@ type IMenuVariantSlots = {
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
     nav?: string;
-    navContentContainer?: string;
+    navContainer?: string;
     navItems?: string;
     navItem?: string;
     navModalBackdrop?: string;
@@ -23,7 +23,7 @@ export const menuVariant = tv({
     slots: {
         modalBackdrop: "",
         anchorContainer: "",
-        contentContainer: "",
+        container: "",
         base: "",
         items: "",
         item: "",
@@ -32,7 +32,7 @@ export const menuVariant = tv({
         bottomSheetTitle: "",
         navModalBackdrop: "resk-nav-menu-modal-backdrop",
         nav: "resk-menu-nav",
-        navContentContainer: "resk-menu-nav-content-container",
+        navContainer: "resk-menu-nav-container",
         navItems: "resk-menu-nav-items",
         navItem: "resk-menu-nav-item",
     },
@@ -59,12 +59,6 @@ export const menuVariant = tv({
         ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
             return { bottomSheetTitle: value }
         }, "bottomSheetTitle"),
-        ...VariantsOptionsFactory.createAllWidth2Height<IMenuVariantSlots, "contentContainer">((value) => {
-            return { contentContainer: value }
-        }, "contentContainer"),
-        ...VariantsOptionsFactory.createAllPadding2Margin<IMenuVariantSlots, "contentContainer">((value) => {
-            return { contentContainer: value }
-        }, "contentContainer"),
         ...VariantsOptionsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
                 base: value,
@@ -194,9 +188,8 @@ export const menuVariant = tv({
         paddingBottom: 4,
         shadow: "xl",
         bottomSheetTitleWeight: "bold",
-        itemPadding: 2,
+        padding: 2,
         itemWidth: "full",
-        itemsPadding: 2,
     }
 });
 

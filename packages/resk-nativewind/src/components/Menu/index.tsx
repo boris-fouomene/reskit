@@ -62,10 +62,11 @@ export function Menu<Context = unknown>({
     bottomSheetVariant: bVariant,
     onRequestOpen,
     disabled,
-    contentContainerClassName,
+    containerClassName,
     ref,
     bottomSheetTitleClassName,
     bottomSheetTitleVariant,
+    containerStyle,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -327,14 +328,14 @@ export function Menu<Context = unknown>({
             <MenuContext.Provider value={context}>
                 {renderedAsNavigationMenu ? backdropContent : null}
                 <MenuComponent
-                    testID={testID}
+                    testID={testID + "-container"}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.nav(), className)}
+                    className={cn("resk-menu-container absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.container(), renderedAsNavigationMenu && computedVariant.navContainer(), containerClassName)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
-                        style,
                         slideTransform,
+                        containerStyle,
                     ]}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
@@ -344,7 +345,7 @@ export function Menu<Context = unknown>({
                     }}
                 >
                     {!renderedAsNavigationMenu ? backdropContent : null}
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navContentContainer(), contentContainerClassName)}>
+                    <Div style={StyleSheet.flatten([maxHeightStyle, style])} testID={testID} className={cn("resk-menu max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.nav(), className)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">

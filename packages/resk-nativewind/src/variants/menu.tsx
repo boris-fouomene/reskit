@@ -174,7 +174,6 @@ export const menuVariant = tv({
         bottomSheetTitleWeight: "bold",
         navItemsPadding: 2,
         navItemPadding: 2,
-        navWithBackdrop: true,
         itemWidth: "full",
         itemsPadding: 2,
     }

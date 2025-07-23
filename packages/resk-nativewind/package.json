@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.98",
+  "version": "1.0.1-canary.99",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",

@@ -193,7 +193,6 @@ export const menuVariant = tv({
         background: "surface",
         paddingBottom: 4,
         shadow: "xl",
-        navShadow: "none",
         bottomSheetTitleWeight: "bold",
         itemPadding: 2,
         itemWidth: "full",

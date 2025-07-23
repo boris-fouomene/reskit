@@ -81,7 +81,7 @@
     "build": "tsup --config tsup.config.build.ts",
     "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
     "build-test": "tsup --config tsup.config.test.ts",
-    "clean": "rm -rf build dist *.tgz",
+    "clean": "npx rimraf build dist",
     "dev": "tsup --config tsup.config.build.ts --watch",
     "test": "npx jest",
     "start": "node build/test/index",
@@ -97,6 +97,7 @@
     "@types/qs": "^6.9.18",
     "fast-glob": "^3.3.3",
     "google-libphonenumber": "^3.2.42",
+    "rimraf": "^6.0.1",
     "tsc-alias": "^1.8.16",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"

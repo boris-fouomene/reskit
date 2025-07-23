@@ -54,31 +54,6 @@ ResKit revolutionizes development by dramatically reducing code complexity while
 - **Modern tooling**: Built with the latest TypeScript and build tools
 - **Zero-config**: Sensible defaults that work out of the box
 
-## 🏗️ Framework Architecture
-
-```
-ResKit Ecosystem
-├── 🧠 @resk/core           # Resource Management & Business Logic
-│   ├── Resources           # Entity modeling with decorators
-│   ├── Validators          # Data validation system
-│   ├── Auth               # Authentication utilities
-│   ├── i18n               # Internationalization
-│   └── Utils              # Common utilities
-│
-├── 🎨 @resk/nativewind    # Universal UI Components
-│   ├── Components         # 40+ pre-built components
-│   ├── AppRoot           # App shell and providers
-│   ├── SSRScrollView     # Server-side rendering optimization
-│   ├── Platform          # Cross-platform utilities
-│   └── Animations        # Smooth animations
-│
-└── 🚀 @resk/nest          # Server Integration
-    ├── Resource Modules   # Backend resource management
-    ├── Auth Guards       # Authentication middleware
-    ├── i18n Integration  # Server-side internationalization
-    └── TypeORM/Mongoose  # Database integrations
-```
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -721,7 +696,7 @@ export function TodoApp() {
                       >
                         {todo.priority.toUpperCase()}
                       </Text>
-    
+  
                       <Text className="text-xs text-gray-500">
                         Created: {todo.createdAt.toLocaleDateString()}
                       </Text>

@@ -1,1 +1,1 @@
-export * from "./build/platform";
+export { default as Platform } from "./build/platform";

@@ -15,7 +15,6 @@ import { cn } from "@utils/cn";
 import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import { Div } from "@html/Div";
-import { appBarVariant } from "@variants/appBar";
 
 export function AppBarClientActions<Context = unknown>({
     context,
@@ -219,13 +218,13 @@ export function AppBarClientActions<Context = unknown>({
             });
         return { actions, menuItems };
     }, [calculatedMaxActions, processedActions, renderAction, renderExpandableAction, actionOnAppBarClx, actionOnMenuClx, effectiveViewportWidth]);
-
-    if (!isHydrated) {
-        if (isValidElement(hydrationFallback)) {
-            return hydrationFallback;
-        }
-        return <ActivityIndicator size="small" className="flex-none" />;
-    }
+    /* 
+        if (!isHydrated) {
+            if (isValidElement(hydrationFallback)) {
+                return hydrationFallback;
+            }
+            return <ActivityIndicator size="small" className="flex-none" />;
+        } */
 
     return (
         <Div

@@ -61,7 +61,6 @@
     "test:watch": "jest --watch",
     "test-node": "npm run build && node ./build/test/index.js",
     "start": "node build/test/index",
-    "prepublish1": "npm run build",
     "build-doc": "npx typedoc"
   },
   "keywords": [

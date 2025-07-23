@@ -7,14 +7,14 @@ type IMenuVariantSlots = {
     container?: string;
     modalBackdrop?: string;
     anchorContainer?: string;
-    contentContainer?: string;
+    base?: string;
     items?: string;
     item?: string;
     scrollView?: string;
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
     nav?: string;
-    navContentContainer?: string;
+    navContainer?: string;
     navItems?: string;
     navItem?: string;
     navModalBackdrop?: string;
@@ -23,8 +23,8 @@ export const menuVariant = tv({
     slots: {
         modalBackdrop: "",
         anchorContainer: "",
+        container: "",
         base: "",
-        contentContainer: "",
         items: "",
         item: "",
         scrollView: "",
@@ -32,7 +32,7 @@ export const menuVariant = tv({
         bottomSheetTitle: "",
         navModalBackdrop: "resk-nav-menu-modal-backdrop",
         nav: "resk-menu-nav",
-        navContentContainer: "resk-menu-nav-content-container",
+        navContainer: "resk-menu-nav-container",
         navItems: "resk-menu-nav-items",
         navItem: "resk-menu-nav-item",
     },
@@ -40,7 +40,6 @@ export const menuVariant = tv({
         renderedAsNavigationMenu: {
             true: {
                 nav: `h-full`,
-                navContentContainer: ``,
                 navItems: ``,
                 navItem: ``
             }
@@ -62,12 +61,12 @@ export const menuVariant = tv({
         }, "bottomSheetTitle"),
         ...VariantsOptionsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
-                contentContainer: value,
+                base: value,
             }
         }),
         colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, IMenuVariantSlots>(VariantsColors.surface, (value) => {
             return {
-                contentContainer: value,
+                base: value,
             }
         }),
         navBackground: VariantsOptionsFactory.createBackgroundColor<IMenuVariantSlots>((value) => {

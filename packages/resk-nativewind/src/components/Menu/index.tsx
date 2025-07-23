@@ -62,7 +62,7 @@ export function Menu<Context = unknown>({
     bottomSheetVariant: bVariant,
     onRequestOpen,
     disabled,
-    contentContainerClassName,
+    containerClassName,
     ref,
     bottomSheetTitleClassName,
     bottomSheetTitleVariant,
@@ -327,10 +327,10 @@ export function Menu<Context = unknown>({
             <MenuContext.Provider value={context}>
                 {renderedAsNavigationMenu ? backdropContent : null}
                 <MenuComponent
-                    testID={testID}
+                    testID={testID + "-container"}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), renderedAsNavigationMenu && computedVariant.nav(), className)}
+                    className={cn("resk-menu-container absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.container(), renderedAsNavigationMenu && computedVariant.navContainer())}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,
@@ -344,7 +344,7 @@ export function Menu<Context = unknown>({
                     }}
                 >
                     {!renderedAsNavigationMenu ? backdropContent : null}
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), renderedAsNavigationMenu && computedVariant.navContentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID} className={cn("max-h-full resk-menu flex flex-col", renderedAsBottomSheet ? [computedBottomSheetVariant.content(), "resk-menu-bottom-sheet"] : computedVariant.base(), renderedAsNavigationMenu && [computedVariant.nav(), "resk-menu-nav"], className)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">

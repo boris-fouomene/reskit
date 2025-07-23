@@ -1041,9 +1041,9 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     withScrollView?: boolean;
 
     /**
-     * CSS classes for the main content container.
+     * CSS classes for the main container.
      * 
-     * The content container is the flex-1 wrapper that holds all menu content
+     * The container is the flex-1 wrapper that holds all menu content
      * including items and children. It sits between the backdrop and the actual
      * content, providing the main structural layout.
      * 
@@ -1053,7 +1053,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * ```tsx
      * <Menu
      *   anchor={<Button>Menu</Button>}
-     *   contentContainerClassName="
+     *   containerClassName="
      *     bg-white dark:bg-gray-800 
      *     border border-gray-200 dark:border-gray-700
      *     rounded-lg shadow-lg
@@ -1062,7 +1062,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * />
      * ```
      */
-    contentContainerClassName?: IClassName;
+    containerClassName?: IClassName;
 
     /**
      * CSS classes for the ScrollView wrapper when `withScrollView` is true.
@@ -1261,7 +1261,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      *   renderAsBottomSheetOnMobile={true}
      *   renderAsBottomSheetOnTablet={true}
      *   bottomSheetTitle="Choose Media"
-     *   contentContainerClassName="tablet:max-w-2xl tablet:mx-auto"
+     *   containerClassName="tablet:max-w-2xl tablet:mx-auto"
      * >
      *   <MediaGrid />
      * </Menu>

@@ -2,7 +2,7 @@ import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
-import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, CountrySelector, TelInput, Expandable, SSRScrollView, cn } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, CountrySelector, TelInput, Expandable, SSRScrollView } from "@resk/nativewind";
 import { buttonVariant } from "@resk/nativewind/variants";
 import { FormExamples } from './FormExamples';
 import { AppBarExamples } from './AppBarExamples';
@@ -14,7 +14,7 @@ type ScreenContentProps = {
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <SSRScrollView>
-      <AppBarExamples/>
+      <AppBarExamples />
       <DialogExample />
       <BottomSheetExample />
       <FormExamples />
@@ -122,7 +122,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </Menu>
         <Menu
           anchor={<Text>Open Bottom Sheet</Text>}
-          renderAsBottomSheetInFullScreen
+          renderAsBottomSheetOnMobile
 
         >
           <Text>Bottom Sheet Menu Opened with</Text>

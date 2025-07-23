@@ -11,8 +11,8 @@
   ],
   "packageManager": "npm@11.2.0",
   "scripts": {
-    "install-nextjs": "npm i && cd ./packages/resk-core && npm i && cd ../resk-nativewind && npm i && cd ../../examples/resk-nativewind-next && npm i",
-    "build-nextjs": "cd ./packages/resk-core && npm run build && cd ../resk-nativewind && npm run build && cd ../../examples/resk-nativewind-next && npm run build",
+    "install:nextjs-example": "npm run install:packages && cd ./examples/resk-nativewind-next && npm i",
+    "build:nextjs-example": "npm run build:core && npm run build:nativewind && cd ./examples/resk-nativewind-next && npm run build",
     "install:packages": "lerna exec -- npm install",
     "clean:install": "lerna clean --yes && npm install && npm run install:packages",
     "build": "lerna run build --stream",

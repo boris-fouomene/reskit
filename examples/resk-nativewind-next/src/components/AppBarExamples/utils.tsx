@@ -4,11 +4,10 @@
  * @since 1.1.0
  */
 
-import { 
-    IAppBarActionProps, 
-    IAppBarResponsiveConfig, 
-    IAppBarActionPriority,
-    DEFAULT_APPBAR_RESPONSIVE_CONFIG 
+import {
+    IAppBarActionProps,
+    IAppBarResponsiveConfig,
+    DEFAULT_APPBAR_RESPONSIVE_CONFIG
 } from '@resk/nativewind/components/appBar';
 
 
@@ -45,7 +44,7 @@ export function filterActionsByViewport<Context = unknown>(
 
     for (const action of actions) {
         // Always show critical actions
-        if (action.alwaysVisible || action.priority === IAppBarActionPriority.CRITICAL) {
+        if (action.alwaysVisible || action.visibilityPriority === 100) {
             visibleActions.push(action);
             continue;
         }
@@ -101,20 +100,20 @@ export function calculateOptimalViewportWidth(
     actualWidth: number
 ): number {
     const minWidth = 320; // Minimum supported width
-    
+
     switch (containerType) {
         case 'drawer':
             // Drawers typically have constrained width
             return Math.max(Math.min(actualWidth, 400), minWidth);
-        
+
         case 'modal':
             // Modals can vary but are often constrained
             return Math.max(Math.min(actualWidth, 600), minWidth);
-        
+
         case 'window':
             // Use full window width with some padding
             return Math.max(actualWidth - 100, minWidth);
-        
+
         case 'auto':
         default:
             // Auto-detect based on width
@@ -138,7 +137,7 @@ export function normalizeResponsiveConfig(
     config?: Partial<IAppBarResponsiveConfig>
 ): IAppBarResponsiveConfig {
     const defaults = DEFAULT_APPBAR_RESPONSIVE_CONFIG;
-    
+
     if (!config) {
         return defaults;
     }
@@ -156,7 +155,7 @@ export function normalizeResponsiveConfig(
 
     // Remove duplicates and sort by width (descending)
     const uniqueBreakpoints = allBreakpoints
-        .filter((bp, index, array) => 
+        .filter((bp, index, array) =>
             array.findIndex(item => item.width === bp.width) === index
         )
         .sort((a, b) => b.width - a.width);

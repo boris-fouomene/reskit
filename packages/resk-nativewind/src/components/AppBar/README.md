@@ -554,16 +554,6 @@ interface AppContext {
 ### From Priority Enum to Numbers
 
 ```tsx
-// ❌ Old approach (still works but deprecated)
-import { IAppBarActionPriority } from '@resk/nativewind/components/AppBar';
-
-const oldActions = [
-  {
-    id: 'save',
-    priority: IAppBarActionPriority.HIGH // Enum value
-  }
-];
-
 // ✅ New recommended approach
 const newActions = [
   {
@@ -746,7 +736,6 @@ interface IAppBarActionProps<Context = unknown> {
 
   // Visibility & Priority
   visibilityPriority?: number; // 1-100, default: 50
-  priority?: IAppBarActionPriority | number; // Deprecated, use visibilityPriority
   alwaysVisible?: boolean;
   minViewportWidth?: number;
   group?: string;

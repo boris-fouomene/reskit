@@ -1,9 +1,8 @@
 "use client";
 
-import { HStack, Dialog, Alert, Preloader, Drawer, useDrawer, ActivityIndicator } from "@resk/nativewind";
+import { HStack, Dialog, Preloader, Drawer, useDrawer } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
 import { Button } from "@resk/nativewind/components/button";
-import dynamic from "next/dynamic";
 import { useState } from "react";
 
 //const Button = dynamic(() => import('@resk/nativewind/components/button').then(mod => mod.Button), { ssr: false });
@@ -52,12 +51,12 @@ export function DialogExample() {
             </Div>
         </Dialog>
         <Button variant={{ colorScheme: "info", rounded: "rounded", padding: "10px", alignSelf: "start", margin: 6 }} icon="lock" onPress={() => setVisible(true)}>Open Dialog 1</Button>
-        <Button.Interactive variant={{ colorScheme: "secondary" }} onPress={((e, context) => {
+        <Button.Interactive variant={{ colorScheme: "secondary" }} onPress={(() => {
             Dialog.Provider.open({
                 title: "DialogProvider",
                 children: <Text>DialogProvider</Text>,
                 actions: [{
-                    label: "Close", onPress: (event, { dialog }) => {
+                    label: "Close", onPress: () => {
                         console.log("want to close dialog heein");
                     }
                 }]
@@ -65,7 +64,7 @@ export function DialogExample() {
         })}>
             open Dialog Provider
         </Button.Interactive>
-        <Button className="m-5" onPress={(e) => {
+        <Button className="m-5" onPress={() => {
             console.log("will open alert ", Dialog.Alert.open, " is opeeeed");
             Dialog.Alert.open({
                 title: "Close an example",
@@ -76,7 +75,7 @@ export function DialogExample() {
             })
         }}>Alert Example 1</Button>
 
-        <Button className="m-5" onPress={(e) => {
+        <Button className="m-5" onPress={() => {
             Dialog.Alert.open({
                 title: "Close an example",
                 message: "Are you sure you want to delete this item?",
@@ -86,7 +85,7 @@ export function DialogExample() {
             })
         }}>Simple Alert</Button>
 
-        <Button variant={{ outline: "primary" }} onPress={(e) => {
+        <Button variant={{ outline: "primary" }} onPress={() => {
             Preloader.open({
                 title: "Loading example",
                 content: <Text>Loading example</Text>

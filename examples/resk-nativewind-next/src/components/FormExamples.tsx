@@ -17,9 +17,10 @@ export function FormExamples() {
                 }}
             >
                 <Form.FieldRenderer
+                    name="custom-field-renderer"
                     formName={formName}
                     type="checkbox"
-                    label={"Field Renderer example"}
+                    label={"Custom Field Renderer example"}
                     checkedValue={"Yes"}
                     uncheckedValue={"No"}
                     onFieldValid={({ value }) => {
@@ -30,7 +31,7 @@ export function FormExamples() {
                 <Form.Action
                     label={"Send"}
                     formName={formName}
-                    onPress={(event, { form, formData }) => {
+                    onPress={(_, { formData }) => {
                         console.log("Form submitted with data:", formData);
                     }}
                 />

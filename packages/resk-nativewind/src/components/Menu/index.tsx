@@ -1,7 +1,7 @@
 "use client";
 import MenuItems from './Items';
 import { useEffect, useState, useRef, useMemo, Fragment, useImperativeHandle } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, TouchableOpacity, Animated } from 'react-native';
+import { StyleSheet, View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, TouchableOpacity, Animated } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core/utils';

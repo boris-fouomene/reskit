@@ -1442,6 +1442,62 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
          */
         role?: string;
     };
+
+    /**
+     * Controls whether this action can be rendered in the overflow menu.
+     * 
+     * When set to `false`, the action will never appear in the dropdown menu, 
+     * even if there's insufficient space on the AppBar. This is useful for:
+     * - Actions that require AppBar context and don't work well in menus
+     * - Critical actions that must always be immediately visible
+     * - Actions with custom styling that breaks in menu context
+     * 
+     * **Note:** If both `visibleOnAppBar` and `visibleOnMenu` are false, 
+     * the action will not be rendered at all.
+     * 
+     * @defaultValue true
+     * 
+     * @example
+     * ```tsx
+     * // Action that should never go to menu (AppBar only)
+     * visibleOnMenu: false
+     * 
+     * // Conditional menu visibility based on action type
+     * visibleOnMenu: action.type !== 'primary-navigation'
+     * 
+     * // Complex actions that don't work well in menu context
+     * visibleOnMenu: !action.hasComplexInteraction
+     * ```
+     */
+    visibleOnMenu?: boolean;
+
+    /**
+     * Controls whether this action can be rendered directly on the AppBar.
+     * 
+     * When set to `false`, the action will only appear in the overflow menu,
+     * never directly on the AppBar. This is useful for:
+     * - Secondary actions that shouldn't clutter the main interface
+     * - Actions that work better in a menu context (e.g., multi-step workflows)
+     * - Administrative or advanced actions that should be less prominent
+     * 
+     * **Note:** If both `visibleOnAppBar` and `visibleOnMenu` are false, 
+     * the action will not be rendered at all.
+     * 
+     * @defaultValue true
+     * 
+     * @example
+     * ```tsx
+     * // Action that should only appear in menu
+     * visibleOnAppBar: false
+     * 
+     * // Conditional AppBar visibility based on user role
+     * visibleOnAppBar: user.role === 'admin' || action.priority === 'high'
+     * 
+     * // Keep secondary actions in menu only
+     * visibleOnAppBar: action.category !== 'secondary'
+     * ```
+     */
+    visibleOnAppBar?: boolean;
 }
 
 /**

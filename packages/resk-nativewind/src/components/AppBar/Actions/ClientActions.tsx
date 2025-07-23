@@ -61,7 +61,7 @@ export function AppBarClientActions<Context = unknown>({
     const processedActions = useMemo(() => {
         if (!Array.isArray(items) || !items.length) return [];
         // Filter out null/undefined items but preserve original order
-        return items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null);
+        return items.filter((action): action is IAppBarActionProps<Context> => isObj(action) && action != null && action.visibleOnAppBar !== false && action.visibleOnMenu !== false);
     }, [items]);
 
     // Calculate max actions based on responsive configuration
@@ -105,7 +105,6 @@ export function AppBarClientActions<Context = unknown>({
     }, [maxVisibleActions, effectiveViewportWidth, responsiveConfig, processedActions.length]);
 
     const { actions, menuItems } = useMemo(() => {
-        const actionCounter = { current: 0 };
         const menuItems: IAppBarActionProps<Context>[] = [];
         const actions: IReactNullableElement[] = [];
 
@@ -135,7 +134,7 @@ export function AppBarClientActions<Context = unknown>({
                 renderAction,
                 renderExpandableAction,
                 testID,
-                actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, onAppBarClassName, onMenuClassName, ...props }, index): IReactNullableElement {
+                actionMutator: function (renderer, { alwaysVisible, visibilityPriority, minViewportWidth, onAppBarClassName, onMenuClassName, visibleOnAppBar, visibleOnMenu, ...props }, index): IReactNullableElement {
                     const { level, className } = props;
                     // Handle nested actions (don't count towards limit)
                     if (level) {
@@ -144,45 +143,73 @@ export function AppBarClientActions<Context = unknown>({
                             actionOnMenuClx,
                             "app-bar-action-menu-item-level-" + level,
                             className,
-                            onMenuClassName // Apply individual action's menu className
+                            onMenuClassName
                         );
                         const renderedAction = (renderer as any)(props, index);
                         if (renderedAction) {
                             menuItems.push(props);
                         }
                         return null;
-                    }                    // Check if action should always be visible
-                    const shouldAlwaysShow = alwaysVisible;
+                    }
 
                     // Check viewport constraints
                     const meetsViewportRequirement = !(isNumber(minViewportWidth) && minViewportWidth > 0) || effectiveViewportWidth >= minViewportWidth;
-
-                    // Determine if action can be rendered directly
-                    const canRenderDirectly = shouldAlwaysShow ||
-                        (actionCounter.current < calculatedMaxActions && meetsViewportRequirement) ||
-                        (processedActions?.length === 1); // Always show single action directly (no menu needed)
-
-                    if (!level && !shouldAlwaysShow) {
-                        actionCounter.current++;
+                    if (!meetsViewportRequirement) {
+                        return null;
                     }
 
+                    // Progressive rendering logic:
+                    // - Track current position in processing
+                    // - Calculate remaining AppBar slots
+                    // - Decide AppBar vs Menu placement based on availability and preferences
+
+                    const currentAppBarCount = actions.length;
+                    const remainingAppBarSlots = calculatedMaxActions - currentAppBarCount;
+
+                    // Determine placement preference
+                    const preferAppBar = visibleOnAppBar !== false; // true or undefined = prefer AppBar
+                    const preferMenu = visibleOnMenu !== false;     // true or undefined = allow Menu
+
+                    // Force AppBar if explicitly requested or always visible
+                    const forceAppBar = alwaysVisible || visibleOnAppBar === true;
+
+                    // Force Menu if explicitly requested
+                    const forceMenu = visibleOnMenu === true && visibleOnAppBar === false;
+
+                    // Decision logic
+                    let renderOnAppBar: boolean;
+
+                    if (forceAppBar) {
+                        renderOnAppBar = true; // Always honor alwaysVisible or explicit visibleOnAppBar=true
+                    } else if (forceMenu) {
+                        renderOnAppBar = false; // Explicit menu-only request
+                    } else if (remainingAppBarSlots > 0 && preferAppBar) {
+                        renderOnAppBar = true; // Space available and action prefers AppBar
+                    } else if (preferMenu) {
+                        renderOnAppBar = false; // No AppBar space or action allows menu
+                    } else {
+                        renderOnAppBar = remainingAppBarSlots > 0; // Fallback: use AppBar if space available
+                    }
+
+                    // Apply appropriate styling and render
                     props.className = cn(
-                        canRenderDirectly ? [
+                        renderOnAppBar ? [
                             "appbar-action flex-none",
                             actionOnAppBarClx,
                             className,
-                            onAppBarClassName // Apply individual action's AppBar className
+                            onAppBarClassName
                         ] : [
                             "appbar-action-menu-item",
-                            "app-bar-action-menu-item-level-" + level,
                             actionOnMenuClx,
                             className,
-                            onMenuClassName // Apply individual action's menu className
+                            onMenuClassName
                         ]
-                    ); const renderedAction = (renderer as any)(props, index);
-                    if (!renderedAction) return null;
+                    );
 
-                    if (canRenderDirectly) {
+                    const renderedAction = (renderer as any)(props, index);
+                    if (!renderedAction) return null;
+                    // Add to appropriate collection
+                    if (renderOnAppBar) {
                         actions.push(renderedAction);
                     } else {
                         menuItems.push(props);

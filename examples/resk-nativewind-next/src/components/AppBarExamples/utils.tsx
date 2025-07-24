@@ -7,7 +7,7 @@
 import {
     IAppBarActionProps,
     IAppBarResponsiveConfig,
-    DEFAULT_APPBAR_RESPONSIVE_CONFIG
+    APP_BAR_DEFAULT_RESPONSIVE_CONFIG
 } from '@resk/nativewind/components/appBar';
 
 
@@ -136,7 +136,7 @@ export function calculateOptimalViewportWidth(
 export function normalizeResponsiveConfig(
     config?: Partial<IAppBarResponsiveConfig>
 ): IAppBarResponsiveConfig {
-    const defaults = DEFAULT_APPBAR_RESPONSIVE_CONFIG;
+    const defaults = APP_BAR_DEFAULT_RESPONSIVE_CONFIG;
 
     if (!config) {
         return defaults;

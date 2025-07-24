@@ -8,7 +8,7 @@ import { isValidElement } from "react";
 import { Animated, Dimensions, PanResponder, GestureResponderEvent, PanResponderGestureState, I18nManager, ViewProps, StyleSheet, EmitterSubscription } from "react-native";
 import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
-import Platform from "@platform";
+import { Platform } from "@platform";
 import { Session } from "@resk/core/session";
 import { Div } from "@html/Div";
 import { Backdrop } from "@components/Backdrop";
@@ -730,7 +730,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
 
 
   getDrawerPosition(): IDrawerPosition {
-    const rtl = I18nManager.isRTL;
+    const rtl = Platform.isRTL();
     let position: IDrawerPosition = this.getComponentProps()?.position;
     if (position !== "left" && position !== "right") {
       if (this.isProvider()) {
@@ -1355,10 +1355,10 @@ ExpandableDrawerItem.displayName = "Drawer.ExpandableItem";
 
 
 function renderDrawerItem(item: IDrawerItemProps, index: number) {
-  return <DrawerItem {...item} key={index} />;
+  return <DrawerItem {...item} key={Nav.getItemRenderKey(item, index)} />;
 }
 function renderExpandableDrawerItem(item: IDrawerItemProps, index: number) {
-  return <ExpandableDrawerItem {...item} key={index} />;
+  return <ExpandableDrawerItem {...item} key={Nav.getItemRenderKey(item, index)} />;
 }
 const ICON_SIZE_VARIANT: IIconVariant["size"] = "25px";
 
@@ -1832,10 +1832,10 @@ export type IDrawerPosition = "left" | "right" | undefined;
  * <DrawerItems
  *   items={menuItems}
  *   renderItem={(item, index) => (
- *     <CustomDrawerItem key={index} {...item} />
+ *     <CustomDrawerItem key={Nav.getItemRenderKey(item, index)} {...item} />
  *   )}
  *   renderExpandableItem={(item, index) => (
- *     <CustomExpandableItem key={index} {...item} />
+ *     <CustomExpandableItem key={Nav.getItemRenderKey(item, index)} {...item} />
  *   )}
  * />
  * ```

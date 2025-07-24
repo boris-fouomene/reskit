@@ -6,7 +6,9 @@ import { IProgressBarVariant } from "@variants/progressBar";
 import { progressBarVariant } from "@variants/progressBar";
 import { Text } from "@html/Text";
 import "./style";
-import { isRTL } from "@utils/i18nManager";
+import { Platform } from "@platform/index";
+
+const isRTL = Platform.isRTL();
 
 /**
  * A highly customizable and accessible progress bar component built with React and Tailwind CSS.

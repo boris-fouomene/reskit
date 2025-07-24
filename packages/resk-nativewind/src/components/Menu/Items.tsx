@@ -39,12 +39,12 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
 }
 (MenuItem as any).displayName = "Menu.Item";
 function renderMenuItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
-  return <MenuItem {...props} key={index} />;
+  return <MenuItem {...props} key={Nav.getItemRenderKey(props, index)} />;
 }
 
 
 function renderExpandableMenuItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
-  return <Nav.ExpandableItem<IMenuContext<Context>> as={MenuItem} {...props} key={index} />;
+  return <Nav.ExpandableItem<IMenuContext<Context>> as={MenuItem} {...props} key={Nav.getItemRenderKey(props, index)} />;
 }
 
 MenuItems.displayName = "MenuItems";

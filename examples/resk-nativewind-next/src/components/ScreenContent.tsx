@@ -142,17 +142,6 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         />
       </Div>
       <Div className="p-5">
-        <H2> AppBar Example</H2>
-        <AppBar
-          title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
-          subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
-          actions={[
-            { label: "Settings" },
-            { label: "Profile" },
-          ]}
-        />
-      </Div>
-      <Div className="p-5">
         <H2>A hight menu example</H2>
         <Menu
           anchor={<Text>Open Menu in a higgggggggggggggggggggggggggggggggggggggggggggggggggggggggg</Text>}

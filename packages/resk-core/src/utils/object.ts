@@ -37,7 +37,7 @@ import { isDOMElement } from "./dom";
  * console.log(isPlainObj(obj)); // Outputs: true
  * ```
  */
-export const isPlainObj = function (obj: any): boolean {
+export function isPlainObj<T = any>(obj: T): obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any) {
   if (obj === null || typeof obj !== 'object' || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
     return false;
   }
@@ -133,44 +133,8 @@ export function cloneObject<T = any>(source: T): T {
   }
 };
 
-/**
- * Determines if the given variable is a plain object.
- *
- * This function checks whether the provided variable is a plain object, which is defined as an object
- * created by the Object constructor or one that inherits from `Object.prototype`. It will return false
- * for instances of classes, arrays, and other non-plain objects.
- *
- * @param {any} obj - The variable to check for being an object.
- * 
- * @returns {boolean} Returns true if the variable is a plain object, false otherwise.
- *
- * @example
- * ```ts
- * // Example with a string
- * console.log(isObj("hello")); // Outputs: false
- *
- * // Example with a plain object
- * console.log(isObj({ a: true })); // Outputs: true
- *
- * // Example with an array
- * console.log(isObj([1, 2, 3])); // Outputs: false
- *
- * // Example with a function
- * console.log(isObj(() => true)); // Outputs: false
- *
- * // Example with a Date object
- * console.log(isObj(new Date())); // Outputs: false
- *
- * // Example with a plain object created using Object.create
- * const obj = Object.create(null);
- * console.log(isObj(obj)); // Outputs: true
- * ```
- */
-export function isObj<T = any>(obj: T): obj is IObject<T> {
-  return isPlainObj(obj);
-};
+export const isObj = isPlainObj;
 
-type IObject<T = any> = T extends IDict ? T : T extends undefined ? never : any;
 /**
  * Calculates the size of an object or array.
  *

@@ -5,6 +5,7 @@ import { IReactNullableElement } from "../../types";
 import { Auth } from "@resk/core/auth";
 import { cloneObject, isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
+import { getItemRenderKey } from "./getItemRenderKey";
 
 
 function renderExpandableMenuItemOrSection<ItemContext = unknown>({ item, itemsNodes, index, context, renderItem, renderExpandableItem, level, itemClassName }: INavRenderItemOptions<ItemContext>) {
@@ -22,7 +23,7 @@ function renderNavItem<ItemContext = unknown>({ item, index, renderItem, renderE
   if (item.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   if (!item.label && !item.icon && !item.children && item.divider === true) {
     const { dividerClassName } = item;
-    return (<Divider key={index} className={dividerClassName} />)
+    return (<Divider key={getItemRenderKey(item, index)} className={dividerClassName} />)
   }
   if (Array.isArray(item.items)) {
     const itemsNodes: IReactNullableElement[] = [];
@@ -50,7 +51,7 @@ export function renderNavItems<ItemContext = unknown>({ items, renderItem, itemC
       clonedItem.level = level;
       const r = renderNavItem({ item: clonedItem, itemClassName, index, renderItem, renderExpandableItem, level, context });
       if (r) {
-        _items.push(<Fragment key={index}>{r}</Fragment>);
+        _items.push(<Fragment key={getItemRenderKey(clonedItem, index)}>{r}</Fragment>);
       }
     });
   }

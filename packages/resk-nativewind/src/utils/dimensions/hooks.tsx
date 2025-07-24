@@ -11,57 +11,8 @@ import { IUseKeyboardResult, useKeyboard } from '@utils/keyboard';
 import usePrevious from '@utils/usePrevious';
 
 
-/**
- * React hook to provide responsive device and window dimensions, hydration status, and keyboard state for React Native apps.
- *
- * This hook tracks window and screen size, device type (mobile, tablet, desktop), hydration status, and keyboard visibility.
- * It supports debounced updates, custom breakpoints, and threshold-based change detection for efficient re-renders.
- *
- * @param options - (Optional) Partial configuration object to customize thresholds, debounce, breakpoints, and keyboard handling.
- * - `widthThreshold`: Minimum width change (in pixels) to trigger an update.
- * - `heightThreshold`: Minimum height change (in pixels) to trigger an update.
- * - `debounceTimeout`: Debounce delay (in ms) for dimension updates.
- * - `ignoreKeyboard`: If `false`, disables keyboard-aware dimension handling.
- * - `breakpoints`: Custom breakpoints for mobile/tablet/desktop detection.
- *
- * @returns An object containing window/screen dimensions, hydration status, keyboard state, and device type flags.
- *
- * @example
- * ```tsx
- * import { useDimensions } from "@resk/nativewind/utils/dimensions";
- *
- * function MyComponent() {
- *   const { window, screen, isMobile, isTablet, isDesktop, isHydrated, isKeyboardVisible } = useDimensions({
- *     widthThreshold: 10,
- *     debounceTimeout: 100,
- *     breakpoints: { mobileMaxWidth: 480, tabletMaxWidth: 1024 }
- *   });
- *   return (
- *     <View>
- *       <Text>Width: {window.width}</Text>
- *       <Text>Device: {isMobile ? "Mobile" : isTablet ? "Tablet" : "Desktop"}</Text>
- *       <Text>Keyboard: {isKeyboardVisible ? "Open" : "Closed"}</Text>
- *       <Text>Hydrated: {isHydrated ? "Yes" : "No"}</Text>
- *     </View>
- *   );
- * }
- * ```
- *
- * @remarks
- * - The hook listens to window/screen dimension changes and keyboard visibility.
- * - Debounced and thresholded updates help avoid unnecessary re-renders.
- * - Hydration status is tracked for SSR/CSR compatibility.
- * - Device type flags (`isMobile`, `isTablet`, `isDesktop`, `isMobileOrTablet`) are computed from breakpoints.
- * - Keyboard state is merged into the result for convenience.
- *
- * @see {@link IUseDimensionsOptons}
- * @see {@link IUseDimensionsResult}
- * @see {@link useKeyboard}
- * @see {@link Dimensions}
- * @see {@link Breakpoints}
- *
- * @public
- */
+
+
 export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDimensionsResult => {
     options = Object.assign({}, options);
     const widthThreshold = isNumber(options.widthThreshold) ? options.widthThreshold : 0;
@@ -71,7 +22,8 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
     const w = Dimensions.get("window");
     const s = Dimensions.get("screen");
     const initialized = isNumber(w?.width) && isNumber(w?.height);
-    const isHydrated = initialized || getInitialHydrationStatus();
+    const hydrationStatus = getInitialHydrationStatus();
+    const isHydrated = initialized || hydrationStatus;
     const keyboard = useKeyboard();
     const [state, setState] = useStateCallback<{ window: ScaledSize, screen: ScaledSize, isHydrated: boolean }>({
         window: isHydrated ? w : scaleSized,
@@ -95,7 +47,7 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
     const { isMobile, isTablet, isDesktop } = Breakpoints.getDeviceLayout({ viewportWidth: width });
     useEffect(() => {
         const applyUpdate = (newDimensions: IUseDimensionsResult) => {
-            if (previousDimensions.current && !exceedsThreshold(newDimensions, previousDimensions.current as any, optionsRef.current.widthThreshold as number, optionsRef.current.heightThreshold as number)) {
+            if (exceedsThreshold(newDimensions, previousDimensions.current as any, optionsRef.current.widthThreshold as number, optionsRef.current.heightThreshold as number)) {
                 setState(prev => ({
                     ...prev,
                     ...newDimensions,
@@ -103,8 +55,6 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
                 previousDimensions.current = newDimensions;
                 return;
             }
-            setState(prev => ({ ...prev, ...newDimensions }));
-            previousDimensions.current = newDimensions;
         };
         const r = Dimensions.addEventListener('change', function onDimensionChanged(newDimensions) {
             if (isObj(newDimensions) && (newDimensions.window.width !== state.window.width || newDimensions.window.height !== state.window.height)) {
@@ -119,7 +69,7 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
                 }
             }
         });
-        if (!isHydrated) {
+        if (!state.isHydrated) {
             setState({ ...state, window: Dimensions.get('window'), screen: Dimensions.get('screen'), isHydrated: true })
         }
         return () => {

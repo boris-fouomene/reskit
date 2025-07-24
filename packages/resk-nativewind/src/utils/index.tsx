@@ -10,7 +10,6 @@ export { default as useStateCallback } from "./stateCallback";
 export * from "./key";
 export { default as useForceRender } from "./useForceRender";
 export { default as setRef } from "./setRef";
-export * from "./i18nManager";
 export * from "./measureLayut";
 export * from "./keyboard";
 export * from "./cn";

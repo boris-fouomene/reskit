@@ -34,14 +34,12 @@ export function BasicAppBarExample() {
             label: 'Export',
             visibilityPriority: 20,
             onPress: () => console.log('Export pressed'),
-            group: 'file-operations'
         },
         {
             id: 'print',
             label: 'Print',
             visibilityPriority: 10,
             onPress: () => console.log('Print pressed'),
-            group: 'file-operations'
         },
         {
             id: 'help',
@@ -192,14 +190,12 @@ export function GroupedActionsAppBarExample() {
             id: 'undo',
             label: 'Undo',
             visibilityPriority: 100,
-            group: 'edit',
             onPress: () => console.log('Undo pressed')
         },
         {
             id: 'redo',
             label: 'Redo',
             visibilityPriority: 100,
-            group: 'edit',
             onPress: () => console.log('Redo pressed')
         },
         // Format group
@@ -207,14 +203,12 @@ export function GroupedActionsAppBarExample() {
             id: 'bold',
             label: 'Bold',
             visibilityPriority: 20,
-            group: 'format',
             onPress: () => console.log('Bold pressed')
         },
         {
             id: 'italic',
             label: 'Italic',
             visibilityPriority: 20,
-            group: 'format',
             onPress: () => console.log('Italic pressed')
         },
         // View group
@@ -222,7 +216,6 @@ export function GroupedActionsAppBarExample() {
             id: 'zoom-in',
             label: 'Zoom In',
             visibilityPriority: 10,
-            group: 'view',
             minViewportWidth: 768,
             onPress: () => console.log('Zoom in pressed')
         },
@@ -230,7 +223,6 @@ export function GroupedActionsAppBarExample() {
             id: 'zoom-out',
             label: 'Zoom Out',
             visibilityPriority: 10,
-            group: 'view',
             minViewportWidth: 768,
             onPress: () => console.log('Zoom out pressed')
         }
@@ -249,7 +241,15 @@ export function AppBarExamples() {
             App Bar examples
         </H2>
         <BasicAppBarExample />
-        <DrawerAppBarExample />
+        {/*  <AppBar
+            title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+            subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+            actions={[
+                { label: "Settings" },
+                { label: "Profile" },
+            ]}
+        /> */}
+        {/*         <DrawerAppBarExample />
         <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
         <GroupedActionsAppBarExample />
@@ -307,7 +307,7 @@ export function AppBarExamples() {
                     icon: 'help-circle'
                 }
             ]}
-        />
+        /> */}
     </>
 }
 

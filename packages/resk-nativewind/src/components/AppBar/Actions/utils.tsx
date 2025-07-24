@@ -4,6 +4,7 @@ import { renderNavItems } from "@components/Nav/utils";
 import { AppBarAction } from "../Action";
 import ExpandableAppBarAction from "../ExpandableAction";
 import { isNumber, isObj } from "@resk/core/utils";
+import { Nav } from "@components/Nav";
 
 
 export function renderActions<Context = unknown>({ context, actionMutator, testID, renderAction, renderExpandableAction, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context> & {
@@ -26,50 +27,37 @@ export function renderActions<Context = unknown>({ context, actionMutator, testI
 }
 
 function renderAppBarAction<Context = unknown>(props: IAppBarActionProps<Context>, index: number) {
-    return <AppBarAction {...props} key={index} />;
+    return <AppBarAction {...props} key={Nav.getItemRenderKey(props, index)} />;
 }
 function renderExpandableAppBarAction<Context = unknown>(props: IAppBarActionProps<Context>, index: number) {
     return <ExpandableAppBarAction
         {...props}
-        key={index}
+        key={Nav.getItemRenderKey(props, index)}
     />;
 }
 
-/**
- * Utility function to calculate maximum visible actions based on viewport width.
- * 
- * @param viewportWidth - Current viewport width
- * @param config - Responsive configuration object
- * @returns Maximum number of actions that should be visible
- * 
- * @example
- * ```tsx
- * const maxActions = calculateMaxVisibleActions(800, DEFAULT_APPBAR_RESPONSIVE_CONFIG);
- * // Returns appropriate number based on breakpoints
- * ```
- * 
- * @since 1.1.0
- */
+
 export function calculateMaxVisibleActions(
     viewportWidth: number,
-    config: IAppBarResponsiveConfig = DEFAULT_APPBAR_RESPONSIVE_CONFIG
+    breakpoints: IAppBarResponsiveConfig["breakpoints"] = APP_BAR_DEFAULT_RESPONSIVE_CONFIG.breakpoints,
+    defaultMaxActions: number = 1
 ): number {
-    if (!isObj(config) || !Array.isArray(config.breakpoints) || config.breakpoints.length === 0) {
-        config = DEFAULT_APPBAR_RESPONSIVE_CONFIG;
-    }
-
-    // Sort breakpoints in descending order (largest to smallest) to ensure we find
-    // the largest breakpoint that fits within the viewport width
-    const sortedBreakpoints = [...config.breakpoints]
-        .filter(breakpoint => breakpoint && isNumber(breakpoint?.width))
-        .sort((a, b) => b.width - a.width);
-
     // Find the first (largest) breakpoint where viewport width is >= breakpoint width
-    const matchingBreakpoint = sortedBreakpoints.find(
+    const matchingBreakpoint = breakpoints.find(
         breakpoint => viewportWidth >= breakpoint.width
     );
 
-    return matchingBreakpoint?.maxActions ?? config.defaultMaxActions;
+    // If we found a matching breakpoint, use its maxActions
+    if (matchingBreakpoint) {
+        return matchingBreakpoint.maxActions;
+    }
+
+    // If viewport is larger than the largest defined breakpoint,
+    // use the maxActions from the largest breakpoint instead of falling back to default
+    if (breakpoints.length > 0 && viewportWidth > breakpoints[0].width) {
+        return breakpoints[0].maxActions;
+    }
+    return defaultMaxActions;
 }
 
 /**
@@ -106,58 +94,79 @@ export function sortActionsByPriority<Context = unknown>(
     });
 }
 
-/**
- * Default responsive configuration for AppBar actions.
- * 
- * This configuration provides comprehensive coverage for all common screen sizes in 2025,
- * from ultra-wide 8K monitors down to legacy mobile devices. Each breakpoint is carefully
- * chosen based on real device dimensions and UX research on optimal action counts.
- * 
- * ## Design Principles:
- * - **Cognitive Load**: Max 8 actions to stay within Miller's Rule (7±2 items)
- * - **Touch Targets**: Fewer actions on touch devices for better accessibility
- * - **Progressive Enhancement**: More actions available as screen space increases
- * - **Real Device Mapping**: Breakpoints match actual device specifications
- * - **Context Awareness**: Considers typical usage patterns per device type
- * 
- * ## Breakpoint Strategy:
- * - Descending order (largest to smallest) for efficient matching
- * - Real device widths, not arbitrary numbers
- * - Smooth transitions to prevent jarring UI changes
- * - Conservative mobile approach, generous desktop approach
- * 
- * ## Usage Examples:
- * ```tsx
- * // Use default configuration
- * <AppBar actions={actions} />
- * 
- * // For drawer context (constrained width)
- * <AppBar 
- *   actions={actions}
- *   actionsProps={{ 
- *     viewportWidth: 350,
- *     responsiveConfig: createConstrainedResponsiveConfig() 
- *   }} 
- * />
- * 
- * // Custom breakpoints
- * <AppBar 
- *   actions={actions}
- *   responsiveConfig={{
- *     breakpoints: [
- *       { width: 1200, maxActions: 5 },
- *       { width: 768, maxActions: 3 },
- *       { width: 390, maxActions: 1 }
- *     ],
- *     defaultMaxActions: 1
- *   }}
- * />
- * ```
- * 
- * @constant DEFAULT_APPBAR_RESPONSIVE_CONFIG
- * @since 1.1.0
- */
-export const DEFAULT_APPBAR_RESPONSIVE_CONFIG: IAppBarResponsiveConfig = {
+export function getMaxActionsPerBreakpoint(
+    config: IAppBarResponsiveConfig = APP_BAR_DEFAULT_RESPONSIVE_CONFIG
+): Record<string, { maxAction: number, hiddenClassName: string }> {
+    const result: Record<string, { maxAction: number, hiddenClassName: string }> = {};
+
+    // Ensure we have a valid configuration
+    if (!isObj(config) || !Array.isArray(config.breakpoints) || config.breakpoints.length === 0) {
+        config = APP_BAR_DEFAULT_RESPONSIVE_CONFIG;
+    }
+
+    // Sort breakpoints in descending order (largest to smallest) to ensure we find
+    // the largest breakpoint that fits within the viewport width
+    const sortedBreakpoints = [...config.breakpoints]
+        .filter(breakpoint => breakpoint && isNumber(breakpoint?.width))
+        .sort((a, b) => b.width - a.width);
+
+    // Find the maximum breakpoint width in the config
+    const maxBreakpointWidth = sortedBreakpoints.length > 0 ? sortedBreakpoints[0].width : 0;
+
+    const screens = APP_BAR_DEFAULT_RESPONSIVE_SCREENS;
+
+    // Add base (smallest screen) configuration - starts from 0px
+    const baseMaxActions = calculateMaxVisibleActions(0, sortedBreakpoints, config.defaultMaxActions);
+    result.base = { maxAction: baseMaxActions, hiddenClassName: "base:hidden" };
+
+    // Sort screen entries by width (ascending order for consistency)
+    const sortedScreenEntries = Object.entries(screens);
+
+    let hasHandleLatest = false;
+    // Generate configuration for each screen breakpoint
+    sortedScreenEntries.forEach(([screenName, screenWidth]) => {
+        // Skip screens that are larger than the maximum breakpoint width in config
+        if (screenWidth > maxBreakpointWidth) {
+            if (hasHandleLatest) {
+                return;
+            }
+            hasHandleLatest = true;
+        }
+
+        // For this screen width, find the best possible maxActions by checking
+        // all breakpoints that are <= this screen width using proper responsive logic
+        const maxActionsForScreen = calculateMaxVisibleActions(screenWidth, sortedBreakpoints, config.defaultMaxActions);
+
+        result[screenName] = { maxAction: maxActionsForScreen, hiddenClassName: `${screenName}:hidden` };
+    });
+    return result;
+}
+interface IAppBarResponsiveScreens extends Record<string, number> { }
+export const APP_BAR_DEFAULT_RESPONSIVE_SCREENS: IAppBarResponsiveScreens = {
+    sm: 640,
+    md: 768,
+    lg: 1024,
+    xl: 1280,
+    '2xl': 1536,
+    '3xl': 1920,  // Full HD+ / Gaming monitors
+    '4xl': 2560,  // 1440p / QHD monitors  
+    '5xl': 3840,  // 4K / UHD monitors
+    '6xl': 5120,  // 5K / Ultra-wide monitors
+    '7xl': 7680,  // 8K displays (future-proofing)
+}
+const classes = {
+    sm: "sm:hidden",
+    md: "md:hidden",
+    lg: "lg:hidden",
+    xl: "xl:hidden",
+    '2xl': "2xl:hidden",
+    '3xl': "3xl:hidden",  // Full HD+ / Gaming monitors
+    '4xl': "4xl:hidden",  // 1440p / QHD monitors  
+    '5xl': "5xl:hidden",  // 4K / UHD monitors
+    '6xl': "6xl:hidden",  // 5K / Ultra-wide monitors
+    '7xl': "7xl:hidden",  // 8K displays (future-proofing)
+}
+export const APP_BAR_DEFAULT_RESPONSIVE_CONFIG: IAppBarResponsiveConfig = {
     breakpoints: [
         // === ULTRA-LARGE DISPLAYS (8 actions max) ===
         {

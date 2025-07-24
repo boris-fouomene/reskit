@@ -94,7 +94,7 @@ function AppBar<Context = unknown>({
       context={{ ...Object.assign({}, context), appBarVariant: Object.assign({}, variant) }}
       {...actionsProps}
       actions={actions}
-      className={cn("resk-app-bar-actions", computedVariant.actions(), actionsProps?.className, actionsClassName)}
+      className={cn("resk-appbar-actions", computedVariant.actions(), actionsProps?.className, actionsClassName)}
       maxVisibleActions={isNumber(maxVisibleActions) && maxVisibleActions > 0 ? maxVisibleActions : actionsProps?.maxVisibleActions}
       onAppBarActionClassName={cn(computedVariant.actionOnAppBar(), actionsProps?.onAppBarActionClassName)}
       onMenuActionClassNamee={cn(computedVariant.actionOnMenu(), actionsProps?.onMenuActionClassNamee)}
@@ -123,7 +123,7 @@ AppBar.Action.displayName = 'AppBar.Action';
 AppBar.BackAction.displayName = 'AppBar.BackAction';
 (AppBar.ExpandableAction as any).displayName = 'AppBar.ExpandableAction';
 
-export { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from './Actions/utils';
+export { APP_BAR_DEFAULT_RESPONSIVE_CONFIG } from './Actions/utils';
 
 export { AppBar };
 

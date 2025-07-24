@@ -801,7 +801,7 @@ export interface IAppBarActionsProps<Context = unknown> {
     /** 
      * Responsive configuration for action display breakpoints.
      * Defines how many actions to show at different viewport widths.
-     * Uses DEFAULT_APPBAR_RESPONSIVE_CONFIG if not provided.
+     * Uses APP_BAR_DEFAULT_RESPONSIVE_CONFIG if not provided.
      * 
      * @example
      * ```tsx
@@ -947,20 +947,6 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     context?: IAppBarContext<Context>;
-
-    // Platform-specific Configuration
-    /** 
-     * Fallback element displayed during hydration process (Next.js SSR).
-     * Prevents hydration mismatches between server and client rendering.
-     * Typically a loading indicator or placeholder.
-     * 
-     * @example
-     * ```tsx
-     * hydrationFallback: <div className="h-10 w-24 bg-gray-200 animate-pulse" />
-     * hydrationFallback: <Skeleton width={100} height={40} />
-     * ```
-     */
-    hydrationFallback?: ReactNode;
 
     /** 
      * Custom overflow menu configuration.
@@ -1392,25 +1378,6 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     onMenuClassName?: string;
-
-    /**
-     * Group identifier for related actions.
-     * Actions within the same group are shown/hidden together as a unit.
-     * Useful for maintaining logical groupings of related functionality.
-     * 
-     * @example
-     * ```tsx
-     * // File operations group
-     * group: 'file-operations'
-     * 
-     * // User management group  
-     * group: 'user-management'
-     * 
-     * // All actions in 'editing' group hide/show together
-     * group: 'editing'
-     * ```
-     */
-    group?: string;
 
     /**
      * Accessibility configuration for the action.

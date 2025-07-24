@@ -4,7 +4,7 @@ import {
     IAppBarActionProps,
     IAppBarActionsProps,
 } from "../types";
-import { DEFAULT_APPBAR_RESPONSIVE_CONFIG } from "./utils";
+import { APP_BAR_DEFAULT_RESPONSIVE_CONFIG } from "./utils";
 import { calculateMaxVisibleActions, sortActionsByPriority } from "./utils";
 import { IReactNullableElement } from "@src/types";
 import { isNumber, isObj } from "@resk/core/utils";
@@ -21,14 +21,13 @@ export function AppBarClientActions<Context = unknown>({
     className,
     renderAction,
     renderExpandableAction,
-    hydrationFallback,
     testID,
     onAppBarActionClassName,
     onMenuActionClassNamee,
     actions: items,
     viewportWidth,
     maxVisibleActions,
-    responsiveConfig = DEFAULT_APPBAR_RESPONSIVE_CONFIG,
+    responsiveConfig = APP_BAR_DEFAULT_RESPONSIVE_CONFIG,
     menuProps,
     enableVirtualization = false,
     accessibilityLabel,
@@ -67,7 +66,7 @@ export function AppBarClientActions<Context = unknown>({
     const calculatedMaxActions = useMemo(() => {
         const baseMaxActions = isNumber(maxVisibleActions) && maxVisibleActions > 0
             ? Math.trunc(maxVisibleActions)
-            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
+            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig.breakpoints, responsiveConfig.defaultMaxActions);
 
         const totalActions = processedActions.length;
 
@@ -114,7 +113,7 @@ export function AppBarClientActions<Context = unknown>({
         const totalActions = processedActions.length;
         const baseMaxActions = isNumber(maxVisibleActions) && maxVisibleActions > 0
             ? Math.trunc(maxVisibleActions)
-            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig);
+            : calculateMaxVisibleActions(effectiveViewportWidth, responsiveConfig.breakpoints, responsiveConfig.defaultMaxActions);
 
         // SMART OVERFLOW DETECTION: Only apply priority sorting when it makes sense
         // We need overflow if we exceed space AND it would result in more than 1 menu item

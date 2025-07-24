@@ -1,10 +1,8 @@
 import { IAppBarActionsProps } from "../types";
-import { AppBarClientActions } from "./ClientActions";
+import { AppBarServerActions } from "./ServerActions";
 
 export function AppBarActions<Context = unknown>(props: IAppBarActionsProps<Context>) {
-    return <>
-        <AppBarClientActions {...props} />
-    </>
+    return <AppBarServerActions {...props} />;
 }
 
-
+AppBarActions.displayName = "AppBar.Actions";

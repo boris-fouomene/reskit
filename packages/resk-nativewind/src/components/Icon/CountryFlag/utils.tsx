@@ -1,5 +1,5 @@
 import { defaultStr, isNonNullString } from "@resk/core/utils";
-import Platform from "@platform";
+import { Platform } from "@platform";
 
 /**
  * Converts a two-letter country code to its corresponding flag emoji using Unicode regional indicators.

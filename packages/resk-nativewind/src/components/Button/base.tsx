@@ -14,7 +14,7 @@ import { commonVariant } from "@variants/common";
 import { GestureResponderEvent } from "react-native";
 import { Auth } from '@resk/core/auth';
 import { RippleContent } from "./RippleContent";
-import Platform from "@platform";
+import { Platform } from "@platform";
 
 
 export function Button<Context = unknown>({

@@ -1,6 +1,6 @@
-import { Platform } from "react-native";
-import { isRTL } from "@utils/i18nManager";
+import { Platform } from "@platform/index";
 
+const isRTL = Platform.isRTL();
 const isIos = Platform.OS === 'ios';
 
 export const FONT_ICONS = {

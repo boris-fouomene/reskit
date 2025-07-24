@@ -1,5 +1,5 @@
 import { Platform as ReskPlatform } from "@resk/core/platform";
-import { Dimensions, Platform, StatusBar } from 'react-native';
+import { Dimensions, Platform, StatusBar, I18nManager } from 'react-native';
 import { isNextJs } from "./isNext";
 /**
  * Determines if the current environment is a development environment.
@@ -264,4 +264,37 @@ function getBottomSpace() {
     return isIphoneX() ? 34 : 0;
 }
 
-export default { ...ReskPlatform, ...Platform, isNextJs, isIphoneX, iphoneX, getStatusBarHeight, getBottomSpace, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+
+
+/**
+ * Checks if the current layout is Right-to-Left (RTL).
+ *
+ * This is determined by accessing the `isRTL` constant from React Native's `I18nManager`.
+ * It's useful for applying styles or logic specific to RTL languages like Arabic or Hebrew.
+ *
+ * @returns {boolean} `true` if the layout is RTL, `false` otherwise.
+ *
+ * @example
+ * ```tsx
+ * import { View, Text, StyleSheet } from 'react-native';
+ * import { Platform } from '@resk/nativewind/platform';
+ *
+ * const MyComponent = () => {
+ *   const textAlign = Platform.isRTL() ? 'right' : 'left';
+ *
+ *   return (
+ *     <View>
+ *       <Text style={{ textAlign }}>
+ *         This text will align based on the language direction.
+ *       </Text>
+ *     </View>
+ *   );
+ * };
+ * ```
+ * @see https://reactnative.dev/docs/i18nmanager
+ */
+const isRTL = () => !!I18nManager?.getConstants()?.isRTL;
+
+const ExortedPL = { ...ReskPlatform, ...Platform, isRTL, isNextJs, isIphoneX, iphoneX, getStatusBarHeight, getBottomSpace, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+
+export { ExortedPL as Platform };

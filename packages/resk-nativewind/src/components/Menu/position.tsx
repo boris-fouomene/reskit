@@ -4,7 +4,7 @@ import { IMenuCalculatedPosition, IMenuPosition, IUseMenuPositionProps } from ".
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { useDimensions } from "@utils/dimensions/hooks";
-import Platform from "@platform";
+import { Platform } from "@platform";
 import { IPercentage } from "@resk/core/types";
 
 const MENU_MIN_WIDTH = 120;

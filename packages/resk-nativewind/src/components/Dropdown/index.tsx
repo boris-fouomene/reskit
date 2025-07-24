@@ -11,7 +11,7 @@ import { IClassName, IReactNullableElement } from "@src/types";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
-import Platform from "@platform";
+import { Platform } from "@platform";
 import FontIcon from "@components/Icon/Font";
 import { FONT_ICONS } from '../Icon/Font/icons';
 import { Div } from "@html/Div";
@@ -71,14 +71,14 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple = u
             return getItemLabel(opts);
         }
         const { item } = opts;
-        if (item && isObj<ItemType>(item)) {
+        if (isObj(item)) {
             if (isNonNullString(this.props.itemLabelField)) {
-                const l = (item)[this.props.itemLabelField];
+                const l = (item as any)[this.props.itemLabelField];
                 if (!isEmpty(l)) {
                     return stringify(l, { escapeString: false });
                 }
             }
-            const { label } = (item);
+            const { label } = (item as any);
             if (isReactNode(label)) {
                 return label;
             }
@@ -101,14 +101,14 @@ export class Dropdown<ItemType = unknown, ValueType = unknown, AllowMultiple = u
             return getItemValue(opts);
         }
         const { item, index } = opts;
-        if (item && isObj<ItemType>(item)) {
+        if (isObj<ItemType>(item)) {
             if (isNonNullString(this.props.itemValueField)) {
-                const v = (item)[this.props.itemValueField];
+                const v = (item as any)[this.props.itemValueField];
                 if (!isEmpty(v)) {
                     return v as ValueType;
                 }
             }
-            const { value } = (item);
+            const { value } = (item as any);
             if (!isEmpty(value)) {
                 return value;
             }

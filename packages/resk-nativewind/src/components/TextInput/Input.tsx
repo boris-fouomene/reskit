@@ -9,7 +9,6 @@ import { ICountryCode } from "@resk/core/countries";
 import { isNumber, isNonNullString, isStringNumber, isEmpty, defaultStr, defaultBool, DateHelper } from "@resk/core/utils";
 import FontIcon from "@components/Icon/Font";
 import { ITextInputCallOptions, ITextInputProps, ITextInputRenderOptions, ITextInputType } from "./types";
-import p from "@platform";
 import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 import { textInputVariant } from "@variants/textInput";
@@ -17,9 +16,10 @@ import { commonVariant } from "@variants/common";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
 import { classes } from "@variants/classes";
+import { Platform } from "@platform";
 
 
-const isNative = p.isNative();
+const isNative = Platform.isNative();
 
 /**
  * Universal, highly-configurable TextInput component for React Native and web.

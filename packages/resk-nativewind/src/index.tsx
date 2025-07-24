@@ -1,5 +1,5 @@
 export * from "./i18n";
-export { default as Platform } from "./platform";
+export { Platform } from "./platform";
 export * from "./utils";
 export * from "./types";
 export * from "./components";

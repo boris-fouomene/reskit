@@ -1,6 +1,6 @@
 import { KeyboardAvoidingView as RNKeyboardAvoidingView, StyleSheet } from 'react-native';
 import { IKeyboardAvoidingViewProps } from './types';
-import Platform from '@platform';
+import { Platform } from '@platform';
 import { normalizeNativeProps } from '@html/utils';
 
 export * from "./types";

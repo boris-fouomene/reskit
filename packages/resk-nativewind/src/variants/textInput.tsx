@@ -2,7 +2,7 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsOptionsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import "@resk/core/utils";
-import Platform from "@platform";
+import { Platform } from "@platform";
 
 const isWeb = Platform.isWeb();
 

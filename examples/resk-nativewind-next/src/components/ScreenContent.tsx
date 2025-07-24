@@ -169,7 +169,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </Div>
       <Div className="p-5">
         <Heading level={2}>ActivityIndicator, on surface with padding</Heading>
-        <Surface variant={{ padding: "100px", borderStyle: "none", rounded: "rounded" }}>
+        <Surface variant={{ padding: "50px", borderStyle: "none", rounded: "rounded" }}>
           <HStack className="p-5 !gap-x-10">
             <ActivityIndicator variant={{ color: "primary" }} />
             <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />

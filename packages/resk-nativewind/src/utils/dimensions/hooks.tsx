@@ -68,11 +68,14 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
     const heightThreshold = isNumber(options.heightThreshold) ? options.heightThreshold : 0;
     const debounceTimeout = isNumber(options.debounceTimeout) ? options.debounceTimeout : 0;
     const ignoreKeyboard = options.ignoreKeyboard !== false;
-    const isHydrated = getInitialHydrationStatus();
+    const w = Dimensions.get("window);
+    const s = Dimensions.get("screen");
+    const initialized = isNumber(w?.width) && isNumber(w?.height);
+    const isHydrated = initialized || getInitialHydrationStatus();
     const keyboard = useKeyboard();
     const [state, setState] = useStateCallback<{ window: ScaledSize, screen: ScaledSize, isHydrated: boolean }>({
-        window: isHydrated ? Dimensions.get('window') : scaleSized,
-        screen: isHydrated ? Dimensions.get('screen') : scaleSized,
+        window: isHydrated ? w : scaleSized,
+        screen: isHydrated ? s : scaleSized,
         isHydrated,
     }
     );

@@ -77,8 +77,7 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
         window: isHydrated ? w : scaleSized,
         screen: isHydrated ? s : scaleSized,
         isHydrated,
-    }
-    );
+    });
     const previousDimensions = useRef(state);
     const debounceTimer = useRef<NodeJS.Timeout | null>(null);
     const optionsRef = useRef<Required<Omit<IUseDimensionsOptons, "breakpoints">>>(options as any);

@@ -68,7 +68,7 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
     const heightThreshold = isNumber(options.heightThreshold) ? options.heightThreshold : 0;
     const debounceTimeout = isNumber(options.debounceTimeout) ? options.debounceTimeout : 0;
     const ignoreKeyboard = options.ignoreKeyboard !== false;
-    const w = Dimensions.get("window);
+    const w = Dimensions.get("window");
     const s = Dimensions.get("screen");
     const initialized = isNumber(w?.width) && isNumber(w?.height);
     const isHydrated = initialized || getInitialHydrationStatus();

@@ -1,10 +1,10 @@
 import { isDOMElement } from '@utils/dom';
-import { extendObj, isPlainObj } from '../object';
+import { extendObj, isObj } from '../object';
 
 describe('extendObj function', () => {
-    test('should test isPlainObj on an empty object', () => {
+    test('should test isObj on an empty object', () => {
         const obj = {};
-        expect(isPlainObj(obj)).toBe(true);
+        expect(isObj(obj)).toBe(true);
     });
     // Test 1: Basic shallow extend
     test('should perform basic shallow extend', () => {
@@ -198,7 +198,7 @@ describe('extendObj function', () => {
     test('should preserve non-plain object properties', () => {
         const dom = typeof document !== 'undefined' ? document.createElement('div') : {};
         const result = extendObj({}, { el: dom });
-        expect(isPlainObj(result.el)).toBe(true);
+        expect(isObj(result.el)).toBe(true);
     });
 
     // Test 20: Preserve non-enumerable properties

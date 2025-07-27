@@ -1,30 +1,30 @@
 import "../index";
-import { isPlainObj, cloneObject, isObj, objectSize, defaultObj, extendObj, flattenObject, isIterableStructure } from '../object';
+import { isObj, cloneObject, objectSize, defaultObj, extendObj, flattenObject, isIterableStructure } from '../object';
 
-describe('isPlainObj', () => {
+describe('isObj', () => {
     it('should return false for a string', () => {
-        expect(isPlainObj("hello")).toBe(false);
+        expect(isObj("hello")).toBe(false);
     });
 
     it('should return true for a plain object', () => {
-        expect(isPlainObj({ a: true })).toBe(true);
+        expect(isObj({ a: true })).toBe(true);
     });
 
     it('should return false for a function', () => {
-        expect(isPlainObj(() => true)).toBe(false);
+        expect(isObj(() => true)).toBe(false);
     });
 
     it('should return false for an array', () => {
-        expect(isPlainObj([1, 2, 3])).toBe(false);
+        expect(isObj([1, 2, 3])).toBe(false);
     });
 
     it('should return false for a Date object', () => {
-        expect(isPlainObj(new Date())).toBe(false);
+        expect(isObj(new Date())).toBe(false);
     });
 
     it('should return true for a plain object created using Object.create', () => {
         const obj = Object.create(null);
-        expect(isPlainObj(obj)).toBe(true);
+        expect(isObj(obj)).toBe(true);
     });
 });
 

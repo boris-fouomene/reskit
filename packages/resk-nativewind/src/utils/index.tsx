@@ -20,6 +20,7 @@ export * from "./useHydrationStatus";
 export * from "./elevations-styles";
 export * from "./textClasses";
 export * from "./animations";
+export * from "./hooks/useSafeId";
 /***
     vérifie si la variable node est un élément reactNode
 */

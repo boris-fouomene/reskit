@@ -14,7 +14,6 @@ export function BasicAppBarExample() {
         {
             id: 'save',
             label: 'Save',
-            visibilityPriority: 100,
             alwaysVisible: true,
             onPress: () => console.log('Save pressed'),
             accessibility: {
@@ -25,26 +24,21 @@ export function BasicAppBarExample() {
         {
             id: 'share',
             label: 'Share',
-            visibilityPriority: 100,
             onPress: () => console.log('Share pressed'),
-            minViewportWidth: 480 // Only show on viewports >= 480px
         },
         {
             id: 'export',
             label: 'Export',
-            visibilityPriority: 20,
             onPress: () => console.log('Export pressed'),
         },
         {
             id: 'print',
             label: 'Print',
-            visibilityPriority: 10,
             onPress: () => console.log('Print pressed'),
         },
         {
             id: 'help',
             label: 'Help',
-            visibilityPriority: 15,
             onPress: () => console.log('Help pressed')
         }
     ];
@@ -66,14 +60,12 @@ export function DrawerAppBarExample() {
         {
             id: 'close',
             label: 'Close',
-            visibilityPriority: 100,
             alwaysVisible: true,
             onPress: () => console.log('Close drawer')
         },
         {
             id: 'settings',
             label: 'Settings',
-            visibilityPriority: 100,
             onPress: () => console.log('Settings pressed')
         }
     ];
@@ -99,7 +91,6 @@ export function MobileAppBarExample() {
         {
             id: 'search',
             label: 'Search',
-            visibilityPriority: 100,
             onPress: () => console.log('Search pressed'),
             accessibility: {
                 label: 'Search content',
@@ -109,13 +100,11 @@ export function MobileAppBarExample() {
         {
             id: 'filter',
             label: 'Filter',
-            visibilityPriority: 20,
             onPress: () => console.log('Filter pressed')
         },
         {
             id: 'sort',
             label: 'Sort',
-            visibilityPriority: 10,
             onPress: () => console.log('Sort pressed')
         }
     ];
@@ -125,7 +114,6 @@ export function MobileAppBarExample() {
             title="Items"
             actions={actions}
             actionsProps={{
-                enableVirtualization: true,
                 accessibilityLabel: "Item management actions"
             }}
         />
@@ -147,25 +135,21 @@ export function CustomResponsiveAppBarExample() {
         {
             id: 'edit',
             label: 'Edit',
-            visibilityPriority: 100,
             onPress: () => console.log('Edit pressed')
         },
         {
             id: 'duplicate',
             label: 'Duplicate',
-            visibilityPriority: 20,
             onPress: () => console.log('Duplicate pressed')
         },
         {
             id: 'archive',
             label: 'Archive',
-            visibilityPriority: 10,
             onPress: () => console.log('Archive pressed')
         },
         {
             id: 'delete',
             label: 'Delete',
-            visibilityPriority: 10,
             onPress: () => console.log('Delete pressed')
         }
     ];
@@ -189,41 +173,33 @@ export function GroupedActionsAppBarExample() {
         {
             id: 'undo',
             label: 'Undo',
-            visibilityPriority: 100,
             onPress: () => console.log('Undo pressed')
         },
         {
             id: 'redo',
             label: 'Redo',
-            visibilityPriority: 100,
             onPress: () => console.log('Redo pressed')
         },
         // Format group
         {
             id: 'bold',
             label: 'Bold',
-            visibilityPriority: 20,
             onPress: () => console.log('Bold pressed')
         },
         {
             id: 'italic',
             label: 'Italic',
-            visibilityPriority: 20,
             onPress: () => console.log('Italic pressed')
         },
         // View group
         {
             id: 'zoom-in',
             label: 'Zoom In',
-            visibilityPriority: 10,
-            minViewportWidth: 768,
             onPress: () => console.log('Zoom in pressed')
         },
         {
             id: 'zoom-out',
             label: 'Zoom Out',
-            visibilityPriority: 10,
-            minViewportWidth: 768,
             onPress: () => console.log('Zoom out pressed')
         }
     ];
@@ -343,31 +319,26 @@ function EnhancedVisibilityPriorityDemo() {
         {
             id: 'action1',
             label: 'First Action',
-            visibilityPriority: 50, // Normal priority
             onPress: () => console.log('Action 1')
         },
         {
             id: 'action2',
             label: 'High Priority Action',
-            visibilityPriority: 90, // High priority - should stay visible longer
             onPress: () => console.log('Action 2')
         },
         {
             id: 'action3',
             label: 'Low Priority Action',
-            visibilityPriority: 20, // Low priority - first to go to overflow menu
             onPress: () => console.log('Action 3')
         },
         {
             id: 'action4',
             label: 'Medium Priority Action',
-            visibilityPriority: 60, // Medium priority
             onPress: () => console.log('Action 4')
         },
         {
             id: 'action5',
             label: 'Another Low Priority',
-            visibilityPriority: 30, // Low priority
             onPress: () => console.log('Action 5')
         }
     ];
@@ -377,19 +348,16 @@ function EnhancedVisibilityPriorityDemo() {
         {
             id: 'action1',
             label: 'First Action',
-            visibilityPriority: 50,
             onPress: () => console.log('Action 1')
         },
         {
             id: 'action2',
             label: 'High Priority',
-            visibilityPriority: 90,
             onPress: () => console.log('Action 2')
         },
         {
             id: 'action3',
             label: 'Low Priority',
-            visibilityPriority: 20,
             onPress: () => console.log('Action 3')
         }
     ];

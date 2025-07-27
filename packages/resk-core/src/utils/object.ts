@@ -5,39 +5,115 @@ import isRegExp from "./isRegex";
 import { isDOMElement } from "./dom";
 
 /**
- * Checks if the given variable is a plain object.
- *
- * A plain object is defined as an object that is created by the Object constructor
- * or one that inherits from `Object.prototype`. This function will return false for
- * instances of classes, arrays, and other non-plain objects.
- *
- * @param {any} obj - The variable to check for being a plain object.
+ * Determines whether a value is a plain object (POJO - Plain Old JavaScript Object).
  * 
- * @returns {boolean} Returns true if the variable is a plain object, false otherwise.
- *
+ * A plain object is an object created by the Object constructor or one with a null prototype.
+ * This function performs comprehensive checks to distinguish plain objects from other object types
+ * like arrays, dates, DOM elements, regular expressions, class instances, and functions.
+ * It also handles cross-frame compatibility where objects might be created in different execution contexts.
+ * 
+ * @template T - The type of the value being checked
+ * @param {T} obj - The value to test for being a plain object
+ * 
+ * @returns {obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any)} 
+ * Type predicate that narrows the type to a plain object if the check passes, or never for non-object types
+ * 
  * @example
- * ```ts
- * // Example with a string
- * console.log(isPlainObj("hello")); // Outputs: false
- *
- * // Example with a plain object
- * console.log(isPlainObj({ a: true })); // Outputs: true
- *
- * // Example with a function
- * console.log(isPlainObj(() => true)); // Outputs: false
- *
- * // Example with an array
- * console.log(isPlainObj([1, 2, 3])); // Outputs: false
- *
- * // Example with a Date object
- * console.log(isPlainObj(new Date())); // Outputs: false
- *
- * // Example with a plain object created using Object.create
- * const obj = Object.create(null);
- * console.log(isPlainObj(obj)); // Outputs: true
+ * ```typescript
+ * // Basic plain object detection
+ * const plainObj = { name: "John", age: 30 };
+ * console.log(isObj(plainObj)); // true
+ * 
+ * // Object created with Object.create(null)
+ * const nullProtoObj = Object.create(null);
+ * nullProtoObj.prop = "value";
+ * console.log(isObj(nullProtoObj)); // true
+ * 
+ * // Arrays are not plain objects
+ * const array = [1, 2, 3];
+ * console.log(isObj(array)); // false
+ * 
+ * // Dates are not plain objects
+ * const date = new Date();
+ * console.log(isObj(date)); // false
+ * 
+ * // Regular expressions are not plain objects
+ * const regex = /pattern/;
+ * console.log(isObj(regex)); // false
+ * 
+ * // Class instances are not plain objects
+ * class MyClass {
+ *   constructor(public value: string) {}
+ * }
+ * const instance = new MyClass("test");
+ * console.log(isObj(instance)); // false
+ * 
+ * // Functions are not plain objects
+ * const func = () => {};
+ * console.log(isObj(func)); // false
+ * 
+ * // Primitives are not plain objects
+ * console.log(isObj("string")); // false
+ * console.log(isObj(42)); // false
+ * console.log(isObj(true)); // false
+ * console.log(isObj(null)); // false
+ * console.log(isObj(undefined)); // false
+ * 
+ * // DOM elements are not plain objects (in browser environment)
+ * const element = document.createElement('div');
+ * console.log(isObj(element)); // false
  * ```
+ * 
+ * @example
+ * ```typescript
+ * // Type narrowing with TypeScript
+ * function processValue<T>(value: T): void {
+ *   if (isObj(value)) {
+ *     // TypeScript now knows 'value' is a plain object
+ *     // Safe to access object properties
+ *     Object.keys(value).forEach(key => {
+ *       console.log(`${key}: ${value[key]}`);
+ *     });
+ *   } else {
+ *     // Handle non-object values
+ *     console.log("Not a plain object:", value);
+ *   }
+ * }
+ * 
+ * // Cross-frame compatibility example
+ * // Works even when objects are created in different iframes
+ * const iframe = document.createElement('iframe');
+ * document.body.appendChild(iframe);
+ * const iframeWindow = iframe.contentWindow;
+ * const crossFrameObj = new iframeWindow.Object();
+ * crossFrameObj.prop = "value";
+ * console.log(isObj(crossFrameObj)); // true (handles cross-frame objects)
+ * ```
+ * 
+ * @remarks
+ * This function is particularly useful for:
+ * - Object serialization/deserialization logic
+ * - Deep cloning or merging operations where you need to distinguish plain objects
+ * - API response validation where you expect plain data objects
+ * - Library functions that need to handle various object types differently
+ * - Cross-frame scenarios in browser environments
+ * 
+ * The function performs several layers of validation:
+ * 1. **Early rejection**: Filters out null, primitives, arrays, dates, regex, and DOM elements
+ * 2. **Null prototype check**: Accepts objects created with `Object.create(null)`
+ * 3. **Constructor validation**: Verifies the object's constructor is a function
+ * 4. **Standard Object check**: Accepts objects with `Object` as constructor
+ * 5. **Prototype chain validation**: Ensures the prototype chain is standard
+ * 6. **Cross-frame compatibility**: Handles objects from different execution contexts
+ * 
+ * @since 1.0.0
+ * @category Type Guards
+ * @see {@link cloneObject} - For cloning plain objects
+ * @see {@link extendObj} - For merging plain objects
+ * @see {@link defaultObj} - For providing default plain objects
  */
-export function isPlainObj<T = any>(obj: T): obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any) {
+export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any) {
+  // Early rejection for null, non-objects, and known non-plain object types
   if (obj === null || typeof obj !== 'object' || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
     return false;
   }
@@ -45,7 +121,7 @@ export function isPlainObj<T = any>(obj: T): obj is (T extends (Record<any, any>
   // Get the prototype of the value
   const proto = Object.getPrototypeOf(obj);
 
-  // Objects with null prototype are plain objects
+  // Objects with null prototype are plain objects (created via Object.create(null))
   if (proto === null) {
     return true;
   }
@@ -56,19 +132,25 @@ export function isPlainObj<T = any>(obj: T): obj is (T extends (Record<any, any>
   if (typeof Ctor !== 'function') {
     return false;
   }
-  // Check if it's the object constructor
+
+  // Check if it's the standard Object constructor
   if (Ctor === Object) {
     return true;
   }
+
   const protoCtor = Ctor.prototype;
   if (typeof protoCtor !== 'object') {
     return false;
   }
+
+  // Additional check for cross-frame compatibility
   if (protoCtor === Object.prototype) {
     return true;
   }
+
   // Test if proto has its own isPrototypeOf method
   // This is important to detect objects from iframes or different execution contexts
+  // where the Object constructor might be different but the object is still plain
   return typeof proto.hasOwnProperty === 'function' &&
     proto.hasOwnProperty('isPrototypeOf') &&
     typeof proto.isPrototypeOf === 'function';
@@ -120,7 +202,7 @@ export function cloneObject<T = any>(source: T): T {
       clone[i] = cloneObject(source[i]);
     }
     return clone as T;
-  } else if (isPlainObj(source) && source) {
+  } else if (isObj(source) && source) {
     const clone: IDict = {};
     for (var prop in source) {
       if (source.hasOwnProperty(prop)) {
@@ -133,7 +215,6 @@ export function cloneObject<T = any>(source: T): T {
   }
 };
 
-export const isObj = isPlainObj;
 
 /**
  * Calculates the size of an object or array.
@@ -495,7 +576,7 @@ declare global {
  */
 export function extendObj<T extends Record<string, any> = any>(target: any, ...sources: any[]): T {
   const isTargetArray = Array.isArray(target);
-  const isTargetObj = isPlainObj(target);
+  const isTargetObj = isObj(target);
   // Return if no target provided
   if (target == null || (!isTargetArray && !isTargetObj)) {
     target = {};
@@ -507,7 +588,7 @@ export function extendObj<T extends Record<string, any> = any>(target: any, ...s
     if (source == null) {
       continue;
     }
-    const isSourceObj = isPlainObj(source);
+    const isSourceObj = isObj(source);
     const isSourceArr = Array.isArray(source);
     //We only merge plain objects and arrays
     if (!isSourceObj && !isSourceArr) {
@@ -547,12 +628,12 @@ export function extendObj<T extends Record<string, any> = any>(target: any, ...s
           (target as any)[j] = srcValue;
         }
         continue;
-      } else if (!isPlainObj(targetValue)) {
+      } else if (!isObj(targetValue)) {
         (target as any)[j] = srcValue;
         continue;
       }
       //here targetValue is a plain object
-      if (isSrcArr || !isPlainObj(srcValue)) {
+      if (isSrcArr || !isObj(srcValue)) {
         (target as any)[j] = srcValue;
         continue;
       }
@@ -571,7 +652,7 @@ const mergeTwoArray = (target: any[], source: any[]) => {
     const sourceK = source[k];
     if (k < sourceLength) {
       const isTkArray = Array.isArray(targetK), isSkArray = Array.isArray(sourceK);
-      const isTObj = isPlainObj(targetK), isSObj = isPlainObj(sourceK);
+      const isTObj = isObj(targetK), isSObj = isObj(sourceK);
       if ((isTkArray && isSkArray) || (isTObj && isSObj)) {
         target[indexCounter] = extendObj(isTkArray ? [] : {}, targetK, sourceK);
         indexCounter++;

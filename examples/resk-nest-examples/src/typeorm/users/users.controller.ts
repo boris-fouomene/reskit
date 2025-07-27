@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { ParseRequest, ResourceInterceptor, Permissions, ResourceController, ValidatorPipe } from '@resk/nest';
 import { User } from './entities/user.entity'
 import { CreateUserDto } from './dto/create-user.dto';
-import { IResourcePaginatedResult, IResourceQueryOptions } from '@resk/core';
+import { IResourcePaginatedResult, IResourceQueryOptions } from '@resk/core/resources';
 
 @Injectable()
 class UsersInterceptor extends ResourceInterceptor<UsersController> {
@@ -38,7 +38,7 @@ export class UsersController extends ResourceController<User, UsersService> {
   }
 }
 
-declare module "@resk/core" {
+declare module "@resk/core/resources" {
   interface IResources {
     users: UsersController;
   }

@@ -1,9 +1,9 @@
-import { ValidatorIsRequired, ValidatorIsEmail } from "@resk/core/validator";
+import { IsRequired, IsEmail } from "@resk/core/validator";
 
 export class CreateUserDto {
-    @ValidatorIsRequired
+    @IsRequired
     id?: number;
-    @ValidatorIsRequired
-    @ValidatorIsEmail
+    @IsRequired
+    @IsEmail
     name?: string;
 }

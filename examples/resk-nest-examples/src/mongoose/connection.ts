@@ -1,5 +1,7 @@
 import { MongooseResourceModule } from "@resk/nest";
 
-export const ConnectionModule = MongooseResourceModule.forRoot(
+import { DynamicModule } from "@nestjs/common";
+
+export const ConnectionModule: DynamicModule = MongooseResourceModule.forRoot(
     process.env.MONGO_URI || ""
 );

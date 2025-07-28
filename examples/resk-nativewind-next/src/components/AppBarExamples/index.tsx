@@ -5,7 +5,7 @@ import {
     IAppBarResponsiveConfig,
 } from '@resk/nativewind/components/appBar';
 import { H2 } from '@resk/nativewind/html';
-import { SSRAppBarExample } from './SSRAppBar1';
+import { SSRAppBarExample } from './SSRAppBar';
 
 
 

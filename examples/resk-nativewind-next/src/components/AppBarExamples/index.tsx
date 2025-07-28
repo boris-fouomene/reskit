@@ -5,6 +5,7 @@ import {
     IAppBarResponsiveConfig,
 } from '@resk/nativewind/components/appBar';
 import { H2 } from '@resk/nativewind/html';
+import { AppBarExample } from './SSRAppBar';
 
 
 
@@ -216,7 +217,8 @@ export function AppBarExamples() {
         <H2>
             App Bar examples
         </H2>
-        <BasicAppBarExample />
+        <AppBarExample />
+        {/* <BasicAppBarExample /> */}
         {/*  <AppBar
             title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
             subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"

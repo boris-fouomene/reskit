@@ -112,7 +112,7 @@ export function AppBarServerActions<Context = unknown>({
                         const v: IAppBarResponsiveConfig[keyof IAppBarResponsiveConfig] = (config as any)[bp];
                         if (!isNumber(v?.maxActions) || v.maxActions < 1) continue;
                         //menu anchor is considered as a action
-                        responsiveClasses.push(renderedActionIndex + 1 >= v.maxActions ? `${bp}:flex` : `${bp}:hidden`);
+                        responsiveClasses.push(renderedActionIndex >= v.maxActions - 1 ? `${bp}:flex` : `${bp}:hidden`);
                     }
                 }
             }

@@ -9,216 +9,12 @@ import { SSRAppBarExample } from './SSRAppBar';
 
 
 
-// Example 1: Basic AppBar with visibilityPriority-based actions
-export function BasicAppBarExample() {
-    const actions: IAppBarActionProps[] = [
-        {
-            id: 'save',
-            label: 'Save',
-            alwaysVisible: true,
-            onPress: () => console.log('Save pressed'),
-            accessibility: {
-                label: 'Save document',
-                hint: 'Saves the current document'
-            }
-        },
-        {
-            id: 'share',
-            label: 'Share',
-            onPress: () => console.log('Share pressed'),
-        },
-        {
-            id: 'export',
-            label: 'Export',
-            onPress: () => console.log('Export pressed'),
-        },
-        {
-            id: 'print',
-            label: 'Print',
-            onPress: () => console.log('Print pressed'),
-        },
-        {
-            id: 'help',
-            label: 'Help',
-            onPress: () => console.log('Help pressed')
-        }
-    ];
-
-    return (
-        <AppBar
-            title="My Document"
-            subtitle="Edited 5 minutes ago"
-            actions={actions}
-            onBackActionPress={() => console.log('Back pressed')}
-            actionsProps={{ responsiveConfig: createDesktopResponsiveConfig() }}
-        />
-    );
-}
-
-// Example 2: AppBar in a drawer context with constrained width
-export function DrawerAppBarExample() {
-    const actions: IAppBarActionProps[] = [
-        {
-            id: 'close',
-            label: 'Close',
-            alwaysVisible: true,
-            onPress: () => console.log('Close drawer')
-        },
-        {
-            id: 'settings',
-            label: 'Settings',
-            onPress: () => console.log('Settings pressed')
-        }
-    ];
-
-    return (
-        <AppBar
-            title="Navigation"
-            actions={actions}
-            actionsProps={{
-                viewportWidth: 350, // Drawer width
-                responsiveConfig: createConstrainedResponsiveConfig(),
-                overflowMenuAccessibilityLabel: "More navigation options"
-            }}
-        />
-    );
-}
-
-
-
-// Example 3: Mobile-optimized AppBar
-export function MobileAppBarExample() {
-    const actions: IAppBarActionProps[] = [
-        {
-            id: 'search',
-            label: 'Search',
-            onPress: () => console.log('Search pressed'),
-            accessibility: {
-                label: 'Search content',
-                hint: 'Opens search interface'
-            }
-        },
-        {
-            id: 'filter',
-            label: 'Filter',
-            onPress: () => console.log('Filter pressed')
-        },
-        {
-            id: 'sort',
-            label: 'Sort',
-            onPress: () => console.log('Sort pressed')
-        }
-    ];
-
-    return (
-        <AppBar
-            title="Items"
-            actions={actions}
-            actionsProps={{
-                accessibilityLabel: "Item management actions"
-            }}
-        />
-    );
-}
-
-// Example 4: Custom responsive configuration
-export function CustomResponsiveAppBarExample() {
-    const customConfig = {
-        breakpoints: [
-            { width: 1000, maxActions: 5 },
-            { width: 600, maxActions: 3 },
-            { width: 400, maxActions: 2 }
-        ],
-        defaultMaxActions: 1
-    };
-
-    const actions: IAppBarActionProps[] = [
-        {
-            id: 'edit',
-            label: 'Edit',
-            onPress: () => console.log('Edit pressed')
-        },
-        {
-            id: 'duplicate',
-            label: 'Duplicate',
-            onPress: () => console.log('Duplicate pressed')
-        },
-        {
-            id: 'archive',
-            label: 'Archive',
-            onPress: () => console.log('Archive pressed')
-        },
-        {
-            id: 'delete',
-            label: 'Delete',
-            onPress: () => console.log('Delete pressed')
-        }
-    ];
-
-    return (
-        <AppBar
-            title="Custom Responsive"
-            subtitle="Breakpoints: 1000px, 600px, 400px"
-            actions={actions}
-            actionsProps={{
-                responsiveConfig: customConfig,
-            }}
-        />
-    );
-}
-
-// Example 5: AppBar with grouped actions
-export function GroupedActionsAppBarExample() {
-    const actions: IAppBarActionProps[] = [
-        // Edit group
-        {
-            id: 'undo',
-            label: 'Undo',
-            onPress: () => console.log('Undo pressed')
-        },
-        {
-            id: 'redo',
-            label: 'Redo',
-            onPress: () => console.log('Redo pressed')
-        },
-        // Format group
-        {
-            id: 'bold',
-            label: 'Bold',
-            onPress: () => console.log('Bold pressed')
-        },
-        {
-            id: 'italic',
-            label: 'Italic',
-            onPress: () => console.log('Italic pressed')
-        },
-        // View group
-        {
-            id: 'zoom-in',
-            label: 'Zoom In',
-            onPress: () => console.log('Zoom in pressed')
-        },
-        {
-            id: 'zoom-out',
-            label: 'Zoom Out',
-            onPress: () => console.log('Zoom out pressed')
-        }
-    ];
-
-    return (
-        <AppBar
-            title="Text Editor"
-            actions={actions}
-        />
-    );
-}
 export function AppBarExamples() {
     return <>
         <H2>
             App Bar examples
         </H2>
-        <SSRAppBarExample />
-        {/* <BasicAppBarExample /> */}
+        <BasicAppBarExample />
         {/*  <AppBar
             title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
             subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
@@ -288,30 +84,186 @@ export function AppBarExamples() {
         /> */}
     </>
 }
+// Example 1: Basic AppBar with visibilityPriority-based actions
+export function BasicAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'save',
+            label: 'Save',
+            onPress: () => console.log('Save pressed'),
+        },
+        {
+            id: 'share',
+            label: 'Share',
+            onPress: () => console.log('Share pressed'),
+        },
+        {
+            id: 'export',
+            label: 'Export',
+            onPress: () => console.log('Export pressed'),
+        },
+        {
+            id: 'print',
+            label: 'Print',
+            onPress: () => console.log('Print pressed'),
+        },
+        {
+            id: 'help',
+            label: 'Help',
+            onPress: () => console.log('Help pressed')
+        }
+    ];
 
-function createConstrainedResponsiveConfig(): IAppBarResponsiveConfig {
-    return {
-        breakpoints: [
-            { width: 600, maxActions: 3 },
-            { width: 400, maxActions: 2 },
-            { width: 300, maxActions: 1 }
-        ],
-        defaultMaxActions: 1
-    };
+    return (
+        <AppBar
+            title="My Document"
+            subtitle="Edited 5 minutes ago"
+            actions={actions}
+            onBackActionPress={() => console.log('Back pressed')}
+        />
+    );
 }
 
-function createDesktopResponsiveConfig(): IAppBarResponsiveConfig {
-    return {
-        breakpoints: [
-            { width: 1400, maxActions: 10 },
-            { width: 1200, maxActions: 8 },
-            { width: 992, maxActions: 6 },
-            { width: 768, maxActions: 4 },
-            { width: 576, maxActions: 3 },
-            { width: 480, maxActions: 2 }
-        ],
-        defaultMaxActions: 3
-    };
+// Example 2: AppBar in a drawer context with constrained width
+export function DrawerAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'close',
+            label: 'Close',
+            alwaysVisible: true,
+            onPress: () => console.log('Close drawer')
+        },
+        {
+            id: 'settings',
+            label: 'Settings',
+            onPress: () => console.log('Settings pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Navigation"
+            actions={actions}
+            actionsProps={{
+                viewportWidth: 350, // Drawer width
+                overflowMenuAccessibilityLabel: "More navigation options"
+            }}
+        />
+    );
+}
+
+
+
+// Example 3: Mobile-optimized AppBar
+export function MobileAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'search',
+            label: 'Search',
+            onPress: () => console.log('Search pressed'),
+        },
+        {
+            id: 'filter',
+            label: 'Filter',
+            onPress: () => console.log('Filter pressed')
+        },
+        {
+            id: 'sort',
+            label: 'Sort',
+            onPress: () => console.log('Sort pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Items"
+            actions={actions}
+            actionsProps={{
+                accessibilityLabel: "Item management actions"
+            }}
+        />
+    );
+}
+
+// Example 4: Custom responsive configuration
+export function CustomResponsiveAppBarExample() {
+
+    const actions: IAppBarActionProps[] = [
+        {
+            id: 'edit',
+            label: 'Edit',
+            onPress: () => console.log('Edit pressed')
+        },
+        {
+            id: 'duplicate',
+            label: 'Duplicate',
+            onPress: () => console.log('Duplicate pressed')
+        },
+        {
+            id: 'archive',
+            label: 'Archive',
+            onPress: () => console.log('Archive pressed')
+        },
+        {
+            id: 'delete',
+            label: 'Delete',
+            onPress: () => console.log('Delete pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Custom Responsive"
+            subtitle="Breakpoints: 1000px, 600px, 400px"
+            actions={actions}
+        />
+    );
+}
+
+// Example 5: AppBar with grouped actions
+export function GroupedActionsAppBarExample() {
+    const actions: IAppBarActionProps[] = [
+        // Edit group
+        {
+            id: 'undo',
+            label: 'Undo',
+            onPress: () => console.log('Undo pressed')
+        },
+        {
+            id: 'redo',
+            label: 'Redo',
+            onPress: () => console.log('Redo pressed')
+        },
+        // Format group
+        {
+            id: 'bold',
+            label: 'Bold',
+            onPress: () => console.log('Bold pressed')
+        },
+        {
+            id: 'italic',
+            label: 'Italic',
+            onPress: () => console.log('Italic pressed')
+        },
+        // View group
+        {
+            id: 'zoom-in',
+            label: 'Zoom In',
+            onPress: () => console.log('Zoom in pressed')
+        },
+        {
+            id: 'zoom-out',
+            label: 'Zoom Out',
+            onPress: () => console.log('Zoom out pressed')
+        }
+    ];
+
+    return (
+        <AppBar
+            title="Text Editor"
+            actions={actions}
+        />
+    );
 }
 
 

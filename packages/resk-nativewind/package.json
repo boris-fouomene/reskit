@@ -146,6 +146,9 @@
       "types": [
         "./build/types/index.d.ts"
       ],
+      "build/*": [
+        "./build/*"
+      ],
       "*": [
         "./build/index.d.ts"
       ]

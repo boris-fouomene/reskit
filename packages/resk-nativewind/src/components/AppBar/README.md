@@ -373,7 +373,7 @@ const customResponsiveConfig = {
   actions={actions}
   actionsProps={{
     onAppBarActionClassName: "mx-1 hover:bg-gray-100 rounded-lg transition-colors",
-    onMenuActionClassNamee: "px-4 py-2 text-left hover:bg-primary/10"
+    onMenuActionClassName: "px-4 py-2 text-left hover:bg-primary/10"
   }}
   actionsClassName="gap-2 px-4 border-l border-gray-200"
 />

@@ -25,7 +25,7 @@ import { textDecorations } from "./textDecorations";
 import { responsiveWidth2height } from "./responsiveWidth2height";
 import { responsivesPadding } from "./responsivePadding";
 import { responsivesBorders } from "./responsivesBorders";
-
+import { displayVariantsOptios } from "./display";
 
 const allShadowColors = {
   shadowColor: VariantsColors.shadow,
@@ -44,7 +44,7 @@ const allVariantsOptions = {
   ...outlineClasses,
   ...allShadowColors,
   ...flexClasses,
-
+  ...displayVariantsOptios,
   borderColor: VariantsColors.borderColor,
   borderTopColor: VariantsColors.borderTopColor,
   borderBottomColor: VariantsColors.borderBottomColor,
@@ -382,6 +382,9 @@ export const VariantsOptionsFactory = {
   },
   createResponsivesBorder: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof responsivesBorders)[keyof typeof responsivesBorders], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof responsivesBorders, ResultType, CompositePrefix>(responsivesBorders, variantMutator, args[0] as CompositePrefix);
+  },
+  createAllDisplay: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantOptionMutator<(typeof displayVariantsOptios)[keyof typeof displayVariantsOptios], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof displayVariantsOptios, ResultType, CompositePrefix>(displayVariantsOptios, variantMutator, args[0] as CompositePrefix);
   },
 };
 

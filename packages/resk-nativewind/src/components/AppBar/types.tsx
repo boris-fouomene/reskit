@@ -1,100 +1,18 @@
 import { JSX, ReactNode } from "react";
 import { IFontIconName, IIconButtonProps } from "@components/Icon/types";
 import { INavItemProps, INavItems, INavItemsProps } from "@components/Nav/types";
-import { IClassName } from "@src/types";
+import { IClassName, INativewindBreakpoints } from "@src/types";
 import { ITextVariant } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
 import { appBarVariant, IAppBarVariant } from "@variants/appBar";
 import { IIconButtonVariant } from "@variants/iconButton";
 import { IMenuProps } from "@components/Menu/types";
 
-/**
- * Configuration for responsive action display breakpoints in the AppBar component.
- * 
- * This interface defines how the AppBar adapts its action visibility based on available
- * viewport width. The responsive system automatically hides lower-priority actions
- * in an overflow menu when screen space is limited, accounting for the menu button
- * itself taking up one action slot.
- * 
- * @interface IAppBarResponsiveConfig
- * @since 1.1.0
- * 
- * @example
- * ```tsx
- * // Custom responsive configuration
- * const customConfig: IAppBarResponsiveConfig = {
- *   breakpoints: [
- *     { width: 1200, maxActions: 6 }, // Desktop: show up to 6 actions
- *     { width: 768, maxActions: 4 },  // Tablet: show up to 4 actions
- *     { width: 480, maxActions: 2 },  // Mobile landscape: show 2 actions
- *     { width: 320, maxActions: 1 }   // Mobile portrait: show 1 action
- *   ],
- *   defaultMaxActions: 1 // Fallback for very small screens
- * };
- * 
- * <AppBar 
- *   actions={actions}
- *   actionsProps={{ responsiveConfig: customConfig }}
- * />
- * ```
- * 
- * @example
- * ```tsx
- * // Using with constrained contexts (drawer, modal)
- * const drawerConfig: IAppBarResponsiveConfig = {
- *   breakpoints: [
- *     { width: 400, maxActions: 3 },
- *     { width: 300, maxActions: 2 },
- *     { width: 200, maxActions: 1 }
- *   ],
- *   defaultMaxActions: 1
- * };
- * ```
- */
-export interface IAppBarResponsiveConfig {
-    /** 
-     * Array of breakpoints defining maximum visible actions at different viewport widths.
-     * Breakpoints are automatically sorted in descending order for optimal matching.
-     * Each breakpoint defines a minimum width threshold and corresponding action limit.
-     * The system accounts for the overflow menu button taking up one action slot.
-     * 
-     * @example
-     * ```tsx
-     * breakpoints: [
-     *   { width: 1024, maxActions: 5 }, // Large screens show 5 actions
-     *   { width: 768, maxActions: 3 },  // Medium screens show 3 actions
-     *   { width: 480, maxActions: 1 }   // Small screens show 1 action
-     * ]
-     * ```
-     */
-    breakpoints: {
-        /** 
-         * Minimum viewport width in pixels for this breakpoint to apply.
-         * Must be a positive number representing CSS pixels.
-         */
-        width: number;
-        /** 
-         * Maximum number of actions to display directly in the AppBar at this breakpoint.
-         * Additional actions are automatically moved to the overflow menu.
-         * Should be between 1-8 for optimal user experience (Miller's Rule).
-         * Note: The system reserves one slot for the overflow menu button when needed.
-         */
-        maxActions: number;
-    }[];
 
-    /** 
-     * Default maximum visible actions when viewport width is smaller than the smallest
-     * breakpoint or when viewport width cannot be determined.
-     * 
-     * @defaultValue 1
-     * @example
-     * ```tsx
-     * // Conservative default for unknown contexts
-     * defaultMaxActions: 1
-     * ```
-     */
-    defaultMaxActions: number;
-}
+export interface IAppBarResponsiveConfig extends Partial<Record<keyof INativewindBreakpoints, {
+    maxActions: number;
+    minWidth?: number;
+}>> { }
 
 /**
  * Content-related properties for the AppBar component.
@@ -374,7 +292,6 @@ export interface IAppBarNavigation<Context = unknown> {
      *     variant={computedAppBarVariant === "primary" ? "ghost" : "solid"}
      *     onPress={handleBackPress}
      *     leftIcon="chevron-left"
-     *     className={context.isConstrained ? "text-sm" : "text-md"}
      *   >
      *     {context.viewport?.width < 768 ? "Back" : "Go Back"}
      *   </Button>
@@ -449,7 +366,7 @@ export interface IAppBarNavigation<Context = unknown> {
  *     )
  *   ),
  *   right: ({ context }) => (
- *     <div className={context.isConstrained ? "text-xs" : "text-sm"}>
+ *     <div>
  *       <NotificationBell />
  *       <Settings />
  *     </div>
@@ -632,14 +549,13 @@ export interface IAppBarProps<Context = unknown> extends
      *     label: 'Save',
      *     fontIconName: 'save',
      *     onPress: handleSave,
-     *     visibilityPriority:100,
+     *     onMenuOrder: 1,
      *   },
      *   {
      *     id: 'share',
      *     label: 'Share',
      *     fontIconName: 'share',
      *     onPress: handleShare,
-     *     minViewportWidth: 768
      *   }
      * ]
      * ```
@@ -699,7 +615,7 @@ export interface IAppBarProps<Context = unknown> extends
  * 
  * This interface defines comprehensive configuration options for managing and displaying
  * actions within the AppBar. It includes responsive behavior, overflow handling, custom
- * rendering, performance optimizations, and accessibility features. The actions system
+ * rendering, and accessibility features. The actions system
  * automatically handles viewport-aware display with intelligent overflow menu management.
  * 
  * @template Context - Generic type parameter for extending context functionality
@@ -740,20 +656,6 @@ export interface IAppBarProps<Context = unknown> extends
  *   context: { user, permissions },
  *   accessibilityLabel: "User actions",
  *   overflowMenuAccessibilityLabel: "More user actions"
- * };
- * ```
- * 
- * @example
- * ```tsx
- * // Custom rendering with performance optimizations
- * const customActionsProps: IAppBarActionsProps = {
- *   actions: largeActionList,
- *   enableVirtualization: true,
- *   renderAction: (action, index) => (
- *     <CustomActionButton key={action.id} {...action} />
- *   ),
- *   onAppBarActionClassName: "custom-action-style",
- *   onMenuActionClassNamee: "custom-menu-item-style"
  * };
  * ```
  */
@@ -802,19 +704,6 @@ export interface IAppBarActionsProps<Context = unknown> {
      * Responsive configuration for action display breakpoints.
      * Defines how many actions to show at different viewport widths.
      * Uses APP_BAR_DEFAULT_RESPONSIVE_CONFIG if not provided.
-     * 
-     * @example
-     * ```tsx
-     * responsiveConfig: {
-     *   breakpoints: [
-     *     { width: 1200, maxActions: 6 },
-     *     { width: 768, maxActions: 4 },
-     *     { width: 480, maxActions: 2 },
-     *     { width: 320, maxActions: 1 }
-     *   ],
-     *   defaultMaxActions: 1
-     * }
-     * ```
      */
     responsiveConfig?: IAppBarResponsiveConfig;
 
@@ -831,7 +720,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      *     label: 'Save Document',
      *     fontIconName: 'save',
      *     onPress: handleSave,
-     *     visibilityPriority: 100, // High priority
+     *     onMenuOrder: 1,
      *     accessibility: { label: 'Save the current document' }
      *   },
      *   {
@@ -839,7 +728,6 @@ export interface IAppBarActionsProps<Context = unknown> {
      *     label: 'Share',
      *     fontIconName: 'share',
      *     onPress: handleShare,
-     *     minViewportWidth: 768,
      *     group: 'sharing'
      *   }
      * ]
@@ -882,11 +770,11 @@ export interface IAppBarActionsProps<Context = unknown> {
      * 
      * @example
      * ```tsx
-     * onMenuActionClassNamee: "px-4 py-2 text-left"
-     * onMenuActionClassNamee: "hover:bg-primary/10"
+     * onMenuActionClassName: "px-4 py-2 text-left"
+     * onMenuActionClassName: "hover:bg-primary/10"
      * ```
      */
-    onMenuActionClassNamee?: IClassName;
+    onMenuActionClassName?: IClassName;
 
     // Action Rendering
     /** 
@@ -941,8 +829,6 @@ export interface IAppBarActionsProps<Context = unknown> {
      * context: {
      *   appBarVariant: "primary",
      *   viewport: { width: 1024, height: 768 },
-     *   isConstrained: false,
-     *   performance: { enableVirtualization: true }
      * }
      * ```
      */
@@ -1019,19 +905,6 @@ export interface IAppBarActionsProps<Context = unknown> {
         anchor?: IMenuProps<IAppBarContext<Context>>["anchor"];
     };
 
-    // Performance and Accessibility
-    /** 
-     * Enable performance optimizations for large action lists.
-     * Implements virtual scrolling and lazy rendering for better performance.
-     * 
-     * @defaultValue false
-     * @example
-     * ```tsx
-     * enableVirtualization: true  // For 50+ actions
-     * ```
-     */
-    enableVirtualization?: boolean;
-
     /** 
      * Accessibility label for the entire actions container.
      * Used by screen readers to describe the actions area.
@@ -1061,7 +934,7 @@ export interface IAppBarActionsProps<Context = unknown> {
  * Context type for AppBar components with enhanced functionality.
  * 
  * This type extends the base context with AppBar-specific properties that provide
- * computed styles, viewport information, performance flags, and constraint details.
+ * computed styles, viewport information, and constraint details.
  * The context is passed to actions, render functions, and other AppBar components
  * to enable dynamic behavior and consistent styling.
  * 
@@ -1077,7 +950,6 @@ export interface IAppBarActionsProps<Context = unknown> {
  *   render: ({ context }) => (
  *     <ThemeToggle 
  *       variant={context.appBarVariant}
- *       size={context.isConstrained ? 'sm' : 'md'}
  *       user={context.user}
  *     />
  *   )
@@ -1106,8 +978,6 @@ export interface IAppBarActionsProps<Context = unknown> {
  *   id: 'notifications',
  *   render: ({ context }) => (
  *     <NotificationBell 
- *       enableVirtualization={context.performance?.enableVirtualization}
- *       memoized={context.performance?.enableMemoization}
  *     />
  *   )
  * };
@@ -1129,74 +999,6 @@ export type IAppBarContext<Context = unknown> = Context & {
      * ```
      */
     appBarVariant: IAppBarVariant;
-
-    /** 
-     * Current viewport dimensions for responsive behavior.
-     * Provides real-time viewport size information for dynamic layouts.
-     * May be undefined during initial render or SSR.
-     * 
-     * @example
-     * ```tsx
-     * // Responsive content based on viewport
-     * render: ({ context }) => (
-     *   <div>
-     *     {context.viewport?.width > 768 ? (
-     *       <FullSearchBar />
-     *     ) : (
-     *       <SearchIcon />
-     *     )}
-     *   </div>
-     * )
-     * ```
-     */
-    viewport?: {
-        /** Current viewport width in pixels */
-        width: number;
-        /** Current viewport height in pixels */
-        height: number;
-    };
-
-    /** 
-     * Indicates whether the AppBar is rendered in a constrained container.
-     * True for contexts like drawers, modals, or sidebars with limited space.
-     * Used to adjust spacing, sizing, and interaction patterns.
-     * 
-     * @example
-     * ```tsx
-     * // Adjust spacing in constrained contexts
-     * render: ({ context }) => (
-     *   <Button 
-     *     size={context.isConstrained ? 'sm' : 'md'}
-     *     className={context.isConstrained ? 'px-2' : 'px-4'}
-     *   >
-     *     Action
-     *   </Button>
-     * )
-     * ```
-     */
-    isConstrained?: boolean;
-
-    /** 
-     * Performance optimization flags and settings.
-     * Controls various performance features like virtualization and memoization.
-     * 
-     * @example
-     * ```tsx
-     * // Performance-aware component rendering
-     * render: ({ context }) => (
-     *   <ActionsList 
-     *     virtual={context.performance?.enableVirtualization}
-     *     memoize={context.performance?.enableMemoization}
-     *   />
-     * )
-     * ```
-     */
-    performance?: {
-        /** Whether virtual scrolling is enabled for large lists */
-        enableVirtualization: boolean;
-        /** Whether component memoization is enabled */
-        enableMemoization: boolean;
-    };
 }
 
 
@@ -1219,21 +1021,20 @@ export type IAppBarContext<Context = unknown> = Context & {
  * 
  * @example
  * ```tsx
- * // Basic action with visibility priority
+ * // Basic action with menu order
  * const saveAction: IAppBarActionProps = {
  *   id: 'save',
  *   label: 'Save',
  *   onPress: () => handleSave(),
- *   visibilityPriority: 90  // High visibility priority (stays visible longer)
+ *   onMenuOrder: 1  // First in overflow menu when moved
  * };
  * 
- * // Action with custom priority based on context
+ * // Action with custom order based on context
  * const contextualAction: IAppBarActionProps = {
  *   id: 'share',
  *   label: 'Share',
  *   onPress: handleShare,
- *   visibilityPriority: user.isPremium ? 80 : 30,  // Dynamic priority
- *   minViewportWidth: 768
+ *   onMenuOrder: user.isPremium ? 2 : 5,  // Dynamic order
  * };
  * 
  * // Critical action that's always visible
@@ -1247,65 +1048,65 @@ export type IAppBarContext<Context = unknown> = Context & {
  * 
  * @example
  * ```tsx
- * // Using predefined priority constants for consistency
- * const VISIBILITY_PRIORITIES = {
- *   CRITICAL: 100,
- *   HIGH: 75,
- *   NORMAL: 50,
- *   LOW: 25,
- *   OPTIONAL: 10
+ * // Using predefined order constants for consistency
+ * const MENU_ORDER = {
+ *   FIRST: 1,
+ *   SECOND: 2,
+ *   THIRD: 3,
+ *   FOURTH: 4,
+ *   FIFTH: 5
  * } as const;
  * 
  * const actions: IAppBarActionProps[] = [
- *   { id: 'save', label: 'Save', visibilityPriority: VISIBILITY_PRIORITIES.CRITICAL },
- *   { id: 'edit', label: 'Edit', visibilityPriority: VISIBILITY_PRIORITIES.HIGH },
- *   { id: 'export', label: 'Export', visibilityPriority: VISIBILITY_PRIORITIES.NORMAL },
- *   { id: 'archive', label: 'Archive', visibilityPriority: VISIBILITY_PRIORITIES.LOW }
+ *   { id: 'save', label: 'Save', onMenuOrder: MENU_ORDER.FIRST },
+ *   { id: 'edit', label: 'Edit', onMenuOrder: MENU_ORDER.SECOND },
+ *   { id: 'export', label: 'Export', onMenuOrder: MENU_ORDER.THIRD },
+ *   { id: 'archive', label: 'Archive', onMenuOrder: MENU_ORDER.FOURTH }
  * ];
  * ```
  */
 export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAppBarContext<Context>> {
     /** 
-     * Visibility priority level for responsive display management.
+     * Order position when the action is rendered in the overflow menu.
      * 
-     * Determines the order in which actions are hidden when viewport space is limited.
-     * Higher numbers mean higher priority - these actions stay visible longer as the 
-     * screen shrinks. Lower priority actions are moved to the overflow menu first.
+     * Determines the display order of actions within the overflow menu when they are
+     * moved from the AppBar due to space constraints. The order that actions are provided
+     * in the actions array represents their order on the AppBar. This prop specifically
+     * controls their arrangement in the overflow menu.
      * 
-     * **Recommended Priority Ranges:**
-     * - `90-100`: Critical actions (save, submit, emergency)
-     * - `70-89`: High priority actions (share, edit, delete, search)
-     * - `40-69`: Normal priority actions (export, print, copy, settings)
-     * - `20-39`: Low priority actions (archive, duplicate, rename)
-     * - `1-19`: Optional actions (debug, advanced options, metadata)
+     * **Order Values:**
+     * - `1`: First item in overflow menu
+     * - `2`: Second item in overflow menu  
+     * - `3`: Third item in overflow menu
+     * - And so on...
      * 
-     * @defaultValue 50 (normal priority)
+     * **Note:** Actions without an `onMenuOrder` will appear after ordered actions
+     * in their original array order.
+     * 
+     * @defaultValue Number.MAX_SAFE_INTEGER (appears at the end, maintaining array order)
      * 
      * @example
      * ```tsx
-     * // Critical action - always among the last to be hidden
-     * visibilityPriority: 95
+     * // Action that appears first in overflow menu
+     * onMenuOrder: 1
      * 
-     * // High priority - important but not critical
-     * visibilityPriority: 80
+     * // Action that appears second in overflow menu
+     * onMenuOrder: 2
      * 
-     * // Normal priority - standard action
-     * visibilityPriority: 50
+     * // Action that appears third in overflow menu
+     * onMenuOrder: 3
      * 
-     * // Low priority - first to move to overflow menu  
-     * visibilityPriority: 25
+     * // Dynamic order based on context
+     * onMenuOrder: user.isAdmin ? 1 : 5
      * 
-     * // Fine-grained custom priority
-     * visibilityPriority: 73  // Slightly higher than normal, lower than high
-     * 
-     * // Dynamic priority based on context
-     * visibilityPriority: user.isAdmin ? 85 : 40
+     * // No explicit order - uses array position at the end
+     * // onMenuOrder: undefined (defaults to Number.MAX_SAFE_INTEGER)
      * ```
      */
-    visibilityPriority?: number;
+    onMenuOrder?: number;
 
     /** 
-     * Whether this action should always be visible regardless of viewport constraints.
+     * Whether this action should always be visible on the AppBar regardless of viewport constraints.
      * When true, the action bypasses all responsive hiding and overflow menu behavior.
      * Use sparingly for critical actions only (emergency stops, primary save actions).
      * 
@@ -1313,7 +1114,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * 
      * @example
      * ```tsx
-     * // Emergency action that must always be visible
+     * // Emergency action that must always be visible on the AppBar
      * alwaysVisible: true
      * 
      * // Conditional always-visible based on context
@@ -1322,24 +1123,6 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      */
     alwaysVisible?: boolean;
 
-    /**
-     * Minimum viewport width (in pixels) required to show this action directly in the AppBar.
-     * Below this width, the action is automatically moved to the overflow menu regardless
-     * of its visibility priority. Useful for actions that need specific screen real estate.
-     * 
-     * @example
-     * ```tsx
-     * // Only show search bar on larger screens
-     * minViewportWidth: 768  // Hide on mobile, show on tablet+
-     * 
-     * // Show detailed actions only on desktop
-     * minViewportWidth: 1024  // Hide on mobile/tablet, show on desktop
-     * 
-     * // Context-aware minimum width
-     * minViewportWidth: isComplexAction ? 640 : 320
-     * ```
-     */
-    minViewportWidth?: number;
 
     /**
      * Custom CSS class names to apply when this action is rendered directly on the AppBar.
@@ -1378,38 +1161,6 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * ```
      */
     onMenuClassName?: string;
-
-    /**
-     * Accessibility configuration for the action.
-     * Provides enhanced accessibility support for screen readers and assistive technologies.
-     * 
-     * @example
-     * ```tsx
-     * accessibility: {
-     *   label: "Save the current document to disk",
-     *   hint: "Press to save your changes permanently", 
-     *   role: "button"
-     * }
-     * ```
-     */
-    accessibility?: {
-        /** 
-         * Detailed accessibility label for screen readers.
-         * Should describe what the action does in detail.
-         */
-        label?: string;
-        /** 
-         * Accessibility hint describing the action's behavior or outcome.
-         * Provides additional context for users with disabilities.
-         */
-        hint?: string;
-        /** 
-         * Accessibility role override for the action element.
-         * Defaults to appropriate role based on action type.
-         */
-        role?: string;
-    };
-
     /**
      * Controls whether this action can be rendered in the overflow menu.
      * 

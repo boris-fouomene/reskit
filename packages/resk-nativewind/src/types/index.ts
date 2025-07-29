@@ -7,6 +7,14 @@ export interface INativewindBaseProps {
   className?: IClassName;
   disabled?: PressableProps["disabled"];
 }
+export interface INativewindBreakpoints {
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  "2xl": number;
+}
+
 /**
   @interface
  * Defines a type that can represent either a Functional Component or a Class Component in React.
@@ -159,7 +167,6 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
  *  @see {@link https://reactnative.dev/docs/animated} for more information about Animated component styles.
  */
 export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
-
 
 export interface IOnChangeOptions<ValueType = unknown, OnChangeEventType = unknown | null> {
   event?: OnChangeEventType;

@@ -2,11 +2,8 @@
 import {
     AppBar,
     IAppBarActionProps,
-    IAppBarResponsiveConfig,
 } from '@resk/nativewind/components/appBar';
 import { H2 } from '@resk/nativewind/html';
-import { SSRAppBarExample } from './SSRAppBar';
-
 
 
 export function AppBarExamples() {
@@ -24,7 +21,7 @@ export function AppBarExamples() {
                 {label: "Shared"},            ]}
         />}
         <DrawerAppBarExample />
-        {/* <MobileAppBarExample />
+        <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
         <GroupedActionsAppBarExample />
         <EnhancedVisibilityPriorityDemo />
@@ -81,7 +78,7 @@ export function AppBarExamples() {
                     icon: 'help-circle'
                 }
             ]}
-        /> */}
+        />
     </>
 }
 // Example 1: Basic AppBar with visibilityPriority-based actions

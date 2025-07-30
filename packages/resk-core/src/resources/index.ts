@@ -1,4 +1,4 @@
-import { IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from "../types/resources";
+import { IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from "./types";
 import { getFields } from "./fields";
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, extendObj } from "../utils/index";
 import { ObservableClass, observableFactory } from "@/observable";
@@ -8,56 +8,18 @@ import { Auth } from "../auth";
 import { i18n } from "@/i18n";
 import { Scope, TranslateOptions } from "i18n-js";
 import { ResourcePaginationHelper } from "./ResourcePaginationHelper";
-import { IResourceActions } from "../types/resources";
+import { IResourceActions } from "./types";
 import { Logger } from "../logger";
 
 export * from "./ResourcePaginationHelper";
 export * from "./fields";
-export * from "../types/resources";
+export * from "./types";
 export * from "./decorators";
+export * from "./filters";
 
 const resourcesMetaDataKey = Symbol("resources");
 const resourcesClassNameMetaData = Symbol("resourceFromClassName");
 
-/**
- * Represents the base class for any resource.
- *
- * The `Resource` class provides a flexible structure for defining resource instances with optional metadata such as
- * `name`, `label`, `title`. Additionally, it manages dynamic fields associated with the resource.
- *
- * This class can be extended to implement specific resources, and it automatically handles merging metaData passed into
- * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
- *
- * @template DataType - The type of data the resource is expected to handle. By default, it accepts any type (`DataType=any`).
- * @template EventType - The type of event that the resource can emit. Defaults to `IResourceActionName`.
- *
- * @extends ObservableClass<EventType> - Extends the `ObservableClass` to enable event-based communication.
- *
- * @example
- * // Create a new resource with basic properties
- * const resource = new Resource({
- *    name: 'user',
- *    label: 'User',
- *    title: 'User Information'
- * });
- *
- * console.log(resource.getLabel()); // Output: 'User'
- * console.log(resource.getTitle()); // Output: 'User Information'
- * console.log(resource.getTooltip()); // Output: 'Contains user-related data'
- *
- * @example
- * // Create a resource with dynamic fields
- * const dynamicResource = new Resource({
- *    name: 'product',
- *    fields: {
- *      name: { type: 'string', label: 'Product Name' },
- *      price: { type: 'number', label: 'Product Price' }
- *    }
- * });
- *
- * console.log(dynamicResource.getFields());
- * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
- */
 export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
@@ -178,24 +140,12 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     Resource.events.trigger(event, Object.assign({}, this.getTranslateParams()), ...args);
     return this.trigger(event, ...args);
   }
-  /**
-   * Checks if the user has permission to perform the specified action.
-   * If the resource does not have a valid data provider, it rejects with an error.
-   * If the user does not have permission to perform the action, it rejects with an error message.
-   * Otherwise, it resolves with no value.
-   * @param actionPerm - A function that returns a boolean indicating whether the user has permission to perform the action.
-   * @param i18nActionKey - The key to use for translating the error message if the user does not have permission.
-   * @returns A promise that resolves if the user has permission, or rejects with an error if the user does not have permission or the data provider is invalid.
-   */
-  checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
+
+  checkPermissionAction(actionPerm: () => boolean): Promise<{ granted: boolean }> {
     if (!this.hasDataService()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
-    return Promise.resolve();
-    if (!actionPerm()) {
-      return Promise.reject(new Error(i18n.t(i18nActionKey, this.getTranslateParams())));
-    }
-    return Promise.resolve();
+    return Promise.resolve({ granted: true });
   }
   /***
    * Fetches all records from the resource.
@@ -203,7 +153,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   find(options?: IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserRead.bind(this)).then(() => {
       return this.getDataService()
         ?.find(options)
         .then((result) => {
@@ -218,7 +168,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserRead.bind(this)).then(() => {
       return this.getDataService()
         .findOne(options)
         .then((result) => {
@@ -329,7 +279,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
   create(record: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserCreate.bind(this)).then(() => {
       return this.beforeCreate(record).then(() => {
         return this.getDataService()
           .create(record)
@@ -349,7 +299,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns
    */
   update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError").then(async () => {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this)).then(async () => {
       return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
         return this.getDataService()
           ?.update(primaryKey, dataToUpdate)
@@ -368,7 +318,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
   delete(primaryKey: PrimaryKeyType) {
-    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserDelete.bind(this)).then(() => {
       return this.beforeDelete(primaryKey).then(() => {
         return this.getDataService()
           ?.delete(primaryKey)
@@ -388,7 +338,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
   findAndCount(options?: IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserRead.bind(this)).then(() => {
       return this.getDataService()
         .findAndCount(options)
         .then((result) => {
@@ -408,7 +358,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the create operation.
    */
   createMany(data: Partial<DataType>[]) {
-    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserCreate.bind(this)).then(() => {
       return this.beforeCreateMany(data).then(() => {
         return this.getDataService()
           .createMany(data)
@@ -428,7 +378,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the update operation.
    */
   updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this)).then(() => {
       return this.beforeUpdateMany(criteria, data).then(() => {
         return this.getDataService()
           .updateMany(criteria, data)
@@ -447,7 +397,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the delete operation.
    */
   deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
-    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserDelete.bind(this)).then(() => {
       return this.beforeDeleteMany(criteria).then(() => {
         return this.getDataService()
           .deleteMany(criteria)
@@ -466,7 +416,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
   count(options?: IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserRead.bind(this)).then(() => {
       return this.getDataService()
         .count(options)
         .then((result) => {
@@ -481,7 +431,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */
   exists(primaryKey: PrimaryKeyType): Promise<boolean> {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+    return this.checkPermissionAction(this.canUserRead.bind(this)).then(() => {
       return this.getDataService()
         .exists(primaryKey)
         .then((result) => {
@@ -751,7 +701,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   getFields(): Record<string, IField> {
     try {
       this.resolveTranslations();
-      this.fields = getFields(this);
+      this.fields = getFields(this) as Record<string, IField>;
       return this.fields;
     } catch (e) {
       Logger.log(e, " getting resources fieldss");

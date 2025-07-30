@@ -1,7 +1,6 @@
 export * from "./date";
 export * from "./dictionary";
 export * from "./i18n";
-export * from "./resources";
 export * from "./percentage";
 /**
  * @typedef IPrimitive
@@ -60,7 +59,7 @@ export * from "./merge";
   const exampleController = new ExampleControllerClass(exampleService);
  */
 export interface IClassConstructor<T = any, D extends any[] = any[]> extends Function {
-  new(...args: D): T;
+  new (...args: D): T;
 }
 
 /**

@@ -1,5 +1,5 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderByDirection } from "../types";
+import { IResourceData, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderByDirection } from "./types";
 import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import { isStringNumber } from "@utils/string";

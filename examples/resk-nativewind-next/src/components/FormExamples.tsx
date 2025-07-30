@@ -13,7 +13,7 @@ export function FormExamples() {
                     name: { label: "Nom", type: "text", required: true },
                     email: { type: "email", label: "Email" },
                     password: { type: "password", label: "Password" },
-                    checked: { type: "switch", checkedLabel: "Checked", uncheckedLabel: "unchecked", defaultValue: 1 }
+                    checked: { type: "switch", checkedLabel: "Checked", uncheckedLabel: "unchecked", defaultValue: 1, validationRules: ["Required"] }
                 }}
             >
                 <Form.FieldRenderer

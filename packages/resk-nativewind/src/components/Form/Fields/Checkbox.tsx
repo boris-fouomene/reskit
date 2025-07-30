@@ -1,7 +1,7 @@
 "use client";
 import { FormFieldSwitch } from "./Switch";
 import { Checkbox, ICheckboxProps } from "@components/Checkbox";
-import { IField } from "@resk/core/types";
+import { IField } from "@resk/core/resources";
 import { ReactElement } from "react";
 import { IFormFieldProps, AttachFormField } from "../base";
 @AttachFormField<"checkbox">("checkbox")

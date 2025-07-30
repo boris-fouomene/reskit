@@ -2,7 +2,7 @@ import { IClassName, IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEventData } from "react-native";
 import React, { ReactNode } from "react";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/inputFormatter";
-import { IFieldBase } from "@resk/core/types";
+import { IFieldBase } from "@resk/core/resources";
 import { ICountryCode } from "@resk/core/countries";
 import { ITextInputVariant } from "@variants/textInput";
 import { textInputVariant } from "@variants/textInput";

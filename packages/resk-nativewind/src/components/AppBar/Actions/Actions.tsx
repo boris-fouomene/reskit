@@ -33,13 +33,16 @@ export function AppBarServerActions<Context = unknown>({
     const actionOnMenuClx = cn("resk-app-bar-action-menu-item", onMenuActionClassName);
     const actionOnAppBarClx = cn("resk-app-bar-action", onAppBarActionClassName);
     const config = normalizeConfig(responsiveConfig);
+    const sanitizedConfig = stableHash(config);
 
     console.log(config, "is normlized config", responsiveConfig, " is respon config ", actions, " is actions", menuItems, " is menu items");
     const restProps = { ...props, context, renderAction, renderExpandableAction, testID };
-    const { actionsContent, menuItemsContent } = useMemo(() => {
+    const { actionsContent, menuItemsContent, hasMenu, menuAnchorclasses } = useMemo(() => {
         let renderedActionsCount = 0;
         const renderedAppBarActions: Record<string, number> = {};
         const menuItemsContent: IAppBarActionsProps<Context>[] = [];
+        const menuAnchorclasses: string[] = [];
+        let hasMenu = false;
         const activeMaxActions = isNumber(viewportWidth) && viewportWidth > 0 ? getActiveMaxActions(config, viewportWidth) : undefined;
         const actionsContent = renderActions<Context>({
             ...restProps,
@@ -106,13 +109,21 @@ export function AppBarServerActions<Context = unknown>({
                     //we have already rendered action on the app bar so we should hide it on menu
                     if (renderedActionIndex <= activeMaxActions) {
                         responsiveClasses.push("hidden");
+                    } else {
+                        hasMenu = true;
                     }
                 } else {
                     for (const bp in config) {
                         const v: IAppBarResponsiveConfig[keyof IAppBarResponsiveConfig] = (config as any)[bp];
                         if (!isNumber(v?.maxActions) || v.maxActions < 1) continue;
                         //menu anchor is considered as a action
-                        responsiveClasses.push(renderedActionIndex >= v.maxActions - 1 ? `${bp}:flex` : `${bp}:hidden`);
+                        const canDisplay = renderedActionIndex >= v.maxActions - 1;
+                        const classes = canDisplay ? `${bp}:flex` : `${bp}:hidden`;
+                        responsiveClasses.push(classes);
+                        menuAnchorclasses.push(classes);
+                        if (canDisplay) {
+                            hasMenu = true;
+                        }
                     }
                 }
             }
@@ -128,8 +139,8 @@ export function AppBarServerActions<Context = unknown>({
                 )
             })
         })
-        return { actionsContent, menuItemsContent };
-    }, [actions, menuItems, stableHash(renderExpandableAction), stableHash(config), stableHash(renderExpandableAction), testID, onAppBarActionClassName, onMenuActionClassName])
+        return { actionsContent, menuItemsContent, hasMenu, menuAnchorclasses };
+    }, [actions, menuItems, stableHash(renderExpandableAction), sanitizedConfig, stableHash(renderExpandableAction), testID, onAppBarActionClassName, onMenuActionClassName])
     return (
         <Div
             className={cn("appbar-actions flex flex-row items-center grow-0 justify-start overflow-hidden", className)}
@@ -139,13 +150,15 @@ export function AppBarServerActions<Context = unknown>({
             {actionsContent}
 
             {/* Render overflow menu if there are 2+ menu items */}
-            {menuItemsContent.length >= 2 && (
-                <AppBarMenu
-                    {...props}
-                    context={context}
-                    menuItems={menuItemsContent}
-                    testID={testID}
-                />
+            {menuItemsContent.length && hasMenu && (
+                <Div className={cn(menuAnchorclasses, "resk-appbar-menu-anchor-container")}>
+                    <AppBarMenu
+                        {...props}
+                        context={context}
+                        menuItems={menuItemsContent}
+                        testID={testID}
+                    />
+                </Div>
             )}
         </Div>
     );

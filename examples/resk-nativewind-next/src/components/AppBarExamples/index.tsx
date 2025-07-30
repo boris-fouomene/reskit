@@ -15,15 +15,15 @@ export function AppBarExamples() {
             App Bar examples
         </H2>
         <BasicAppBarExample />
-        {/*  <AppBar
+        {<AppBar
             title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
             subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
             actions={[
                 { label: "Settings" },
                 { label: "Profile" },
             ]}
-        /> */}
-        {/*         <DrawerAppBarExample />
+        />}
+        <DrawerAppBarExample />
         <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
         <GroupedActionsAppBarExample />
@@ -81,7 +81,7 @@ export function AppBarExamples() {
                     icon: 'help-circle'
                 }
             ]}
-        /> */}
+        />
     </>
 }
 // Example 1: Basic AppBar with visibilityPriority-based actions
@@ -142,7 +142,7 @@ export function DrawerAppBarExample() {
 
     return (
         <AppBar
-            title="Navigation"
+            title="Navigation viewportWidth:350"
             actions={actions}
             actionsProps={{
                 viewportWidth: 350, // Drawer width

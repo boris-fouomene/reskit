@@ -92,7 +92,7 @@ export const APP_BAR_DEFAULT_RESPONSIVE_CONFIG: IAppBarResponsiveConfig = {
     },
     md: {
         minWidth: 768,
-        maxActions: 2
+        maxActions: 3,
     },
     lg: {
         minWidth: 1024,

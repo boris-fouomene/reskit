@@ -939,6 +939,7 @@ export class Validator {
     target: T,
     data: Partial<Record<keyof InstanceType<T>, any>>,
     options?: {
+      context?: Context;
       errorMessageBuilder?: (
         translatedPropertyName: string,
         error: string,
@@ -960,10 +961,10 @@ export class Validator {
   ): Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }> {
     const targetRules = Validator.getTargetRules<T>(target);
     const messageSeparators = Validator.getErrorMessageSeparators();
-    options = extendObj({}, Validator.getValidateTargetOptions(target), options);
+    const { context, errorMessageBuilder, ...restOptions } = extendObj({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
 
-    const buildErrorMessage = typeof options?.errorMessageBuilder === "function" ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
+    const buildErrorMessage = typeof errorMessageBuilder === "function" ? errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
 
     const validationErrors: { fieldName: string; propertyName: string; message: string }[] = [];
     const validationPromises: Promise<any>[] = [];
@@ -976,7 +977,10 @@ export class Validator {
 
       validationPromises.push(
         Validator.validate<Context>({
+          context,
+          ...restOptions,
           value: data[propertyKey],
+          data,
           translatedPropertyName,
           fieldName: propertyKey,
           propertyName: propertyKey,

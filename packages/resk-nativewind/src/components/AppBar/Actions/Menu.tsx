@@ -13,8 +13,7 @@ export function AppBarMenu<Context = unknown>({ overflowMenuAccessibilityLabel, 
         anchorIconSize,
         ...restMenuProps
     } = Object.assign({}, menuProps);
-    return menuItems.length >= 2 ? (
-        <Menu
+    return <Menu
             preferredPositionAxis='vertical'
             testID={`${testID}-menu`}
             anchor={({ menu }) => {
@@ -42,7 +41,6 @@ export function AppBarMenu<Context = unknown>({ overflowMenuAccessibilityLabel, 
             containerClassName={cn("appbar-menu-container", restMenuProps.containerClassName)}
             className={cn("appbar-menu", restMenuProps.className)}
         />
-    ) : null
 }
 
 AppBarMenu.displayName = "AppBar.Menu";

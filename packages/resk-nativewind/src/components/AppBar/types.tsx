@@ -1083,7 +1083,7 @@ export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAp
      * **Note:** Actions without an `onMenuOrder` will appear after ordered actions
      * in their original array order.
      * 
-     * @defaultValue Number.MAX_SAFE_INTEGER (appears at the end, maintaining array order)
+     * @defaultValue menuItems.length (appears at the end, maintaining array order)
      * 
      * @example
      * ```tsx

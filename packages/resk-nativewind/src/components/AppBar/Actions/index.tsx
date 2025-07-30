@@ -9,7 +9,7 @@ import { IReactNullableElement } from "@src/types";
 import { AppBarMenu } from "./Menu";
 import { useMemo } from "./hook";
 import stableHash from "stable-hash";
-import { isNonNullString, isNumber } from "@resk/core/utils";
+import { isNonNullString, isNumber, typedEntries } from "@resk/core/utils";
 
 export function AppBarActions<Context = unknown>({
     context,
@@ -72,12 +72,14 @@ export function AppBarActions<Context = unknown>({
                         }
                     } else {
                         responsiveClasses.push('hidden');
-                        for (const bp in config) {
-                            const v: IAppBarResponsiveConfig[keyof IAppBarResponsiveConfig] = (config as any)[bp];
-                            if (!isNumber(v?.maxActions) || v.maxActions < 1) continue;
-                            //note : menu anchor is considered as a action
-                            responsiveClasses.push(totalRenderedActionsWithMenu < v.maxActions ? `${bp}:flex` : `${bp}:hidden`);
-                        }
+                        typedEntries(config).map(function(opt){
+                            if (!opt) return;
+                            const [bp, v] = opt;
+                            if(!v || !bp) return;
+                            const {maxActions} = v;
+                            if(!isNumber(maxActions) || maxActions < 1)return;
+                            responsiveClasses.push(totalRenderedActionsWithMenu < maxActions ? `${bp}:flex` : `${bp}:hidden`);
+                        })
                     }
                 }
                 const r = renderer({
@@ -114,20 +116,22 @@ export function AppBarActions<Context = unknown>({
                         hasMenu = true;
                     }
                 } else {
-                    for (const bp in config) {
-                        const v: IAppBarResponsiveConfig[keyof IAppBarResponsiveConfig] = (config as any)[bp];
-                        if (!isNumber(v?.maxActions) || v.maxActions < 1) continue;
-                        //menu anchor is considered as a action
-                        const canDisplay = actionIndex >= v.maxActions - 1;
-                        const clx = canDisplay ? `${bp}:flex` : `${bp}:hidden`;
+                    typedEntries(config).map(function(opt){
+                        if (!opt) return;
+                        const [bp, v] = opt;
+                        if(!v || !bp) return;
+                        const {maxActions} = v;
+                        if(!isNumber(maxActions) || maxActions < 1)return;
+                        const shouldDisplay = actionIndex+1 >= maxActions;
+                        const clx = shouldDisplay ? `${bp}:flex` : `${bp}:hidden`;
                         responsiveClasses.push(clx);
                         if(!shouldRenderMenu && !menuAnchorclasses.includes(clx)){
-                            menuAnchorclasses.push(clx);
+                           menuAnchorclasses.push(clx);
                         }
-                        if (canDisplay) {
+                        if (shouldDisplay) {
                             hasMenu = true;
                         }
-                    }
+                    });
                 }
             }
             menuItemsContent.push({
@@ -152,7 +156,7 @@ export function AppBarActions<Context = unknown>({
             {/* Render direct actions */}
             {actionsContent}
             {menuItemsContent.length && hasMenu && (
-                <Div className={cn(menuAnchorclasses, "resk-appbar-menu-anchor-container")}>
+                <Div asHtmlTag="span" testID={testID+"-overflow-menu-anchor-container"} className={cn(menuAnchorclasses, "resk-appbar-menu-anchor-container")}>
                     <AppBarMenu
                         {...props}
                         context={context}

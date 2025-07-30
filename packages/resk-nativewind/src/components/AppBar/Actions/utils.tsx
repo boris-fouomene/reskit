@@ -98,8 +98,8 @@ export function usePrepareActions<Context = unknown>({ actions: items }: IAppBar
             menuToActionMap,
             actions,
             menuItems: menuItems.sort((a, b) => {
-                const aOrder = isNumber(a.onMenuOrder) ? a.onMenuOrder : Number.MAX_SAFE_INTEGER;
-                const bOrder = isNumber(b.onMenuOrder) ? b.onMenuOrder : Number.MAX_SAFE_INTEGER;
+                const aOrder = isNumber(a.onMenuOrder) ? a.onMenuOrder : menuItems.length;
+                const bOrder = isNumber(b.onMenuOrder) ? b.onMenuOrder : menuItems.length;
                 return aOrder - bOrder;
             }),
             //actionsByIds,

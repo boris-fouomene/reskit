@@ -20,6 +20,48 @@ export function AppBarExamples() {
                 { label: "Profile" },
                 {label: "Shared"},            ]}
         />}
+        <AppBar
+            title = "ttttppaaaaa"
+            actions = {[
+                {
+                    id: 'page-send-money',
+                    label :  "Send Money",
+                    "aria-label": "shortLabel",
+                    "aria-description": "description",
+                },
+                {
+                    id: 'page-exchange-rates',
+                    label :  "Exchange rates",
+                    "aria-label": "shortLabel",
+                    "aria-description": "description",
+                    //icon: 'chart-line'
+                },
+                {
+                    id: 'page-help',
+                    label :  "Help",
+                    "aria-label": "shortLabel",
+                    "aria-description": "description",
+                    onMenuOrder: 100000,
+
+                    //icon: 'help-circle'
+                },
+                // Authentication actions
+                {
+                    id: 'page-login',
+                    label :  "Login",
+                    "aria-label": ".label",
+                    "aria-description": ".description",
+                    //icon: 'login'
+                },
+                {
+                    id: 'page-register',
+                    label :  "Register",
+                    "aria-label":"label",
+                    "aria-description":"description",
+                    //icon: 'account-plus'
+                }
+            ]}
+        />
         <DrawerAppBarExample />
         <MobileAppBarExample />
         <CustomResponsiveAppBarExample />

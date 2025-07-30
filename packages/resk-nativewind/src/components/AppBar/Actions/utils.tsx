@@ -43,34 +43,55 @@ function renderExpandableAppBarAction<Context = unknown>(props: IAppBarActionPro
 
 export function usePrepareActions<Context = unknown>({ actions: items }: IAppBarActionsProps<Context>) {
     const generatedId = useSafeId();
-    const menuToActionMap: Record<string, string> = {};
     return useMemo(() => {
+        const menuToActionMap: Record<string, string> = {};
+        //const actionsByIds: Record<string, (IAppBarActionProps<Context>)> = {};
+        //const menuOnlyToActionMap: Record<string,string> = {};
+        /**
+         * represents the number of actions that will be rendered only on the menu
+         */
+        let menuOnlyActionCount = 0;
+        /***
+         * represents the number of actions that can be rendered on the menu
+         */
+        let menuRenderableActionCount = 0;
         // Early return if no actions
         if (!Array.isArray(items) || items.length === 0) {
             return {
                 actions: [],
                 menuItems: [],
                 menuToActionMap,
+                //actionsByIds,
+                //menuOnlyToActionMap,
+                menuOnlyActionCount,
+                menuRenderableActionCount,
             }
         }
         const actions: (IAppBarActionProps<Context>)[] = [],
             menuItems: (IAppBarActionProps<Context>)[] = [];
-        //const actionsByIds: Record<string, (IAppBarActionProps<Context>)> = {};
         items.map((action, index) => {
             if (!isObj(action) || (action.visibleOnAppBar === false && action.visibleOnMenu === false) && !action.alwaysVisible) return null;
             const act: IAppBarActionProps<Context> = Object.clone(action);
             act.id = defaultStr(act.id, (generatedId + "-action-" + index));
             //actionsByIds[act.id] = act;
-            if (act.visibleOnAppBar !== false || act.alwaysVisible) {
+            const isRenderableOnAppBar = act.visibleOnAppBar !== false || act.alwaysVisible;
+            if (isRenderableOnAppBar) {
                 actions.push(act);
             }
-            if (act.visibleOnMenu !== false) {
-                const menuId = "__appbarac-menu-item__" + act.id;
+            //we only display the action on the menu if it is not always visible
+            if (act.visibleOnMenu !== false && !act.alwaysVisible) {
+                const menuId = "__am-item-id__" + act.id;
                 menuItems.push({
                     ...act,
                     id: menuId,
                 });
                 menuToActionMap[menuId] = act.id;
+                if(!isRenderableOnAppBar) {
+                    menuOnlyActionCount++;
+                    //menuOnlyToActionMap[menuId] = act.id;
+                } else {
+                    menuRenderableActionCount++;
+                }
             }
         });
         return {
@@ -82,6 +103,9 @@ export function usePrepareActions<Context = unknown>({ actions: items }: IAppBar
                 return aOrder - bOrder;
             }),
             //actionsByIds,
+            //menuOnlyToActionMap,
+            menuOnlyActionCount,
+            menuRenderableActionCount,
         }
     }, [items, generatedId]);
 }

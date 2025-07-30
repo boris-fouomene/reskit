@@ -25,7 +25,7 @@ export function AppBarServerActions<Context = unknown>({
     viewportWidth,
     ...props
 }: IAppBarActionsProps<Context>) {
-    const { actions, menuItems, menuToActionMap } = usePrepareActions({ actions: items })
+    const { actions, menuItems, menuToActionMap,menuOnlyActionCount,menuRenderableActionCount } = usePrepareActions({ actions: items })
     if (actions.length === 0 && menuItems.length === 0) {
         return null;
     }
@@ -35,15 +35,18 @@ export function AppBarServerActions<Context = unknown>({
     const config = normalizeConfig(responsiveConfig);
     const sanitizedConfig = stableHash(config);
 
-    console.log(config, "is normlized config", responsiveConfig, " is respon config ", actions, " is actions", menuItems, " is menu items");
     const restProps = { ...props, context, renderAction, renderExpandableAction, testID };
     const { actionsContent, menuItemsContent, hasMenu, menuAnchorclasses } = useMemo(() => {
         let renderedActionsCount = 0;
         const renderedAppBarActions: Record<string, number> = {};
         const menuItemsContent: IAppBarActionsProps<Context>[] = [];
         const menuAnchorclasses: string[] = [];
-        let hasMenu = false;
-        const activeMaxActions = isNumber(viewportWidth) && viewportWidth > 0 ? getActiveMaxActions(config, viewportWidth) : undefined;
+        
+        const totalMenuItems = menuItems.length;
+        const shouldRenderMenu = menuOnlyActionCount > 0;
+        let hasMenu = shouldRenderMenu;
+        const viewportMaxActions = isNumber(viewportWidth) && viewportWidth > 0 ? getActiveMaxActions(config, viewportWidth) : undefined;
+        const hasViewport = isNumber(viewportMaxActions) && viewportMaxActions > 0;
         const actionsContent = renderActions<Context>({
             ...restProps,
             actions,
@@ -65,8 +68,8 @@ export function AppBarServerActions<Context = unknown>({
                 if (!alwaysVisible) {
                     const totalRenderedActionsWithMenu = renderedActionsCount + 1;
                     // If viewportWidth is fixed, calculate visibility once.
-                    if (isNumber(activeMaxActions)) {
-                        if (totalRenderedActionsWithMenu > activeMaxActions) {
+                    if (hasViewport) {
+                        if (totalRenderedActionsWithMenu > viewportMaxActions) {
                             responsiveClasses.push('hidden');
                         }
                     } else {
@@ -102,14 +105,14 @@ export function AppBarServerActions<Context = unknown>({
         menuItems.map(({ alwaysVisible, onMenuOrder, onAppBarClassName, onMenuClassName, className, visibleOnAppBar, visibleOnMenu, ...props }, index) => {
             const { level } = props;
             const actionId = isNonNullString(props.id) ? menuToActionMap[props.id] : undefined;
-            const renderedActionIndex = isNonNullString(actionId) ? renderedAppBarActions[actionId] : undefined;
+            const actionIndex = isNonNullString(actionId) ? renderedAppBarActions[actionId] : undefined;
             const responsiveClasses: string[] = [];
-            if (isNumber(renderedActionIndex)) {
-                if (activeMaxActions) {
-                    //we have already rendered action on the app bar so we should hide it on menu
-                    if (renderedActionIndex <= activeMaxActions) {
+            if (isNumber(actionIndex)) {
+                if (hasViewport) {
+                    if(actionIndex < viewportMaxActions){
                         responsiveClasses.push("hidden");
                     } else {
+                        //we have already rendered action on the app bar so we should hide it on menu
                         hasMenu = true;
                     }
                 } else {
@@ -117,10 +120,12 @@ export function AppBarServerActions<Context = unknown>({
                         const v: IAppBarResponsiveConfig[keyof IAppBarResponsiveConfig] = (config as any)[bp];
                         if (!isNumber(v?.maxActions) || v.maxActions < 1) continue;
                         //menu anchor is considered as a action
-                        const canDisplay = renderedActionIndex >= v.maxActions - 1;
-                        const classes = canDisplay ? `${bp}:flex` : `${bp}:hidden`;
-                        responsiveClasses.push(classes);
-                        menuAnchorclasses.push(classes);
+                        const canDisplay = actionIndex >= v.maxActions - 1;
+                        const clx = canDisplay ? `${bp}:flex` : `${bp}:hidden`;
+                        responsiveClasses.push(clx);
+                        if(!shouldRenderMenu && !menuAnchorclasses.includes(clx)){
+                            menuAnchorclasses.push(clx);
+                        }
                         if (canDisplay) {
                             hasMenu = true;
                         }
@@ -140,7 +145,7 @@ export function AppBarServerActions<Context = unknown>({
             })
         })
         return { actionsContent, menuItemsContent, hasMenu, menuAnchorclasses };
-    }, [actions, menuItems, stableHash(renderExpandableAction), sanitizedConfig, stableHash(renderExpandableAction), testID, onAppBarActionClassName, onMenuActionClassName])
+    }, [actions, menuItems,menuOnlyActionCount,menuRenderableActionCount,viewportWidth, stableHash(renderExpandableAction), sanitizedConfig, stableHash(renderExpandableAction), testID, onAppBarActionClassName, onMenuActionClassName])
     return (
         <Div
             className={cn("appbar-actions flex flex-row items-center grow-0 justify-start overflow-hidden", className)}

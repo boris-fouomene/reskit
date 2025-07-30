@@ -21,10 +21,10 @@ export function AppBarExamples() {
             actions={[
                 { label: "Settings" },
                 { label: "Profile" },
-            ]}
+                {label: "Shared"},            ]}
         />}
         <DrawerAppBarExample />
-        <MobileAppBarExample />
+        {/* <MobileAppBarExample />
         <CustomResponsiveAppBarExample />
         <GroupedActionsAppBarExample />
         <EnhancedVisibilityPriorityDemo />
@@ -81,7 +81,7 @@ export function AppBarExamples() {
                     icon: 'help-circle'
                 }
             ]}
-        />
+        /> */}
     </>
 }
 // Example 1: Basic AppBar with visibilityPriority-based actions
@@ -130,13 +130,21 @@ export function DrawerAppBarExample() {
         {
             id: 'close',
             label: 'Close',
-            alwaysVisible: true,
+            //alwaysVisible: true,
             onPress: () => console.log('Close drawer')
         },
         {
             id: 'settings',
             label: 'Settings',
             onPress: () => console.log('Settings pressed')
+        },
+        {
+            label:"Close Before",
+            onMenuOrder:2,
+        },
+        {
+            label:"Setting 2",
+            onMenuOrder:1,
         }
     ];
 

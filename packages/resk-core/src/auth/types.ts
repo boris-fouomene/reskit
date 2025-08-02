@@ -1,35 +1,35 @@
-import { IResourceActionName, IResourceActionTuple, IResourceName } from "@/types/resources";
+import { IResourceActionName, IResourceActionTuple, IResourceName } from "@resources/types";
 import { IDict } from "../types/dictionary";
 /**
  * @interface IAuthUser
  * Represents an authenticated user in the application.
- * 
- * The `IAuthUser ` interface defines the structure for an authenticated 
- * user object, which includes an identifier, an optional timestamp 
- * for when the authentication session was created, and an optional 
- * permissions map that specifies the actions the user can perform 
+ *
+ * The `IAuthUser ` interface defines the structure for an authenticated
+ * user object, which includes an identifier, an optional timestamp
+ * for when the authentication session was created, and an optional
+ * permissions map that specifies the actions the user can perform
  * on various resources.
- * 
+ *
  * ### Properties
- * 
- * - `id` (string | number): A unique identifier for the user. This 
+ *
+ * - `id` (string | number): A unique identifier for the user. This
  *   can be either a string or a number, depending on the implementation.
- * 
- * - `authSessionCreatedAt` (number, optional): An optional property 
- *   that stores the timestamp (in milliseconds) of when the 
- *   authentication session was created. This can be useful for 
+ *
+ * - `authSessionCreatedAt` (number, optional): An optional property
+ *   that stores the timestamp (in milliseconds) of when the
+ *   authentication session was created. This can be useful for
  *   tracking session duration or expiration.
- * 
- * - `perms` (IAuthPerms , optional): 
- *   An optional property that maps resource names to an array of 
- *   actions that the user is permitted to perform on those resources. 
- *   This allows for fine-grained control over user permissions within 
+ *
+ * - `perms` (IAuthPerms , optional):
+ *   An optional property that maps resource names to an array of
+ *   actions that the user is permitted to perform on those resources.
+ *   This allows for fine-grained control over user permissions within
  *   the application.
- * 
+ *
  * ### Example Usage
- * 
+ *
  * Here is an example of how the `IAuthUser ` interface can be used:
- * 
+ *
  * ```typescript
  * const user: IAuthUser  = {
  *     id: "user123",
@@ -39,21 +39,21 @@ import { IDict } from "../types/dictionary";
  *         users: ["read", "delete"]
  *     }
  * };
- * 
+ *
  * // Function to check if a user has permission to perform an action
  * function hasPermission(user: IAuthUser , resource: IResourceName, action: IResourceActionName): boolean {
  *     return user.perms?.[resource]?.includes(action) ?? false;
  * }
- * 
+ *
  * // Example of checking permissions
  * const canReadDocuments = hasPermission(user, "documents", "read"); // true
  * const canDeleteUsers = hasPermission(user, "users", "delete"); // true
  * ```
- * 
- * In this example, the `IAuthUser ` interface is used to define a user 
- * object with an ID, session creation timestamp, and a permissions map. 
- * The `hasPermission` function checks if the user has the specified 
- * permission for a given resource, demonstrating how the `perms` 
+ *
+ * In this example, the `IAuthUser ` interface is used to define a user
+ * object with an ID, session creation timestamp, and a permissions map.
+ * The `hasPermission` function checks if the user has the specified
+ * permission for a given resource, demonstrating how the `perms`
  * property can be utilized in permission management.
  * @see {@link IResourceName} for the `IResourceName` type.
  * @see {@link IResourceActionName} for the `IResourceActionName` type.
@@ -73,10 +73,10 @@ export interface IAuthUser extends Record<string, any> {
 
 /**
  * Interface representing an authorization role.
- * 
- * @description This interface defines the structure of an authorization role, 
+ *
+ * @description This interface defines the structure of an authorization role,
  *              which consists of a name and a set of permissions.
- * 
+ *
  * @example
  * ```typescript
  * const adminRole: IAuthRole = {
@@ -93,7 +93,7 @@ export interface IAuthUser extends Record<string, any> {
 export interface IAuthRole extends Record<string, any> {
   /**
    * The name of the authorization role.
-   * 
+   *
    * @description This property represents the unique identifier of the role.
    * @example 'admin', 'moderator', 'user'
    */
@@ -101,7 +101,7 @@ export interface IAuthRole extends Record<string, any> {
 
   /**
    * The set of permissions associated with the role.
-   * 
+   *
    * @description This property represents the permissions that are granted to the role.
    * @see {@link IAuthPerms} for the `IAuthPerms` type.
    * @example
@@ -117,52 +117,52 @@ export interface IAuthRole extends Record<string, any> {
   perms: IAuthPerms;
 }
 /**
-* @interface IAuthSessionStorage
-* Interface for managing authentication session storage.
-* 
-* The `IAuthSessionStorage` interface defines methods for storing and 
-* retrieving session data associated with authenticated users. This 
-* interface provides a structured way to manage session data, ensuring 
-* that it can be easily accessed and manipulated.
-* 
-* ### Methods
-* 
-* - `get(key?: string): any`: Retrieves the value of the session 
-*   associated with the specified key. If no key is provided, it 
-*   returns the entire session value.
-* 
-*   @param {string} key - The key of the value to retrieve.
-*   @returns {any} The value associated with the specified key, or 
-*   undefined if the key does not exist.
-* 
-* - `set(key?: string | IDict, value?: any): any`: Persists a value 
-*   in the session storage. This can either be a single key-value 
-*   pair or an object containing multiple session data.
-* 
-*   @param {string | IDict} key - The key of the value to persist, or 
-*   an object containing session data.
-*   @param {any} value - The value to persist. This can be of any type.
-* 
-* - `getData(): IDict`: Retrieves all session data associated with 
-*   the session name defined in the `sessionName` property.
-* 
-*   @returns {IDict} An object containing all session data.
-* 
-* - `getKey(): string`: Returns the key associated with the session 
-*   name defined in the `sessionName` property.
-* 
-*   @returns {string} The session key.
-* 
-* ### Properties
-* 
-* - `sessionName` (string, optional): The name of the session used by 
-*   the session manager. This can be used to identify the session 
-*   context in which the storage operates.
-*/
+ * @interface IAuthSessionStorage
+ * Interface for managing authentication session storage.
+ *
+ * The `IAuthSessionStorage` interface defines methods for storing and
+ * retrieving session data associated with authenticated users. This
+ * interface provides a structured way to manage session data, ensuring
+ * that it can be easily accessed and manipulated.
+ *
+ * ### Methods
+ *
+ * - `get(key?: string): any`: Retrieves the value of the session
+ *   associated with the specified key. If no key is provided, it
+ *   returns the entire session value.
+ *
+ *   @param {string} key - The key of the value to retrieve.
+ *   @returns {any} The value associated with the specified key, or
+ *   undefined if the key does not exist.
+ *
+ * - `set(key?: string | IDict, value?: any): any`: Persists a value
+ *   in the session storage. This can either be a single key-value
+ *   pair or an object containing multiple session data.
+ *
+ *   @param {string | IDict} key - The key of the value to persist, or
+ *   an object containing session data.
+ *   @param {any} value - The value to persist. This can be of any type.
+ *
+ * - `getData(): IDict`: Retrieves all session data associated with
+ *   the session name defined in the `sessionName` property.
+ *
+ *   @returns {IDict} An object containing all session data.
+ *
+ * - `getKey(): string`: Returns the key associated with the session
+ *   name defined in the `sessionName` property.
+ *
+ *   @returns {string} The session key.
+ *
+ * ### Properties
+ *
+ * - `sessionName` (string, optional): The name of the session used by
+ *   the session manager. This can be used to identify the session
+ *   context in which the storage operates.
+ */
 export interface IAuthSessionStorage {
   /**
    * Retrieves the value of the session associated with the specified key.
-   * 
+   *
    * @param {string} key - The key of the value to retrieve.
    * @returns {any} The value associated with the specified key, or undefined if the key does not exist.
    */
@@ -170,7 +170,7 @@ export interface IAuthSessionStorage {
 
   /**
    * Persists a value in the session storage.
-   * 
+   *
    * @param {string | IDict} key - The key of the value to persist, or an object containing session data.
    * @param {any} value - The value to persist. This can be of any type.
    * @returns {any} The result of the persistence operation.
@@ -179,14 +179,14 @@ export interface IAuthSessionStorage {
 
   /**
    * Retrieves all session data associated with the session name.
-   * 
+   *
    * @returns {IDict} An object containing all session data.
    */
   getData: () => IDict;
 
   /**
    * Returns the key associated with the session name.
-   * 
+   *
    * @returns {string} The session key.
    */
   getKey: () => string;
@@ -196,7 +196,6 @@ export interface IAuthSessionStorage {
    */
   sessionName?: string;
 }
-
 
 /**
  * @interface IAuthPerm
@@ -257,26 +256,26 @@ export type IAuthPerm<ResourceName extends IResourceName = IResourceName> = ((us
 
 /**
  * Represents a mapping of authentication permissions for resources.
- * The `IAuthPerms` type defines a structure that maps resource names 
- * to an array of actions that can be performed on those resources. 
- * This type is useful for managing user permissions in an application, 
- * allowing for fine-grained control over what actions users can take 
+ * The `IAuthPerms` type defines a structure that maps resource names
+ * to an array of actions that can be performed on those resources.
+ * This type is useful for managing user permissions in an application,
+ * allowing for fine-grained control over what actions users can take
  * on various resources.
- * 
- * 
+ *
+ *
  * ### Structure
- * 
+ *
  * The `IAuthPerms` type is defined as a `Record` where:
- * - The keys are of type `IResourceName`, representing the names of 
+ * - The keys are of type `IResourceName`, representing the names of
  *   the resources (e.g., "documents", "users").
- * - The values are arrays of `IResourceActionName`, representing the 
- *   actions that can be performed on the corresponding resource (e.g., 
+ * - The values are arrays of `IResourceActionName`, representing the
+ *   actions that can be performed on the corresponding resource (e.g.,
  *   ["read", "create", "update"]).
- * 
+ *
  * ### Example Usage
- * 
+ *
  * Here is an example of how the `IAuthPerms` type can be used:
- * 
+ *
  * ```typescript
  * // Example of defining user permissions using IAuthPerms
  * const userPermissions: IAuthPerms = {
@@ -285,26 +284,24 @@ export type IAuthPerm<ResourceName extends IResourceName = IResourceName> = ((us
  *     posts: ["read", "create"]
  * };
  * ```
- * 
- * In this example, the `IAuthPerms` type is used to define a permissions 
- * object for a user, mapping resources to the actions they are allowed 
+ *
+ * In this example, the `IAuthPerms` type is used to define a permissions
+ * object for a user, mapping resources to the actions they are allowed
  * to perform.
  * @typedef {Partial<{ [ResourceName in IResourceName]: Partial<IResourceActionName<ResourceName>[]> }>} IAuthPerms
  */
 export type IAuthPerms = Partial<{
   /**
    * Each key in the object is a resource name.
-   * 
+   *
    * @type {[ResourceName in IResourceName]}
    */
-  [ResourceName in IResourceName]: (
-    /**
-     * Each value is a partial array of action names for the corresponding resource.
-     * 
-     * @type {Partial<IResourceActionName<ResourceName>[]>}
-     */
-    Partial<IResourceActionName<ResourceName>[]>
-  );
+  [ResourceName in IResourceName]: /**
+   * Each value is a partial array of action names for the corresponding resource.
+   *
+   * @type {Partial<IResourceActionName<ResourceName>[]>}
+   */
+  Partial<IResourceActionName<ResourceName>[]>;
 }>;
 
 /**
@@ -340,11 +337,11 @@ export type IAuthPerms = Partial<{
 export interface IAuthEventMap {
   /**
    * Event triggered when a user signs in.
-   * 
+   *
    * This event is emitted when a user successfully logs into the system.
    * It can be used to trigger actions such as updating the user interface
    * or logging the sign-in activity.
-   * 
+   *
    * @example
    * // Example of handling the SIGN_IN event
    * eventEmitter.on('SIGN_IN', () => {
@@ -355,11 +352,11 @@ export interface IAuthEventMap {
 
   /**
    * Event triggered when a user signs out.
-   * 
+   *
    * This event is emitted when a user successfully logs out of the system.
-   * It can be used to trigger actions such as clearing user data or 
+   * It can be used to trigger actions such as clearing user data or
    * redirecting to the login page.
-   * 
+   *
    * @example
    * // Example of handling the SIGN_OUT event
    * eventEmitter.on('SIGN_OUT', () => {
@@ -370,11 +367,11 @@ export interface IAuthEventMap {
 
   /**
    * Event triggered when a user signs up.
-   * 
+   *
    * This event is emitted when a new user successfully registers for an account.
-   * It can be used to trigger actions such as sending a welcome email or 
+   * It can be used to trigger actions such as sending a welcome email or
    * redirecting the user to a confirmation page.
-   * 
+   *
    * @example
    * // Example of handling the SIGN_UP event
    * eventEmitter.on('SIGN_UP', () => {
@@ -385,27 +382,26 @@ export interface IAuthEventMap {
 }
 
 /**
-* Type representing the keys of the IAuthEventMap interface.
-* 
-* This type is a union of string literals corresponding to the event names
-* defined in the IAuthEventMap interface. It allows for type-safe handling
-* of authentication events throughout the application.
-* 
-* @example
-* // Example of using IAuthEvent
-* function handleAuthEvent(event: IAuthEvent) {
-*     switch (event) {
-*         case 'SIGN_IN':
-*             console.log('Handling sign-in event...');
-*             break;
-*         case 'SIGN_OUT':
-*             console.log('Handling sign-out event...');
-*             break;
-*         case 'SIGN_UP':
-*             console.log('Handling sign-up event...');
-*             break;
-*     }
-* }
-*/
+ * Type representing the keys of the IAuthEventMap interface.
+ *
+ * This type is a union of string literals corresponding to the event names
+ * defined in the IAuthEventMap interface. It allows for type-safe handling
+ * of authentication events throughout the application.
+ *
+ * @example
+ * // Example of using IAuthEvent
+ * function handleAuthEvent(event: IAuthEvent) {
+ *     switch (event) {
+ *         case 'SIGN_IN':
+ *             console.log('Handling sign-in event...');
+ *             break;
+ *         case 'SIGN_OUT':
+ *             console.log('Handling sign-out event...');
+ *             break;
+ *         case 'SIGN_UP':
+ *             console.log('Handling sign-up event...');
+ *             break;
+ *     }
+ * }
+ */
 export type IAuthEvent = keyof IAuthEventMap;
-

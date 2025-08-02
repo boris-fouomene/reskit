@@ -31,48 +31,48 @@ export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = 
 export type IValidatorSanitizedRule<ParamType extends Array<any> = Array<any>, Context = unknown> =
   | IValidatorRuleFunction<ParamType, Context>
   | {
-    /**
-     * The name of the validation rule.
-     *
-     * This property specifies the rule's identifier, which can be used
-     * to reference the rule in validation scenarios.
-     *
-     * @type {IValidatorRuleName}
-     * @example
-     * const ruleName = sanitizedRule.ruleName; // 'minLength'
-     */
-    ruleName: IValidatorRuleName;
+      /**
+       * The name of the validation rule.
+       *
+       * This property specifies the rule's identifier, which can be used
+       * to reference the rule in validation scenarios.
+       *
+       * @type {IValidatorRuleName}
+       * @example
+       * const ruleName = sanitizedRule.ruleName; // 'minLength'
+       */
+      ruleName: IValidatorRuleName;
 
-    /**
-     * The parameters required for the validation rule.
-     *
-     * This array contains the values that are necessary for the rule's
-     * execution, such as minimum or maximum lengths, or other criteria.
-     *
-     * @type {ParamType}
-     * @example
-     * const params = sanitizedRule.params; // [5]
-     */
-    params: ParamType;
+      /**
+       * The parameters required for the validation rule.
+       *
+       * This array contains the values that are necessary for the rule's
+       * execution, such as minimum or maximum lengths, or other criteria.
+       *
+       * @type {ParamType}
+       * @example
+       * const params = sanitizedRule.params; // [5]
+       */
+      params: ParamType;
 
-    /**
-     * The function that implements the validation logic.
-     *
-     * This function is called to perform the actual validation based on
-     * the provided parameters and the value being validated.
-     *
-     * @type {IValidatorRuleFunction}
-     * @example
-     * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
-     */
-    ruleFunction: IValidatorRuleFunction<ParamType, Context>;
+      /**
+       * The function that implements the validation logic.
+       *
+       * This function is called to perform the actual validation based on
+       * the provided parameters and the value being validated.
+       *
+       * @type {IValidatorRuleFunction}
+       * @example
+       * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
+       */
+      ruleFunction: IValidatorRuleFunction<ParamType, Context>;
 
-    /***
-     * The rule with parameters.
-     * it represents the rule with parameters, for example "minLength[5]" that has been passed to the validator.
-     */
-    rawRuleName: string;
-  };
+      /***
+       * The rule with parameters.
+       * it represents the rule with parameters, for example "minLength[5]" that has been passed to the validator.
+       */
+      rawRuleName: string;
+    };
 
 /**
  * @typedef IValidatorSanitizedRules
@@ -150,15 +150,15 @@ export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Co
 
 /**
  * @interface IValidatorRuleName
- * Represents the name of a validation rule as defined in the `IValidatorRuleMap`.
+ * Represents the name of a validation rule as defined in the `IValidatorRules`.
  *
  * The `IValidatorRuleName` type is a union of string literal types that correspond to the keys
- * of the `IValidatorRuleMap` interface. This allows for type-safe access to the names of
+ * of the `IValidatorRules` interface. This allows for type-safe access to the names of
  * validation rules, ensuring that only valid rule names can be used in contexts where a rule name
  * is required.
  *
  * ### Structure:
- * - The type is derived from the keys of the `IValidatorRuleMap`, meaning it will include
+ * - The type is derived from the keys of the `IValidatorRules`, meaning it will include
  *   all the rule names defined in that map.
  *
  * ### Example:
@@ -179,12 +179,12 @@ export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Co
  * This type enhances type safety in your code by ensuring that only valid validation rule names
  * can be used, reducing the risk of runtime errors due to typos or invalid rule names.
  */
-export type IValidatorRuleName = keyof IValidatorRuleMap;
+export type IValidatorRuleName = keyof IValidatorRules;
 
 /**
  * Represents a mapping of validation rule names to their corresponding validation rules.
  *
- * The `IValidatorRuleMap` interface defines an object where each key is a string
+ * The `IValidatorRules` interface defines an object where each key is a string
  * representing the name of a validation rule, and the value is the corresponding validation rule
  * of type `IValidatorRule`. This allows for easy retrieval and management of validation rules
  * by name.
@@ -196,7 +196,7 @@ export type IValidatorRuleName = keyof IValidatorRuleMap;
  * ### Example:
  *
  * ```typescript
- * const validationRules: IValidatorRuleMap = {
+ * const validationRules: IValidatorRules = {
  *     required: "required",
  *     minLength: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
  *     maxLength: ({ value }) => value.length <= 10 || "Maximum length is 10 characters.",
@@ -210,7 +210,7 @@ export type IValidatorRuleName = keyof IValidatorRuleMap;
  * This interface is useful for organizing and managing validation rules in a structured way,
  * making it easier to apply and reference them in  validation scenarios.
  */
-export interface IValidatorRuleMap {
+export interface IValidatorRules {
   /**
    * Validator rule that checks if a number is less than or equals a specified value.
    */
@@ -326,7 +326,7 @@ export interface IValidatorRuleMap {
 /**
  * Represents a mapping of validation rule names to their corresponding validation rules.
  *
- * The `IValidatorRuleMap` interface defines an object where each key is a PascalCase string
+ * The `IValidatorRules` interface defines an object where each key is a PascalCase string
  * representing the name of a validation rule, and the value is the corresponding validation rule
  * of type `IValidatorRule`. This allows for easy retrieval and management of validation rules
  * by name.
@@ -338,7 +338,7 @@ export interface IValidatorRuleMap {
  * ### Example:
  *
  * ```typescript
- * const validationRules: IValidatorRuleMap = {
+ * const validationRules: IValidatorRules = {
  *     Required: "Required",
  *     MinLength: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
  *     MaxLength: ({ value }) => value.length <= 10 || "Maximum length is 10 characters.",
@@ -485,4 +485,11 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
   translatedPropertyName?: string;
 
   context?: Context;
+  /**
+   * Optional data for context
+   * This property is used to provide additional context for the validation rule.
+   * It can be used to pass any additional data that might be needed for validation,
+   * such as form data or other relevant information.
+   */
+  data?: Record<string, any>;
 }

@@ -1,5 +1,6 @@
 import "reflect-metadata";
-import { IClassConstructor, IField, IFieldBase, IFieldType } from "../../types";
+import { IField, IFieldBase, IFieldType } from "../types";
+import { IClassConstructor } from "@/types";
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**

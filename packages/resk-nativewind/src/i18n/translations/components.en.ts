@@ -1,4 +1,4 @@
-import { IMongoOperatorName } from "@resk/core/types";
+import { IMongoOperatorName } from "@resk/core/resources";
 import { I18n } from "@resk/core/i18n";
 I18n.RegisterTranslations({
   en: {
@@ -155,7 +155,7 @@ I18n.RegisterTranslations({
         alert: {
           confirmButton: "Ok",
           cancelButton: "Cancel",
-        }
+        },
       },
       notify: {
         errorTitle: "Error",
@@ -166,8 +166,8 @@ I18n.RegisterTranslations({
       form: {
         validator: {
           matchField: "Field %{fieldName} must match %{matchFieldName}",
-        }
-      }
+        },
+      },
     },
   },
 });

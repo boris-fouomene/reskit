@@ -227,6 +227,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
     async validate(validateOptions: Omit<IFormFieldValidateOptions<FieldType, ValueType>, "context">, force: boolean = false): Promise<IFormFieldValidateOptions<FieldType, ValueType>> {
         const options = this.getCallOptions(validateOptions);
+        options.data = this.getForm()?.getData();
         options.fieldName = defaultStr(options.fieldName, this.getName());
         if (this.isPhone() && isNonNullString(options.phoneNumber) && InputFormatter.isValidPhoneNumber(options.phoneNumber)) {
             (options as any).rawPhoneNumber = options.value;

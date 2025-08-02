@@ -1,4 +1,4 @@
-import { IResourceQueryOptionsOrderByDirection } from "@/types/filters";
+import { IResourceQueryOptionsOrderByDirection } from "@resources/types";
 import isEmpty from "./isEmpty";
 import { isNumber } from "./isNumber";
 import isNonNullString from "./isNonNullString";
@@ -6,16 +6,16 @@ import defaultBool from "./defaultBool";
 /**
  * A highly optimized sorting function capable of efficiently handling billions of array elements
  * with support for complex objects and various data types.
- * 
+ *
  * @template T - The type of array elements being sorted
  * @template V - The type of values being compared for sorting
- * 
+ *
  * @param data - The array to be sorted
  * @param getItemValue - Function that extracts the comparable value from each array item
  * @param options - Configuration options to control the sorting behavior
- * 
+ *
  * @returns The sorted array (either the original array modified in-place or a new array)
- * 
+ *
  * @example
  * // Sort an array of objects by their 'name' property
  * const users = [
@@ -23,15 +23,15 @@ import defaultBool from "./defaultBool";
  *   { id: 102, name: "bob", age: 34 },
  *   { id: 103, name: "Charlie", age: 21 }
  * ];
- * 
+ *
  * // Case-sensitive sort (default)
  * const sortedByName = sortBy(users, user => user.name);
  * // Result: [{ id: 101, name: "Alice", age: 28 }, { id: 103, name: "Charlie", age: 21 }, { id: 102, name: "bob", age: 34 }]
- * 
+ *
  * // Case-insensitive sort
  * const sortedIgnoringCase = sortBy(users, user => user.name, { ignoreCase: true });
  * // Result: [{ id: 101, name: "Alice", age: 28 }, { id: 102, name: "bob", age: 34 }, { id: 103, name: "Charlie", age: 21 }]
- * 
+ *
  * @example
  * // Sort by date values in descending order (newest first)
  * const tasks = [
@@ -39,10 +39,10 @@ import defaultBool from "./defaultBool";
  *   { id: 2, title: "Task 2", deadline: new Date("2023-05-15") },
  *   { id: 3, title: "Task 3", deadline: new Date("2024-02-20") }
  * ];
- * 
+ *
  * const sortedByDeadline = sortBy(tasks, task => task.deadline, { direction: 'desc' });
  * // Result: Tasks ordered with newest deadline first
- * 
+ *
  * @example
  * // Create a new sorted array without modifying the original
  * const numbers = [5, 2, 9, 1, 5, 6];
@@ -70,11 +70,7 @@ export function sortBy<T, V = any>(
   options.direction = isNonNullString(options.direction) && ["asc", "desc"].includes(options.direction) ? options.direction : "asc";
   options.chunkSize = isNumber(options.chunkSize) && options.chunkSize > 0 ? options.chunkSize : 10000;
   options.ignoreCase = defaultBool(options.ignoreCase, true);
-  const {
-    direction,
-    chunkSize,
-    ignoreCase
-  } = options;
+  const { direction, chunkSize, ignoreCase } = options;
   // For very large arrays, use a chunked merge sort approach
   if (data.length > chunkSize) {
     return chunkingMergeSort(data, getItemValue, direction, ignoreCase);
@@ -89,12 +85,7 @@ export function sortBy<T, V = any>(
  * Chunking merge sort implementation for very large arrays
  * Splits the work into manageable chunks to avoid call stack issues
  */
-function chunkingMergeSort<T, V>(
-  array: T[],
-  getItemValue: (item: T) => V,
-  direction: IResourceQueryOptionsOrderByDirection,
-  ignoreCase: boolean
-): T[] {
+function chunkingMergeSort<T, V>(array: T[], getItemValue: (item: T) => V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase: boolean): T[] {
   // Base case
   if (array.length <= 1) {
     return array;
@@ -106,27 +97,21 @@ function chunkingMergeSort<T, V>(
   const right = array.slice(middle);
 
   // Recursively sort both halves
-  return merge(
-    chunkingMergeSort(left, getItemValue, direction, ignoreCase),
-    chunkingMergeSort(right, getItemValue, direction, ignoreCase),
-    getItemValue,
-    direction,
-    ignoreCase
-  );
+  return merge(chunkingMergeSort(left, getItemValue, direction, ignoreCase), chunkingMergeSort(right, getItemValue, direction, ignoreCase), getItemValue, direction, ignoreCase);
 }
 
 function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase?: boolean): number {
   // Inside our compare function:
   // Special handling for null and undefined
   if (isEmpty(valueA) && isEmpty(valueB)) return 0;
-  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === 'asc' ? -1 : 1;
-  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === 'asc' ? 1 : -1;
-  if (typeof valueA === 'number' && typeof valueB === 'number') {
-    return direction === 'asc' ? valueA - valueB : valueB - valueA;
+  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === "asc" ? -1 : 1;
+  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === "asc" ? 1 : -1;
+  if (typeof valueA === "number" && typeof valueB === "number") {
+    return direction === "asc" ? valueA - valueB : valueB - valueA;
   }
   // Handle different types appropriately
   if (valueA instanceof Date && valueB instanceof Date) {
-    return direction === 'asc' ? valueA.getTime() - valueB.getTime() : valueB.getTime() - valueA.getTime();
+    return direction === "asc" ? valueA.getTime() - valueB.getTime() : valueB.getTime() - valueA.getTime();
   }
   if (valueA instanceof RegExp && valueB instanceof RegExp) {
     valueA = valueA.toString() as V;
@@ -146,12 +131,11 @@ function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptions
     stringB = stringB.toLowerCase();
   }
   return compareStrings(stringA, stringB, direction as any);
-};
-
+}
 
 /**
  * Compares two strings and returns -1, 0, or 1 based on their relative order
- * 
+ *
  * @param a - First string to compare
  * @param b - Second string to compare
  * @param dir - Direction of comparison ('asc' for ascending, 'desc' for descending)
@@ -159,8 +143,8 @@ function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptions
  */
 function compareStrings(a: string, b: string, dir: IResourceQueryOptionsOrderByDirection): -1 | 0 | 1 {
   // For empty string checks
-  if (!a && b) return dir === 'asc' ? -1 : 1;
-  if (a && !b) return dir === 'asc' ? 1 : -1;
+  if (!a && b) return dir === "asc" ? -1 : 1;
+  if (a && !b) return dir === "asc" ? 1 : -1;
   if (!a && !b) return 0;
 
   // For non-empty strings
@@ -169,19 +153,13 @@ function compareStrings(a: string, b: string, dir: IResourceQueryOptionsOrderByD
   // Normalize to exactly -1, 0, or 1
   const normalizedComparison = comparison < 0 ? -1 : comparison > 0 ? 1 : 0;
   // Apply direction
-  return (dir === 'asc' ? normalizedComparison : -normalizedComparison) as -1 | 0 | 1;
+  return (dir === "asc" ? normalizedComparison : -normalizedComparison) as -1 | 0 | 1;
 }
 
 /**
  * Merge two sorted arrays
  */
-function merge<T, V>(
-  left: T[],
-  right: T[],
-  getItemValue: (item: T) => V,
-  direction: IResourceQueryOptionsOrderByDirection,
-  ignoreCase: boolean
-): T[] {
+function merge<T, V>(left: T[], right: T[], getItemValue: (item: T) => V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase: boolean): T[] {
   const result: T[] = [];
   let leftIndex = 0;
   let rightIndex = 0;
@@ -196,7 +174,5 @@ function merge<T, V>(
     }
   }
   // Add remaining elements
-  return result
-    .concat(left.slice(leftIndex))
-    .concat(right.slice(rightIndex));
+  return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
 }

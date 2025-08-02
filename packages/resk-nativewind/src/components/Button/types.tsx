@@ -4,7 +4,7 @@ import { GestureResponderEvent, PressableProps, View } from "react-native";
 import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
 import { JSX, ReactNode, Ref } from "react";
-import { IDict, IResourceName } from '@resk/core/types';
+import { IResourceName } from '@resk/core/resources';
 import { buttonVariant, IButtonVariant } from "@variants/button";
 
 
@@ -232,5 +232,5 @@ export type IButtonInteractiveContext<Context = unknown> = IButtonContext<Contex
      * The data associated with the form if the button is representing a form action.
      * This method is implemented only for interactive buttons.
      */
-    formData?: IDict;
+    formData?: Record<any, any>;
 }

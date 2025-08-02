@@ -1,82 +1,77 @@
 {
   "name": "@resk/core",
-  "version": "1.24.3",
+  "version": "1.25.0",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "exports": {
     "./auth": {
+      "types": "./build/auth/index.d.ts",
       "import": "./lib/esm/auth.mjs",
-      "require": "./lib/cjs/auth.js",
-      "types": "./build/auth/index.d.ts"
+      "require": "./lib/cjs/auth.js"
     },
     "./countries": {
+      "types": "./build/countries/index.d.ts",
       "import": "./lib/esm/countries.mjs",
-      "require": "./lib/cjs/countries.js",
-      "types": "./build/countries/index.d.ts"
+      "require": "./lib/cjs/countries.js"
     },
     "./currency": {
+      "types": "./build/currency/index.d.ts",
       "import": "./lib/esm/currency.mjs",
-      "require": "./lib/cjs/currency.js",
-      "types": "./build/currency/index.d.ts"
+      "require": "./lib/cjs/currency.js"
     },
     "./i18n": {
+      "types": "./build/i18n/index.d.ts",
       "import": "./lib/esm/i18n.mjs",
-      "require": "./lib/cjs/i18n.js",
-      "types": "./build/i18n/index.d.ts"
+      "require": "./lib/cjs/i18n.js"
     },
     "./inputFormatter": {
+      "types": "./build/inputFormatter/index.d.ts",
       "import": "./lib/esm/inputFormatter.mjs",
-      "require": "./lib/cjs/inputFormatter.js",
-      "types": "./build/inputFormatter/index.d.ts"
+      "require": "./lib/cjs/inputFormatter.js"
     },
     "./logger": {
+      "types": "./build/logger/index.d.ts",
       "import": "./lib/esm/logger.mjs",
-      "require": "./lib/cjs/logger.js",
-      "types": "./build/logger/index.d.ts"
+      "require": "./lib/cjs/logger.js"
     },
     "./observable": {
+      "types": "./build/observable/index.d.ts",
       "import": "./lib/esm/observable.mjs",
-      "require": "./lib/cjs/observable.js",
-      "types": "./build/observable/index.d.ts"
+      "require": "./lib/cjs/observable.js"
     },
     "./platform": {
+      "types": "./build/platform/index.d.ts",
       "import": "./lib/esm/platform.mjs",
-      "require": "./lib/cjs/platform.js",
-      "types": "./build/platform/index.d.ts"
+      "require": "./lib/cjs/platform.js"
     },
     "./resources": {
+      "types": "./build/resources/index.d.ts",
       "import": "./lib/esm/resources.mjs",
-      "require": "./lib/cjs/resources.js",
-      "types": "./build/resources/index.d.ts"
+      "require": "./lib/cjs/resources.js"
     },
     "./session": {
+      "types": "./build/session/index.d.ts",
       "import": "./lib/esm/session.mjs",
-      "require": "./lib/cjs/session.js",
-      "types": "./build/session/index.d.ts"
+      "require": "./lib/cjs/session.js"
     },
     "./utils": {
+      "types": "./build/utils/index.d.ts",
       "import": "./lib/esm/utils.mjs",
-      "require": "./lib/cjs/utils.js",
-      "types": "./build/utils/index.d.ts"
+      "require": "./lib/cjs/utils.js"
     },
     "./types": {
+      "types": "./build/types/index.d.ts",
       "import": "./lib/esm/types.mjs",
-      "require": "./lib/cjs/types.js",
-      "types": "./build/types/index.d.ts"
+      "require": "./lib/cjs/types.js"
     },
     "./validator": {
+      "types": "./build/validator/index.d.ts",
       "import": "./lib/esm/validator.mjs",
-      "require": "./lib/cjs/validator.js",
-      "types": "./build/validator/index.d.ts"
-    },
-    "./filters": {
-      "import": "./lib/esm/filters.mjs",
-      "require": "./lib/cjs/filters.js",
-      "types": "./build/filters/index.d.ts"
+      "require": "./lib/cjs/validator.js"
     },
     "./http-client": {
+      "types": "./build/http-client/index.d.ts",
       "import": "./lib/esm/http-client.mjs",
-      "require": "./lib/cjs/http-client.js",
-      "types": "./build/http-client/index.d.ts"
+      "require": "./lib/cjs/http-client.js"
     }
   },
   "typesVersions": {

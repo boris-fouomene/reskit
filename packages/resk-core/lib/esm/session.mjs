@@ -1,1 +1,1 @@
-export * from "./build/session/index.js";
+export * from "../../build/session/index.js";

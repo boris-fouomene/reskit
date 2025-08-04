@@ -1,1 +1,1 @@
-export * from "./build/inputFormatter/index.js";
+export * from "../../build/inputFormatter/index.js";

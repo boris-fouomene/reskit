@@ -1,1 +1,1 @@
-export * from "./build/validator/index.js";
+export * from "../../build/validator/index.js";

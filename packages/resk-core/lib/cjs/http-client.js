@@ -1,1 +1,1 @@
-module.exports = require("./build/http-client");
+module.exports = require("../../build/http-client");

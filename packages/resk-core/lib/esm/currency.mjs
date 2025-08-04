@@ -1,1 +1,1 @@
-export * from "./build/currency/index.js";
+export * from "../../build/currency/index.js";

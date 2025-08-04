@@ -1,1 +1,1 @@
-export * from "./build/i18n/index.js";
+export * from "../../build/i18n/index.js";

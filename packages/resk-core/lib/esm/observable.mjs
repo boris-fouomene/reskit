@@ -1,1 +1,1 @@
-export * from "./build/observable/index.js";
+export * from "../../build/observable/index.js";

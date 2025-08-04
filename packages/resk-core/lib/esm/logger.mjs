@@ -1,1 +1,1 @@
-export * from "./build/logger/index.js";
+export * from "../../build/logger/index.js";

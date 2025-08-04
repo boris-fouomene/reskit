@@ -1,14 +1,15 @@
 "use client";
+
 import { defaultStr, getMaxZindex } from '@resk/core/utils';
 import { useEffect, useId, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { cn } from '@utils/cn';
+
+import { Div } from '@html/Div';
 import { IPortalProps } from './types';
 import { StyleSheet } from 'react-native';
-import { Div } from '@html/Div';
+import { cn } from '@utils/cn';
 import { commonVariant } from '@variants/common';
+import { createPortal } from 'react-dom';
 import { useAccessibilityEscape } from '@html/accessibility';
-
 
 /**
  * Web Portal component for rendering children into a React portal with accessibility and z-index management.
@@ -62,6 +63,7 @@ import { useAccessibilityEscape } from '@html/accessibility';
  */
 export function Portal({ children, onAccessibilityEscape, style, withBackdrop, id, className, testID, ...props }: IPortalProps) {
     const [shouldRender, setShouldRender] = useState(!!(typeof document !== "undefined" && document));
+    const isRendable = shouldRender && typeof document !== "undefined" && document;
     useEffect(() => {
         if (!shouldRender) {
             setShouldRender(true);
@@ -70,10 +72,11 @@ export function Portal({ children, onAccessibilityEscape, style, withBackdrop, i
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const zIndex = useMemo(() => {
+        if(!isRendable) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
-    }, []);
+    }, [isRendable]);
     useAccessibilityEscape(targetId, onAccessibilityEscape);
-    if (!shouldRender || typeof document === "undefined" || !document) return null;
+    if (!isRendable) return null;
     testID = defaultStr(testID, "resk-portal");
     return createPortal(<Div
         id={targetId}

@@ -1,19 +1,21 @@
 "use client";
-import { IModalProps } from "./types";
-import { JSX, ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import "./styles.css";
-import { normalizeGestureEvent } from "@html/events";
-import { IClassName } from "@src/types";
-import { classes } from "@variants/classes";
-import { StyleSheet } from "react-native";
-import { cn } from "@utils/cn";
-import { addClassName, defaultStr, getMaxZindex } from "@resk/core/utils";
-import { useAccessibilityEscape } from "@html/accessibility";
-import { Div } from "@html/Div";
-import { createPortal } from "react-dom";
-import { Backdrop } from "@components/Backdrop";
-import { commonVariant } from "@variants/common";
 
+import "./styles.css";
+
+import { JSX, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { defaultStr, getMaxZindex } from "@resk/core/utils";
+
+import { Backdrop } from "@components/Backdrop";
+import { Div } from "@html/Div";
+import { IClassName } from "@src/types";
+import { IModalProps } from "./types";
+import { StyleSheet } from "react-native";
+import { classes } from "@variants/classes";
+import { cn } from "@utils/cn";
+import { commonVariant } from "@variants/common";
+import { createPortal } from "react-dom";
+import { normalizeGestureEvent } from "@html/events";
+import { useAccessibilityEscape } from "@html/accessibility";
 
 const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
 export function Modal({ animationType = "fade", dismissible, withBackdrop, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
@@ -68,6 +70,8 @@ export function Modal({ animationType = "fade", dismissible, withBackdrop, backd
     }, [isAnimated, visible, onAnimationEnd]);
     const rProps = { onAnimationEnd };
     const canRender = isRendering || visible;
+    const isRendable = canRender && typeof document !== "undefined" && document;
+    
     const className = useMemo(() => {
         if (!isRendering) return [hiddenStyle]
         const animatedStyle = visible ? "resk-modal-animated-in" : "resk-modal-animated-out";
@@ -86,10 +90,10 @@ export function Modal({ animationType = "fade", dismissible, withBackdrop, backd
         return className;
     }, [isRendering, visible, animationType]);
     const zIndex = useMemo(() => {
-        if (!visible) return 0;
+        if (!visible || !isRendable) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
-    }, [visible]);
-    if (!canRender || typeof document === "undefined" || !document) return null;
+    }, [visible,isRendable]);
+    if (!isRendable) return null;
     testID = defaultStr(testID, "resk-modal");
     return createPortal(<Div
         {...props}

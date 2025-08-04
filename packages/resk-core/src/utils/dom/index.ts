@@ -1,5 +1,5 @@
 import isDOMElement from "./isDOMElement";
-  
+
 /**
  * Returns the maximum z-index value of all elements in the document body.
  *
@@ -10,6 +10,9 @@ import isDOMElement from "./isDOMElement";
  * @returns The maximum z-index value of all elements in the document body.
  */
 export function getMaxZindex(): number {
+  if(typeof document === 'undefined' || !document) {
+    return 1000; // Default fallback value if document is not available
+  }
   let highestZIndex = 0;
 
   // later, potentially repeatedly
@@ -104,4 +107,5 @@ export function removeClassName(elem: any, ...args: string[]): void {
   }
 }
   
-export {isDOMElement};
+export { isDOMElement };
+

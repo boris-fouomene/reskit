@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.116",
+  "version": "1.0.1-canary.117",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -181,7 +181,7 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.24.2",
+    "@resk/core": "^1.25.2",
     "clsx": "^2.1.1",
     "commander": "^14.0.0",
     "tailwind-merge": "^3.3.1",

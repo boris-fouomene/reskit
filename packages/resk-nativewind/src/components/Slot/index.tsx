@@ -1,7 +1,7 @@
 import { Logger } from "@resk/core/logger";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { isValidElement, ComponentType, ReactNode, FC, cloneElement, JSX } from "react";
-import { StyleSheet } from "nativewind";
+import { StyleSheet } from "react-native";
 import { cn } from "@utils/cn";
 // Type to extract the props of a component
 type PropsOf<T> = T extends ComponentType<infer P> ? P : never;

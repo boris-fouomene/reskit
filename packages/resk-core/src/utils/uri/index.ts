@@ -1,7 +1,10 @@
-import isNonNullString from "../isNonNullString";
-import { IDict } from "../../types";
 import "../string";
+
 import queryString, { IParseBaseOptions, IStringifyBaseOptions } from "qs";
+
+import { IDict } from "../../types";
+import isNonNullString from "../isNonNullString";
+
 /**
  * Returns the query string from a given URL.
  *
@@ -264,7 +267,7 @@ export const parseURI = (
  * console.log(isValidUrl('not-a-valid-url')); // false
  * console.log(isValidUrl('http://256.256.256.256')); // false (invalid IP address)
  */
-export const isValidUrl = (uri: any): uri is string => {
+export const isValidUrl = (uri: any): boolean => {
   if (!isNonNullString(uri) || !uri.trim()) return false;
   if (!!/^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/.test(uri)) {
     return true;

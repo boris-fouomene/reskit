@@ -1,6 +1,6 @@
 {
   "name": "@resk/core",
-  "version": "1.25.6",
+  "version": "1.25.7",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "exports": {
     "./auth": {
@@ -77,6 +77,52 @@
       "types": "./build/*",
       "import": "./build/*",
       "require": "./build/*"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "auth": [
+        "./build/auth/index.d.ts"
+      ],
+      "countries": [
+        "./build/countries/index.d.ts"
+      ],
+      "currency": [
+        "./build/currency/index.d.ts"
+      ],
+      "i18n": [
+        "./build/i18n/index.d.ts"
+      ],
+      "inputFormatter": [
+        "./build/inputFormatter/index.d.ts"
+      ],
+      "logger": [
+        "./build/logger/index.d.ts"
+      ],
+      "observable": [
+        "./build/observable/index.d.ts"
+      ],
+      "platform": [
+        "./build/platform/index.d.ts"
+      ],
+      "resources": [
+        "./build/resources/index.d.ts"
+      ],
+      "session": [
+        "./build/session/index.d.ts"
+      ],
+      "utils": [
+        "./build/utils/index.d.ts"
+      ],
+      "types": [
+        "./build/types/index.d.ts"
+      ],
+      "validator": [
+        "./build/validator/index.d.ts"
+      ],
+      "http-client": [
+        "./build/http-client/index.d.ts"
+      ]
     }
   },
   "files": [

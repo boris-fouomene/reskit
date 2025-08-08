@@ -70,7 +70,7 @@ export const roundedClasses = {
     "50px": "rounded-b-[50px]",
   },
 
-  roundeLeft: {
+  roundedLeft: {
     rounded: "rounded-l",
     none: "rounded-l-none",
     sm: "rounded-l-sm",

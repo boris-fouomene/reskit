@@ -1,4 +1,4 @@
-export const displayVariantsOptios = {
+export const displayVariantsOptions = {
   display: {
     flex: "flex",
     hidden: "hidden",

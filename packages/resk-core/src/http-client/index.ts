@@ -118,7 +118,7 @@ export class HttpClient {
    *
    * @param options - The original fetch options object.
    * @param path - The endpoint path being requested.
-   * @returns {IHttpClient.FetchOptions | Promise<IHttpClient.FetchOptions>} The transformed options.
+   * @returns {Promise<RequestInit>} The transformed options.
    *
    * @example
    * ```typescript
@@ -126,10 +126,10 @@ export class HttpClient {
    * const opts = await client.transformRequestOptions({ headers: { Accept: "application/json" } }, "/users");
    * ```
    */
-  transformRequestOptions(
+  async transformRequestOptions(
     options: IHttpClient.FetchOptions,
     path: string
-  ): RequestInit | Promise<RequestInit> {
+  ): Promise<RequestInit> {
     options.headers = this.transformRequestHeader(options.headers);
     return options;
   }

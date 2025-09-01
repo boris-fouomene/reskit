@@ -26,11 +26,11 @@ export class Breakpoints {
         };
         const windowWidth = Dimensions.get('window').width;
         const width = isNumber(viewportWidth) && viewportWidth > 0 ? viewportWidth : windowWidth;
-        const isMobile = width <= breakpoints.mobileMaxWidth, isTablet = width <= breakpoints.mobileMaxWidth;
+        const isMobile = width <= breakpoints.mobileMaxWidth, isTablet = width < breakpoints.tabletMaxWidth;
         return {
             isMobile,
             isTablet,
-            isDesktop: width > breakpoints.tabletMaxWidth,
+            isDesktop: width >= breakpoints.tabletMaxWidth,
             isMobileOrTablet: isMobile || isTablet,
             mobileMaxWidth,
             tabletMaxWidth,

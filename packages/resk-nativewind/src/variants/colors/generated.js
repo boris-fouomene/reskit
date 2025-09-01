@@ -5,73 +5,73 @@ export const VariantsColors = {
       "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",
       "label": "text-primary-foreground dark:text-dark-primary-foreground",
       "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
-      "activityIndicator": "border-t-primary-foreground dark:border-t-dark-primary-foreground"
+      "activityIndicator": "bg-primary-foreground dark:bg-dark-primary-foreground"
     },
     "secondary": {
       "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary",
       "label": "text-secondary-foreground dark:text-dark-secondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
-      "activityIndicator": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground"
+      "activityIndicator": "bg-secondary-foreground dark:bg-dark-secondary-foreground"
     },
     "surface": {
       "base": "bg-gray-100 dark:bg-gray-800 focus-visible:outline-gray-100 dark:focus-visible:outline-gray-800",
       "label": "text-gray-900 dark:text-gray-100",
       "icon": "!text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
+      "activityIndicator": "bg-gray-900 dark:bg-gray-100"
     },
     "background": {
       "base": "bg-white dark:bg-gray-900 focus-visible:outline-white dark:focus-visible:outline-gray-900",
       "label": "text-gray-900 dark:text-gray-100",
       "icon": "!text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
+      "activityIndicator": "bg-gray-900 dark:bg-gray-100"
     },
     "neutral": {
       "base": "bg-gray-500 dark:bg-gray-600 focus-visible:outline-gray-500 dark:focus-visible:outline-gray-600",
       "label": "text-white dark:text-gray-50",
       "icon": "!text-white dark:!text-gray-50",
-      "activityIndicator": "border-t-white dark:border-t-gray-50"
+      "activityIndicator": "bg-white dark:bg-gray-50"
     },
     "error": {
       "base": "bg-red-500 dark:bg-red-600 focus-visible:outline-red-500 dark:focus-visible:outline-red-600",
       "label": "text-white dark:text-red-50",
       "icon": "!text-white dark:!text-red-50",
-      "activityIndicator": "border-t-white dark:border-t-red-50"
+      "activityIndicator": "bg-white dark:bg-red-50"
     },
     "info": {
       "base": "bg-blue-500 dark:bg-blue-600 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-600",
       "label": "text-white dark:text-blue-50",
       "icon": "!text-white dark:!text-blue-50",
-      "activityIndicator": "border-t-white dark:border-t-blue-50"
+      "activityIndicator": "bg-white dark:bg-blue-50"
     },
     "warning": {
       "base": "bg-yellow-500 dark:bg-yellow-600 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-600",
       "label": "text-yellow-900 dark:text-yellow-50",
       "icon": "!text-yellow-900 dark:!text-yellow-50",
-      "activityIndicator": "border-t-yellow-900 dark:border-t-yellow-50"
+      "activityIndicator": "bg-yellow-900 dark:bg-yellow-50"
     },
     "success": {
       "base": "bg-green-500 dark:bg-green-600 focus-visible:outline-green-500 dark:focus-visible:outline-green-600",
       "label": "text-white dark:text-green-50",
       "icon": "!text-white dark:!text-green-50",
-      "activityIndicator": "border-t-white dark:border-t-green-50"
+      "activityIndicator": "bg-white dark:bg-green-50"
     },
     "text": {
       "base": "bg-gray-900 dark:bg-gray-100 focus-visible:outline-gray-900 dark:focus-visible:outline-gray-100",
       "label": "text-gray-100 dark:text-gray-900",
       "icon": "!text-gray-100 dark:!text-gray-900",
-      "activityIndicator": "border-t-gray-100 dark:border-t-gray-900"
+      "activityIndicator": "bg-gray-100 dark:bg-gray-900"
     },
     "outline": {
       "base": "bg-gray-300 dark:bg-gray-700 focus-visible:outline-gray-300 dark:focus-visible:outline-gray-700",
       "label": "text-gray-900 dark:text-gray-100",
       "icon": "!text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
+      "activityIndicator": "bg-gray-900 dark:bg-gray-100"
     },
     "backdrop": {
       "base": "bg-gray-900/50 dark:bg-gray-900/80 focus-visible:outline-gray-900/50 dark:focus-visible:outline-gray-900/80",
       "label": "text-white dark:text-white",
       "icon": "!text-white dark:!text-white",
-      "activityIndicator": "border-t-white dark:border-t-white"
+      "activityIndicator": "bg-white dark:bg-white"
     }
   },
   "buttonOutline": {
@@ -79,73 +79,73 @@ export const VariantsColors = {
       "base": "group web:hover:bg-primary web:dark:hover:bg-dark-primary border-2 border-primary dark:border-dark-primary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-primary-foreground web:dark:hover:text-dark-primary-foreground web:group-hover:text-primary-foreground web:dark:group-hover:text-dark-primary-foreground text-primary dark:text-dark-primary",
       "icon": "web:hover:!text-primary-foreground web:dark:hover:!text-dark-primary-foreground web:group-hover:!text-primary-foreground web:dark:group-hover:!text-dark-primary-foreground !text-primary dark:!text-dark-primary",
-      "activityIndicator": "web:hover:border-t-primary-foregund web:dark:hover:border-t-dark-primary-foreground web:group-hover:border-t-primary-foreground web:dark:group-hover:border-t-dark-primary-foreground border-t-primary dark:border-t-dark-primary"
+      "activityIndicator": "web:hover:bg-primary-foreground web:dark:hover:bg-dark-primary-foreground web:group-hover:bg-primary-foreground web:dark:group-hover:bg-dark-primary-foreground bg-primary dark:bg-dark-primary"
     },
     "secondary": {
       "base": "group web:hover:bg-secondary web:dark:hover:bg-dark-secondary border-2 border-secondary dark:border-dark-secondary bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-secondary-foreground web:dark:hover:text-dark-secondary-foreground web:group-hover:text-secondary-foreground web:dark:group-hover:text-dark-secondary-foreground text-secondary dark:text-dark-secondary",
       "icon": "web:hover:!text-secondary-foreground web:dark:hover:!text-dark-secondary-foreground web:group-hover:!text-secondary-foreground web:dark:group-hover:!text-dark-secondary-foreground !text-secondary dark:!text-dark-secondary",
-      "activityIndicator": "web:hover:border-t-secondary-foregund web:dark:hover:border-t-dark-secondary-foreground web:group-hover:border-t-secondary-foreground web:dark:group-hover:border-t-dark-secondary-foreground border-t-secondary dark:border-t-dark-secondary"
+      "activityIndicator": "web:hover:bg-secondary-foreground web:dark:hover:bg-dark-secondary-foreground web:group-hover:bg-secondary-foreground web:dark:group-hover:bg-dark-secondary-foreground bg-secondary dark:bg-dark-secondary"
     },
     "surface": {
       "base": "group web:hover:bg-gray-100 web:dark:hover:bg-gray-800 border-2 border-gray-100 dark:border-gray-800 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-gray-100 dark:text-gray-800",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-gray-100 dark:!text-gray-800",
-      "activityIndicator": "web:hover:border-t-gray-100-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-gray-100 dark:border-t-gray-800"
+      "activityIndicator": "web:hover:bg-gray-100-foreground web:dark:hover:bg-gray-100 web:group-hover:bg-gray-900 web:dark:group-hover:bg-gray-100 bg-gray-100 dark:bg-gray-800"
     },
     "background": {
       "base": "group web:hover:bg-white web:dark:hover:bg-gray-900 border-2 border-white dark:border-gray-900 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-white dark:text-gray-900",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-white dark:!text-gray-900",
-      "activityIndicator": "web:hover:border-t-white-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-white dark:border-t-gray-900"
+      "activityIndicator": "web:hover:bg-white-foreground web:dark:hover:bg-gray-100 web:group-hover:bg-gray-900 web:dark:group-hover:bg-gray-100 bg-white dark:bg-gray-900"
     },
     "neutral": {
       "base": "group web:hover:bg-gray-500 web:dark:hover:bg-gray-600 border-2 border-gray-500 dark:border-gray-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-gray-50 web:group-hover:text-white web:dark:group-hover:text-gray-50 text-gray-500 dark:text-gray-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-gray-50 web:group-hover:!text-white web:dark:group-hover:!text-gray-50 !text-gray-500 dark:!text-gray-600",
-      "activityIndicator": "web:hover:border-t-gray-500-foregund web:dark:hover:border-t-gray-50 web:group-hover:border-t-white web:dark:group-hover:border-t-gray-50 border-t-gray-500 dark:border-t-gray-600"
+      "activityIndicator": "web:hover:bg-gray-500-foreground web:dark:hover:bg-gray-50 web:group-hover:bg-white web:dark:group-hover:bg-gray-50 bg-gray-500 dark:bg-gray-600"
     },
     "error": {
       "base": "group web:hover:bg-red-500 web:dark:hover:bg-red-600 border-2 border-red-500 dark:border-red-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-red-50 web:group-hover:text-white web:dark:group-hover:text-red-50 text-red-500 dark:text-red-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-red-50 web:group-hover:!text-white web:dark:group-hover:!text-red-50 !text-red-500 dark:!text-red-600",
-      "activityIndicator": "web:hover:border-t-red-500-foregund web:dark:hover:border-t-red-50 web:group-hover:border-t-white web:dark:group-hover:border-t-red-50 border-t-red-500 dark:border-t-red-600"
+      "activityIndicator": "web:hover:bg-red-500-foreground web:dark:hover:bg-red-50 web:group-hover:bg-white web:dark:group-hover:bg-red-50 bg-red-500 dark:bg-red-600"
     },
     "info": {
       "base": "group web:hover:bg-blue-500 web:dark:hover:bg-blue-600 border-2 border-blue-500 dark:border-blue-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-blue-50 web:group-hover:text-white web:dark:group-hover:text-blue-50 text-blue-500 dark:text-blue-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-blue-50 web:group-hover:!text-white web:dark:group-hover:!text-blue-50 !text-blue-500 dark:!text-blue-600",
-      "activityIndicator": "web:hover:border-t-blue-500-foregund web:dark:hover:border-t-blue-50 web:group-hover:border-t-white web:dark:group-hover:border-t-blue-50 border-t-blue-500 dark:border-t-blue-600"
+      "activityIndicator": "web:hover:bg-blue-500-foreground web:dark:hover:bg-blue-50 web:group-hover:bg-white web:dark:group-hover:bg-blue-50 bg-blue-500 dark:bg-blue-600"
     },
     "warning": {
       "base": "group web:hover:bg-yellow-500 web:dark:hover:bg-yellow-600 border-2 border-yellow-500 dark:border-yellow-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-yellow-900 web:dark:hover:text-yellow-50 web:group-hover:text-yellow-900 web:dark:group-hover:text-yellow-50 text-yellow-500 dark:text-yellow-600",
       "icon": "web:hover:!text-yellow-900 web:dark:hover:!text-yellow-50 web:group-hover:!text-yellow-900 web:dark:group-hover:!text-yellow-50 !text-yellow-500 dark:!text-yellow-600",
-      "activityIndicator": "web:hover:border-t-yellow-500-foregund web:dark:hover:border-t-yellow-50 web:group-hover:border-t-yellow-900 web:dark:group-hover:border-t-yellow-50 border-t-yellow-500 dark:border-t-yellow-600"
+      "activityIndicator": "web:hover:bg-yellow-500-foreground web:dark:hover:bg-yellow-50 web:group-hover:bg-yellow-900 web:dark:group-hover:bg-yellow-50 bg-yellow-500 dark:bg-yellow-600"
     },
     "success": {
       "base": "group web:hover:bg-green-500 web:dark:hover:bg-green-600 border-2 border-green-500 dark:border-green-600 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-green-50 web:group-hover:text-white web:dark:group-hover:text-green-50 text-green-500 dark:text-green-600",
       "icon": "web:hover:!text-white web:dark:hover:!text-green-50 web:group-hover:!text-white web:dark:group-hover:!text-green-50 !text-green-500 dark:!text-green-600",
-      "activityIndicator": "web:hover:border-t-green-500-foregund web:dark:hover:border-t-green-50 web:group-hover:border-t-white web:dark:group-hover:border-t-green-50 border-t-green-500 dark:border-t-green-600"
+      "activityIndicator": "web:hover:bg-green-500-foreground web:dark:hover:bg-green-50 web:group-hover:bg-white web:dark:group-hover:bg-green-50 bg-green-500 dark:bg-green-600"
     },
     "text": {
       "base": "group web:hover:bg-gray-900 web:dark:hover:bg-gray-100 border-2 border-gray-900 dark:border-gray-100 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-100 web:dark:hover:text-gray-900 web:group-hover:text-gray-100 web:dark:group-hover:text-gray-900 text-gray-900 dark:text-gray-100",
       "icon": "web:hover:!text-gray-100 web:dark:hover:!text-gray-900 web:group-hover:!text-gray-100 web:dark:group-hover:!text-gray-900 !text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "web:hover:border-t-gray-900-foregund web:dark:hover:border-t-gray-900 web:group-hover:border-t-gray-100 web:dark:group-hover:border-t-gray-900 border-t-gray-900 dark:border-t-gray-100"
+      "activityIndicator": "web:hover:bg-gray-900-foreground web:dark:hover:bg-gray-900 web:group-hover:bg-gray-100 web:dark:group-hover:bg-gray-900 bg-gray-900 dark:bg-gray-100"
     },
     "outline": {
       "base": "group web:hover:bg-gray-300 web:dark:hover:bg-gray-700 border-2 border-gray-300 dark:border-gray-700 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-gray-900 web:dark:hover:text-gray-100 web:group-hover:text-gray-900 web:dark:group-hover:text-gray-100 text-gray-300 dark:text-gray-700",
       "icon": "web:hover:!text-gray-900 web:dark:hover:!text-gray-100 web:group-hover:!text-gray-900 web:dark:group-hover:!text-gray-100 !text-gray-300 dark:!text-gray-700",
-      "activityIndicator": "web:hover:border-t-gray-300-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-gray-300 dark:border-t-gray-700"
+      "activityIndicator": "web:hover:bg-gray-300-foreground web:dark:hover:bg-gray-100 web:group-hover:bg-gray-900 web:dark:group-hover:bg-gray-100 bg-gray-300 dark:bg-gray-700"
     },
     "backdrop": {
       "base": "group web:hover:bg-gray-900/50 web:dark:hover:bg-gray-900/80 border-2 border-gray-900/50 dark:border-gray-900/80 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
       "label": "web:hover:text-white web:dark:hover:text-white web:group-hover:text-white web:dark:group-hover:text-white text-gray-900/50 dark:text-gray-900/80",
       "icon": "web:hover:!text-white web:dark:hover:!text-white web:group-hover:!text-white web:dark:group-hover:!text-white !text-gray-900/50 dark:!text-gray-900/80",
-      "activityIndicator": "web:hover:border-t-gray-900/50-foregund web:dark:hover:border-t-white web:group-hover:border-t-white web:dark:group-hover:border-t-white border-t-gray-900/50 dark:border-t-gray-900/80"
+      "activityIndicator": "web:hover:bg-gray-900/50-foreground web:dark:hover:bg-white web:group-hover:bg-white web:dark:group-hover:bg-white bg-gray-900/50 dark:bg-gray-900/80"
     }
   },
   "surface": {
@@ -773,30 +773,30 @@ export const VariantsColors = {
     "backdrop-foreground": "border-r-white dark:border-r-white"
   },
   "activityIndicator": {
-    "primary": "border-t-primary dark:border-t-dark-primary",
-    "secondary": "border-t-secondary dark:border-t-dark-secondary",
-    "surface": "border-t-gray-100 dark:border-t-gray-800",
-    "background": "border-t-white dark:border-t-gray-900",
-    "neutral": "border-t-gray-500 dark:border-t-gray-600",
-    "error": "border-t-red-500 dark:border-t-red-600",
-    "info": "border-t-blue-500 dark:border-t-blue-600",
-    "warning": "border-t-yellow-500 dark:border-t-yellow-600",
-    "success": "border-t-green-500 dark:border-t-green-600",
-    "text": "border-t-gray-900 dark:border-t-gray-100",
-    "outline": "border-t-gray-300 dark:border-t-gray-700",
-    "backdrop": "border-t-gray-900/50 dark:border-t-gray-900/80",
-    "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
-    "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
-    "surface-foreground": "border-t-gray-900 dark:border-t-gray-100",
-    "background-foreground": "border-t-gray-900 dark:border-t-gray-100",
-    "neutral-foreground": "border-t-white dark:border-t-gray-50",
-    "error-foreground": "border-t-white dark:border-t-red-50",
-    "info-foreground": "border-t-white dark:border-t-blue-50",
-    "warning-foreground": "border-t-yellow-900 dark:border-t-yellow-50",
-    "success-foreground": "border-t-white dark:border-t-green-50",
-    "text-foreground": "border-t-gray-100 dark:border-t-gray-900",
-    "outline-foreground": "border-t-gray-900 dark:border-t-gray-100",
-    "backdrop-foreground": "border-t-white dark:border-t-white"
+    "primary": "bg-primary dark:bg-dark-primary",
+    "secondary": "bg-secondary dark:bg-dark-secondary",
+    "surface": "bg-gray-100 dark:bg-gray-800",
+    "background": "bg-white dark:bg-gray-900",
+    "neutral": "bg-gray-500 dark:bg-gray-600",
+    "error": "bg-red-500 dark:bg-red-600",
+    "info": "bg-blue-500 dark:bg-blue-600",
+    "warning": "bg-yellow-500 dark:bg-yellow-600",
+    "success": "bg-green-500 dark:bg-green-600",
+    "text": "bg-gray-900 dark:bg-gray-100",
+    "outline": "bg-gray-300 dark:bg-gray-700",
+    "backdrop": "bg-gray-900/50 dark:bg-gray-900/80",
+    "primary-foreground": "bg-primary-foreground dark:bg-dark-primary-foreground",
+    "secondary-foreground": "bg-secondary-foreground dark:bg-dark-secondary-foreground",
+    "surface-foreground": "bg-gray-900 dark:bg-gray-100",
+    "background-foreground": "bg-gray-900 dark:bg-gray-100",
+    "neutral-foreground": "bg-white dark:bg-gray-50",
+    "error-foreground": "bg-white dark:bg-red-50",
+    "info-foreground": "bg-white dark:bg-blue-50",
+    "warning-foreground": "bg-yellow-900 dark:bg-yellow-50",
+    "success-foreground": "bg-white dark:bg-green-50",
+    "text-foreground": "bg-gray-100 dark:bg-gray-900",
+    "outline-foreground": "bg-gray-900 dark:bg-gray-100",
+    "backdrop-foreground": "bg-white dark:bg-white"
   },
   "ringColors": {
     "primary": "ring-primary dark:ring-dark-primary",

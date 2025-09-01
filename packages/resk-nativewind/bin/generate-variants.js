@@ -17,8 +17,14 @@ module.exports = (options) => {
   }
   const variantsRootDir = require("./find-package-dir")("build", "variants");
   options = Object.assign({}, options);
-  const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
-  const inputPath = isNonNullString(options.input) && options.input.trim().endsWith(".json") ? path.resolve(options.input) : path.resolve(dir, "variants.json");
+  const isDev =
+    options.isDev === true &&
+    variantsRootDir &&
+    fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
+  const inputPath =
+    isNonNullString(options.input) && options.input.trim().endsWith(".json")
+      ? path.resolve(options.input)
+      : path.resolve(dir, "variants.json");
   if (!fs.existsSync(inputPath)) {
     console.log("variants.json file not found at ", inputPath);
     return;
@@ -28,8 +34,16 @@ module.exports = (options) => {
     console.log("variants.json file is not a valid json object");
     return;
   }
-  const variantsDir = variantsRootDir ? path.resolve(variantsRootDir, isDev ? "src" : "build", "variants") : dir;
-  const vOptions = { variantsRootDir, isDev, inputPath, variantsDir, outputRootDir: variantsDir ?? dir };
+  const variantsDir = variantsRootDir
+    ? path.resolve(variantsRootDir, isDev ? "src" : "build", "variants")
+    : dir;
+  const vOptions = {
+    variantsRootDir,
+    isDev,
+    inputPath,
+    variantsDir,
+    outputRootDir: variantsDir ?? dir,
+  };
   const { colors } = Object.assign({}, variants);
   generateColorVariants(colors, vOptions);
 };
@@ -37,20 +51,32 @@ module.exports = (options) => {
 function generateColorVariants(colors, { outputRootDir, isDev }) {
   if (!colors || typeof colors != "object") return;
   const { VariantsColorsFactory } = require("./color-variants/colors");
-  if (!VariantsColorsFactory || typeof VariantsColorsFactory.buildColors !== "function" || typeof VariantsColorsFactory.buildTextColors !== "function") {
+  if (
+    !VariantsColorsFactory ||
+    typeof VariantsColorsFactory.buildColors !== "function" ||
+    typeof VariantsColorsFactory.buildTextColors !== "function"
+  ) {
     return;
   }
   VariantsColorsFactory.registerColor(colors);
   const ouputFolder = path.resolve(outputRootDir, "colors");
   const outputPath = path.resolve(ouputFolder, "generated.js");
   const outputDeclarations = path.resolve(ouputFolder, "generated.d.ts");
-  const textForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value]));
+  const textForeground = Object.fromEntries(
+    Object.entries(VariantsColorsFactory.buildTextForegroundColors()).map(
+      ([key, value]) => [`${key}-foreground`, value]
+    )
+  );
   const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
-  const iconForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
+  const iconForeground = Object.fromEntries(
+    Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(
+      ([key, value]) => [`${key}-foreground`, value]
+    )
+  );
   const textColors = {
-    ...VariantsColorsFactory.buildTextColors(),
-    ...textForeground,
-  },
+      ...VariantsColorsFactory.buildTextColors(),
+      ...textForeground,
+    },
     icon = {
       ...textColorsWithImportant,
       ...iconForeground,
@@ -59,66 +85,225 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const allColors = {};
   const content = JSON.stringify(
     {
-      button: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor }) => {
-        return {
-          base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
-          label: `text-${lightForeground} dark:text-${darkForeground}`,
-          icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
-          activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
-        };
-      }),
-      buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        const groupClassName = {
-          base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
-          label: `web:hover:text-${lightForeground} web:dark:hover:text-${darkForeground} web:group-hover:text-${lightForeground} web:dark:group-hover:text-${darkForeground}`,
-          icon: `web:hover:!text-${lightForeground} web:dark:hover:!text-${darkForeground} web:group-hover:!text-${lightForeground} web:dark:group-hover:!text-${darkForeground}`,
-          activityIndicator: `web:hover:border-t-${lightColor}-foregund web:dark:hover:border-t-${darkForeground} web:group-hover:border-t-${lightForeground} web:dark:group-hover:border-t-${darkForeground}`,
-        };
-        return {
-          base: `${groupClassName.base} border-2 border-${lightColor} dark:border-${darkColor} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]`,
-          label: `${groupClassName.label} text-${lightColor} dark:text-${darkColor}`,
-          icon: `${groupClassName.icon} !text-${lightColor} dark:!text-${darkColor}`,
-          activityIndicator: cn(groupClassName.activityIndicator, `border-t-${lightColor} dark:border-t-${darkColor}`),
-        };
-      }),
-      surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`);
-      }),
-      hoverBackground: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`hover:bg-${lightColor} dark:bg-${darkColor}`);
-      }),
-      activeBackground: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`active:bg-${lightColor} dark:active:bg-${darkColor}`);
-      }),
-      shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`shadow-${lightColor} dark:shadow-${darkColor}`);
-      }),
-      hoverShadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`hover:shadow-${lightColor} dark:hover:shadow-${darkColor}`);
-      }),
-      activeShadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`active:shadow-${lightColor} dark:active:shadow-${darkColor}`);
-      }),
-      hoverText: VariantsColorsFactory.buildTextColors(false, ({ lightColor, darkColor }) => {
-        return cn(`hover:text-${lightColor} dark:hover:text-${darkColor}`);
-      }),
-      activeText: VariantsColorsFactory.buildTextColors(false, ({ lightColor, darkColor }) => {
-        return cn(`active:text-${lightColor} dark:active:text-${darkColor}`);
-      }),
+      button: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+        }) => {
+          return {
+            base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
+            label: `text-${lightForeground} dark:text-${darkForeground}`,
+            icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
+            activityIndicator: cn(
+              `bg-${lightForeground} dark:bg-${darkForeground}`
+            ),
+          };
+        }
+      ),
+      buttonOutline: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          const groupClassName = {
+            base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
+            label: `web:hover:text-${lightForeground} web:dark:hover:text-${darkForeground} web:group-hover:text-${lightForeground} web:dark:group-hover:text-${darkForeground}`,
+            icon: `web:hover:!text-${lightForeground} web:dark:hover:!text-${darkForeground} web:group-hover:!text-${lightForeground} web:dark:group-hover:!text-${darkForeground}`,
+            activityIndicator: `web:hover:bg-${lightColor}-foreground web:dark:hover:bg-${darkForeground} web:group-hover:bg-${lightForeground} web:dark:group-hover:bg-${darkForeground}`,
+          };
+          return {
+            base: `${groupClassName.base} border-2 border-${lightColor} dark:border-${darkColor} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]`,
+            label: `${groupClassName.label} text-${lightColor} dark:text-${darkColor}`,
+            icon: `${groupClassName.icon} !text-${lightColor} dark:!text-${darkColor}`,
+            activityIndicator: cn(
+              groupClassName.activityIndicator,
+              `bg-${lightColor} dark:bg-${darkColor}`
+            ),
+          };
+        }
+      ),
+      surface: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(
+            lightComputedColor,
+            darkComputedColor,
+            `text-${lightForeground} dark:text-${darkForeground}`
+          );
+        }
+      ),
+      hoverBackground: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(`hover:bg-${lightColor} dark:bg-${darkColor}`);
+        }
+      ),
+      activeBackground: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(`active:bg-${lightColor} dark:active:bg-${darkColor}`);
+        }
+      ),
+      shadow: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(`shadow-${lightColor} dark:shadow-${darkColor}`);
+        }
+      ),
+      hoverShadow: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(
+            `hover:shadow-${lightColor} dark:hover:shadow-${darkColor}`
+          );
+        }
+      ),
+      activeShadow: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
+          darkComputedForeground,
+        }) => {
+          return cn(
+            `active:shadow-${lightColor} dark:active:shadow-${darkColor}`
+          );
+        }
+      ),
+      hoverText: VariantsColorsFactory.buildTextColors(
+        false,
+        ({ lightColor, darkColor }) => {
+          return cn(`hover:text-${lightColor} dark:hover:text-${darkColor}`);
+        }
+      ),
+      activeText: VariantsColorsFactory.buildTextColors(
+        false,
+        ({ lightColor, darkColor }) => {
+          return cn(`active:text-${lightColor} dark:active:text-${darkColor}`);
+        }
+      ),
       text: textColors,
-      textDecoration: Object.fromEntries(Object.entries(textColors).map(([key, value]) => [key, value.split("text-").join("decoration-")])),
-      hoverText: Object.fromEntries(Object.entries(textColors).map(([key, value]) => [key, value.split("text-").join("hover:text-")])),
-      activeText: Object.fromEntries(Object.entries(textColors).map(([key, value]) => [key, value.split("text-").join("active:text-")])),
+      textDecoration: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => [
+          key,
+          value.split("text-").join("decoration-"),
+        ])
+      ),
+      hoverText: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => [
+          key,
+          value.split("text-").join("hover:text-"),
+        ])
+      ),
+      activeText: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => [
+          key,
+          value.split("text-").join("active:text-"),
+        ])
+      ),
       icon,
-      hoverIcon: Object.fromEntries(Object.entries(icon).map(([key, value]) => [key, value.split("!text-").join("hover:!text-")])),
-      activeIcon: Object.fromEntries(Object.entries(icon).map(([key, value]) => [key, value.split("!text-").join("active:!text-")])),
+      hoverIcon: Object.fromEntries(
+        Object.entries(icon).map(([key, value]) => [
+          key,
+          value.split("!text-").join("hover:!text-"),
+        ])
+      ),
+      activeIcon: Object.fromEntries(
+        Object.entries(icon).map(([key, value]) => [
+          key,
+          value.split("!text-").join("active:!text-"),
+        ])
+      ),
       background,
       textForeground,
-      hoverTextForeground: Object.fromEntries(Object.entries(textForeground).map(([key, value]) => [key, value.split("text-").join("hover:text-")])),
-      activeTextForeground: Object.fromEntries(Object.entries(textForeground).map(([key, value]) => [key, value.split("text-").join("active:text-")])),
+      hoverTextForeground: Object.fromEntries(
+        Object.entries(textForeground).map(([key, value]) => [
+          key,
+          value.split("text-").join("hover:text-"),
+        ])
+      ),
+      activeTextForeground: Object.fromEntries(
+        Object.entries(textForeground).map(([key, value]) => [
+          key,
+          value.split("text-").join("active:text-"),
+        ])
+      ),
       iconForeground,
-      hoverIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("hover:!text-")])),
-      activeIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("active:!text-")])),
+      hoverIconForeground: Object.fromEntries(
+        Object.entries(iconForeground).map(([key, value]) => [
+          key,
+          value.split("!text-").join("hover:!text-"),
+        ])
+      ),
+      activeIconForeground: Object.fromEntries(
+        Object.entries(iconForeground).map(([key, value]) => [
+          key,
+          value.split("!text-").join("active:!text-"),
+        ])
+      ),
       outlineColor: Object.fromEntries(
         Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("outline-")];
@@ -171,7 +356,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       ),
       activityIndicator: Object.fromEntries(
         Object.entries(textColors).map(([key, value]) => {
-          return [key, value.split("text-").join("border-t-")];
+          return [key, value.split("text-").join("bg-")];
         })
       ),
       ringColors: Object.fromEntries(
@@ -269,10 +454,18 @@ export const VariantsColors : IVariantsGeneratedColors = {} as any;
   if (!isDev && fs.existsSync(ouputFolder)) {
     const colorMapTypesPath = path.resolve(ouputFolder, "colorsMap.d.ts");
     try {
-      fs.writeFileSync(colorMapTypesPath, VariantsColorsFactory.generateColorsMapTypes(), "utf8");
+      fs.writeFileSync(
+        colorMapTypesPath,
+        VariantsColorsFactory.generateColorsMapTypes(),
+        "utf8"
+      );
       console.log("Variants colors map types generated at ", colorMapTypesPath);
     } catch (error) {
-      console.log("Error generating color map types file at ", colorMapTypesPath, error);
+      console.log(
+        "Error generating color map types file at ",
+        colorMapTypesPath,
+        error
+      );
     }
   }
 }

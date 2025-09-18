@@ -4,7 +4,7 @@ import { IPrimitive } from "@/types";
 import { Validator } from "../validator";
 
 function Enum<T extends IPrimitive = IPrimitive>({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<Array<T>>): IValidatorResult {
-  if (!ruleParams || ruleParams.length) {
+  if (!ruleParams || !ruleParams.length) {
     const message = i18n.t("validator.invalidRuleParams", {
       rule: "Enum",
       field: translatedPropertyName || fieldName,

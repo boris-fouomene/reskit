@@ -1,4 +1,4 @@
-import { IValidatorRule, IValidatorValidateOptions, IValidatorRules, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
+import { IValidatorRule, IValidatorValidateOptions, IValidatorRules, IValidatorRuleName, IValidatorRuleFunction, IValidatorSanitizedRules } from "./types";
 import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
 import { IClassConstructor, IDict } from "@/types";
@@ -720,7 +720,7 @@ export class Validator {
    * @see {@link registerRule} - Register custom rules
    * @public
    */
-  static validate<Context = unknown>({ rules, value, ...extra }: IValidatorValidateOptions<Array<any>, Context>): Promise<IValidatorValidateOptions<Array<any>, Context>> {
+  static validate<Context = unknown>({ rules, value, ...extra }: IValidatorValidateOptions<Array<any>, Context>): Promise<IValidatorValidateOptions<Array<any>, Context> & { success: boolean }> {
     const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules(rules);
     const separators = Validator.getErrorMessageSeparators();
 
@@ -729,7 +729,7 @@ export class Validator {
       return Promise.reject({ rules, value, ...extra, message });
     }
 
-    if (!sanitizedRules.length) return Promise.resolve({ rules, value, ...extra });
+    if (!sanitizedRules.length) return Promise.resolve({ rules, value, ...extra, success: false });
 
     extra.fieldName = extra.propertyName = defaultStr(extra.fieldName, extra.propertyName);
     const i18nRulesOptions = {
@@ -744,7 +744,7 @@ export class Validator {
         const next = async function (): Promise<any> {
           index++;
           if (index >= rulesLength) {
-            return resolve({ value, rules, ...extra });
+            return resolve({ value, rules, ...extra, success: true });
           }
           const rule = sanitizedRules[index];
           let ruleName = undefined;

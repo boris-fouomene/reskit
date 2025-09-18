@@ -10,8 +10,8 @@
     "allowJs": true,
     "resolveJsonModule": false,
     "target": "ES2015", // Or the desired target
-    "module": "ES6", // Enables ESM & CJS interop
-    "moduleResolution": "node",
+    "module": "node16", // Enables ESM & CJS interop
+    "moduleResolution": "node16",
     "removeComments": true,
     "declaration": false,
     "sourceMap": false,
@@ -41,6 +41,7 @@
     "node_modules",
     "node_modules/**/*",
     "@resk/core/**/*",
+    "packages/resk-core/lib/**/*",
     "docs/**/*",
     "examples/**/*",
     "**/build/**/*",

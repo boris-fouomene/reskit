@@ -22,6 +22,7 @@ I18n.RegisterTranslations({
       invalidRule: "Invalid validation rule: %{rule}",
       invalidRuleParams: "Invalid parameters for rule %{rule}; params: %{ruleParams[0]}, %{ruleParams[1]}, ...",
       invalidMessage: "Invalid validation message for rule %{rule}; error validating value %{value}",
+      invalidEnumValue: "The field %{field} must be one of %{expectedValues}",
       required: "This field is required",
       minLength: "This field must be at least %{minLength} characters long",
       maxLength: "This field must be at most %{maxLength} characters long",

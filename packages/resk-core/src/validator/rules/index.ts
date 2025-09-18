@@ -8,6 +8,7 @@ import { isNumber } from "@utils/isNumber";
 export * from "./boolean";
 export * from "./string";
 export * from "./numeric";
+export * from "./enum";
 
 /**
  * @function compareNumer

@@ -1,14 +1,21 @@
-import { IValidatorResult, IValidatorValidateOptions } from "../types";
-import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
-import { Validator } from "../validator";
+import {
+  defaultStr,
+  isEmpty,
+  isNonNullString,
+  isStringNumber,
+  isValidEmail,
+  isValidUrl,
+} from "@utils/index";
+import { isNumber } from "@utils/isNumber";
 import { i18n } from "../../i18n";
 import { InputFormatter } from "../../inputFormatter";
-import { isNumber } from "@utils/isNumber";
+import { IValidatorResult, IValidatorValidateOptions } from "../types";
+import { Validator } from "../validator";
 
 export * from "./boolean";
-export * from "./string";
-export * from "./numeric";
 export * from "./enum";
+export * from "./numeric";
+export * from "./string";
 
 /**
  * @function compareNumer
@@ -31,17 +38,31 @@ export * from "./enum";
  *     .catch(error => console.error(error)); // Output: "Value must be less than 10"
  * ```
  */
-function compareNumer(compare: (value: any, toCompare: any) => boolean, translateKey: string, { value, ruleParams, ...rest }: IValidatorValidateOptions): IValidatorResult {
+function compareNumer(
+  compare: (value: any, toCompare: any) => boolean,
+  translateKey: string,
+  { value, ruleParams, ...rest }: IValidatorValidateOptions
+): IValidatorResult {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const rParams = ruleParams ? ruleParams : [];
   translateKey = defaultStr(translateKey);
   const message = i18n.t(translateKey, { ...rest, value, ruleParams });
-  value = typeof value === "number" ? value : isStringNumber(value) ? parseFloat(value) : NaN;
+  value =
+    typeof value === "number"
+      ? value
+      : isStringNumber(value)
+        ? parseFloat(value)
+        : NaN;
   return new Promise((resolve, reject) => {
     if (isNaN(value) || rParams[0] === undefined) {
       return resolve(message);
     }
-    const toCompare = typeof rParams[0] === "number" ? rParams[0] : isStringNumber(rParams[0]) ? parseFloat(rParams[0]) : NaN;
+    const toCompare =
+      typeof rParams[0] === "number"
+        ? rParams[0]
+        : isStringNumber(rParams[0])
+          ? parseFloat(rParams[0])
+          : NaN;
     if (isNaN(toCompare)) {
       return reject(message);
     }
@@ -52,7 +73,7 @@ function compareNumer(compare: (value: any, toCompare: any) => boolean, translat
   });
 }
 
-function numberLessThanOrEquals(options: IValidatorValidateOptions) {
+function numberLessThanOrEquals(options: IValidatorValidateOptions<[number]>) {
   return compareNumer(
     (value, toCompare) => {
       return value <= toCompare;
@@ -76,7 +97,9 @@ Validator.registerRule("NumberLessThanOrEquals", numberLessThanOrEquals);
  *  }
  * ```
  */
-export const IsNumberLessThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberLessThanOrEquals);
+export const IsNumberLessThanOrEquals = Validator.createRuleDecorator<
+  [param: number]
+>(numberLessThanOrEquals);
 
 function numberLessThan(options: IValidatorValidateOptions) {
   return compareNumer(
@@ -116,9 +139,12 @@ Validator.registerRule("NumberLessThan", numberLessThan);
  * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberLessThan = Validator.createRuleDecorator<[param: number]>(numberLessThan);
+export const IsNumberLessThan =
+  Validator.createRuleDecorator<[param: number]>(numberLessThan);
 
-function numberGreaterThanOrEquals(options: IValidatorValidateOptions) {
+function numberGreaterThanOrEquals(
+  options: IValidatorValidateOptions<[number]>
+) {
   return compareNumer(
     (value, toCompare) => {
       return value >= toCompare;
@@ -156,7 +182,9 @@ Validator.registerRule("NumberGreaterThanOrEquals", numberGreaterThanOrEquals);
  * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberGreaterThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberGreaterThanOrEquals);
+export const IsNumberGreaterThanOrEquals = Validator.createRuleDecorator<
+  [param: number]
+>(numberGreaterThanOrEquals);
 
 function numberGreaterThan(options: IValidatorValidateOptions) {
   return compareNumer(
@@ -196,9 +224,10 @@ Validator.registerRule("NumberGreaterThan", numberGreaterThan);
  * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberGreaterThan = Validator.createRuleDecorator<[param: number]>(numberGreaterThan);
+export const IsNumberGreaterThan =
+  Validator.createRuleDecorator<[param: number]>(numberGreaterThan);
 
-function numberEqualsTo(options: IValidatorValidateOptions) {
+function numberEqualsTo(options: IValidatorValidateOptions<[number]>) {
   return compareNumer(
     (value, toCompare) => {
       return value === toCompare;
@@ -236,9 +265,10 @@ Validator.registerRule("NumberEquals", numberEqualsTo);
  * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberEquals = Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
+export const IsNumberEquals =
+  Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
 
-function numberIsDifferentFromTo(options: IValidatorValidateOptions) {
+function numberIsDifferentFromTo(options: IValidatorValidateOptions<[number]>) {
   return compareNumer(
     (value, toCompare) => {
       return value !== toCompare;
@@ -263,7 +293,9 @@ Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
  * }
  * ```
  */
-export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<[param: number]>(numberIsDifferentFromTo);
+export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<
+  [param: number]
+>(numberIsDifferentFromTo);
 
 Validator.registerRule("Required", function Required(options) {
   const value = options?.value;
@@ -273,10 +305,21 @@ Validator.registerRule("Required", function Required(options) {
 function numberHasLength({ value, ruleParams }: IValidatorValidateOptions) {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   value = defaultStr(value);
-  const minLength = isNumber(ruleParams[0]) ? ruleParams[0] : isStringNumber(ruleParams[0]) ? parseFloat(ruleParams[0]) : undefined;
-  const maxLength = isNumber(ruleParams[1]) ? ruleParams[1] : isStringNumber(ruleParams[1]) ? parseFloat(ruleParams[1]) : undefined;
+  const minLength = isNumber(ruleParams[0])
+    ? ruleParams[0]
+    : isStringNumber(ruleParams[0])
+      ? parseFloat(ruleParams[0])
+      : undefined;
+  const maxLength = isNumber(ruleParams[1])
+    ? ruleParams[1]
+    : isStringNumber(ruleParams[1])
+      ? parseFloat(ruleParams[1])
+      : undefined;
   const i18nParams = { value, minLength, maxLength, length: minLength };
-  const message = isNumber(minLength) && isNumber(maxLength) ? i18n.t("validator.lengthRange", i18nParams) : i18n.t("validator.length", i18nParams);
+  const message =
+    isNumber(minLength) && isNumber(maxLength)
+      ? i18n.t("validator.lengthRange", i18nParams)
+      : i18n.t("validator.length", i18nParams);
   if (isNumber(minLength) && isNumber(maxLength)) {
     return (value.length >= minLength && value.length <= maxLength) || message;
   }
@@ -324,7 +367,10 @@ Validator.registerRule("Length", numberHasLength);
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const HasLength = Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(numberHasLength);
+export const HasLength =
+  Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(
+    numberHasLength
+  );
 
 Validator.registerRule("Email", function Email(options) {
   const value = options?.value;
@@ -336,15 +382,24 @@ Validator.registerRule("Email", function Email(options) {
 
 Validator.registerRule("Url", function Url(options) {
   const value = options?.value;
-  return !value || typeof value !== "string" ? true : isValidUrl(value) || i18n.t("validator.url", options);
+  return !value || typeof value !== "string"
+    ? true
+    : isValidUrl(value) || i18n.t("validator.url", options);
 });
 
 function minLength(options: IValidatorValidateOptions) {
   let { value, ruleParams } = options;
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const mLength = parseFloat(ruleParams[0]) || 0;
-  const message = i18n.t("validator.minLength", { ...options, minLength: mLength });
-  return isEmpty(value) || (value && typeof value === "string" && String(value).length >= mLength) || message;
+  const message = i18n.t("validator.minLength", {
+    ...options,
+    minLength: mLength,
+  });
+  return (
+    isEmpty(value) ||
+    (value && typeof value === "string" && String(value).length >= mLength) ||
+    message
+  );
 }
 Validator.registerRule("MinLength", minLength);
 
@@ -376,14 +431,22 @@ Validator.registerRule("MinLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const HasMinLength = Validator.createRuleDecorator<[minLength: string]>(minLength);
+export const HasMinLength =
+  Validator.createRuleDecorator<[minLength: string]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
   let { value, ruleParams } = options;
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const mLength = parseFloat(ruleParams[0]) || 0;
-  const message = i18n.t("validator.maxLength", { ...options, maxLength: mLength });
-  return isEmpty(value) || (value && typeof value === "string" && String(value).length <= mLength) || message;
+  const message = i18n.t("validator.maxLength", {
+    ...options,
+    maxLength: mLength,
+  });
+  return (
+    isEmpty(value) ||
+    (value && typeof value === "string" && String(value).length <= mLength) ||
+    message
+  );
 }
 Validator.registerRule("MaxLength", maxLength);
 
@@ -416,7 +479,8 @@ Validator.registerRule("MaxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const HasMaxLength = Validator.createRuleDecorator<[maxLength: number]>(maxLength);
+export const HasMaxLength =
+  Validator.createRuleDecorator<[maxLength: number]>(maxLength);
 
 Validator.registerRule("FileName", function FileName(options) {
   const { value } = options;
@@ -425,7 +489,9 @@ Validator.registerRule("FileName", function FileName(options) {
   const rg1 = /^[^\\/:*?"<>|]+$/; // forbidden characters \ / : * ? " < > |
   const rg2 = /^\./; // cannot start with dot (.)
   const rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(\.|$)/i; // forbidden file names
-  return (rg1.test(String(value)) && !rg2.test(value) && !rg3.test(value)) || message;
+  return (
+    (rg1.test(String(value)) && !rg2.test(value) && !rg3.test(value)) || message
+  );
 });
 
 Validator.registerRule("Number", function Number(options) {
@@ -440,7 +506,10 @@ Validator.registerRule("NonNullString", function NonNullString(options) {
 
 function phoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
-  return InputFormatter.isValidPhoneNumber(value, phoneCountryCode) || i18n.t("validator.phoneNumber", options);
+  return (
+    InputFormatter.isValidPhoneNumber(value, phoneCountryCode) ||
+    i18n.t("validator.phoneNumber", options)
+  );
 }
 Validator.registerRule("PhoneNumber", phoneNumber);
 
@@ -461,7 +530,11 @@ export const IsPhoneNumber = Validator.createPropertyDecorator(["PhoneNumber"]);
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
-  return isValidEmail(value) || InputFormatter.isValidPhoneNumber(value, phoneCountryCode) || i18n.t("validator.emailOrPhoneNumber", options);
+  return (
+    isValidEmail(value) ||
+    InputFormatter.isValidPhoneNumber(value, phoneCountryCode) ||
+    i18n.t("validator.emailOrPhoneNumber", options)
+  );
 }
 Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
 
@@ -478,4 +551,6 @@ Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
  * }
  * ```
  */
-export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator(["EmailOrPhoneNumber"]);
+export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator([
+  "EmailOrPhoneNumber",
+]);

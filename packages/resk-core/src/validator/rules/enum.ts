@@ -1,9 +1,15 @@
 import { i18n } from "@/i18n";
-import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { IPrimitive } from "@/types";
+import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
-function Enum<T extends IPrimitive = IPrimitive>({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<Array<T>>): IValidatorResult {
+function Enum<T extends IPrimitive = IPrimitive>({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<Array<T>>): IValidatorResult {
   if (!ruleParams || !ruleParams.length) {
     const message = i18n.t("validator.invalidRuleParams", {
       rule: "Enum",
@@ -14,7 +20,10 @@ function Enum<T extends IPrimitive = IPrimitive>({ value, ruleParams, fieldName,
     return message;
   }
   const exists = ruleParams.some((v) => {
-    return v === value || (v !== undefined && v !== null && String(value) == String(v));
+    return (
+      v === value ||
+      (v !== undefined && v !== null && String(value) == String(v))
+    );
   });
   if (!exists) {
     return i18n.t("validator.invalidEnumValue", {
@@ -29,7 +38,10 @@ function Enum<T extends IPrimitive = IPrimitive>({ value, ruleParams, fieldName,
 export const IsIsEnum = Validator.createRuleDecorator<Array<IPrimitive>>(Enum);
 Validator.registerRule("Enum", Enum);
 declare module "../types" {
-  export interface IValidatorRules {
+  export interface IValidatorRules<
+    ParamType extends Array<any> = Array<any>,
+    Context = unknown,
+  > {
     /**
      * ### Enum Rule
      *
@@ -43,6 +55,6 @@ declare module "../types" {
      * @since 1.25.13
      * @public
      */
-    Enum: IValidatorRuleFunction;
+    Enum: IValidatorRuleFunction<ParamType, Context>;
   }
 }

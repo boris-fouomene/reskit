@@ -1,9 +1,15 @@
 import isNonNullString from "@utils/isNonNullString";
 import { i18n } from "../../i18n";
-import { IValidatorValidateOptions, IValidatorResult } from "../types";
+import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
-function _EndsWith({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _EndsWith({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.endsWithOneOf", {
@@ -24,7 +30,9 @@ function _EndsWith({ value, ruleParams, fieldName, translatedPropertyName, ...re
       });
       return reject(message);
     }
-    const endsWithAny = ruleParams.some((ending) => isNonNullString(ending) && value.endsWith(ending));
+    const endsWithAny = ruleParams.some(
+      (ending) => isNonNullString(ending) && value.endsWith(ending)
+    );
     if (endsWithAny) {
       resolve(true);
     } else {
@@ -69,7 +77,13 @@ Validator.registerRule("EndsWithOneOf", _EndsWith);
  */
 export const EndsWithOneOf = Validator.createRuleDecorator<string[]>(_EndsWith);
 
-function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _StartsWith({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.startsWithOneOf", {
@@ -91,7 +105,9 @@ function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, ...
       return reject(message);
     }
 
-    const startsWithAny = ruleParams.some((prefix) => isNonNullString(value) && value.startsWith(prefix));
+    const startsWithAny = ruleParams.some(
+      (prefix) => isNonNullString(value) && value.startsWith(prefix)
+    );
 
     if (startsWithAny) {
       resolve(true);
@@ -107,7 +123,12 @@ function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, ...
   });
 }
 
-function _String({ value, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions): IValidatorResult {
+function _String({
+  value,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value === "string") {
       resolve(true);
@@ -151,7 +172,10 @@ Validator.registerRule("String", _String);
 export const IsString = Validator.createPropertyDecorator(["String"]);
 
 declare module "../types" {
-  export interface IValidatorRules {
+  export interface IValidatorRules<
+    ParamType extends Array<any> = Array<any>,
+    Context = unknown,
+  > {
     /**
      * ### String Rule
      *
@@ -205,7 +229,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    String: IValidatorRuleFunction;
+    String: IValidatorRuleFunction<ParamType, Context>;
 
     /**
      * ### StartsWithOneOf Rule
@@ -251,7 +275,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    StartsWithOneOf: IValidatorRuleFunction;
+    StartsWithOneOf: IValidatorRuleFunction<string[], Context>;
 
     /**
      * ### Ends With Rule
@@ -297,6 +321,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    EndsWithOneOf: IValidatorRuleFunction;
+    EndsWithOneOf: IValidatorRuleFunction<string[], Context>;
   }
 }

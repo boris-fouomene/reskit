@@ -5,7 +5,16 @@
 export type IValidatorResult = boolean | string | Promise<boolean | string>;
 import { IInputFormatterResult } from "@/inputFormatter/types";
 
-export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = unknown> = IValidatorRuleFunction<ParamType, Context> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
+export type IValidatorRule<
+  ParamType extends Array<any> = Array<any>,
+  Context = unknown,
+> =
+  | IValidatorRuleFunction<ParamType, Context>
+  | IValidatorRuleName
+  | `${IValidatorRuleName}[${string}]`
+  | {
+      [K in IValidatorRuleName]: IValidatorRules[K];
+    };
 
 /**
  * @typedef IValidatorSanitizedRule
@@ -28,7 +37,10 @@ export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = 
  *     ruleFunction: minLengthRule,
  * };
  */
-export type IValidatorSanitizedRule<ParamType extends Array<any> = Array<any>, Context = unknown> =
+export type IValidatorSanitizedRule<
+  ParamType extends Array<any> = Array<any>,
+  Context = unknown,
+> =
   | IValidatorRuleFunction<ParamType, Context>
   | {
       /**
@@ -146,7 +158,12 @@ export type IValidatorSanitizedRules = IValidatorSanitizedRule[];
  * - This type is essential for defining custom validation logic in forms, allowing developers to create reusable and flexible validation rules.
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
-export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Context = unknown> = (options: IValidatorValidateOptions<ParamType, Context>) => IValidatorResult;
+export type IValidatorRuleFunction<
+  ParamType extends Array<any> = Array<any>,
+  Context = unknown,
+> = (
+  options: IValidatorValidateOptions<ParamType, Context>
+) => IValidatorResult;
 
 /**
  * @interface IValidatorRuleName
@@ -179,7 +196,11 @@ export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Co
  * This type enhances type safety in your code by ensuring that only valid validation rule names
  * can be used, reducing the risk of runtime errors due to typos or invalid rule names.
  */
-export type IValidatorRuleName = keyof IValidatorRules;
+export type IValidatorRuleName = {
+  [K in keyof IValidatorRules]: IValidatorRules[K] extends IValidatorRuleFunction
+    ? K
+    : never;
+}[keyof IValidatorRules];
 
 /**
  * Represents a mapping of validation rule names to their corresponding validation rules.
@@ -210,91 +231,94 @@ export type IValidatorRuleName = keyof IValidatorRules;
  * This interface is useful for organizing and managing validation rules in a structured way,
  * making it easier to apply and reference them in  validation scenarios.
  */
-export interface IValidatorRules {
+export interface IValidatorRules<
+  ParamType extends Array<any> = Array<any>,
+  Context = unknown,
+> {
   /**
    * Validator rule that checks if a number is less than or equals a specified value.
    */
-  NumberLessThanOrEquals: IValidatorRuleFunction;
+  NumberLessThanOrEquals: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is less than a specified value.
    */
-  NumberLessThan: IValidatorRuleFunction;
+  NumberLessThan: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is greater than or equals a specified value.
    */
-  NumberGreaterThanOrEquals: IValidatorRuleFunction;
+  NumberGreaterThanOrEquals: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is greater than a specified value.
    */
-  NumberGreaterThan: IValidatorRuleFunction;
+  NumberGreaterThan: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is equal to a specified value.
    */
-  NumberEquals: IValidatorRuleFunction;
+  NumberEquals: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is different from a specified value.
    */
-  NumberIsDifferentFrom: IValidatorRuleFunction;
+  NumberIsDifferentFrom: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a value is present and not empty.
    */
-  Required: IValidatorRuleFunction;
+  Required: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that validates the length of a string.
    */
-  Length: IValidatorRuleFunction;
+  Length: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a string meets a minimum length requirement.
    */
-  MinLength: IValidatorRuleFunction;
+  MinLength: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a string does not exceed a maximum length.
    */
-  MaxLength: IValidatorRuleFunction;
+  MaxLength: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a valid email address format.
    */
-  Email: IValidatorRuleFunction;
+  Email: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a valid URL format.
    */
-  Url: IValidatorRuleFunction;
+  Url: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a valid file name.
    */
-  FileName: IValidatorRuleFunction;
+  FileName: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a number.
    */
-  Number: IValidatorRuleFunction;
+  Number: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a non-null string.
    */
-  NonNullString: IValidatorRuleFunction;
+  NonNullString: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a valid phone number.
    */
-  PhoneNumber: IValidatorRuleFunction;
+  PhoneNumber: IValidatorRuleFunction<ParamType, Context>;
 
   /**
    * Validator rule that checks if a value is a valid email or phone number.
    */
-  EmailOrPhoneNumber: IValidatorRuleFunction;
+  EmailOrPhoneNumber: IValidatorRuleFunction<ParamType, Context>;
 }
 
 /**
@@ -364,7 +388,10 @@ export interface IValidatorRules {
  * @template ParamType The type of the parameters that the rule function accepts.
  * @template Context The type of the context that the rule function accepts.
  */
-export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>, Context = unknown> extends Partial<IInputFormatterResult> {
+export interface IValidatorValidateOptions<
+  ParamType extends Array<any> = Array<any>,
+  Context = unknown,
+> extends Partial<IInputFormatterResult> {
   /**
    * The list of validation rules to apply that have been passed through the `Validator.validate` method.
    *

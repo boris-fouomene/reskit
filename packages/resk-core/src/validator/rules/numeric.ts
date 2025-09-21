@@ -1,9 +1,14 @@
-import { IValidatorValidateOptions, IValidatorResult } from "../types";
 import { i18n } from "../../i18n";
+import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
-import { isInteger } from "../../utils/index";
 
-function NumberBetween({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<[number, number]>): IValidatorResult {
+function NumberBetween({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<[number, number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -82,10 +87,19 @@ function NumberBetween({ value, ruleParams, fieldName, translatedPropertyName, .
  * @since 1.22.0
  * @public
  */
-export const IsNumberBetween = Validator.createRuleDecorator<[min: number, max: number]>(NumberBetween);
+export const IsNumberBetween =
+  Validator.createRuleDecorator<[min: number, max: number]>(NumberBetween);
 Validator.registerRule("NumberBetween", NumberBetween);
 
-function DecimalPlaces({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<[minDecimalPlaces: number, maxDecimalPlaces?: number]>): IValidatorResult {
+function DecimalPlaces({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<
+  [minDecimalPlaces: number, maxDecimalPlaces?: number]
+>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || !ruleParams.length) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -112,7 +126,8 @@ function DecimalPlaces({ value, ruleParams, fieldName, translatedPropertyName, .
     // Get decimal places from the number
     const valueStr = String(value);
     const decimalIndex = valueStr.indexOf(".");
-    const actualDecimalPlaces = decimalIndex === -1 ? 0 : valueStr.length - decimalIndex - 1;
+    const actualDecimalPlaces =
+      decimalIndex === -1 ? 0 : valueStr.length - decimalIndex - 1;
 
     let isValid = false;
 
@@ -124,7 +139,8 @@ function DecimalPlaces({ value, ruleParams, fieldName, translatedPropertyName, .
       // Range of decimal places
       const minPlaces = Number(ruleParams[0]);
       const maxPlaces = Number(ruleParams[1]);
-      isValid = actualDecimalPlaces >= minPlaces && actualDecimalPlaces <= maxPlaces;
+      isValid =
+        actualDecimalPlaces >= minPlaces && actualDecimalPlaces <= maxPlaces;
     }
     if (isValid) {
       resolve(true);
@@ -175,9 +191,17 @@ Validator.registerRule("DecimalPlaces", DecimalPlaces);
  * @since 1.22.0
  * @public
  */
-export const HasDecimalPlaces = Validator.createRuleDecorator<[minDecimalPlaces: number, maxDecimalPlaces?: number]>(DecimalPlaces);
+export const HasDecimalPlaces =
+  Validator.createRuleDecorator<
+    [minDecimalPlaces: number, maxDecimalPlaces?: number]
+  >(DecimalPlaces);
 
-function _Integer({ value, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions): IValidatorResult {
+function _Integer({
+  value,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     const numericValue = Number(value);
     if (isNaN(numericValue) || !Number.isInteger(numericValue)) {
@@ -224,7 +248,13 @@ function _Integer({ value, fieldName, translatedPropertyName, ...rest }: IValida
 export const IsInteger = Validator.createPropertyDecorator(["Integer"]);
 Validator.registerRule("Integer", _Integer);
 
-function MultipleOf({ value, ruleParams, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<[number]>): IValidatorResult {
+function MultipleOf({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<[number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || !ruleParams.length) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -248,7 +278,10 @@ function MultipleOf({ value, ruleParams, fieldName, translatedPropertyName, ...r
     }
 
     const multiple = Number(ruleParams[0]);
-    if (isNaN(multiple) || (multiple === 0 && String(ruleParams[0]).trim() !== "0")) {
+    if (
+      isNaN(multiple) ||
+      (multiple === 0 && String(ruleParams[0]).trim() !== "0")
+    ) {
       const message = i18n.t("validator.invalidRuleParams", {
         rule: "MultipleOf",
         ruleParams,
@@ -306,10 +339,14 @@ function MultipleOf({ value, ruleParams, fieldName, translatedPropertyName, ...r
  * @since 1.22.0
  * @public
  */
-export const IsMultipleOf = Validator.createRuleDecorator<[multiple: number]>(MultipleOf);
+export const IsMultipleOf =
+  Validator.createRuleDecorator<[multiple: number]>(MultipleOf);
 
 declare module "../types" {
-  export interface IValidatorRules {
+  export interface IValidatorRules<
+    ParamType extends Array<any> = Array<any>,
+    Context = unknown,
+  > {
     /**
      * ### NumberBetween Rule (Numeric)
      *
@@ -354,7 +391,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    NumberBetween: IValidatorRuleFunction;
+    NumberBetween: IValidatorRuleFunction<[min: number, max: number], Context>;
 
     /**
      * ### DecimalPlaces Rule
@@ -404,7 +441,10 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DecimalPlaces: IValidatorRuleFunction;
+    DecimalPlaces: IValidatorRuleFunction<
+      [minDecimalPlaces: number, maxDecimalPlaces?: number],
+      Context
+    >;
 
     /**
      * ### Integer Rule
@@ -448,7 +488,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Integer: IValidatorRuleFunction;
+    Integer: IValidatorRuleFunction<[number], Context>;
 
     /**
      * ### Multiple Of Rule
@@ -504,6 +544,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MultipleOf: IValidatorRuleFunction;
+    MultipleOf: IValidatorRuleFunction<[number], Context>;
   }
 }

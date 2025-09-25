@@ -1,5 +1,4 @@
-import isNonNullString from "./isNonNullString";
-
+import { isNonNullString } from "./isNonNullString";
 
 /**
  * Returns the first non-null string value among the provided arguments.
@@ -17,7 +16,7 @@ import isNonNullString from "./isNonNullString";
  * console.log(defaultStr(null, null, null)); // Output: ""
  * ```
  */
-export default function defaultStr(...args: any[]): string {
+export function defaultStr(...args: any[]): string {
   /**
    * Iterate over the provided arguments.
    */

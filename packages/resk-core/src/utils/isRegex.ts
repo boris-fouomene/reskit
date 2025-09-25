@@ -12,7 +12,7 @@
  * console.log(isRegExp({})); // Output: false
  * ```
  */
-export default function isRegExp(regExp: any): regExp is RegExp {
+export function isRegExp(regExp: any): regExp is RegExp {
   /**
    * If the value is an instance of the RegExp constructor, it's a regular expression.
    */
@@ -23,7 +23,7 @@ export default function isRegExp(regExp: any): regExp is RegExp {
   /**
    * If the value is not an object or does not have a toString method that includes "RegExp", it's not a regular expression.
    */
-  if (!regExp || typeof regExp !== "object" || (!Object.prototype.toString.call(regExp).includes("RegExp"))) {
+  if (!regExp || typeof regExp !== "object" || !Object.prototype.toString.call(regExp).includes("RegExp")) {
     return false;
   }
   try {

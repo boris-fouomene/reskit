@@ -15,7 +15,7 @@ function isNativePromise(p: any): boolean {
   /**
    * If the value is a boolean or falsy, it's not a Promise.
    */
-  if (typeof p === 'boolean' || !p || typeof p === "number" || typeof p === "string" || typeof p == "symbol") {
+  if (typeof p === "boolean" || !p || typeof p === "number" || typeof p === "string" || typeof p == "symbol") {
     return false;
   }
 
@@ -29,7 +29,7 @@ function isNativePromise(p: any): boolean {
   /**
    * If the value's constructor is named 'Promise' or 'AsyncFunction', it's a Promise.
    */
-  if (p.constructor && (p.constructor.name === 'Promise' || p.constructor.name === 'AsyncFunction')) {
+  if (p.constructor && (p.constructor.name === "Promise" || p.constructor.name === "AsyncFunction")) {
     return true;
   }
 
@@ -46,11 +46,15 @@ function isNativePromise(p: any): boolean {
   /**
    * If the value's constructor is a function that is similar to the Promise constructor, it's a Promise.
    */
-  return p && typeof p.constructor === "function"
-    && Function.prototype.toString.call(p.constructor).replace(/\(.*\)/, "()")
-    === Function.prototype.toString.call(Function)
-      .replace("Function", "Promise") // replacing Identifier
-      .replace(/\(.*\)/, "()"); // removing possible FormalParameterList
+  return (
+    p &&
+    typeof p.constructor === "function" &&
+    Function.prototype.toString.call(p.constructor).replace(/\(.*\)/, "()") ===
+      Function.prototype.toString
+        .call(Function)
+        .replace("Function", "Promise") // replacing Identifier
+        .replace(/\(.*\)/, "()")
+  ); // removing possible FormalParameterList
 }
 
 /**
@@ -66,7 +70,7 @@ function isNativePromise(p: any): boolean {
  * console.log(isPromise({})); // Output: false
  * ```
  */
-export default function isPromise(value: any): boolean {
+export function isPromise(value: any): boolean {
   /**
    * Check if the value is a native Promise.
    */

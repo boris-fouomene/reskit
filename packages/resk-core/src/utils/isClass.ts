@@ -13,17 +13,17 @@
  * console.log(isClass(function() {})); // Output: false
  * ```
  */
-export default function isClass(variable: any): boolean {
+export function isClass(variable: any): boolean {
   if (variable === null || variable === undefined) {
     return false;
   }
   // Handle class constructors
-  if (typeof variable === 'function') {
+  if (typeof variable === "function") {
     const str = variable.toString();
-    return str.startsWith('class') || str.includes('_classCallCheck');
+    return str.startsWith("class") || str.includes("_classCallCheck");
   }
   // Handle class instances
-  if (typeof variable === 'object') {
+  if (typeof variable === "object") {
     const proto = Object.getPrototypeOf(variable);
     if (!proto || proto === Object.prototype) return false;
     const constructor = proto.constructor;

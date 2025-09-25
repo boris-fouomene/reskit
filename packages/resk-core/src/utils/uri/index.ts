@@ -3,7 +3,7 @@ import "../string";
 import queryString, { IParseBaseOptions, IStringifyBaseOptions } from "qs";
 
 import { IDict } from "../../types";
-import isNonNullString from "../isNonNullString";
+import { isNonNullString } from "../isNonNullString";
 
 /**
  * Returns the query string from a given URL.

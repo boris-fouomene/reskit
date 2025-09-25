@@ -1,21 +1,21 @@
 import { IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "./types";
 import { DateHelper } from "@utils/date/dateHelper";
-import defaultStr from "@utils/defaultStr";
-import isNonNullString from "@utils/isNonNullString";
-import isRegExp from "@utils/isRegex";
+import { defaultStr } from "@utils/defaultStr";
+import { isNonNullString } from "@utils/isNonNullString";
 import moment from "moment";
 import "../utils/numbers";
 import libPhoneNumber, { PhoneNumber, PhoneNumberFormat } from "google-libphonenumber";
+import { CountriesManager, ICountryCode } from "@countries/index";
+import { isEmpty } from "@utils/isEmpty";
+import { Logger } from "@logger";
+import { isPrimitive } from "@utils/isPrimitive";
+import { stringify } from "@utils/stringify";
+import { isNullable } from "@utils/isNullable";
+import { isNumber } from "@utils/isNumber";
+import { isRegExp } from "@utils/isRegex";
 
 const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
-import { CountriesManager, ICountryCode } from "@countries/index";
-import isEmpty from "@utils/isEmpty";
-import { Logger } from "@logger";
-import isPrimitive from "@utils/isPrimitive";
-import stringify from "@utils/stringify";
-import { isNullable } from "@utils/isNullable";
-import { isNumber } from "@utils/isNumber";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;

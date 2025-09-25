@@ -15,7 +15,7 @@
  * console.log(isEmpty([1, 2, 3])); // Output: false
  * ```
  */
-export default function isEmpty(value: any): boolean {
+export function isEmpty(value: any): boolean {
   /**
    * Check if the value is null or undefined.
    */
@@ -26,7 +26,7 @@ export default function isEmpty(value: any): boolean {
   /**
    * Check if the value is an empty string.
    */
-  if (typeof value === 'string' && value === '') {
+  if (typeof value === "string" && value === "") {
     return true;
   }
 

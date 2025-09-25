@@ -1,5 +1,3 @@
-import isEmpty from "./isEmpty";
-
 /**
  * Returns the first non-null and non-undefined value among the provided arguments.
  *
@@ -17,7 +15,7 @@ import isEmpty from "./isEmpty";
  * console.log(defaultVal(undefined, undefined)); // Output: undefined
  * ```
  */
-export default function defaultVal(...args: any[]) {
+export function defaultVal(...args: any[]) {
   let nullV = undefined;
   for (let i in args) {
     if (args[i] !== undefined && args[i] !== null) {

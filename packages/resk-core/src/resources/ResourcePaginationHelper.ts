@@ -1,11 +1,11 @@
-import isNonNullString from "@utils/isNonNullString";
+import { isNonNullString } from "@utils/isNonNullString";
 import { IResourceData, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderByDirection } from "./types";
 import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import { isStringNumber } from "@utils/string";
 import { defaultArray } from "@utils/defaultArray";
 import { isNumber } from "@utils/isNumber";
-import defaultStr from "@utils/defaultStr";
+import { defaultStr } from "@utils/defaultStr";
 
 export class ResourcePaginationHelper {
   /**

@@ -1,5 +1,5 @@
 import { getFileExtension } from "./file";
-import isNonNullString from "./isNonNullString";
+import { isNonNullString } from "./isNonNullString";
 
 /**
  * Regular expression to validate data URLs.

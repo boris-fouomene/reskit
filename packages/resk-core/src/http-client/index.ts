@@ -1,5 +1,5 @@
-import defaultStr from "@utils/defaultStr";
-import isNonNullString from "@utils/isNonNullString";
+import { defaultStr } from "@utils/defaultStr";
+import { isNonNullString } from "@utils/isNonNullString";
 import { isNumber } from "@utils/isNumber";
 import { JsonHelper } from "@utils/json";
 import { isValidUrl, setQueryParams } from "@utils/uri";
@@ -126,10 +126,7 @@ export class HttpClient {
    * const opts = await client.transformRequestOptions({ headers: { Accept: "application/json" } }, "/users");
    * ```
    */
-  async transformRequestOptions(
-    options: IHttpClient.FetchOptions,
-    path: string
-  ): Promise<RequestInit> {
+  async transformRequestOptions(options: IHttpClient.FetchOptions, path: string): Promise<RequestInit> {
     options.headers = this.transformRequestHeader(options.headers);
     return options;
   }
@@ -148,10 +145,7 @@ export class HttpClient {
    * const response = await client.fetch("/users", { headers: { "X-Custom": "value" } });
    * ```
    */
-  async fetch(
-    path: string,
-    options: IHttpClient.FetchOptions | null = null
-  ): Promise<Response> {
+  async fetch(path: string, options: IHttpClient.FetchOptions | null = null): Promise<Response> {
     options = Object.assign({}, options);
     const token = await this.getBearerToken();
     const { xFilter } = options;
@@ -160,10 +154,7 @@ export class HttpClient {
       {
         Accept: "application/json",
         "Accepted-Language": locale,
-        Authorization: isNonNullString(token)
-          ? "Bearer " +
-            (token.includes("Bearer ") ? token.replace("Bearer ", "") : token)
-          : undefined,
+        Authorization: isNonNullString(token) ? "Bearer " + (token.includes("Bearer ") ? token.replace("Bearer ", "") : token) : undefined,
       },
       options.headers
     );
@@ -171,23 +162,15 @@ export class HttpClient {
       options.headers = Object.assign(
         {},
         {
-          "X-filter": JsonHelper.isJSON(xFilter)
-            ? xFilter
-            : JSON.stringify(xFilter),
+          "X-filter": JsonHelper.isJSON(xFilter) ? xFilter : JSON.stringify(xFilter),
         },
         options.headers
       );
     }
-    const transformedOptions = await this.transformRequestOptions(
-      options,
-      path
-    );
+    const transformedOptions = await this.transformRequestOptions(options, path);
     return this.timeout(
       new Promise((resolve, reject) => {
-        return fetch(
-          this.buildUrl(path, options.queryParams),
-          transformedOptions
-        ).then(async (res) => {
+        return fetch(this.buildUrl(path, options.queryParams), transformedOptions).then(async (res) => {
           if (this.isSuccessStatus(res.status)) {
             resolve(res);
           } else {
@@ -231,10 +214,7 @@ export class HttpClient {
    * const data = await client.fetchJson<{ users: User[] }>("/users");
    * ```
    */
-  async fetchJson<T = Response>(
-    path: string,
-    options: IHttpClient.FetchOptions = {}
-  ): Promise<T> {
+  async fetchJson<T = Response>(path: string, options: IHttpClient.FetchOptions = {}): Promise<T> {
     return this.fetch(path, options).then((res: Response) => {
       return res.json();
     });
@@ -258,34 +238,11 @@ export class HttpClient {
    * }
    * ```
    */
-  async handleFetchError(
-    error: any,
-    path: string,
-    options: IHttpClient.FetchOptions
-  ) {
+  async handleFetchError(error: any, path: string, options: IHttpClient.FetchOptions) {
     if (options?.handleErrors !== false) {
-      let message =
-        typeof error == "object" && error
-          ? defaultStr(
-              error.message,
-              error.ExceptionMessage,
-              error.Message,
-              error.MessageDetail,
-              error.msg,
-              error.error
-            )
-          : null;
-      if (
-        defaultStr(Object.prototype.toString.call(error?.target)).includes(
-          "XMLHttpRequest"
-        ) &&
-        error.target.status === 0
-      ) {
-        message = defaultStr(
-          error.message,
-          error.msg,
-          I18n.getInstance().t("httpClient.serverUnreachable")
-        );
+      let message = typeof error == "object" && error ? defaultStr(error.message, error.ExceptionMessage, error.Message, error.MessageDetail, error.msg, error.error) : null;
+      if (defaultStr(Object.prototype.toString.call(error?.target)).includes("XMLHttpRequest") && error.target.status === 0) {
+        message = defaultStr(error.message, error.msg, I18n.getInstance().t("httpClient.serverUnreachable"));
       }
       if (!message) {
         message = error?.toString();
@@ -402,15 +359,10 @@ export class HttpClient {
    * const json = await client.transformResponse(res, {});
    * ```
    */
-  async transformResponse<T = Response>(
-    response: Response,
-    options: IHttpClient.FetchOptions
-  ): Promise<T> {
+  async transformResponse<T = Response>(response: Response, options: IHttpClient.FetchOptions): Promise<T> {
     if (response instanceof Response) {
       if (response.headers.has("Content-Type")) {
-        const contentType = defaultStr(
-          response.headers.get("Content-Type")
-        ).toLowerCase();
+        const contentType = defaultStr(response.headers.get("Content-Type")).toLowerCase();
         if (contentType.includes("application/json")) {
           return response.json() as T;
         }
@@ -635,18 +587,7 @@ export class HttpClient {
    * }
    * ```
    */
-  static SUCCESS_STATUSES = [
-    HttpClient.STATUSES.SUCCESS,
-    HttpClient.STATUSES.CREATED,
-    HttpClient.STATUSES.ACCEPTED,
-    HttpClient.STATUSES.NON_AUTHORITATIVE_INFORMATION,
-    HttpClient.STATUSES.NO_CONTENT,
-    HttpClient.STATUSES.RESET_CONTENT,
-    HttpClient.STATUSES.PARTIAL_CONTENT,
-    HttpClient.STATUSES.MULTI_STATUS,
-    HttpClient.STATUSES.ALREADY_REPORTED,
-    HttpClient.STATUSES.IM_USED,
-  ];
+  static SUCCESS_STATUSES = [HttpClient.STATUSES.SUCCESS, HttpClient.STATUSES.CREATED, HttpClient.STATUSES.ACCEPTED, HttpClient.STATUSES.NON_AUTHORITATIVE_INFORMATION, HttpClient.STATUSES.NO_CONTENT, HttpClient.STATUSES.RESET_CONTENT, HttpClient.STATUSES.PARTIAL_CONTENT, HttpClient.STATUSES.MULTI_STATUS, HttpClient.STATUSES.ALREADY_REPORTED, HttpClient.STATUSES.IM_USED];
 }
 
 export namespace IHttpClient {

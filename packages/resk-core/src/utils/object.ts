@@ -1,69 +1,69 @@
 import { IDict, IPrimitive } from "../types";
-import isPrimitive from "./isPrimitive";
-import isDateObj from "./date/isDateObj";
-import isRegExp from "./isRegex";
+import { isPrimitive } from "./isPrimitive";
+import { isDateObj } from "./date/isDateObj";
+import { isRegExp } from "./isRegex";
 import { isDOMElement } from "./dom";
 
 /**
  * Determines whether a value is a plain object (POJO - Plain Old JavaScript Object).
- * 
+ *
  * A plain object is an object created by the Object constructor or one with a null prototype.
  * This function performs comprehensive checks to distinguish plain objects from other object types
  * like arrays, dates, DOM elements, regular expressions, class instances, and functions.
  * It also handles cross-frame compatibility where objects might be created in different execution contexts.
- * 
+ *
  * @template T - The type of the value being checked
  * @param {T} obj - The value to test for being a plain object
- * 
- * @returns {obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any)} 
+ *
+ * @returns {obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any)}
  * Type predicate that narrows the type to a plain object if the check passes, or never for non-object types
- * 
+ *
  * @example
  * ```typescript
  * // Basic plain object detection
  * const plainObj = { name: "John", age: 30 };
  * console.log(isObj(plainObj)); // true
- * 
+ *
  * // Object created with Object.create(null)
  * const nullProtoObj = Object.create(null);
  * nullProtoObj.prop = "value";
  * console.log(isObj(nullProtoObj)); // true
- * 
+ *
  * // Arrays are not plain objects
  * const array = [1, 2, 3];
  * console.log(isObj(array)); // false
- * 
+ *
  * // Dates are not plain objects
  * const date = new Date();
  * console.log(isObj(date)); // false
- * 
+ *
  * // Regular expressions are not plain objects
  * const regex = /pattern/;
  * console.log(isObj(regex)); // false
- * 
+ *
  * // Class instances are not plain objects
  * class MyClass {
  *   constructor(public value: string) {}
  * }
  * const instance = new MyClass("test");
  * console.log(isObj(instance)); // false
- * 
+ *
  * // Functions are not plain objects
  * const func = () => {};
  * console.log(isObj(func)); // false
- * 
+ *
  * // Primitives are not plain objects
  * console.log(isObj("string")); // false
  * console.log(isObj(42)); // false
  * console.log(isObj(true)); // false
  * console.log(isObj(null)); // false
  * console.log(isObj(undefined)); // false
- * 
+ *
  * // DOM elements are not plain objects (in browser environment)
  * const element = document.createElement('div');
  * console.log(isObj(element)); // false
  * ```
- * 
+ *
  * @example
  * ```typescript
  * // Type narrowing with TypeScript
@@ -79,7 +79,7 @@ import { isDOMElement } from "./dom";
  *     console.log("Not a plain object:", value);
  *   }
  * }
- * 
+ *
  * // Cross-frame compatibility example
  * // Works even when objects are created in different iframes
  * const iframe = document.createElement('iframe');
@@ -89,7 +89,7 @@ import { isDOMElement } from "./dom";
  * crossFrameObj.prop = "value";
  * console.log(isObj(crossFrameObj)); // true (handles cross-frame objects)
  * ```
- * 
+ *
  * @remarks
  * This function is particularly useful for:
  * - Object serialization/deserialization logic
@@ -97,7 +97,7 @@ import { isDOMElement } from "./dom";
  * - API response validation where you expect plain data objects
  * - Library functions that need to handle various object types differently
  * - Cross-frame scenarios in browser environments
- * 
+ *
  * The function performs several layers of validation:
  * 1. **Early rejection**: Filters out null, primitives, arrays, dates, regex, and DOM elements
  * 2. **Null prototype check**: Accepts objects created with `Object.create(null)`
@@ -105,16 +105,16 @@ import { isDOMElement } from "./dom";
  * 4. **Standard Object check**: Accepts objects with `Object` as constructor
  * 5. **Prototype chain validation**: Ensures the prototype chain is standard
  * 6. **Cross-frame compatibility**: Handles objects from different execution contexts
- * 
+ *
  * @since 1.0.0
  * @category Type Guards
  * @see {@link cloneObject} - For cloning plain objects
  * @see {@link extendObj} - For merging plain objects
  * @see {@link defaultObj} - For providing default plain objects
  */
-export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | object) ? T : T extends string | undefined | null | boolean | Array<any> ? never : any) {
+export function isObj<T = any>(obj: T): obj is T extends Record<any, any> | object ? T : T extends string | undefined | null | boolean | Array<any> ? never : any {
   // Early rejection for null, non-objects, and known non-plain object types
-  if (obj === null || typeof obj !== 'object' || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
+  if (obj === null || typeof obj !== "object" || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
     return false;
   }
 
@@ -129,7 +129,7 @@ export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | ob
   // Check if the constructor is Object and has the default prototype chain
   // This handles browser environments where Object.prototype might have been modified
   const Ctor = proto.constructor;
-  if (typeof Ctor !== 'function') {
+  if (typeof Ctor !== "function") {
     return false;
   }
 
@@ -139,7 +139,7 @@ export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | ob
   }
 
   const protoCtor = Ctor.prototype;
-  if (typeof protoCtor !== 'object') {
+  if (typeof protoCtor !== "object") {
     return false;
   }
 
@@ -151,21 +151,19 @@ export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | ob
   // Test if proto has its own isPrototypeOf method
   // This is important to detect objects from iframes or different execution contexts
   // where the Object constructor might be different but the object is still plain
-  return typeof proto.hasOwnProperty === 'function' &&
-    proto.hasOwnProperty('isPrototypeOf') &&
-    typeof proto.isPrototypeOf === 'function';
-};
+  return typeof proto.hasOwnProperty === "function" && proto.hasOwnProperty("isPrototypeOf") && typeof proto.isPrototypeOf === "function";
+}
 
 /**
  * Clones a source object by returning a non-reference copy of the object.
  *
  * This function creates a deep copy of the provided object.
- * Any nested objects or arrays within the source will also be cloned, ensuring that the 
+ * Any nested objects or arrays within the source will also be cloned, ensuring that the
  * returned object does not reference the original object.
  *
  * @template T - The type of the object to clone. This can be any type, including arrays and nested objects.
  * @param {T} source - The object to clone. This can be any type, including arrays and nested objects.
- * 
+ *
  * @returns {T} A deep cloned copy of the source object. The return type can be
  * either an object or an array, depending on the input.
  *
@@ -175,20 +173,20 @@ export function isObj<T = any>(obj: T): obj is (T extends (Record<any, any> | ob
  * const original = { a: 1, b: { c: 2 } };
  * const cloned = cloneObject(original);
  * console.log(cloned); // Outputs: { a: 1, b: { c: 2 } }
- * 
+ *
  * // Modifying the cloned object does not affect the original
  * cloned.b.c = 3;
  * console.log(original.b.c); // Outputs: 2 (original remains unchanged)
- * 
+ *
  * // Example with an array
  * const originalArray = [1, 2, { a: 3 }];
  * const clonedArray = cloneObject(originalArray);
  * console.log(clonedArray); // Outputs: [1, 2, { a: 3 }]
- * 
+ *
  * // Modifying the cloned array does not affect the original
  * clonedArray[2].a = 4;
  * console.log(originalArray[2].a); // Outputs: 3 (original remains unchanged)
- * 
+ *
  * // Example with a nested structure
  * const complexObject = { a: 1, b: [2, { c: 3 }] };
  * const clonedComplex = cloneObject(complexObject);
@@ -213,8 +211,7 @@ export function cloneObject<T = any>(source: T): T {
   } else {
     return source as T;
   }
-};
-
+}
 
 /**
  * Calculates the size of an object or array.
@@ -225,7 +222,7 @@ export function cloneObject<T = any>(source: T): T {
  * @param {any} obj - The object or array whose size is to be calculated.
  * @param {boolean} [breakOnFirstElementFound=false] - Optional flag to determine if the function should
  * return the size immediately upon finding the first property or element.
- * 
+ *
  * @returns {number} The size of the object or array. Returns 0 if the input is null or not an object.
  *
  * @example
@@ -255,7 +252,7 @@ export function cloneObject<T = any>(source: T): T {
  * const nonObjectSize = objectSize(42);
  * console.log(nonObjectSize); // Outputs: 0
  */
-export const objectSize = Object.getSize = function (obj: any, breakOnFirstElementFound: boolean = false): number {
+export const objectSize = (Object.getSize = function (obj: any, breakOnFirstElementFound: boolean = false): number {
   if (!obj || typeof obj !== "object") return 0;
   /**
    * If the object is an array, return its length.
@@ -266,7 +263,7 @@ export const objectSize = Object.getSize = function (obj: any, breakOnFirstEleme
   /**
    * Ensure breakOnFirstElementFound is a boolean.
    */
-  if (typeof breakOnFirstElementFound !== 'boolean') {
+  if (typeof breakOnFirstElementFound !== "boolean") {
     breakOnFirstElementFound = false;
   }
 
@@ -295,9 +292,7 @@ export const objectSize = Object.getSize = function (obj: any, breakOnFirstEleme
    * Return the final size.
    */
   return size;
-};
-
-
+});
 
 /**
  * Returns a default object based on the provided arguments.
@@ -308,7 +303,7 @@ export const objectSize = Object.getSize = function (obj: any, breakOnFirstEleme
  *
  * @param {...any[]} args - The arguments to check for objects.
  * @template T - The type of the object to return.
- * 
+ *
  * @returns {object} The first non-empty object found among the arguments, or an empty object if none is found.
  *
  * @example
@@ -338,7 +333,7 @@ export function defaultObj<T extends object = any>(...args: any[]): T {
   /**
    * If there is only one argument, return it if it's an object, or an empty object if it's not.
    */
-  if (args.length === 1) return isObj(args[0]) ? args[0] : {} as T;
+  if (args.length === 1) return isObj(args[0]) ? args[0] : ({} as T);
 
   /**
    * Initialize the previous object to null.
@@ -372,7 +367,7 @@ export function defaultObj<T extends object = any>(...args: any[]): T {
    * Return the previous object, or an empty object if none was found.
    */
   return prevObj || {};
-};
+}
 
 /**
  * Declares a global interface extension for the built-in `Object` type.
@@ -385,7 +380,7 @@ declare global {
     /**
      * Clones a source object by returning a non-reference copy of the object.
      *
-     * This method creates a deep clone of the provided object, ensuring that nested objects 
+     * This method creates a deep clone of the provided object, ensuring that nested objects
      * are also cloned, and modifications to the cloned object do not affect the original.
      *
      * @param {any} obj - The object to clone. This can be any type, including arrays and nested objects.
@@ -396,7 +391,7 @@ declare global {
      * const original = { a: 1, b: { c: 2 } };
      * const cloned = Object.clone(original);
      * console.log(cloned); // Outputs: { a: 1, b: { c: 2 } }
-     * 
+     *
      * cloned.b.c = 3;
      * console.log(original.b.c); // Outputs: 2 (original remains unchanged)
      * ```
@@ -409,8 +404,8 @@ declare global {
     /**
      * Determines the size of an object or array.
      *
-     * This method calculates the number of own enumerable properties in an object or 
-     * the number of elements in an array. If the `breakOnFirstElementFound` parameter 
+     * This method calculates the number of own enumerable properties in an object or
+     * the number of elements in an array. If the `breakOnFirstElementFound` parameter
      * is set to true, it will return 1 immediately upon finding the first element or property.
      *
      * @param {any} obj - The object or array to determine the size of.
@@ -422,14 +417,14 @@ declare global {
      * const obj = { a: 1, b: 2, c: 3 };
      * const size = Object.getSize(obj);
      * console.log(size); // Outputs: 3
-     * 
+     *
      * const arr = [1, 2, 3];
      * const arrSize = Object.getSize(arr);
      * console.log(arrSize); // Outputs: 3
-     * 
+     *
      * const singleElementSize = Object.getSize(arr, true);
      * console.log(singleElementSize); // Outputs: 1 (returns immediately)
-     * 
+     *
      * const emptyObjSize = Object.getSize({});
      * console.log(emptyObjSize); // Outputs: 0
      * ```
@@ -437,107 +432,105 @@ declare global {
     getSize: (obj: any, breakOnFirstElementFound?: boolean) => number;
 
     /**
-    * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
-    * Handles various data structures including Arrays, Sets, Maps, and plain objects.
-    * Skips non-primitive values like functions, class instances.
-    * 
-    * @param {any} obj - The object to flatten
-    * @param {string} [prefix=''] - The prefix to use for nested keys
-    * @returns {Record<string, Primitive>} A flattened object with primitive values
-    * 
-    * @example
-    * // Basic object flattening
-    * _flattenObject({
-    *   a: {
-    *     b: 'value',
-    *     c: 42
-    *   }
-    * })
-    * // Returns: { 'a.b': 'value', 'a.c': 42 }
-    * 
-    * @example
-    * // Array handling
-    * _flattenObject({
-    *   items: ['a', 'b', { nested: 'value' }]
-    * })
-    * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
-    * 
-    * @example
-    * // Map handling
-    * _flattenObject({
-    *   map: new Map([
-    *     ['key1', 'value1'],
-    *     ['key2', { nested: 'value2' }]
-    *   ])
-    * })
-    * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
-    * 
-    * @example
-    * // Complex nested structure
-    * _flattenObject({
-    *   array: [1, { a: 2 }],
-    *   set: new Set(['x', { b: 'y' }]),
-    *   map: new Map([['k', { c: 'v' }]]),
-    *   obj: { 
-    *     deep: { 
-    *       nested: 'value',
-    *       fn: () => {}, // Will be skipped
-    *       date: new Date() // Will be skipped
-    *     }
-    *   }
-    * })
-    * // Returns: {
-    * //   'array[0]': 1,
-    * //   'array[1].a': 2,
-    * //   'set[0]': 'x',
-    * //   'set[1].b': 'y',
-    * //   'map[k].c': 'v',
-    * //   'obj.deep.nested': 'value'
-    * // }
-    * 
-    * @throws {Error} Will not throw errors, but silently skips non-primitive values
-    * 
-    * @category Utilities
-    * @since 1.0.0
-    */
+     * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
+     * Handles various data structures including Arrays, Sets, Maps, and plain objects.
+     * Skips non-primitive values like functions, class instances.
+     *
+     * @param {any} obj - The object to flatten
+     * @param {string} [prefix=''] - The prefix to use for nested keys
+     * @returns {Record<string, Primitive>} A flattened object with primitive values
+     *
+     * @example
+     * // Basic object flattening
+     * _flattenObject({
+     *   a: {
+     *     b: 'value',
+     *     c: 42
+     *   }
+     * })
+     * // Returns: { 'a.b': 'value', 'a.c': 42 }
+     *
+     * @example
+     * // Array handling
+     * _flattenObject({
+     *   items: ['a', 'b', { nested: 'value' }]
+     * })
+     * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
+     *
+     * @example
+     * // Map handling
+     * _flattenObject({
+     *   map: new Map([
+     *     ['key1', 'value1'],
+     *     ['key2', { nested: 'value2' }]
+     *   ])
+     * })
+     * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
+     *
+     * @example
+     * // Complex nested structure
+     * _flattenObject({
+     *   array: [1, { a: 2 }],
+     *   set: new Set(['x', { b: 'y' }]),
+     *   map: new Map([['k', { c: 'v' }]]),
+     *   obj: {
+     *     deep: {
+     *       nested: 'value',
+     *       fn: () => {}, // Will be skipped
+     *       date: new Date() // Will be skipped
+     *     }
+     *   }
+     * })
+     * // Returns: {
+     * //   'array[0]': 1,
+     * //   'array[1].a': 2,
+     * //   'set[0]': 'x',
+     * //   'set[1].b': 'y',
+     * //   'map[k].c': 'v',
+     * //   'obj.deep.nested': 'value'
+     * // }
+     *
+     * @throws {Error} Will not throw errors, but silently skips non-primitive values
+     *
+     * @category Utilities
+     * @since 1.0.0
+     */
     flatten(obj: any): Record<string, IPrimitive>;
-
 
     /**
      * Enhanced version of Object.entries that preserves key types in TypeScript inference.
-     * 
+     *
      * Unlike the standard Object.entries which types all keys as string, this method
      * maintains the original key types (string | number | symbol) in TypeScript's type system
      * while still following JavaScript's runtime behavior where all keys are strings.
-     * 
+     *
      * @template T - The object type extending Record<string | number, any>
      * @param obj - The object to extract entries from
      * @returns Array of key-value tuples with preserved key types in TypeScript
-     * 
+     *
      * @example
      * ```typescript
      * const obj = { 1: "one", "foo": "bar", 42: "answer" } as const;
-     * 
+     *
      * // Standard Object.entries - all keys typed as string
      * const standard = Object.entries(obj); // [string, string][]
-     * 
+     *
      * // Enhanced Object.typedEntries - preserves original key types
-     * const typed = Object.typedEntries(obj); 
+     * const typed = Object.typedEntries(obj);
      * // Type: (["1", "one"] | ["foo", "bar"] | ["42", "answer"])[]
      * ```
-     * 
+     *
      * @remarks
      * - Runtime behavior is identical to Object.entries (all keys are strings)
      * - Only TypeScript inference is enhanced to remember original key types
      * - Works best with objects declared with 'as const' for literal type inference
      * - Particularly useful for objects with mixed string and numeric keys
-     * 
+     *
      * @since 1.0.0
      */
     typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
   }
 }
-
 
 /**
  * Extends an object by merging properties from one or more source objects.
@@ -562,14 +555,14 @@ declare global {
  * console.log(target);   // Outputs: { a: 1, b: 3 } (target is modified)
  * ```
  * Merges the contents of two or more objects together into the first object.
- * Similar to jQuery's $.extend function. 
+ * Similar to jQuery's $.extend function.
  * @remarks
  * This function is used to merge the contents of multiple objects into a single object. It takes an optional target object as the first argument and one or more source objects as additional arguments. The function returns the merged object, which is a new object that contains all the properties from the source objects.
- * 
+ *
  * If the target object is not provided or is not a plain object, an empty object is returned.
- * 
+ *
  * If the target object is a plain object, the function iterates over the sources and copies the properties from each source object to the target object. If a property with the same name already exists in the target object, it is overwritten with the corresponding value from the source object.
- * 
+ *
  * If the target object is a plain object, the function iterates over the sources and copies the properties from each source object to the target object. If a property with the same name already exists in the target object, it is overwritten with the corresponding value from the source object.
  * For arrays, The function replaces the contents of the arrays, preserving the original order of the elements.
  * Empty values like null, undefined, and empty strings are ignored.
@@ -597,7 +590,8 @@ export function extendObj<T extends Record<string, any> = any>(target: any, ...s
     if (isTargetArray) {
       if (isSourceArr) {
         mergeTwoArray(target, source);
-      } else {//preserving the type
+      } else {
+        //preserving the type
         //target.push(source);
       }
       continue;
@@ -651,8 +645,10 @@ const mergeTwoArray = (target: any[], source: any[]) => {
     const targetK = target[k];
     const sourceK = source[k];
     if (k < sourceLength) {
-      const isTkArray = Array.isArray(targetK), isSkArray = Array.isArray(sourceK);
-      const isTObj = isObj(targetK), isSObj = isObj(sourceK);
+      const isTkArray = Array.isArray(targetK),
+        isSkArray = Array.isArray(sourceK);
+      const isTObj = isObj(targetK),
+        isSObj = isObj(sourceK);
       if ((isTkArray && isSkArray) || (isTObj && isSObj)) {
         target[indexCounter] = extendObj(isTkArray ? [] : {}, targetK, sourceK);
         indexCounter++;
@@ -673,76 +669,76 @@ const mergeTwoArray = (target: any[], source: any[]) => {
     }
   }
   return target;
-}
+};
 
 /**
-     * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
-     * Handles various data structures including Arrays, Sets, Maps, and plain objects.
-     * Skips non-primitive values like functions, class instances.
-     * 
-     * @param {any} obj - The object to flatten
-     * @param {string} [prefix=''] - The prefix to use for nested keys
-     * @returns {Record<string, Primitive>} A flattened object with primitive values
-     * 
-     * @example
-     * // Basic object flattening
-     * _flattenObject({
-     *   a: {
-     *     b: 'value',
-     *     c: 42
-     *   }
-     * })
-     * // Returns: { 'a.b': 'value', 'a.c': 42 }
-     * 
-     * @example
-     * // Array handling
-     * _flattenObject({
-     *   items: ['a', 'b', { nested: 'value' }]
-     * })
-     * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
-     * 
-     * @example
-     * // Map handling
-     * _flattenObject({
-     *   map: new Map([
-     *     ['key1', 'value1'],
-     *     ['key2', { nested: 'value2' }]
-     *   ])
-     * })
-     * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
-     * 
-     * @example
-     * // Complex nested structure
-     * _flattenObject({
-     *   array: [1, { a: 2 }],
-     *   set: new Set(['x', { b: 'y' }]),
-     *   map: new Map([['k', { c: 'v' }]]),
-     *   obj: { 
-     *     deep: { 
-     *       nested: 'value',
-     *       fn: () => {}, // Will be skipped
-     *       date: new Date() // Will be skipped
-     *     }
-     *   }
-     * })
-     * // Returns: {
-     * //   'array[0]': 1,
-     * //   'array[1].a': 2,
-     * //   'set[0]': 'x',
-     * //   'set[1].b': 'y',
-     * //   'map[k].c': 'v',
-     * //   'obj.deep.nested': 'value'
-     * // }
-     * 
-     * @throws {Error} Will not throw errors, but silently skips non-primitive values
-     * 
-     * @category Utilities
-     * @since 1.0.0
-     */
+ * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
+ * Handles various data structures including Arrays, Sets, Maps, and plain objects.
+ * Skips non-primitive values like functions, class instances.
+ *
+ * @param {any} obj - The object to flatten
+ * @param {string} [prefix=''] - The prefix to use for nested keys
+ * @returns {Record<string, Primitive>} A flattened object with primitive values
+ *
+ * @example
+ * // Basic object flattening
+ * _flattenObject({
+ *   a: {
+ *     b: 'value',
+ *     c: 42
+ *   }
+ * })
+ * // Returns: { 'a.b': 'value', 'a.c': 42 }
+ *
+ * @example
+ * // Array handling
+ * _flattenObject({
+ *   items: ['a', 'b', { nested: 'value' }]
+ * })
+ * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
+ *
+ * @example
+ * // Map handling
+ * _flattenObject({
+ *   map: new Map([
+ *     ['key1', 'value1'],
+ *     ['key2', { nested: 'value2' }]
+ *   ])
+ * })
+ * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
+ *
+ * @example
+ * // Complex nested structure
+ * _flattenObject({
+ *   array: [1, { a: 2 }],
+ *   set: new Set(['x', { b: 'y' }]),
+ *   map: new Map([['k', { c: 'v' }]]),
+ *   obj: {
+ *     deep: {
+ *       nested: 'value',
+ *       fn: () => {}, // Will be skipped
+ *       date: new Date() // Will be skipped
+ *     }
+ *   }
+ * })
+ * // Returns: {
+ * //   'array[0]': 1,
+ * //   'array[1].a': 2,
+ * //   'set[0]': 'x',
+ * //   'set[1].b': 'y',
+ * //   'map[k].c': 'v',
+ * //   'obj.deep.nested': 'value'
+ * // }
+ *
+ * @throws {Error} Will not throw errors, but silently skips non-primitive values
+ *
+ * @category Utilities
+ * @since 1.0.0
+ */
 export function flattenObject(obj: any): Record<string, any> {
   return _flattenObject(obj);
 }
-function _flattenObject(obj: any, prefix: string = '', flattened: Record<string, any> = {}): Record<string, IPrimitive> {
+function _flattenObject(obj: any, prefix: string = "", flattened: Record<string, any> = {}): Record<string, IPrimitive> {
   flattened = isObj(flattened) ? flattened : {};
   // Handle null/undefined early
   if (isPrimitive(obj) || isDateObj(obj) || isRegExp(obj)) {
@@ -753,16 +749,14 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
   }
 
   // Skip if it's a function or a class instance (but not a plain object)
-  if (typeof obj === 'function' || (typeof obj === 'object' && !isObj(obj) && !isIterableStructure(obj))) {
+  if (typeof obj === "function" || (typeof obj === "object" && !isObj(obj) && !isIterableStructure(obj))) {
     return flattened;
   }
 
   // Handle Map and WeakMap
   if (obj instanceof Map || obj instanceof WeakMap) {
     Array.from((obj as Map<any, any>).entries()).forEach(([mapKey, value]) => {
-      const newKey = prefix
-        ? `${prefix}[${String(mapKey)}]`
-        : String(mapKey);
+      const newKey = prefix ? `${prefix}[${String(mapKey)}]` : String(mapKey);
       _flattenObject(value, newKey, flattened);
     });
     return flattened;
@@ -772,9 +766,7 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
   if (Array.isArray(obj) || obj instanceof Set || obj instanceof WeakSet) {
     const array = Array.isArray(obj) ? obj : Array.from(obj as any);
     array.forEach((value, index) => {
-      const newKey = prefix
-        ? `${prefix}[${index}]`
-        : String(index);
+      const newKey = prefix ? `${prefix}[${index}]` : String(index);
       _flattenObject(value, newKey, flattened);
     });
     return flattened;
@@ -785,9 +777,7 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
     for (const key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
       const value = obj[key];
-      const newKey = prefix
-        ? (prefix.endsWith(']') ? `${prefix}.${key}` : `${prefix}.${key}`)
-        : key;
+      const newKey = prefix ? (prefix.endsWith("]") ? `${prefix}.${key}` : `${prefix}.${key}`) : key;
       _flattenObject(value, newKey, flattened);
     }
   }
@@ -796,10 +786,10 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
 
 /**
  * Checks if a value is an iterable data structure (Array, Set, Map, WeakMap, WeakSet).
- * 
+ *
  * @param {any} value - The value to check
  * @returns {boolean} True if the value is an iterable structure, false otherwise
- * 
+ *
  * @example
  * isIterableStructure([1, 2, 3])           // returns true
  * isIterableStructure(new Set([1, 2, 3]))  // returns true
@@ -807,46 +797,40 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
  * isIterableStructure({})                  // returns false
  */
 export function isIterableStructure(value: any): boolean {
-  return (
-    Array.isArray(value) ||
-    value instanceof Set ||
-    value instanceof Map ||
-    value instanceof WeakMap ||
-    value instanceof WeakSet
-  );
+  return Array.isArray(value) || value instanceof Set || value instanceof Map || value instanceof WeakMap || value instanceof WeakSet;
 }
 
 /**
-     * Enhanced version of Object.entries that preserves key types in TypeScript inference.
-     * 
-     * Unlike the standard Object.entries which types all keys as string, this method
-     * maintains the original key types (string | number | symbol) in TypeScript's type system
-     * while still following JavaScript's runtime behavior where all keys are strings.
-     * 
-     * @template T - The object type extending Record<string | number, any>
-     * @param obj - The object to extract entries from
-     * @returns Array of key-value tuples with preserved key types in TypeScript
-     * 
-     * @example
-     * ```typescript
-     * const obj = { 1: "one", "foo": "bar", 42: "answer" } as const;
-     * 
-     * // Standard Object.entries - all keys typed as string
-     * const standard = Object.entries(obj); // [string, string][]
-     * 
-     * // Enhanced Object.typedEntries - preserves original key types
-     * const typed = Object.typedEntries(obj); 
-     * // Type: (["1", "one"] | ["foo", "bar"] | ["42", "answer"])[]
-     * ```
-     * 
-     * @remarks
-     * - Runtime behavior is identical to Object.entries (all keys are strings)
-     * - Only TypeScript inference is enhanced to remember original key types
-     * - Works best with objects declared with 'as const' for literal type inference
-     * - Particularly useful for objects with mixed string and numeric keys
-     * 
-     * @since 1.0.0
-     */
+ * Enhanced version of Object.entries that preserves key types in TypeScript inference.
+ *
+ * Unlike the standard Object.entries which types all keys as string, this method
+ * maintains the original key types (string | number | symbol) in TypeScript's type system
+ * while still following JavaScript's runtime behavior where all keys are strings.
+ *
+ * @template T - The object type extending Record<string | number, any>
+ * @param obj - The object to extract entries from
+ * @returns Array of key-value tuples with preserved key types in TypeScript
+ *
+ * @example
+ * ```typescript
+ * const obj = { 1: "one", "foo": "bar", 42: "answer" } as const;
+ *
+ * // Standard Object.entries - all keys typed as string
+ * const standard = Object.entries(obj); // [string, string][]
+ *
+ * // Enhanced Object.typedEntries - preserves original key types
+ * const typed = Object.typedEntries(obj);
+ * // Type: (["1", "one"] | ["foo", "bar"] | ["42", "answer"])[]
+ * ```
+ *
+ * @remarks
+ * - Runtime behavior is identical to Object.entries (all keys are strings)
+ * - Only TypeScript inference is enhanced to remember original key types
+ * - Works best with objects declared with 'as const' for literal type inference
+ * - Particularly useful for objects with mixed string and numeric keys
+ *
+ * @since 1.0.0
+ */
 export function typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]> {
   // Runtime implementation is identical to Object.entries
   // The magic happens in the TypeScript type annotations above
@@ -854,7 +838,6 @@ export function typedEntries<T extends Record<any, unknown> = any>(obj: T): Arra
 }
 
 Object.typedEntries = typedEntries;
-
 
 Object.flatten = flattenObject;
 Object.clone = cloneObject;

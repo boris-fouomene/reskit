@@ -1,22 +1,13 @@
-import defaultStr from "./defaultStr";
+import { defaultStr } from "./defaultStr";
 import { isNumber } from "./isNumber";
-import { isNullable } from "./isNullable";
 
 function escapeString(str: string): string {
-  return defaultStr(str)
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '\\r')
-    .replace(/\t/g, '\\t')
-    .replace(/\v/g, '\\v')
-    .replace(/[\b]/g, '\\b')
-    .replace(/\f/g, '\\f')
+  return defaultStr(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\v/g, "\\v").replace(/[\b]/g, "\\b").replace(/\f/g, "\\f");
 }
 
 function isType(obj: any, type: string): boolean {
-  var t = Object.prototype.toString.call(obj)
-  return t === '[object ' + type + ']'
+  var t = Object.prototype.toString.call(obj);
+  return t === "[object " + type + "]";
 }
 
 /**
@@ -38,7 +29,7 @@ function isType(obj: any, type: string): boolean {
  * console.log(stringify(undefined)); // Output: "undefined"
  * ```
  */
-export default function stringify(obj: any, options?: { parenthesis?: boolean, escapeString?: boolean }): string {
+export function stringify(obj: any, options?: { parenthesis?: boolean; escapeString?: boolean }): string {
   if (["boolean", "undefined"].includes(typeof obj) || obj === null) {
     return String(obj);
   }
@@ -46,47 +37,55 @@ export default function stringify(obj: any, options?: { parenthesis?: boolean, e
     return (obj as number).formatNumber();
   }
   if (obj instanceof Date) {
-    return (obj).toFormat();
+    return obj.toFormat();
   }
   if (obj instanceof Error) {
     return obj?.toString();
   }
   options = Object.assign({}, options);
   const { parenthesis } = options;
-  const openParen = parenthesis ? '(' : '';
-  const closeParen = parenthesis ? ')' : '';
+  const openParen = parenthesis ? "(" : "";
+  const closeParen = parenthesis ? ")" : "";
   /**
    * If the input is a string, return its string representation wrapped in single quotes.
    */
-  if (typeof obj === 'string') {
-    return options?.escapeString !== false ? ("'" + escapeString(obj as string) + "'") : obj;
+  if (typeof obj === "string") {
+    return options?.escapeString !== false ? "'" + escapeString(obj as string) + "'" : obj;
   }
-  if (isType(obj, 'RegExp') || isType(obj, 'Number') || isType(obj, 'Boolean')) {
+  if (isType(obj, "RegExp") || isType(obj, "Number") || isType(obj, "Boolean")) {
     return obj.toString();
   }
 
   /**
    * If the input is a Date object, return its string representation as a new Date object.
    */
-  if (isType(obj, 'Date')) {
-    return 'new Date(' + obj.getTime() + ')';
+  if (isType(obj, "Date")) {
+    return "new Date(" + obj.getTime() + ")";
   }
 
   /**
    * If the input is an array, return its string representation as a comma-separated list of string representations.
    */
   if (Array.isArray(obj)) {
-    return '[' + obj.map(v => stringify(v, options)).join(',') + ']';
+    return "[" + obj.map((v) => stringify(v, options)).join(",") + "]";
   }
 
   /**
    * If the input is an object, return its string representation as a comma-separated list of key-value pairs.
    */
-  if (typeof obj === 'object') {
-    return openParen + '{' + Object.keys(obj).map(k => {
-      var v = obj[k];
-      return stringify(k, options) + ':' + stringify(v, options);
-    }).join(',') + '}' + closeParen;
+  if (typeof obj === "object") {
+    return (
+      openParen +
+      "{" +
+      Object.keys(obj)
+        .map((k) => {
+          var v = obj[k];
+          return stringify(k, options) + ":" + stringify(v, options);
+        })
+        .join(",") +
+      "}" +
+      closeParen
+    );
   }
   if (!obj) return String(obj);
   return typeof obj?.toString == "function" ? obj?.toString() : String(obj);

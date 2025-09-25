@@ -1,11 +1,11 @@
-import defaultStr from '@utils/defaultStr';
-import { IClassConstructor, IDict } from '../types/index';
-import { DateHelper } from '@utils/date';
+import { defaultStr } from "@utils/defaultStr";
+import { IClassConstructor, IDict } from "../types/index";
+import { DateHelper } from "@utils/date";
 
 /**
  * Represents a logger that provides logging functionalities with different log levels.
  * It supports dynamic registration of a logger instance and ensures consistent logging behavior.
- * 
+ *
  * @example
  * ```ts
  * @AttachLogger()
@@ -35,9 +35,9 @@ export class Logger {
   /**
    * Retrieves the currently registered logger instance.
    * If no logger is registered, it falls back to `console`.
-   * 
+   *
    * @returns {ILogger} The current logger instance.
-   * 
+   *
    * @example
    * ```ts
    * const currentLogger = Logger.logger;
@@ -56,9 +56,9 @@ export class Logger {
   /**
    * Sets a new logger instance dynamically.
    * Ensures the provided logger conforms to the expected interface.
-   * 
+   *
    * @param {ILogger} logger - The logger instance to register.
-   * 
+   *
    * @example
    * ```ts
    * class CustomLogger implements ILogger {
@@ -79,10 +79,10 @@ export class Logger {
 
   /**
    * Internal logging method that delegates calls to the registered logger.
-   * 
+   *
    * @param {ILoggerLevel} level - The log level (e.g., "info", "error").
    * @param {...any[]} data - Data to log.
-   * 
+   *
    * @returns {this} The logger instance for method chaining.
    */
   static _log(level: ILoggerLevel, ...data: any[]) {
@@ -96,9 +96,9 @@ export class Logger {
   }
   /**
    * Returns the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'.
-   * 
+   *
    * @returns {string} The current time.
-   * 
+   *
    * @example
    * const currentTime = Logger.getDateTimeString();
    * console.log(currentTime);
@@ -106,10 +106,10 @@ export class Logger {
    */
   static getDateTimeString() {
     const { day, year, hours, minutes, seconds, dayNameShort, monthName } = DateHelper.getUTCDateTimeDetails();
-    const dayString = day < 10 ? ("0" + day) : day;
-    const hoursString = hours < 10 ? ("0" + hours) : hours;
-    const minutesString = minutes < 10 ? ("0" + minutes) : minutes;
-    const secondsString = seconds < 10 ? ("0" + seconds) : seconds;
+    const dayString = day < 10 ? "0" + day : day;
+    const hoursString = hours < 10 ? "0" + hours : hours;
+    const minutesString = minutes < 10 ? "0" + minutes : minutes;
+    const secondsString = seconds < 10 ? "0" + seconds : seconds;
     return "[" + [dayNameShort, dayString, monthName, year].join(" ") + " " + [hoursString, minutesString, secondsString].join(":") + "]";
   }
 
@@ -156,7 +156,7 @@ export class Logger {
 
 /**
  * Represents valid logger levels.
- * 
+ *
  * @example
  * ```ts
  * const level: ILoggerLevel = "info";
@@ -164,31 +164,30 @@ export class Logger {
  */
 export type ILoggerLevel = "info" | "debug" | "warn" | "error" | string;
 
-
 /**
  * Interface for a logger that provides methods for logging messages at different levels.
- * 
+ *
  * Implementations of this interface should provide a way to log messages with varying levels of severity.
- * 
+ *
  * @example
  * ```typescript
  * class ConsoleLogger implements ILogger {
  *   log(...data: any[]): void {
  *     console.log(...data);
  *   }
- * 
+ *
  *   info(...data: any[]): void {
  *     console.info(...data);
  *   }
- * 
+ *
  *   debug(...data: any[]): void {
  *     console.debug(...data);
  *   }
- * 
+ *
  *   warn(...data: any[]): void {
  *     console.warn(...data);
  *   }
- * 
+ *
  *   error(...data: any[]): void {
  *     console.error(...data);
  *   }
@@ -244,9 +243,9 @@ export interface ILogger {
 
   /**
    * Logs a message at the warn level.
-   * 
+   *
    * This method is intended for logging warning messages that indicate potential issues with the application.
-   * 
+   *
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
    * @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
@@ -271,15 +270,15 @@ export interface ILogger {
    * ```
    */
   error(dateTimeString: string, ...data: any[]): void;
-};
+}
 
 /**
  * Checks whether an object conforms to the ILogger interface.
- * 
+ *
  * @param {ILogger} [logger] - The logger instance to validate.
- * 
+ *
  * @returns {boolean} True if valid, otherwise false.
- * 
+ *
  * @example
  * ```ts
  * const isValid = isValidLogger(myLogger);
@@ -296,9 +295,9 @@ const isValidLogger = (logger?: ILogger): boolean => {
 
 /**
  * Decorator function that attaches a logger to the application.
- * 
+ *
  * This decorator is used to register a logger class with the application. The logger class must implement the ILogger interface.
- * 
+ *
  * @returns A decorator function that takes a target class constructor as an argument.
  * @example
  * ```typescript

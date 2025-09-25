@@ -1,4 +1,4 @@
-import isNonNullString from "./isNonNullString";
+import { isNonNullString } from "./isNonNullString";
 
 /**
  * Removes all occurrences of the specified string from the left side of the current string.
@@ -18,7 +18,7 @@ import isNonNullString from "./isNonNullString";
  */
 export const ltrim = function (current: string, str: string = "") {
   if (!current || typeof current !== "string") return "";
-  if (!(str) || typeof str !== "string") {
+  if (!str || typeof str !== "string") {
     return current.trim();
   }
   let index = current.length;
@@ -38,8 +38,7 @@ export const ltrim = function (current: string, str: string = "") {
    * Return the modified string.
    */
   return current.toString();
-}
-
+};
 
 /**
  * Removes all occurrences of the specified string from the right side of the current string.
@@ -59,7 +58,7 @@ export const ltrim = function (current: string, str: string = "") {
  */
 export const rtrim = function (current: string, str: string = ""): string {
   if (!current || typeof current !== "string") return "";
-  if (!(str) || typeof str !== "string") {
+  if (!str || typeof str !== "string") {
     return current.trim();
   }
   let index = current.length;
@@ -79,7 +78,7 @@ export const rtrim = function (current: string, str: string = ""): string {
    * Return the modified string.
    */
   return current.toString();
-}
+};
 
 /**
  * Checks if the provided string consists only of numbers.
@@ -101,7 +100,7 @@ export const isStringNumber = (str: string, withDecimal: boolean = true) => {
   /**
    * If the input is not a string, return false.
    */
-  if (typeof str !== 'string') return false;
+  if (typeof str !== "string") return false;
 
   /**
    * If decimal points are allowed, check for a string that consists of digits and an optional decimal point.
@@ -114,7 +113,7 @@ export const isStringNumber = (str: string, withDecimal: boolean = true) => {
    * If decimal points are not allowed, check for a string that consists only of digits.
    */
   return /^\d+$/.test(str);
-}
+};
 
 /**
  * Extends the String interface with additional methods for string manipulation.
@@ -176,24 +175,22 @@ declare global {
   }
 }
 
-
 String.prototype.ltrim = function (str?: string): string {
   return ltrim(this.toString(), str);
-}
+};
 
 String.prototype.rtrim = function (str?: string): string {
   return rtrim(this.toString(), str);
-}
-
+};
 
 String.prototype.isNumber = function (withDecimal = true) {
   return isStringNumber(this.toString(), withDecimal);
-}
+};
 
 String.prototype.replaceAll = function (find, replace) {
   if (!isNonNullString(find) || !isNonNullString(replace)) return this.toString();
-  return this.toString().split(find).join(replace)
-}
+  return this.toString().split(find).join(replace);
+};
 
 /**
  * Converts a string from camel case to snake case (e.g. "addElementComponent" becomes "ADD_ELEMENT_COMPONENT").
@@ -214,7 +211,7 @@ export const toSnakeCase = (text: string): string => {
   /**
    * If the input string is empty, return an empty string.
    */
-  if (!isNonNullString(text)) return '';
+  if (!isNonNullString(text)) return "";
 
   /**
    * Trim the input string to remove any leading or trailing whitespace.
@@ -226,12 +223,15 @@ export const toSnakeCase = (text: string): string => {
    * The regular expression /(.)([A-Z][a-z]+)/ matches any character followed by an uppercase letter and one or more lowercase letters.
    * The regular expression /([a-z0-9])([A-Z])/ matches any lowercase letter or digit followed by an uppercase letter.
    */
-  return text.replace(/(.)([A-Z][a-z]+)/, '$1_$2').replace(/([a-z0-9])([A-Z])/, '$1_$2').toUpperCase();
-}
+  return text
+    .replace(/(.)([A-Z][a-z]+)/, "$1_$2")
+    .replace(/([a-z0-9])([A-Z])/, "$1_$2")
+    .toUpperCase();
+};
 
 String.prototype.toSnakeCase = function () {
   return toSnakeCase(this.toString());
-}
+};
 /**
  * Converts a string from snake case to camel case (e.g. "ADD_ELEMENT_COMPONENT" becomes "addElementComponent").
  *
@@ -251,7 +251,7 @@ export const toCamelCase = (text: string): string => {
   /**
    * If the input string is empty, return an empty string.
    */
-  if (!isNonNullString(text)) return '';
+  if (!isNonNullString(text)) return "";
 
   /**
    * Trim the input string to remove any leading or trailing whitespace.
@@ -263,11 +263,11 @@ export const toCamelCase = (text: string): string => {
    * The regular expression /(_\w)/g matches any underscore followed by a word character.
    * The replacement string k => k[1].toUpperCase() converts the matched character to uppercase.
    */
-  return text.charAt(0) + text.replace(/(_\w)/g, k => k[1].toUpperCase()).substring(1);
-}
+  return text.charAt(0) + text.replace(/(_\w)/g, (k) => k[1].toUpperCase()).substring(1);
+};
 String.prototype.toCamelCase = function () {
   return toCamelCase(this.toString());
-}
+};
 
 /**
  * Converts the first character of a string to uppercase.
@@ -298,7 +298,7 @@ export const upperFirst = function (str: string): string {
    * Convert the first character of the string to uppercase and concatenate it with the rest of the string.
    */
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
 
 /***
   met en majuscule le premier caractère de la chaine string
@@ -306,7 +306,7 @@ export const upperFirst = function (str: string): string {
 */
 String.prototype.upperFirst = function () {
   return upperFirst(this.toString());
-}
+};
 /**
  * Converts the first character of a string to lowercase.
  *
@@ -336,7 +336,7 @@ export const lowerFirst = function (str: string): string {
    * Convert the first character of the string to lowercase and concatenate it with the rest of the string.
    */
   return str.charAt(0).toLowerCase() + str.slice(1);
-}
+};
 /**
  * met en miniscule le premier caractère de de la chaine string
  * @returns {string}, la chaine de caractère modifiée
@@ -344,4 +344,3 @@ export const lowerFirst = function (str: string): string {
 String.prototype.lowerFirst = function () {
   return lowerFirst(this.toString());
 };
-

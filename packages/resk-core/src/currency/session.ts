@@ -1,23 +1,23 @@
 import { Session } from "../session";
 import currencies from "./currencies";
 import { ICurrency } from "./types";
-import isNonNullString from "../utils/isNonNullString";
+import { isNonNullString } from "../utils/isNonNullString";
 import { isValidCurrency } from "./utils";
 import { i18n } from "../i18n";
-import defaultStr from "@utils/defaultStr";
+import { defaultStr } from "@utils/defaultStr";
 
 /**
  * The default format for displaying currency values.
- * 
+ *
  * This format string is used to display currency values in the format "value symbol" (e.g., "123.45 USD").
- * 
+ *
  * Example: `%v %s`
  */
 const defaultCurrencyFormat = "%v %s";
 
 /**
  * Retrieves the persisted currency format from the Session storage.
- * 
+ *
  * @param force If true, returns the default currency format if the persisted format is not available.
  * @returns The persisted currency format if available, otherwise an empty string or the default format.
  */
@@ -33,14 +33,14 @@ const getCurrencyFormat = (force?: boolean): string => {
    * Otherwise, return an empty string.
    */
   return r && typeof r === "string" && r.includes("%v") ? r : force !== false ? defaultCurrencyFormat : "";
-}
+};
 
 /**
  * Persists the currency format in the Session storage.
- * 
+ *
  * @param format The currency format to persist.
  * @returns The result of setting the currency format in the Session storage.
- * 
+ *
  * Example:
  * ```ts
  * setCurrencyFormat("%v %s"); // Persists the currency format in the Session storage
@@ -59,14 +59,14 @@ const setCurrencyFormat = (format: string): any => {
    * Set the currency format in the Session storage.
    */
   return Session.set("currencyFormat", format);
-}
+};
 
 /**
  * Persists the current currency in the database.
- * 
+ *
  * @param {ICurrency | string} currency The currency to persist, either as an ICurrency object or a string representing the currency code.
  * @returns {Promise<void>} A promise that resolves when the currency has been persisted.
- * 
+ *
  * Example:
  * ```ts
  * setCurrency("USD"); // Persists the USD currency in the database
@@ -127,13 +127,13 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
    */
   Session.set("appConfigCurrency", currencyObject);
   return currencyObject as ICurrency;
-}
+};
 
 /**
  * Retrieves the currently persisted currency from the Session variables.
- * 
+ *
  * @returns {ICurrency} The currently persisted currency.
- * 
+ *
  * Example:
  * ```ts
  * const currentCurrency = getCurrency(); // Retrieves the currently persisted currency
@@ -171,7 +171,7 @@ const getCurrency: () => ICurrency = (): ICurrency => {
   }
   /**
    * Return the currency object with default values.
-   * 
+   *
    * The default values are:
    * - symbol: "FCFA"
    * - format: "%v %s"
@@ -188,7 +188,7 @@ const getCurrency: () => ICurrency = (): ICurrency => {
     ...Object.assign({}, i18n.getNestedTranslation("currencies") as ICurrency),
     ...currency,
   } as ICurrency;
-}
+};
 
 export default {
   getFormat: getCurrencyFormat,
@@ -196,4 +196,4 @@ export default {
   setCurrency: setCurrency,
   getCurrency: getCurrency,
   defaultCurrencyFormat,
-}
+};

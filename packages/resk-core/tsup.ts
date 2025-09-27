@@ -13,7 +13,7 @@ export default function createConfig(
     entry: glob.sync(
       `./src/**/${!isTest ? "!(*.d|*.spec|*.test)" : "*"}.(ts|tsx|js|jsx)`
     ),
-    format: ["cjs", "esm"], // isTest ? ["cjs"] : ["cjs", "esm"],
+    format: ["cjs"], // isTest ? ["cjs"] : ["cjs", "esm"],
     outDir: "./build",
     splitting: false, // Avoid splitting to keep module references simple
     sourcemap: false,
@@ -24,11 +24,7 @@ export default function createConfig(
     treeshake: true,
     bundle: false, // ❌ Disable bundling to keep file structure
     external: ["node_modules"], // Prevent bundling external dependencies
-    cjsInterop: true, // Enable CJS interop for better compatibility
-    legacyOutput: true, // Add explicit file extensions to resolved imports
-    banner: {
-      js: "Object.defineProperty(exports, '__esModule', { value: true });",
-    },
+    //legacyOutput: true,     // Add explicit file extensions to resolved imports
     async onSuccess() {
       console.log(
         "Running tsc-alias after the build to resolve the path aliases"

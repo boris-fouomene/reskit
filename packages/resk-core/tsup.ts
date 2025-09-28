@@ -22,7 +22,7 @@ export default function createConfig(
     minify: true, // Optimizes performance
     target: "es2015",
     treeshake: true,
-    bundle: false, // ❌ Disable bundling to keep file structure
+    bundle: true, // ❌ Disable bundling to keep file structure
     external: ["node_modules"], // Prevent bundling external dependencies
     //legacyOutput: true,     // Add explicit file extensions to resolved imports
     async onSuccess() {

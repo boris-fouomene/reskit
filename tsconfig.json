@@ -9,7 +9,7 @@
     "esModuleInterop": true, // Allow interoperability with CommonJS modules
     "allowJs": true,
     "resolveJsonModule": false,
-    "target": "ES2015", // Or the desired target
+    "target": "es2020", // Or the desired target
     "module": "node16", // Enables ESM & CJS interop
     "moduleResolution": "node16",
     "removeComments": true,
@@ -25,17 +25,9 @@
     "jsx": "preserve",
     "skipLibCheck": true,
     "isolatedModules": true,
-    "lib": [
-      "DOM",
-      "ESNext"
-    ],
+    "lib": ["DOM", "ESNext"]
   },
-  "types": [
-    "jest",
-    "node",
-    "react-native",
-    "react",
-  ],
+  "types": ["jest", "node", "react-native", "react"],
   "exclude": [
     "react-native",
     "node_modules",
@@ -46,6 +38,6 @@
     "examples/**/*",
     "**/build/**/*",
     "**/dist/**/*",
-    "**/*.js",
-  ],
+    "**/*.js"
+  ]
 }

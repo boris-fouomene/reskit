@@ -522,3 +522,5 @@ const formatDescription: string = `Display format for numerical values: a charac
 `;
 
 export const Currency = { parse: unformat, session, formatMoney, currencies, isValidCurrency, formatNumber, formatMoneyAsObject, unformat, toFixed, formatDescription, prepareOptions };
+
+export * from "./types";

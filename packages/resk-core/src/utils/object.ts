@@ -778,7 +778,7 @@ function _flattenObject(
     isPrimitive(obj) ||
     isDateObj(obj) ||
     isRegExp(obj) ||
-    (Array.isArray(obj) && options?.skipArray)
+    (Array.isArray(obj) && options?.skipArrays)
   ) {
     if (prefix) {
       flattened[prefix] = obj;
@@ -914,16 +914,16 @@ export interface FlattenObjectOptions {
    *   scores: [85, 92, 78]
    * };
    *
-   * // Default behavior (skipArray: false)
+   * // Default behavior (skipArrays: false)
    * flattenObject(obj);
    * // Result: { 'name': 'John', 'tags[0]': 'developer', 'tags[1]': 'typescript', 'scores[0]': 85, 'scores[1]': 92, 'scores[2]': 78 }
    *
-   * // With skipArray: true
-   * flattenObject(obj, { skipArray: true });
+   * // With skipArrays: true
+   * flattenObject(obj, { skipArrays: true });
    * // Result: { 'name': 'John', 'tags': ['developer', 'typescript'], 'scores': [85, 92, 78] }
    * ```
    *
    * @since 1.0.0
    */
-  skipArray?: boolean;
+  skipArrays?: boolean;
 }

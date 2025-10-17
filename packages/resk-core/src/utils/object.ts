@@ -1,8 +1,8 @@
 import { IDict, IPrimitive } from "../types";
-import { isPrimitive } from "./isPrimitive";
 import { isDateObj } from "./date/isDateObj";
-import { isRegExp } from "./isRegex";
 import { isDOMElement } from "./dom";
+import { isPrimitive } from "./isPrimitive";
+import { isRegExp } from "./isRegex";
 
 /**
  * Determines whether a value is a plain object (POJO - Plain Old JavaScript Object).
@@ -112,9 +112,22 @@ import { isDOMElement } from "./dom";
  * @see {@link extendObj} - For merging plain objects
  * @see {@link defaultObj} - For providing default plain objects
  */
-export function isObj<T = any>(obj: T): obj is T extends Record<any, any> | object ? T : T extends string | undefined | null | boolean | Array<any> ? never : any {
+export function isObj<T = any>(
+  obj: T
+): obj is T extends Record<any, any> | object
+  ? T
+  : T extends string | undefined | null | boolean | Array<any>
+    ? never
+    : any {
   // Early rejection for null, non-objects, and known non-plain object types
-  if (obj === null || typeof obj !== "object" || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
+  if (
+    obj === null ||
+    typeof obj !== "object" ||
+    isDOMElement(obj) ||
+    isDateObj(obj) ||
+    isRegExp(obj) ||
+    isPrimitive(obj)
+  ) {
     return false;
   }
 
@@ -151,7 +164,11 @@ export function isObj<T = any>(obj: T): obj is T extends Record<any, any> | obje
   // Test if proto has its own isPrototypeOf method
   // This is important to detect objects from iframes or different execution contexts
   // where the Object constructor might be different but the object is still plain
-  return typeof proto.hasOwnProperty === "function" && proto.hasOwnProperty("isPrototypeOf") && typeof proto.isPrototypeOf === "function";
+  return (
+    typeof proto.hasOwnProperty === "function" &&
+    proto.hasOwnProperty("isPrototypeOf") &&
+    typeof proto.isPrototypeOf === "function"
+  );
 }
 
 /**
@@ -252,7 +269,10 @@ export function cloneObject<T = any>(source: T): T {
  * const nonObjectSize = objectSize(42);
  * console.log(nonObjectSize); // Outputs: 0
  */
-export const objectSize = (Object.getSize = function (obj: any, breakOnFirstElementFound: boolean = false): number {
+export const objectSize = (Object.getSize = function (
+  obj: any,
+  breakOnFirstElementFound: boolean = false
+): number {
   if (!obj || typeof obj !== "object") return 0;
   /**
    * If the object is an array, return its length.
@@ -528,7 +548,9 @@ declare global {
      *
      * @since 1.0.0
      */
-    typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
+    typedEntries<T extends Record<any, unknown> = any>(
+      obj: T
+    ): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
   }
 }
 
@@ -567,7 +589,10 @@ declare global {
  * For arrays, The function replaces the contents of the arrays, preserving the original order of the elements.
  * Empty values like null, undefined, and empty strings are ignored.
  */
-export function extendObj<T extends Record<string, any> = any>(target: any, ...sources: any[]): T {
+export function extendObj<T extends Record<string, any> = any>(
+  target: any,
+  ...sources: any[]
+): T {
   const isTargetArray = Array.isArray(target);
   const isTargetObj = isObj(target);
   // Return if no target provided
@@ -735,13 +760,26 @@ const mergeTwoArray = (target: any[], source: any[]) => {
  * @category Utilities
  * @since 1.0.0
  */
-export function flattenObject(obj: any): Record<string, any> {
-  return _flattenObject(obj);
+export function flattenObject(
+  obj: any,
+  options?: FlattenObjectOptions
+): Record<string, any> {
+  return _flattenObject(obj, "", {}, options);
 }
-function _flattenObject(obj: any, prefix: string = "", flattened: Record<string, any> = {}): Record<string, IPrimitive> {
+function _flattenObject(
+  obj: any,
+  prefix: string = "",
+  flattened: Record<string, any> = {},
+  options?: FlattenObjectOptions
+): Record<string, IPrimitive> {
   flattened = isObj(flattened) ? flattened : {};
   // Handle null/undefined early
-  if (isPrimitive(obj) || isDateObj(obj) || isRegExp(obj)) {
+  if (
+    isPrimitive(obj) ||
+    isDateObj(obj) ||
+    isRegExp(obj) ||
+    (Array.isArray(obj) && options?.skipArray)
+  ) {
     if (prefix) {
       flattened[prefix] = obj;
     }
@@ -749,7 +787,10 @@ function _flattenObject(obj: any, prefix: string = "", flattened: Record<string,
   }
 
   // Skip if it's a function or a class instance (but not a plain object)
-  if (typeof obj === "function" || (typeof obj === "object" && !isObj(obj) && !isIterableStructure(obj))) {
+  if (
+    typeof obj === "function" ||
+    (typeof obj === "object" && !isObj(obj) && !isIterableStructure(obj))
+  ) {
     return flattened;
   }
 
@@ -757,7 +798,7 @@ function _flattenObject(obj: any, prefix: string = "", flattened: Record<string,
   if (obj instanceof Map || obj instanceof WeakMap) {
     Array.from((obj as Map<any, any>).entries()).forEach(([mapKey, value]) => {
       const newKey = prefix ? `${prefix}[${String(mapKey)}]` : String(mapKey);
-      _flattenObject(value, newKey, flattened);
+      _flattenObject(value, newKey, flattened, options);
     });
     return flattened;
   }
@@ -767,7 +808,7 @@ function _flattenObject(obj: any, prefix: string = "", flattened: Record<string,
     const array = Array.isArray(obj) ? obj : Array.from(obj as any);
     array.forEach((value, index) => {
       const newKey = prefix ? `${prefix}[${index}]` : String(index);
-      _flattenObject(value, newKey, flattened);
+      _flattenObject(value, newKey, flattened, options);
     });
     return flattened;
   }
@@ -777,8 +818,12 @@ function _flattenObject(obj: any, prefix: string = "", flattened: Record<string,
     for (const key in obj) {
       if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
       const value = obj[key];
-      const newKey = prefix ? (prefix.endsWith("]") ? `${prefix}.${key}` : `${prefix}.${key}`) : key;
-      _flattenObject(value, newKey, flattened);
+      const newKey = prefix
+        ? prefix.endsWith("]")
+          ? `${prefix}.${key}`
+          : `${prefix}.${key}`
+        : key;
+      _flattenObject(value, newKey, flattened, options);
     }
   }
   return flattened;
@@ -797,7 +842,13 @@ function _flattenObject(obj: any, prefix: string = "", flattened: Record<string,
  * isIterableStructure({})                  // returns false
  */
 export function isIterableStructure(value: any): boolean {
-  return Array.isArray(value) || value instanceof Set || value instanceof Map || value instanceof WeakMap || value instanceof WeakSet;
+  return (
+    Array.isArray(value) ||
+    value instanceof Set ||
+    value instanceof Map ||
+    value instanceof WeakMap ||
+    value instanceof WeakSet
+  );
 }
 
 /**
@@ -831,7 +882,9 @@ export function isIterableStructure(value: any): boolean {
  *
  * @since 1.0.0
  */
-export function typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]> {
+export function typedEntries<T extends Record<any, unknown> = any>(
+  obj: T
+): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]> {
   // Runtime implementation is identical to Object.entries
   // The magic happens in the TypeScript type annotations above
   return Object.entries(obj) as Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
@@ -841,3 +894,36 @@ Object.typedEntries = typedEntries;
 
 Object.flatten = flattenObject;
 Object.clone = cloneObject;
+
+export interface FlattenObjectOptions {
+  /**
+   * Whether to skip arrays during the flattening process.
+   *
+   * When set to `true`, arrays will be treated as primitive values and included
+   * directly in the flattened result instead of being recursively flattened.
+   * This can be useful for performance optimization or when you want to preserve
+   * array structures in your flattened output.
+   *
+   * @default false - Arrays are recursively flattened by default
+   *
+   * @example
+   * ```typescript
+   * const obj = {
+   *   name: 'John',
+   *   tags: ['developer', 'typescript'],
+   *   scores: [85, 92, 78]
+   * };
+   *
+   * // Default behavior (skipArray: false)
+   * flattenObject(obj);
+   * // Result: { 'name': 'John', 'tags[0]': 'developer', 'tags[1]': 'typescript', 'scores[0]': 85, 'scores[1]': 92, 'scores[2]': 78 }
+   *
+   * // With skipArray: true
+   * flattenObject(obj, { skipArray: true });
+   * // Result: { 'name': 'John', 'tags': ['developer', 'typescript'], 'scores': [85, 92, 78] }
+   * ```
+   *
+   * @since 1.0.0
+   */
+  skipArray?: boolean;
+}

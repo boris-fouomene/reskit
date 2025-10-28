@@ -1,8 +1,8 @@
 import { defaultStr } from "../utils/defaultStr";
 import { isNonNullString } from "../utils/isNonNullString";
+import { currencies } from "./currencies";
 import session from "./session";
-import { ICurrency } from "./types";
-import currencies from "./currencies";
+import { ICurrency, ICurrencySymbol } from "./types";
 import { isValidCurrency } from "./utils";
 
 const isObj = (x: any) => x && typeof x == "object";
@@ -29,7 +29,10 @@ function prepareOptions(options?: ICurrency): ICurrency {
      * Iterate over the options object and assign its properties to the default object.
      */
     for (let i in options) {
-      if (options.hasOwnProperty(i) && options[i as keyof ICurrency] !== undefined) {
+      if (
+        options.hasOwnProperty(i) &&
+        options[i as keyof ICurrency] !== undefined
+      ) {
         (object as { [key: string]: any })[i] = options[i as keyof ICurrency];
       }
     }
@@ -84,7 +87,12 @@ function checkPrecision(val?: number, base?: number): number {
  *   Either a string with the default (positive) format, or an object containing `pos` (required), `neg` and `zero` values (or a function returning either a string or object)
  * @returns {{ pos: string, neg: string, zero: string }} A format object containing positive, negative, and zero formats.
  */
-function checkCurrencyFormat(format: string | { pos: string; neg?: string; zero?: string } | (() => string | { pos: string; neg?: string; zero?: string })): { pos: string; neg: string; zero: string } {
+function checkCurrencyFormat(
+  format:
+    | string
+    | { pos: string; neg?: string; zero?: string }
+    | (() => string | { pos: string; neg?: string; zero?: string })
+): { pos: string; neg: string; zero: string } {
   /**
    * Get the current currency settings.
    */
@@ -205,7 +213,10 @@ const unformat = (value: any, decimalSeparator?: string): number => {
  * @param {number} [decimalDigits] The number of decimal digits to round to (defaults to accounting.settings.decimalDigits).
  * @returns {string} The formatted number as a string.
  */
-const toFixed: (value: number, decimalDigits?: number) => string = (value: number, decimalDigits?: number): string => {
+const toFixed: (value: number, decimalDigits?: number) => string = (
+  value: number,
+  decimalDigits?: number
+): string => {
   /**
    * Get the current currency settings.
    */
@@ -237,7 +248,9 @@ const toFixed: (value: number, decimalDigits?: number) => string = (value: numbe
       // Use standard exponential trick for standard-sized numbers
       const exponentialForm = Number(num + "e" + decimalDigits);
       const rounded = Math.round(exponentialForm);
-      const finalResult = Number(rounded + "e-" + decimalDigits).toFixed(decimalDigits);
+      const finalResult = Number(rounded + "e-" + decimalDigits).toFixed(
+        decimalDigits
+      );
       return finalResult;
     } catch (e) {
       // Fallback for cases where conversion fails
@@ -262,7 +275,17 @@ const toFixed: (value: number, decimalDigits?: number) => string = (value: numbe
  * @param {string} [decimalSeparator] The decimal separator to use.
  * @returns {string} The formatted number as a string.
  */
-const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number, thousandSeparator?: string, decimalSeparator?: string) => string = (number: number, optionsOrDecimalDigits?: ICurrency | number, thousandSeparator?: string, decimalSeparator?: string): string => {
+const formatNumber: (
+  number: number,
+  optionsOrDecimalDigits?: ICurrency | number,
+  thousandSeparator?: string,
+  decimalSeparator?: string
+) => string = (
+  number: number,
+  optionsOrDecimalDigits?: ICurrency | number,
+  thousandSeparator?: string,
+  decimalSeparator?: string
+): string => {
   /**
    * Clean up the number by removing any formatting.
    */
@@ -270,7 +293,9 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
   /**
    * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
    */
-  const toPrepare: ICurrency = (isValidCurrency(optionsOrDecimalDigits) ? optionsOrDecimalDigits : {}) as ICurrency;
+  const toPrepare: ICurrency = (
+    isValidCurrency(optionsOrDecimalDigits) ? optionsOrDecimalDigits : {}
+  ) as ICurrency;
   if (typeof optionsOrDecimalDigits === "number") {
     toPrepare.decimalDigits = optionsOrDecimalDigits;
   }
@@ -306,7 +331,9 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
    */
   let decimalStr = "";
   if (usePrecision) {
-    const fNum = String(parseFloat(toFixed(Math.abs(number), usePrecision)) || 0);
+    const fNum = String(
+      parseFloat(toFixed(Math.abs(number), usePrecision)) || 0
+    );
     if (fNum.includes(".")) {
       decimalStr = defaultStr(fNum.split(".")[1]).trim();
     }
@@ -315,7 +342,14 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
   /**
    * Format the number.
    */
-  return negative + (mod ? base.substring(0, mod) + opts.thousandSeparator : "") + base.substring(mod).replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) + (usePrecision && decimalStr ? opts.decimalSeparator + decimalStr : "");
+  return (
+    negative +
+    (mod ? base.substring(0, mod) + opts.thousandSeparator : "") +
+    base
+      .substring(mod)
+      .replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) +
+    (usePrecision && decimalStr ? opts.decimalSeparator + decimalStr : "")
+  );
 };
 
 /**
@@ -333,7 +367,7 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
  * To do: tidy up the parameters
  *
  * @param {number} [number] The number to format.
- * @param {ICurrency | string} [symbol] The symbol or options object.
+ * @param {ICurrency | ICurrencySymbol} [symbol] The symbol or options object.
  * @param {number} [decimalDigits] The decimal digits to use.
  * @param {string} [thousandSeparator] The thousand separator to use.
  * @param {string} [decimalSeparator] The decimal separator to use.
@@ -345,7 +379,19 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
  *   result: string,
  * }}
  */
-const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): ICurrency & { formattedValue: string; formattedNumber: string; usedFormat: string; result: string } => {
+const formatMoneyAsObject = (
+  number?: number,
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+): ICurrency & {
+  formattedValue: string;
+  formattedNumber: string;
+  usedFormat: string;
+  result: string;
+} => {
   /**
    * Clean up the number by removing any formatting.
    */
@@ -354,7 +400,9 @@ const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decim
   /**
    * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
    */
-  const toPrepare: ICurrency = isValidCurrency(symbol) ? (symbol as ICurrency) : ({} as ICurrency);
+  const toPrepare: ICurrency = isValidCurrency(symbol)
+    ? (symbol as ICurrency)
+    : ({} as ICurrency);
   if (symbol !== undefined && typeof symbol === "string") {
     toPrepare.symbol = symbol;
   }
@@ -384,14 +432,24 @@ const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decim
   /**
    * Choose which format to use for this value.
    */
-  const usedFormat = defaultStr(number > 0 ? formats.pos : number < 0 ? formats.neg : formats.zero);
+  const usedFormat = defaultStr(
+    number > 0 ? formats.pos : number < 0 ? formats.neg : formats.zero
+  );
 
   /**
    * Format the value.
    */
   const symbolStr = defaultStr(opts.symbol);
-  const formattedValue = usedFormat.replace(symbolStr ? "%s" : symbolStr, symbolStr);
-  const formattedNumber = formatNumber(Math.abs(number), checkPrecision(opts.decimalDigits), opts.thousandSeparator, opts.decimalSeparator);
+  const formattedValue = usedFormat.replace(
+    symbolStr ? "%s" : symbolStr,
+    symbolStr
+  );
+  const formattedNumber = formatNumber(
+    Math.abs(number),
+    checkPrecision(opts.decimalDigits),
+    opts.thousandSeparator,
+    opts.decimalSeparator
+  );
   const result = formattedValue.replace("%v", formattedNumber);
 
   /**
@@ -421,18 +479,39 @@ const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decim
  * To do: tidy up the parameters
  *
  * @param {number} [number] The number to format.
- * @param {ICurrency | string} [symbol] The symbol or options object.
+ * @param {ICurrency | ICurrencySymbol} [symbol] The symbol or options object.
  * @param {number} [decimalDigits] The decimal digits to use.
  * @param {string} [thousandSeparator] The thousand separator to use.
  * @param {string} [decimalSeparator] The decimal separator to use.
  * @param {string} [format] The format to use.
  * @returns {string} The formatted number as a string.
  */
-const formatMoney: (number?: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string) => string = (number?: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string => {
+const formatMoney: (
+  number?: number,
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+) => string = (
+  number?: number,
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+): string => {
   /**
    * Format the number into currency using the formatMoneyAsObject function.
    */
-  return formatMoneyAsObject(number, symbol, decimalDigits, thousandSeparator, decimalSeparator, format).result;
+  return formatMoneyAsObject(
+    number,
+    symbol,
+    decimalDigits,
+    thousandSeparator,
+    decimalSeparator,
+    format
+  ).result;
 };
 
 /**
@@ -449,7 +528,9 @@ const formatMoney: (number?: number, symbol?: ICurrency | string, decimalDigits?
  *
  * @returns {ICurrency} An object containing the parsed format and decimal digits.
  */
-const parseFormat: (format?: string) => ICurrency = (format?: string): ICurrency => {
+const parseFormat: (format?: string) => ICurrency = (
+  format?: string
+): ICurrency => {
   /**
    * Trim the format string.
    */
@@ -521,6 +602,18 @@ const formatDescription: string = `Display format for numerical values: a charac
 	for example, the format %v %s .## returns: 12.35 $ for the value 12.357777 converted into dollard.  
 `;
 
-export const Currency = { parse: unformat, session, formatMoney, currencies, isValidCurrency, formatNumber, formatMoneyAsObject, unformat, toFixed, formatDescription, prepareOptions };
+export const Currency = {
+  parse: unformat,
+  session,
+  formatMoney,
+  currencies,
+  isValidCurrency,
+  formatNumber,
+  formatMoneyAsObject,
+  unformat,
+  toFixed,
+  formatDescription,
+  prepareOptions,
+};
 
 export * from "./types";

@@ -1,10 +1,10 @@
-import { Session } from "../session";
-import currencies from "./currencies";
-import { ICurrency } from "./types";
-import { isNonNullString } from "../utils/isNonNullString";
-import { isValidCurrency } from "./utils";
-import { i18n } from "../i18n";
 import { defaultStr } from "@utils/defaultStr";
+import { i18n } from "../i18n";
+import { Session } from "../session";
+import { isNonNullString } from "../utils/isNonNullString";
+import { currencies } from "./currencies";
+import { ICurrency, ICurrencyCode } from "./types";
+import { isValidCurrency } from "./utils";
 
 /**
  * The default format for displaying currency values.
@@ -32,7 +32,11 @@ const getCurrencyFormat = (force?: boolean): string => {
    * Otherwise, if force is true, return the default currency format.
    * Otherwise, return an empty string.
    */
-  return r && typeof r === "string" && r.includes("%v") ? r : force !== false ? defaultCurrencyFormat : "";
+  return r && typeof r === "string" && r.includes("%v")
+    ? r
+    : force !== false
+      ? defaultCurrencyFormat
+      : "";
 };
 
 /**
@@ -64,7 +68,7 @@ const setCurrencyFormat = (format: string): any => {
 /**
  * Persists the current currency in the database.
  *
- * @param {ICurrency | string} currency The currency to persist, either as an ICurrency object or a string representing the currency code.
+ * @param {ICurrency | ICurrencyCode} currency The currency to persist, either as an ICurrency object or a string representing the currency code.
  * @returns {Promise<void>} A promise that resolves when the currency has been persisted.
  *
  * Example:
@@ -73,7 +77,7 @@ const setCurrencyFormat = (format: string): any => {
  * setCurrency({ code: "EUR", symbol: "€" }); // Persists the EUR currency in the database
  * ```
  */
-const setCurrency = (currency: ICurrency | string): ICurrency => {
+const setCurrency = (currency: ICurrency | ICurrencyCode): ICurrency => {
   /**
    * Check if the provided currency is valid.
    */
@@ -81,7 +85,12 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
     /**
      * If the currency is not valid, try to extract the currency code from the provided value.
      */
-    let cCode = typeof currency === "object" && currency && !Array.isArray(currency) ? defaultStr((currency as any).code, (currency as any).name) : typeof currency === "string" ? currency : undefined;
+    let cCode =
+      typeof currency === "object" && currency && !Array.isArray(currency)
+        ? defaultStr((currency as any).code, (currency as any).name)
+        : typeof currency === "string"
+          ? currency
+          : undefined;
     if (cCode) {
       /**
        * Trim and uppercase the currency code.
@@ -92,7 +101,10 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
     /**
      * If the currency code is valid, use the corresponding currency object.
      */
-    if (cCode && isValidCurrency(currencies[cCode as keyof typeof currencies])) {
+    if (
+      cCode &&
+      isValidCurrency(currencies[cCode as keyof typeof currencies])
+    ) {
       currency = currencies[cCode as keyof typeof currencies];
     } else if (typeof currency === "string") {
       /**
@@ -154,8 +166,18 @@ const getCurrency: () => ICurrency = (): ICurrency => {
   /**
    * If the currency code is valid, merge the corresponding currency object with the existing currency object.
    */
-  if (isNonNullString(currencyCode) && isValidCurrency(currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies])) {
-    currency = { ...currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies], ...currency };
+  if (
+    isNonNullString(currencyCode) &&
+    isValidCurrency(
+      currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies]
+    )
+  ) {
+    currency = {
+      ...currencies[
+        currencyCode.trim().toUpperCase() as keyof typeof currencies
+      ],
+      ...currency,
+    };
   }
 
   /**

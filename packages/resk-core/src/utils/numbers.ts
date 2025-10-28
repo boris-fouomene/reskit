@@ -1,5 +1,11 @@
 import { Currency } from "../currency";
-import { ICurrency, ICurrencyAbreviate2FormatKey, ICurrencyFormatterKey, ICurrencyFormatters } from "../currency/types";
+import {
+  ICurrency,
+  ICurrencyAbreviate2FormatKey,
+  ICurrencyFormatterKey,
+  ICurrencyFormatters,
+  ICurrencySymbol,
+} from "../currency/types";
 import { defaultStr } from "./defaultStr";
 import { isNumber } from "./isNumber";
 
@@ -18,7 +24,7 @@ declare global {
 
     /**
      * Formats the number as a currency string.
-     * @param {ICurrency | string} [symbol] The currency symbol to use (optional).
+     * @param {ICurrency | ICurrencySymbol} [symbol] The currency symbol to use (optional).
      * @param {number} [decimalDigits] The number of decimal places to display (optional).
      * @param {string} [thousandSeparator] The separator to use for thousands (optional).
      * @param {string} [decimalSeparator] The separator to use for decimals (optional).
@@ -30,7 +36,13 @@ declare global {
      * (12000).formatMoney(); // Output: "12 000 FCFA"
      * ```
      */
-    formatMoney: (symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string) => string;
+    formatMoney: (
+      symbol?: ICurrency | ICurrencySymbol,
+      decimalDigits?: number,
+      thousandSeparator?: string,
+      decimalSeparator?: string,
+      format?: string
+    ) => string;
 
     /**
      * Formats the number using the specified formatter.
@@ -51,18 +63,28 @@ declare global {
      * @param {string} [decimalSeparator] The separator to use for decimals (optional).
      * @returns {string} The formatted number string.
      */
-    formatNumber: (optionsOrDecimalDigits?: ICurrency | number, thousandSeparator?: string, decimalSeparator?: string) => string;
+    formatNumber: (
+      optionsOrDecimalDigits?: ICurrency | number,
+      thousandSeparator?: string,
+      decimalSeparator?: string
+    ) => string;
 
     /**
      * Abbreviates the number and formats it as a currency string.
-     * @param {ICurrency | string} [symbol] The currency symbol to use (optional).
+     * @param {ICurrency | ICurrencySymbol} [symbol] The currency symbol to use (optional).
      * @param {number} [decimalDigits] The number of decimal places to display (optional).
      * @param {string} [thousandSeparator] The separator to use for thousands (optional).
      * @param {string} [decimalSeparator] The separator to use for decimals (optional).
      * @param {string} [format] The format to use for the currency string (optional).
      * @returns {string} The formatted and abbreviated currency string.
      */
-    abreviate2FormatMoney: (symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string) => string;
+    abreviate2FormatMoney: (
+      symbol?: ICurrency | ICurrencySymbol,
+      decimalDigits?: number,
+      thousandSeparator?: string,
+      decimalSeparator?: string,
+      format?: string
+    ) => string;
 
     /***
      * Abbreviates a number and formats it as a number string.
@@ -71,7 +93,11 @@ declare global {
      * @param {string} [decimalSeparator] The separator to use for decimals (optional).
      * @returns {string} The formatted and abbreviated number string.
      */
-    abreviate2FormatNumber: (decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string) => string;
+    abreviate2FormatNumber: (
+      decimalDigits?: number,
+      thousandSeparator?: string,
+      decimalSeparator?: string
+    ) => string;
   }
 }
 
@@ -107,28 +133,50 @@ Number.prototype.countDecimals = function (): number {
  * @param {string} decimalSeparator The decimal separator to use.
  * @returns {string} The formatted number as a string.
  */
-Number.prototype.formatNumber = function (optionsOrDecimalDigits?: ICurrency | number, thousandSeparator?: string, decimalSeparator?: string): string {
+Number.prototype.formatNumber = function (
+  optionsOrDecimalDigits?: ICurrency | number,
+  thousandSeparator?: string,
+  decimalSeparator?: string
+): string {
   /**
    * Call the formatNumber function with the current number value and the specified options.
    */
-  return Currency.formatNumber(this.valueOf(), optionsOrDecimalDigits, thousandSeparator, decimalSeparator);
+  return Currency.formatNumber(
+    this.valueOf(),
+    optionsOrDecimalDigits,
+    thousandSeparator,
+    decimalSeparator
+  );
 };
 
 /**
  * Formats a number as a monetary value with the specified options.
  *
- * @param {ICurrency | string} symbol The symbol to use for the currency.
+ * @param {ICurrency | ICurrencySymbol} [symbol] The symbol to use for the currency.
  * @param {number} decimalDigits The number of decimal digits to use.
  * @param {string} thousandSeparator The thousand separator to use.
  * @param {string} decimalSeparator The decimal separator to use.
  * @param {string} format The format to use for the currency.
  * @returns {string} The formatted number as a monetary value.
  */
-Number.prototype.formatMoney = function (symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string {
+Number.prototype.formatMoney = function (
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+): string {
   /**
    * Call the formatMoney function with the current number value and the specified options.
    */
-  return Currency.formatMoney(this.valueOf(), symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
+  return Currency.formatMoney(
+    this.valueOf(),
+    symbol,
+    decimalDigits,
+    thousandSeparator,
+    decimalSeparator,
+    format
+  );
 };
 
 /**
@@ -179,7 +227,12 @@ export type IAbreviateNumberResult = {
  *  @param {string} [options.decimalSeparator] Character to use as decimal separator. Example: "." for 1.5 or "," for 1,5.
  * @returns {IAbreviateNumberResult} The abbreviated number or an object with additional information.
  */
-export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsSeparator?: string, decimalSeparator?: string): IAbreviateNumberResult => {
+export const _abreviateNumber = (
+  num: number,
+  decimalDigits?: number,
+  thousandsSeparator?: string,
+  decimalSeparator?: string
+): IAbreviateNumberResult => {
   if (num === null || typeof num !== "number" || isNaN(num)) {
     return {
       result: "",
@@ -220,13 +273,24 @@ export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsS
   /**
    * Get the number of decimal places in the number.
    */
-  const decimals = num.countDecimals ? num.countDecimals() : Math.floor(num) === num ? 0 : num.toString().split(".")[1]?.length || 0;
+  const decimals = num.countDecimals
+    ? num.countDecimals()
+    : Math.floor(num) === num
+      ? 0
+      : num.toString().split(".")[1]?.length || 0;
 
   // Determine which threshold to use for abbreviation
-  let threshold = thresholds.find((t) => Math.abs(num) >= t.value) || thresholds[thresholds.length - 1];
-  let abbreviatedValue = isUnder1000 ? num : num / (threshold.value === 1 ? 1 : threshold.value);
+  let threshold =
+    thresholds.find((t) => Math.abs(num) >= t.value) ||
+    thresholds[thresholds.length - 1];
+  let abbreviatedValue = isUnder1000
+    ? num
+    : num / (threshold.value === 1 ? 1 : threshold.value);
   let suffix = threshold.suffix;
-  const minAbreviationDecimalDigits = determineSignificantDecimals(abbreviatedValue, 5);
+  const minAbreviationDecimalDigits = determineSignificantDecimals(
+    abbreviatedValue,
+    5
+  );
   /**
 
   /**
@@ -250,7 +314,12 @@ export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsS
     };
   }
   // Determine the number of decimal places to use
-  const decimalPlaces = isNumber(decimalDigits) && decimalDigits > 0 ? decimalDigits : threshold.value === 1 ? Math.min(decimals, 5) : Math.max(minAbreviationDecimalDigits, 0);
+  const decimalPlaces =
+    isNumber(decimalDigits) && decimalDigits > 0
+      ? decimalDigits
+      : threshold.value === 1
+        ? Math.min(decimals, 5)
+        : Math.max(minAbreviationDecimalDigits, 0);
 
   // Format the abbreviated value with appropriate decimal places
   let formattedValue = abbreviatedValue.toFixed(decimalPlaces);
@@ -268,7 +337,11 @@ export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsS
     parts.push("0".repeat(decimalPlaces));
   }
   // If we need decimal places and have some but not enough, pad with zeros
-  else if (decimalPlaces > 0 && parts.length > 1 && parts[1].length < decimalPlaces) {
+  else if (
+    decimalPlaces > 0 &&
+    parts.length > 1 &&
+    parts[1].length < decimalPlaces
+  ) {
     parts[1] = parts[1].padEnd(decimalPlaces, "0");
   }
   formattedValue = parts.join(decimalSeparator);
@@ -288,7 +361,10 @@ export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsS
  * Determines the optimal number of decimal places to display
  * to preserve significant information
  */
-function determineSignificantDecimals(value: number, maxDecimals: number): number {
+function determineSignificantDecimals(
+  value: number,
+  maxDecimals: number
+): number {
   const absValue = Math.abs(value);
 
   // If it's an integer, no decimal places needed
@@ -333,8 +409,18 @@ function determineSignificantDecimals(value: number, maxDecimals: number): numbe
  *   Example: '.' for 1.5 or ',' for 1,5.
  * @returns {string} The abbreviated number as a string.
  */
-export const abreviateNumber = (num: number, decimalDigits?: number, thousandsSeparator?: string, decimalSeparator?: string): string => {
-  return _abreviateNumber(num, decimalDigits, thousandsSeparator, decimalSeparator).result;
+export const abreviateNumber = (
+  num: number,
+  decimalDigits?: number,
+  thousandsSeparator?: string,
+  decimalSeparator?: string
+): string => {
+  return _abreviateNumber(
+    num,
+    decimalDigits,
+    thousandsSeparator,
+    decimalSeparator
+  ).result;
 };
 
 /**
@@ -342,43 +428,87 @@ export const abreviateNumber = (num: number, decimalDigits?: number, thousandsSe
  *
  * @returns {string} The abbreviated number.
  */
-Number.prototype.abreviate2FormatNumber = function (decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string): string {
+Number.prototype.abreviate2FormatNumber = function (
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string
+): string {
   /**
    * Call the abreviateNumber function with the current number value and return a string.
    */
-  return abreviateNumber(this.valueOf(), decimalDigits, thousandSeparator, decimalSeparator) as string;
+  return abreviateNumber(
+    this.valueOf(),
+    decimalDigits,
+    thousandSeparator,
+    decimalSeparator
+  ) as string;
 };
 
 /**
  * Abbreviates a number and formats it as a monetary value.
  *
  * @param {number} number The number to abbreviate and format.
- * @param {ICurrency | string} [symbol] The currency symbol or name.
+ * @param {ICurrency | ICurrencySymbol} [symbol] The currency symbol or name.
  * @param {number} [decimalDigits] The number of decimal digits to use.
  * @param {string} [thousandSeparator] The thousand separator to use.
  * @param {string} [decimalSeparator] The decimal separator to use.
  * @param {string} [format] The format string to use.
  * @returns {string} The abbreviated and formatted monetary value.
  */
-export const abreviate2FormatMoney = (number: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string => {
+export const abreviate2FormatMoney = (
+  number: number,
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+): string => {
   if (!isNumber(number)) return "";
-  const { formattedValue: fVal, ...rest } = Currency.formatMoneyAsObject(number, symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
-  return fVal.replace("%v", abreviateNumber(number, rest.decimalDigits, rest.thousandSeparator, rest.decimalSeparator));
+  const { formattedValue: fVal, ...rest } = Currency.formatMoneyAsObject(
+    number,
+    symbol,
+    decimalDigits,
+    thousandSeparator,
+    decimalSeparator,
+    format
+  );
+  return fVal.replace(
+    "%v",
+    abreviateNumber(
+      number,
+      rest.decimalDigits,
+      rest.thousandSeparator,
+      rest.decimalSeparator
+    )
+  );
 };
 
 /**
  * Abbreviates a number and formats it as a monetary value.
  * @description Abbreviates a number and formats it as a monetary value, using a currency symbol or name, decimal digits, and separators.
  * @param {number} number The number to abbreviate and format.
- * @param {ICurrency | string} [symbol] The currency symbol or name.
+ * @param {ICurrency | ICurrencySymbol} [symbol] The currency symbol or name.
  * @param {number} [decimalDigits] The number of decimal digits to use.
  * @param {string} [thousandSeparator] The thousand separator to use.
  * @param {string} [decimalSeparator] The decimal separator to use.
  * @param {string} [format] The format string to use.
  * @returns {string} The abbreviated and formatted monetary value.
  */
-Number.prototype.abreviate2FormatMoney = function (symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string {
-  return abreviate2FormatMoney(this.valueOf(), symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
+Number.prototype.abreviate2FormatMoney = function (
+  symbol?: ICurrency | ICurrencySymbol,
+  decimalDigits?: number,
+  thousandSeparator?: string,
+  decimalSeparator?: string,
+  format?: string
+): string {
+  return abreviate2FormatMoney(
+    this.valueOf(),
+    symbol,
+    decimalDigits,
+    thousandSeparator,
+    decimalSeparator,
+    format
+  );
 };
 
 /**
@@ -403,16 +533,40 @@ Object.keys(currencies).forEach((currencyKey) => {
   const currency: ICurrency = currencies[key];
   const functionName: ICurrencyFormatterKey = `format${key}`;
   const abreviate2FormatKey: ICurrencyAbreviate2FormatKey = `abreviate2Format${key}`;
-  Number.prototype[functionName] = function (decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string {
+  Number.prototype[functionName] = function (
+    decimalDigits?: number,
+    thousandSeparator?: string,
+    decimalSeparator?: string,
+    format?: string
+  ): string {
     /**
      * Call the formatMoney function with the current number value and the specified options.
      */
-    return Currency.formatMoney(this.valueOf(), currency, decimalDigits, thousandSeparator, decimalSeparator, format);
+    return Currency.formatMoney(
+      this.valueOf(),
+      currency,
+      decimalDigits,
+      thousandSeparator,
+      decimalSeparator,
+      format
+    );
   };
-  Number.prototype[abreviate2FormatKey] = function (decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): string {
+  Number.prototype[abreviate2FormatKey] = function (
+    decimalDigits?: number,
+    thousandSeparator?: string,
+    decimalSeparator?: string,
+    format?: string
+  ): string {
     /**
      * Call the formatMoney function with the current number value and the specified options.
      */
-    return abreviate2FormatMoney(this.valueOf(), currency, decimalDigits, thousandSeparator, decimalSeparator, format);
+    return abreviate2FormatMoney(
+      this.valueOf(),
+      currency,
+      decimalDigits,
+      thousandSeparator,
+      decimalSeparator,
+      format
+    );
   };
 });

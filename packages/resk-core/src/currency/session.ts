@@ -122,16 +122,21 @@ const setCurrency = (currency: ICurrency | ICurrencyCode): ICurrency => {
    */
   const currencyObject: ICurrency = Object.assign({}, currency) as ICurrency;
 
-  /**
-   * Get the current currency format.
-   */
-  const format = getCurrencyFormat();
+  if (!currencyObject.format) {
+    /**
+     * Get the current currency format.
+     */
+    const format = getCurrencyFormat();
 
-  /**
-   * If a format is found, set it on the currency object.
-   */
-  if (format) {
-    currencyObject.format = format;
+    /**
+     * If a format is found, set it on the currency object.
+     */
+    if (format) {
+      currencyObject.format = format;
+    }
+  }
+  if (currencyObject.format) {
+    setCurrencyFormat(currencyObject.format);
   }
 
   /**

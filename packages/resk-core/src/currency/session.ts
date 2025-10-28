@@ -184,29 +184,17 @@ const getCurrency: () => ICurrency = (): ICurrency => {
    * Get the current currency format.
    */
   const format = getCurrencyFormat(false);
-
-  /**
-   * If a format is found and includes the %v placeholder, set it on the currency object.
-   */
   if (isNonNullString(format) && format.includes("%v")) {
     currency.format = format;
   }
-  /**
-   * Return the currency object with default values.
-   *
-   * The default values are:
-   * - symbol: "FCFA"
-   * - format: "%v %s"
-   * - decimalSeparator: "."
-   * - thousandSeparator: " "
-   * - decimalDigits: 0
-   */
+  const defaultCode: ICurrencyCode = "USD";
+  const defaultCurrency = currencies[defaultCode];
   return {
-    symbol: "FCFA", // default currency symbol
-    format: "%v %s", // default format
-    decimalSeparator: ".", // default decimal separator
-    thousandSeparator: " ", // default thousands separator
-    decimalDigits: 0, // default decimal digits
+    symbol: defaultCurrency.symbol, // default currency symbol
+    format: defaultCurrency.format ?? "%v %s", // default format
+    decimalSeparator: defaultCurrency.decimalSeparator ?? ".", // default decimal separator
+    thousandSeparator: defaultCurrency.thousandSeparator ?? ",", // default thousands separator
+    decimalDigits: defaultCurrency.decimalDigits ?? 0, // default decimal digits
     ...Object.assign({}, i18n.getNestedTranslation("currencies") as ICurrency),
     ...currency,
   } as ICurrency;

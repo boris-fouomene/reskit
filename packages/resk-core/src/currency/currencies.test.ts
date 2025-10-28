@@ -78,7 +78,7 @@ describe("Currency Utils", () => {
         thousandSeparator: " ",
       });
       expect(Currency.formatNumber(1234567.89)).toBe("1 234 567.89");
-      expect(Currency.formatMoney(1234567.89)).toBe("1 234 567.89 FCFA");
+      expect(Currency.formatMoney(1234567.89)).toBe("1 234 567.89 $");
     });
   });
 
@@ -143,7 +143,7 @@ describe("Will format large numbers", () => {
       "448 745 130 379 325 400 000"
     );
     expect(Currency.formatMoney(448745130379325400000)).toBe(
-      "448 745 130 379 325 400 000 FCFA"
+      "448 745 130 379 325 400 000 $"
     );
   });
 });

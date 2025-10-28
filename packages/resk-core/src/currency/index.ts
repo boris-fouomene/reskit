@@ -294,7 +294,9 @@ const formatNumber: (
    * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
    */
   const toPrepare: ICurrency = (
-    isValidCurrency(optionsOrDecimalDigits) ? optionsOrDecimalDigits : {}
+    isValidCurrency(optionsOrDecimalDigits)
+      ? optionsOrDecimalDigits
+      : session.getCurrency()
   ) as ICurrency;
   if (typeof optionsOrDecimalDigits === "number") {
     toPrepare.decimalDigits = optionsOrDecimalDigits;
@@ -402,7 +404,7 @@ const formatMoneyAsObject = (
    */
   const toPrepare: ICurrency = isValidCurrency(symbol)
     ? (symbol as ICurrency)
-    : ({} as ICurrency);
+    : session.getCurrency();
   if (symbol !== undefined && typeof symbol === "string") {
     toPrepare.symbol = symbol;
   }

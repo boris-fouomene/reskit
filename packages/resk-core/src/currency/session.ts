@@ -184,13 +184,11 @@ const getCurrency: () => ICurrency = (): ICurrency => {
       ...currency,
     };
   }
-
-  /**
-   * Get the current currency format.
-   */
-  const format = getCurrencyFormat(false);
-  if (isNonNullString(format) && format.includes("%v")) {
-    currency.format = format;
+  if (!isNonNullString(currency?.format)) {
+    const format = getCurrencyFormat(false);
+    if (isNonNullString(format) && format.includes("%v")) {
+      currency.format = format;
+    }
   }
   const defaultCode: ICurrencyCode = "USD";
   const defaultCurrency = currencies[defaultCode];

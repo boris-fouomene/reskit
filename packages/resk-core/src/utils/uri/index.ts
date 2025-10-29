@@ -93,9 +93,14 @@ export const removeQueryString = function (
 };
 
 const defaultStringifyOptions: IStringifyBaseOptions = {
-  indices: false,
-  arrayFormat: "brackets",
-  encodeValuesOnly: true,
+  indices: true,
+  encodeValuesOnly: false,
+  skipNulls: false,
+  arrayFormat: "indices",
+  encoder: (str: string) => {
+    // Encode everything except [ and ]
+    return encodeURIComponent(str).replace(/%5B/g, "[").replace(/%5D/g, "]");
+  },
 };
 
 /**
@@ -122,9 +127,15 @@ export function setQueryParams(
   value?: any,
   options: IStringifyBaseOptions = {}
 ): string {
-  if (typeof url !== "string" || !url) return "";
+  if (typeof url !== "string") return "";
+  if (!url) url = "";
   let params = getQueryParams(url);
-  url = removeQueryString(url);
+  // Preserve fragment
+  const urlParts = url.split("#");
+  const baseUrl = urlParts[0];
+  const fragment = urlParts[1] ? "#" + urlParts[1] : "";
+
+  url = removeQueryString(baseUrl);
   if (typeof key === "object") {
     if (!key) key = {};
     options =
@@ -139,14 +150,12 @@ export function setQueryParams(
   if (typeof key == "object" && key && !Array.isArray(key)) {
     Object.assign(params, key);
   }
-  return (
-    url +
-    "?" +
-    queryString.stringify(params, {
-      ...defaultStringifyOptions,
-      ...Object.assign({}, options),
-    })
-  );
+  const queryStr = queryString.stringify(params, {
+    ...defaultStringifyOptions,
+    ...Object.assign({}, options),
+  });
+
+  return url + (queryStr ? "?" + queryStr : "") + fragment;
 }
 
 /**

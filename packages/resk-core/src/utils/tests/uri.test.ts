@@ -36,6 +36,219 @@ describe("URI Utils", () => {
       const url = "https://example.com/path";
       expect(getQueryParams(url)).toEqual({});
     });
+
+    describe("Basic parameter types", () => {
+      it("should parse string values", () => {
+        const url = "https://example.com?name=john&city=new+york";
+        expect(getQueryParams(url)).toEqual({ name: "john", city: "new york" });
+      });
+
+      it("should parse numeric values as strings", () => {
+        const url = "https://example.com?age=25&price=19.99";
+        expect(getQueryParams(url)).toEqual({ age: "25", price: "19.99" });
+      });
+
+      it("should parse boolean-like values as strings", () => {
+        const url = "https://example.com?active=true&disabled=false";
+        expect(getQueryParams(url)).toEqual({
+          active: "true",
+          disabled: "false",
+        });
+      });
+
+      it("should parse null values as strings", () => {
+        const url = "https://example.com?value=null&empty=";
+        expect(getQueryParams(url)).toEqual({ value: "null", empty: "" });
+      });
+    });
+
+    describe("Array parameters", () => {
+      it("should parse bracket notation arrays", () => {
+        const url = "https://example.com?tags[]=red&tags[]=blue&tags[]=green";
+        expect(getQueryParams(url)).toEqual({ tags: ["red", "blue", "green"] });
+      });
+
+      it("should parse indexed arrays", () => {
+        const url =
+          "https://example.com?items[0]=apple&items[1]=banana&items[2]=orange";
+        expect(getQueryParams(url)).toEqual({
+          items: ["apple", "banana", "orange"],
+        });
+      });
+
+      it("should parse mixed array notations", () => {
+        const url =
+          "https://example.com?list[]=a&list[]=b&indexed[0]=x&indexed[1]=y";
+        expect(getQueryParams(url)).toEqual({
+          list: ["a", "b"],
+          indexed: ["x", "y"],
+        });
+      });
+
+      it("should handle empty arrays", () => {
+        const url = "https://example.com?empty[]=";
+        expect(getQueryParams(url)).toEqual({ empty: [""] });
+      });
+
+      it("should handle sparse arrays", () => {
+        const url = "https://example.com?sparse[0]=first&sparse[2]=third";
+        expect(getQueryParams(url)).toEqual({
+          sparse: ["first", undefined, "third"],
+        });
+      });
+    });
+
+    describe("Nested objects", () => {
+      it("should parse bracket notation nested objects", () => {
+        const url =
+          "https://example.com?user[name]=john&user[age]=30&user[address][city]=NYC";
+        expect(getQueryParams(url)).toEqual({
+          user: {
+            name: "john",
+            age: "30",
+            address: { city: "NYC" },
+          },
+        });
+      });
+
+      it("should parse dot notation nested objects", () => {
+        const url =
+          "https://example.com?config.database.host=localhost&config.database.port=5432";
+        expect(getQueryParams(url)).toEqual({
+          "config.database.host": "localhost",
+          "config.database.port": "5432",
+        });
+      });
+
+      it("should handle complex nested structures", () => {
+        const url =
+          "https://example.com?query[where][and][0][status]=active&query[where][and][1][category]=tech&query[limit]=10";
+        expect(getQueryParams(url)).toEqual({
+          query: {
+            where: {
+              and: [{ status: "active" }, { category: "tech" }],
+            },
+            limit: "10",
+          },
+        });
+      });
+    });
+
+    describe("Special characters and encoding", () => {
+      it("should decode URL-encoded values", () => {
+        const url =
+          "https://example.com?message=hello%20world&email=user%40example.com";
+        expect(getQueryParams(url)).toEqual({
+          message: "hello world",
+          email: "user@example.com",
+        });
+      });
+
+      it("should handle plus signs as spaces", () => {
+        const url = "https://example.com?text=hello+world&equation=2%2B2%3D4";
+        expect(getQueryParams(url)).toEqual({
+          text: "hello world",
+          equation: "2+2=4",
+        });
+      });
+
+      it("should handle special characters in keys and values", () => {
+        const url =
+          "https://example.com?key%20with%20spaces=value%26more&special%40key=%3Ctag%3E";
+        expect(getQueryParams(url)).toEqual({
+          "key with spaces": "value&more",
+          "special@key": "<tag>",
+        });
+      });
+
+      it("should handle Unicode characters", () => {
+        const url = "https://example.com?name=José&city=München&emoji=🚀";
+        expect(getQueryParams(url)).toEqual({
+          name: "José",
+          city: "München",
+          emoji: "🚀",
+        });
+      });
+    });
+
+    describe("Edge cases", () => {
+      it("should handle URLs with fragments", () => {
+        const url = "https://example.com?a=1&b=2#section";
+        expect(getQueryParams(url)).toEqual({ a: "1", b: "2" });
+      });
+
+      it("should handle URLs with only query string", () => {
+        const url = "?a=1&b=2";
+        expect(getQueryParams(url)).toEqual({ a: "1", b: "2" });
+      });
+
+      it("should handle malformed query strings", () => {
+        const url = "https://example.com?a=1&&b=2&c=";
+        expect(getQueryParams(url)).toEqual({ a: "1", b: "2", c: "" });
+      });
+
+      it("should handle duplicate keys", () => {
+        const url = "https://example.com?key=value1&key=value2&key=value3";
+        expect(getQueryParams(url)).toEqual({
+          key: ["value1", "value2", "value3"],
+        });
+      });
+
+      it("should handle empty keys", () => {
+        const url = "https://example.com?=value&=another&=third";
+        expect(getQueryParams(url)).toEqual({});
+      });
+
+      it("should handle keys without values", () => {
+        const url = "https://example.com?flag&another&third=";
+        expect(getQueryParams(url)).toEqual({
+          flag: "",
+          another: "",
+          third: "",
+        });
+      });
+    });
+
+    describe("Complex real-world scenarios", () => {
+      it("should parse API query parameters with filters", () => {
+        const url =
+          "https://api.example.com/users?filter[name]=john&filter[age][gte]=18&filter[active]=true&sort=name&limit=10";
+        expect(getQueryParams(url)).toEqual({
+          filter: {
+            name: "john",
+            age: { gte: "18" },
+            active: "true",
+          },
+          sort: "name",
+          limit: "10",
+        });
+      });
+
+      it("should parse search queries with operators", () => {
+        const url =
+          "https://search.example.com?q=typescript&operator=AND&fields[]=title&fields[]=content&boost[title]=2";
+        expect(getQueryParams(url)).toEqual({
+          q: "typescript",
+          operator: "AND",
+          fields: ["title", "content"],
+          boost: { title: "2" },
+        });
+      });
+
+      it("should parse complex nested OR conditions", () => {
+        const url =
+          "https://api.example.com/search?where[or][0][title][contains]=test&where[or][1][description][contains]=test&where[or][2][tags][in][]=tag1&where[or][2][tags][in][]=tag2";
+        expect(getQueryParams(url)).toEqual({
+          where: {
+            or: [
+              { title: { contains: "test" } },
+              { description: { contains: "test" } },
+              { tags: { in: ["tag1", "tag2"] } },
+            ],
+          },
+        });
+      });
+    });
   });
 
   describe("removeQueryString", () => {
@@ -66,6 +279,296 @@ describe("URI Utils", () => {
       expect(setQueryParams(url, "b", 2)).toBe(
         "https://example.com/path?a=1&b=2"
       );
+    });
+
+    describe("Basic parameter types", () => {
+      it("should handle string values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "name", "john")).toBe(
+          "https://example.com?name=john"
+        );
+        expect(setQueryParams(url, "message", "hello world")).toBe(
+          "https://example.com?message=hello%20world"
+        );
+      });
+
+      it("should handle numeric values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "age", 25)).toBe(
+          "https://example.com?age=25"
+        );
+        expect(setQueryParams(url, "price", 19.99)).toBe(
+          "https://example.com?price=19.99"
+        );
+      });
+
+      it("should handle boolean values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "active", true)).toBe(
+          "https://example.com?active=true"
+        );
+        expect(setQueryParams(url, "disabled", false)).toBe(
+          "https://example.com?disabled=false"
+        );
+      });
+
+      it("should handle null and undefined values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "value", null)).toBe(
+          "https://example.com?value="
+        );
+        expect(setQueryParams(url, "empty", undefined)).toBe(
+          "https://example.com"
+        );
+      });
+
+      it("should handle empty string values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "empty", "")).toBe(
+          "https://example.com?empty="
+        );
+      });
+    });
+
+    describe("Array parameters", () => {
+      it("should serialize arrays with indexed notation", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "tags", ["red", "blue", "green"])).toBe(
+          "https://example.com?tags[0]=red&tags[1]=blue&tags[2]=green"
+        );
+      });
+
+      it("should handle empty arrays", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "empty", [])).toBe("https://example.com");
+      });
+
+      it("should handle arrays with mixed types", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "mixed", [1, "two", true, null])).toBe(
+          "https://example.com?mixed[0]=1&mixed[1]=two&mixed[2]=true&mixed[3]="
+        );
+      });
+
+      it("should handle sparse arrays", () => {
+        const url = "https://example.com";
+        const sparse = [];
+        sparse[0] = "first";
+        sparse[2] = "third";
+        expect(setQueryParams(url, "sparse", sparse)).toBe(
+          "https://example.com?sparse[0]=first&sparse[2]=third"
+        );
+      });
+    });
+
+    describe("Nested objects", () => {
+      it("should serialize nested objects with bracket notation", () => {
+        const url = "https://example.com";
+        const obj = { user: { name: "john", age: 30 } };
+        expect(setQueryParams(url, obj)).toBe(
+          "https://example.com?user[name]=john&user[age]=30"
+        );
+      });
+
+      it("should handle deeply nested objects", () => {
+        const url = "https://example.com";
+        const obj = {
+          config: {
+            database: {
+              host: "localhost",
+              port: 5432,
+              credentials: { user: "admin", pass: "secret" },
+            },
+          },
+        };
+        expect(setQueryParams(url, obj)).toBe(
+          "https://example.com?config[database][host]=localhost&config[database][port]=5432&config[database][credentials][user]=admin&config[database][credentials][pass]=secret"
+        );
+      });
+
+      it("should handle objects with array properties", () => {
+        const url = "https://example.com";
+        const obj = {
+          query: {
+            tags: ["red", "blue"],
+            filters: { active: true, category: "tech" },
+          },
+        };
+        expect(setQueryParams(url, obj)).toBe(
+          "https://example.com?query[tags][0]=red&query[tags][1]=blue&query[filters][active]=true&query[filters][category]=tech"
+        );
+      });
+    });
+
+    describe("Special characters and encoding", () => {
+      it("should encode special characters in values", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "message", "hello world")).toBe(
+          "https://example.com?message=hello%20world"
+        );
+        expect(setQueryParams(url, "email", "user@example.com")).toBe(
+          "https://example.com?email=user%40example.com"
+        );
+        expect(setQueryParams(url, "query", "name=john&age=30")).toBe(
+          "https://example.com?query=name%3Djohn%26age%3D30"
+        );
+      });
+
+      it("should encode special characters in keys", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "key with spaces", "value")).toBe(
+          "https://example.com?key%20with%20spaces=value"
+        );
+        expect(setQueryParams(url, "special@key", "value")).toBe(
+          "https://example.com?special%40key=value"
+        );
+      });
+
+      it("should handle Unicode characters", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "name", "José")).toBe(
+          "https://example.com?name=Jos%C3%A9"
+        );
+        expect(setQueryParams(url, "city", "München")).toBe(
+          "https://example.com?city=M%C3%BCnchen"
+        );
+      });
+
+      it("should handle emoji and special symbols", () => {
+        const url = "https://example.com";
+        expect(setQueryParams(url, "icon", "🚀")).toBe(
+          "https://example.com?icon=%F0%9F%9A%80"
+        );
+        expect(setQueryParams(url, "math", "∑")).toBe(
+          "https://example.com?math=%E2%88%91"
+        );
+      });
+    });
+
+    describe("Merging with existing parameters", () => {
+      it("should merge with existing query parameters", () => {
+        const url = "https://example.com?existing=old";
+        expect(setQueryParams(url, "new", "value")).toBe(
+          "https://example.com?existing=old&new=value"
+        );
+      });
+
+      it("should override existing parameters with same key", () => {
+        const url = "https://example.com?key=old";
+        expect(setQueryParams(url, "key", "new")).toBe(
+          "https://example.com?key=new"
+        );
+      });
+
+      it("should handle complex merging scenarios", () => {
+        const url = "https://example.com?filter[active]=false&sort=name";
+        const newParams = { "filter[category]": "tech", limit: 10 };
+        expect(setQueryParams(url, newParams)).toBe(
+          "https://example.com?filter[active]=false&sort=name&filter[category]=tech&limit=10"
+        );
+      });
+
+      it("should preserve fragments when merging", () => {
+        const url = "https://example.com?existing=value#section";
+        expect(setQueryParams(url, "new", "param")).toBe(
+          "https://example.com?existing=value&new=param#section"
+        );
+      });
+    });
+
+    describe("Edge cases", () => {
+      it("should handle URLs with only query strings", () => {
+        const url = "?existing=value";
+        expect(setQueryParams(url, "new", "param")).toBe(
+          "?existing=value&new=param"
+        );
+      });
+
+      it("should handle URLs with fragments", () => {
+        const url = "https://example.com#section";
+        expect(setQueryParams(url, "param", "value")).toBe(
+          "https://example.com?param=value#section"
+        );
+      });
+
+      it("should handle URLs with both query and fragment", () => {
+        const url = "https://example.com?existing=value#section";
+        expect(setQueryParams(url, "new", "param")).toBe(
+          "https://example.com?existing=value&new=param#section"
+        );
+      });
+
+      it("should handle empty base URLs", () => {
+        expect(setQueryParams("", "param", "value")).toBe("?param=value");
+      });
+
+      it("should handle malformed URLs gracefully", () => {
+        const url = "not-a-url";
+        expect(setQueryParams(url, "param", "value")).toBe(
+          "not-a-url?param=value"
+        );
+      });
+    });
+
+    describe("Complex real-world scenarios", () => {
+      it("should serialize API filter parameters", () => {
+        const url = "https://api.example.com/users";
+        const filters = {
+          filter: {
+            name: "john",
+            age: { gte: 18 },
+            active: true,
+          },
+          sort: "name",
+          limit: 10,
+        };
+        expect(setQueryParams(url, filters)).toBe(
+          "https://api.example.com/users?filter[name]=john&filter[age][gte]=18&filter[active]=true&sort=name&limit=10"
+        );
+      });
+
+      it("should serialize search query parameters", () => {
+        const url = "https://search.example.com";
+        const params = {
+          q: "typescript tutorial",
+          operator: "AND",
+          fields: ["title", "content", "tags"],
+          boost: { title: 2, tags: 1.5 },
+        };
+        expect(setQueryParams(url, params)).toBe(
+          "https://search.example.com?q=typescript%20tutorial&operator=AND&fields[0]=title&fields[1]=content&fields[2]=tags&boost[title]=2&boost[tags]=1.5"
+        );
+      });
+
+      it("should serialize complex nested OR conditions", () => {
+        const url = "https://api.example.com/search";
+        const params = {
+          where: {
+            or: [
+              { title: { contains: "test" } },
+              { description: { contains: "test" } },
+              { tags: { in: ["tag1", "tag2"] } },
+            ],
+          },
+          limit: 20,
+        };
+        expect(setQueryParams(url, params)).toBe(
+          "https://api.example.com/search?where[or][0][title][contains]=test&where[or][1][description][contains]=test&where[or][2][tags][in][0]=tag1&where[or][2][tags][in][1]=tag2&limit=20"
+        );
+      });
+
+      it("should handle pagination parameters", () => {
+        const url = "https://api.example.com/items";
+        const params = {
+          page: 2,
+          per_page: 50,
+          sort: "-created_at",
+          include: ["author", "comments"],
+        };
+        expect(setQueryParams(url, params)).toBe(
+          "https://api.example.com/items?page=2&per_page=50&sort=-created_at&include[0]=author&include[1]=comments"
+        );
+      });
     });
   });
 
@@ -352,6 +855,287 @@ describe("URI Utils", () => {
         expect(isUriEncoded("hello%20world")).toBe(true); // %20 = space
         expect(isUriEncoded("hello%2Oworld")).toBe(false); // %2O = invalid (O not hex)
         expect(isUriEncoded("hello%2Gworld")).toBe(false); // %2G = invalid (G not hex)
+      });
+    });
+
+    describe("Round-trip conversion", () => {
+      it("should correctly round-trip complex objects with OR conditions", () => {
+        const testObj = {
+          limit: 100,
+          id: 12,
+          where: {
+            or: [
+              {
+                id: {
+                  contains: "ccg",
+                },
+              },
+              {
+                "user.firstName": {
+                  contains: "ccg",
+                },
+              },
+              {
+                "user.lastName": {
+                  contains: "ccg",
+                },
+              },
+            ],
+          },
+        };
+
+        // Convert object to URL
+        const url = setQueryParams("http://example.com", testObj);
+
+        // Parse URL back to object
+        const parsed = getQueryParams(url);
+
+        // The parsed object should match the original (with string/number conversions)
+        expect(parsed.limit).toBe("100");
+        expect(parsed.id).toBe("12");
+        expect(parsed.where.or).toHaveLength(3);
+        expect(parsed.where.or[0]).toEqual({ id: { contains: "ccg" } });
+        expect(parsed.where.or[1]).toEqual({
+          "user.firstName": { contains: "ccg" },
+        });
+        expect(parsed.where.or[2]).toEqual({
+          "user.lastName": { contains: "ccg" },
+        });
+      });
+
+      describe("Round-trip conversion scenarios", () => {
+        it("should round-trip simple key-value pairs", () => {
+          const original = { name: "john", age: 30, active: true };
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ name: "john", age: "30", active: "true" });
+        });
+
+        it("should round-trip arrays", () => {
+          const original = { tags: ["red", "blue", "green"] };
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ tags: ["red", "blue", "green"] });
+        });
+
+        it("should round-trip nested objects", () => {
+          const original = {
+            user: {
+              profile: { name: "john", email: "john@example.com" },
+              settings: { theme: "dark", notifications: true },
+            },
+          };
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            user: {
+              profile: { name: "john", email: "john@example.com" },
+              settings: { theme: "dark", notifications: "true" },
+            },
+          });
+        });
+
+        it("should round-trip complex API queries", () => {
+          const original = {
+            filter: {
+              status: "active",
+              category: { in: ["tech", "business"] },
+              date: { gte: "2023-01-01" },
+            },
+            sort: "-created_at",
+            limit: 50,
+            include: ["author", "comments"],
+          };
+          const url = setQueryParams("https://api.example.com/posts", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            filter: {
+              status: "active",
+              category: { in: ["tech", "business"] },
+              date: { gte: "2023-01-01" },
+            },
+            sort: "-created_at",
+            limit: "50",
+            include: ["author", "comments"],
+          });
+        });
+
+        it("should round-trip with special characters", () => {
+          const original = {
+            query: "hello world & more",
+            email: "user@example.com",
+            tags: ["tag with spaces", "special@tag"],
+          };
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            query: "hello world & more",
+            email: "user@example.com",
+            tags: ["tag with spaces", "special@tag"],
+          });
+        });
+
+        it("should round-trip with null and undefined values", () => {
+          const original = { name: "john", age: null, active: undefined };
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ name: "john", age: "" });
+        });
+
+        it("should round-trip sparse arrays", () => {
+          const original: { items: (string | undefined)[] } = { items: [] };
+          original.items[0] = "first";
+          original.items[2] = "third";
+          const url = setQueryParams("https://example.com", original);
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ items: ["first", undefined, "third"] });
+        });
+      });
+
+      describe("Parsing complex encoded query strings", () => {
+        it("should parse deeply encoded query strings", () => {
+          // Simulate a query string that has been double-encoded
+          const encodedQuery =
+            "where%5Bor%5D%5B0%5D%5Btitle%5D%5Bcontains%5D=test&where%5Bor%5D%5B1%5D%5Bdescription%5D%5Bcontains%5D=test";
+          const url = `https://api.example.com?${encodedQuery}`;
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            where: {
+              or: [
+                { title: { contains: "test" } },
+                { description: { contains: "test" } },
+              ],
+            },
+          });
+        });
+
+        it("should handle query strings with mixed encoding levels", () => {
+          const url =
+            "https://example.com?simple=value&encoded=hello%20world&complex%5Bnested%5D%5Bkey%5D=encoded%20value";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            simple: "value",
+            encoded: "hello world",
+            complex: { nested: { key: "encoded value" } },
+          });
+        });
+
+        it("should parse query strings with array indices and brackets", () => {
+          const url =
+            "https://example.com?filters[0][field]=status&filters[0][value]=active&filters[1][field]=category&filters[1][value]=tech";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            filters: [
+              { field: "status", value: "active" },
+              { field: "category", value: "tech" },
+            ],
+          });
+        });
+
+        it("should handle query strings with empty brackets", () => {
+          const url = "https://example.com?tags[]=&tags[]=red&tags[]=";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ tags: ["", "red", ""] });
+        });
+
+        it("should parse complex filter expressions", () => {
+          const url =
+            "https://api.example.com/search?q=typescript&filters[and][0][tags][in][]=javascript&filters[and][0][tags][in][]=programming&filters[and][1][level]=beginner&sort[rating]=desc&limit=20";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            q: "typescript",
+            filters: {
+              and: [
+                { tags: { in: ["javascript", "programming"] } },
+                { level: "beginner" },
+              ],
+            },
+            sort: { rating: "desc" },
+            limit: "20",
+          });
+        });
+
+        it("should handle query strings with date ranges and comparisons", () => {
+          const url =
+            "https://api.example.com/events?date[gte]=2023-01-01&date[lte]=2023-12-31&price[lt]=100&category[in][]=conference&category[in][]=workshop";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            date: { gte: "2023-01-01", lte: "2023-12-31" },
+            price: { lt: "100" },
+            category: { in: ["conference", "workshop"] },
+          });
+        });
+
+        it("should parse query strings with nested array operations", () => {
+          const url =
+            "https://api.example.com/products?where[or][0][and][0][price][gt]=10&where[or][0][and][1][price][lt]=100&where[or][1][category]=electronics&limit=50";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            where: {
+              or: [
+                {
+                  and: [
+                    { price: { "[gt]": "10" } },
+                    { price: { "[lt]": "100" } },
+                  ],
+                },
+                { category: "electronics" },
+              ],
+            },
+            limit: "50",
+          });
+        });
+      });
+
+      describe("Edge cases in parsing", () => {
+        it("should handle URLs with only query parameters", () => {
+          const url = "?a=1&b=2&c[0]=test";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ a: "1", b: "2", c: ["test"] });
+        });
+
+        it("should handle query strings with leading/trailing ampersands", () => {
+          const url = "https://example.com?&a=1&&b=2&c=&";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ a: "1", b: "2", c: "" });
+        });
+
+        it("should handle malformed bracket notation", () => {
+          const url = "https://example.com?a[=1&b]=2&c[=]&d[]=";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ "a[": "1", "b]": "2", "c[": "]", d: [""] });
+        });
+
+        it("should handle extremely nested structures", () => {
+          const url =
+            "https://example.com?data[a][b][c][d][e]=value&data[a][b][c][f]=another";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({
+            data: {
+              a: {
+                b: {
+                  c: {
+                    d: { e: "value" },
+                    f: "another",
+                  },
+                },
+              },
+            },
+          });
+        });
+
+        it("should handle query strings with hash fragments", () => {
+          const url = "https://example.com?a=1&b=2#section?param=value";
+          const parsed = getQueryParams(url);
+          expect(parsed).toEqual({ a: "1", b: "2" });
+        });
+
+        it("should handle very long query strings", () => {
+          const longValue = "a".repeat(1000);
+          const url = `https://example.com?data=${longValue}`;
+          const parsed = getQueryParams(url);
+          expect(parsed.data).toBe(longValue);
+        });
       });
     });
   });

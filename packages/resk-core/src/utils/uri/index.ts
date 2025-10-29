@@ -241,6 +241,14 @@ export const parseURI = (
   password?: string;
 } => {
   if (typeof uri !== "string") return {};
+  if (typeof URL !== "undefined" && URL && isValidUrl(uri)) {
+    try {
+      return new URL(uri);
+    } catch {
+      // Fallback to regex parsing
+    }
+  }
+  uri = isUriEncoded(uri) ? decodeURIComponent(uri) : uri;
   var m = uri.match(
     /^(([^:\/?#]+:)?(?:\/\/((?:([^\/?#:]*):([^\/?#:]*)@)?([^\/?#:]*)(?::([^\/?#:]*))?)))?([^?#]*)(\?[^#]*)?(#.*)?$/
   );
@@ -334,15 +342,15 @@ export const isValidUrl = (uri: any): boolean => {
  * @returns {boolean} - Returns true if the string appears to be encoded, false otherwise
  *
  * @example
- * console.log(isEncodedURIComponent('hello%20world')); // true
- * console.log(isEncodedURIComponent('hello world')); // false
- * console.log(isEncodedURIComponent('hello%2Bworld')); // true
- * console.log(isEncodedURIComponent('hello+world')); // false
- * console.log(isEncodedURIComponent('https%3A%2F%2Fexample.com')); // true
- * console.log(isEncodedURIComponent('https://example.com')); // false
- * console.log(isEncodedURIComponent('hello%20world%21normal')); // true (mixed)
+ * console.log(isUriEncoded('hello%20world')); // true
+ * console.log(isUriEncoded('hello world')); // false
+ * console.log(isUriEncoded('hello%2Bworld')); // true
+ * console.log(isUriEncoded('hello+world')); // false
+ * console.log(isUriEncoded('https%3A%2F%2Fexample.com')); // true
+ * console.log(isUriEncoded('https://example.com')); // false
+ * console.log(isUriEncoded('hello%20world%21normal')); // true (mixed)
  */
-export const isEncodedURIComponent = (str: any): boolean => {
+export const isUriEncoded = (str: any): boolean => {
   // Check if input is a valid string
   if (!isNonNullString(str)) return false;
 

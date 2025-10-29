@@ -1,6 +1,6 @@
 {
   "name": "@resk/core",
-  "version": "1.27.2",
+  "version": "1.27.3",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "exports": {
     "./auth": {

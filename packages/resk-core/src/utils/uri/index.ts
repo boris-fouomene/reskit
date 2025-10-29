@@ -22,7 +22,10 @@ import { isNonNullString } from "../isNonNullString";
  * console.log(extractQueryString(url, false)); // Output: "a=1&b=2"
  * ```
  */
-export const extractQueryString = (uri?: string, addQuestionSeparator: boolean = true): string => {
+export const extractQueryString = (
+  uri?: string,
+  addQuestionSeparator: boolean = true
+): string => {
   if (typeof uri !== "string") return "";
   let parse = parseURI(uri);
   uri = typeof parse.search === "string" ? parse.search : "";
@@ -49,9 +52,15 @@ export const extractQueryString = (uri?: string, addQuestionSeparator: boolean =
  * console.log(getQueryParams(url)); // Output: { a: '1', b: '2', c: [ '3', '4' ] }
  * ```
  */
-export const getQueryParams = function (uri: string | null | undefined, queryStringOpts: IParseBaseOptions = {}): IDict {
+export const getQueryParams = function (
+  uri: string | null | undefined,
+  queryStringOpts: IParseBaseOptions = {}
+): IDict {
   if (typeof uri !== "string") return {};
-  return queryString.parse(extractQueryString(uri, false), { allowSparse: true, ...Object.assign({}, queryStringOpts) });
+  return queryString.parse(extractQueryString(uri, false), {
+    allowSparse: true,
+    ...Object.assign({}, queryStringOpts),
+  });
 };
 
 /**
@@ -71,7 +80,10 @@ export const getQueryParams = function (uri: string | null | undefined, queryStr
  * console.log(removeQueryString(url, true)); // Output: "https://example.com/path" (decoded)
  * ```
  */
-export const removeQueryString = function (uri: string | undefined | null, _decodeURIComponent: boolean = false): string {
+export const removeQueryString = function (
+  uri: string | undefined | null,
+  _decodeURIComponent: boolean = false
+): string {
   if (typeof uri !== "string") return "";
   uri = uri.replace(/#.*$/, "").replace(/\?.*$/, "");
   if (_decodeURIComponent === true) {
@@ -104,20 +116,37 @@ const defaultStringifyOptions: IStringifyBaseOptions = {
  * console.log(setQueryParams(url, { a: 1, b: 2 })); // Output: "https://example.com/path?a=1&b=2"
  * ```
  */
-export function setQueryParams(url: string | undefined | null, key: any, value?: any, options: IStringifyBaseOptions = {}): string {
+export function setQueryParams(
+  url: string | undefined | null,
+  key: any,
+  value?: any,
+  options: IStringifyBaseOptions = {}
+): string {
   if (typeof url !== "string" || !url) return "";
   let params = getQueryParams(url);
   url = removeQueryString(url);
   if (typeof key === "object") {
     if (!key) key = {};
-    options = typeof options == "object" && options ? options : typeof value == "object" && value ? value : {};
+    options =
+      typeof options == "object" && options
+        ? options
+        : typeof value == "object" && value
+          ? value
+          : {};
   } else if (typeof key == "string") {
     key = { [key]: value };
   }
   if (typeof key == "object" && key && !Array.isArray(key)) {
     Object.assign(params, key);
   }
-  return url + "?" + queryString.stringify(params, { ...defaultStringifyOptions, ...Object.assign({}, options) });
+  return (
+    url +
+    "?" +
+    queryString.stringify(params, {
+      ...defaultStringifyOptions,
+      ...Object.assign({}, options),
+    })
+  );
 }
 
 /**
@@ -137,7 +166,10 @@ export function setQueryParams(url: string | undefined | null, key: any, value?:
  * console.log(objectToQueryString(obj, true)); // Output: "a=1&b=2&c%5Bd%5D=3&c%5Be%5D=4"
  * ```
  */
-export function objectToQueryString(o: any, encodeURI: boolean = false): string {
+export function objectToQueryString(
+  o: any,
+  encodeURI: boolean = false
+): string {
   if (o == null || typeof o !== "object") return "";
   function iter(o: any, path: string) {
     if (Array.isArray(o)) {
@@ -152,7 +184,11 @@ export function objectToQueryString(o: any, encodeURI: boolean = false): string 
       });
       return;
     }
-    data.push((encodeURI ? encodeURIComponent(path) : path) + "=" + (encodeURI ? encodeURIComponent(o) : o));
+    data.push(
+      (encodeURI ? encodeURIComponent(path) : path) +
+        "=" +
+        (encodeURI ? encodeURIComponent(o) : o)
+    );
   }
 
   const data: string[] = [];
@@ -205,7 +241,9 @@ export const parseURI = (
   password?: string;
 } => {
   if (typeof uri !== "string") return {};
-  var m = uri.match(/^(([^:\/?#]+:)?(?:\/\/((?:([^\/?#:]*):([^\/?#:]*)@)?([^\/?#:]*)(?::([^\/?#:]*))?)))?([^?#]*)(\?[^#]*)?(#.*)?$/);
+  var m = uri.match(
+    /^(([^:\/?#]+:)?(?:\/\/((?:([^\/?#:]*):([^\/?#:]*)@)?([^\/?#:]*)(?::([^\/?#:]*))?)))?([^?#]*)(\?[^#]*)?(#.*)?$/
+  );
   let r = !m
     ? {}
     : {
@@ -280,5 +318,68 @@ export const isValidUrl = (uri: any): boolean => {
       return false;
     }
   }
+  return false;
+};
+
+/**
+ * Detects if a URL string has been encoded using encodeURIComponent.
+ *
+ * This function uses multiple heuristics to determine if a string has been
+ * encoded with encodeURIComponent. It checks for:
+ * 1. Presence of valid encoded character sequences (%XX where XX are hex digits)
+ * 2. Whether decoding changes the string (indicating encoded content)
+ * 3. Handles mixed encoded/unencoded content properly
+ *
+ * @param {any} str - The string to check for encoding
+ * @returns {boolean} - Returns true if the string appears to be encoded, false otherwise
+ *
+ * @example
+ * console.log(isEncodedURIComponent('hello%20world')); // true
+ * console.log(isEncodedURIComponent('hello world')); // false
+ * console.log(isEncodedURIComponent('hello%2Bworld')); // true
+ * console.log(isEncodedURIComponent('hello+world')); // false
+ * console.log(isEncodedURIComponent('https%3A%2F%2Fexample.com')); // true
+ * console.log(isEncodedURIComponent('https://example.com')); // false
+ * console.log(isEncodedURIComponent('hello%20world%21normal')); // true (mixed)
+ */
+export const isEncodedURIComponent = (str: any): boolean => {
+  // Check if input is a valid string
+  if (!isNonNullString(str)) return false;
+
+  // Quick check: if no percent signs, definitely not encoded
+  if (!str.includes("%")) return false;
+
+  // Check for valid percent-encoded sequences (%XX where XX are hex digits)
+  const percentEncodedRegex = /%[0-9A-Fa-f]{2}/g;
+  const matches = str.match(percentEncodedRegex);
+
+  // If no valid percent-encoded sequences found, not encoded
+  if (!matches) return false;
+
+  try {
+    // Try to decode the string
+    const decoded = decodeURIComponent(str);
+
+    // If decoding changed the string, it contains encoded content
+    if (decoded !== str) return true;
+
+    // If decoding didn't change the string, check for double-encoding
+    // (e.g., %2520 should decode to %20, then to space)
+    try {
+      const doubleDecoded = decodeURIComponent(decoded);
+      if (doubleDecoded !== decoded) {
+        return true; // Double-encoded content detected
+      }
+    } catch {
+      // Double decode failed, but we have valid encoding, so it's encoded
+      return true;
+    }
+  } catch (error) {
+    // If decodeURIComponent throws an error, the string is not properly encoded
+    return false;
+  }
+
+  // If we get here, the string has %XX patterns but they don't decode to anything different
+  // This shouldn't happen with properly formed encoding, but just in case
   return false;
 };

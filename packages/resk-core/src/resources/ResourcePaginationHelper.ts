@@ -5,7 +5,6 @@ import { extendObj, isObj } from "@utils/object";
 import { isStringNumber } from "@utils/string";
 import { getQueryParams } from "@utils/uri";
 import {
-  IResourceData,
   IResourcePaginationMetaData,
   IResourceQueryOptions,
   IResourceQueryOrderBy,
@@ -178,7 +177,7 @@ export class ResourcePaginationHelper {
    * @param {IResourceQueryOptions} options - The pagination options.
    * @returns {IResourcePaginatedResult<DataType>} The paginated result.
    */
-  static paginate<DataType extends IResourceData = any>(
+  static paginate<DataType = unknown>(
     data: DataType[],
     count: number,
     options?: IResourceQueryOptions
@@ -212,7 +211,7 @@ export class ResourcePaginationHelper {
    * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
    * const queryOptions = parseQueryOptions(req);
    */
-  static parseQueryOptions<T extends IResourceData = IResourceData>(req: {
+  static parseQueryOptions<T = unknown>(req: {
     url: string;
     headers: Record<string, any>;
     params?: Record<string, any>;

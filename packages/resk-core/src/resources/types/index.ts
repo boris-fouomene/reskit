@@ -1,6 +1,6 @@
 import { IAuthPerm } from "@/auth/types";
 import { IInputFormatterOptions } from "@/inputFormatter/types";
-import { IDict, IUcFirst } from "@/types/dictionary";
+import { IUcFirst } from "@/types/dictionary";
 import { IMongoQuery, IResourceQueryOrderBy } from "./filters";
 
 export * from "./filters";
@@ -207,48 +207,10 @@ export type IFieldType = keyof IFieldMap;
  */
 export interface IResources {}
 
-/**
- * Enforces the type constraint that all properties of an object must conform to the `IResource` interface.
- * This type is a mapped type that iterates over the keys of the input type `T` and checks if each property conforms to `IResource`.
- * If a property does not conform, the type is set to `never`, indicating a type error.
- *
- * @template T - The input type to be enforced.
- *
- * @example
- * ```typescript
- * interface MyResources {
- *     users: IResource;
- *     products: IResource;
- * }
- *
- * type EnforcedResources = IEnforceIResources<MyResources>;
- * ```
- *
- * @typeParam T - The input type to be enforced.
- *
- * @typedef {{ [K in keyof T]: T[K] extends IResource ? T[K] : never }} IEnforceIResources
- */
 type IEnforceIResources<T> = {
-  /**
-   * Iterates over the keys of the input type `T` and checks if each property conforms to `IResource`.
-   *
-   * @type {[K in keyof T]}
-   */
-  [K in keyof T]: /**
-   * If the property conforms to `IResource`, returns the property type.
-   *
-   * @type {T[K] extends IResource ? T[K] : never}
-   */
-  T[K] extends IResource ? T[K] : never; // ❌ Invalid types will result in 'never'
+  [K in keyof T]: T[K] extends IResource ? T[K] : never; // ❌ Invalid types will result in 'never'
 };
 
-/**
- * Triggers validation of the `IResources` object to ensure it conforms to the `IResource` interface.
- * This type is used to enforce type safety and catch any errors in the `IResources` object.
- *
- * @type {IEnforceIResources<IResources>}
- */
-// ✅ Trigger validation
 type ICheckIResources = IEnforceIResources<IResources>;
 
 /**
@@ -598,7 +560,7 @@ export interface IResourceAction {
  * @property {Partial<IResourceActions> & Record<string, IResourceAction>} [actions] - The actions associated with the resource.
  */
 export interface IResource<
-  DataType extends IResourceData = any,
+  DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
 > {
   /**
@@ -680,42 +642,6 @@ export interface IResource<
    */
   className?: string;
 }
-
-/**
- * @interface IResourceDefaultEvent
- * Represents the default events that can be triggered for a resource.
- * This type is a union of custom action names (`IResourceActionName`) and keys from the `IResourceDataService`.
- *
- * @example
- * ```typescript
- * const event: IResourceDefaultEvent = "create"; // Example of a resource action name
- * const event: IResourceDefaultEvent = "update"; // Example of a key from IResourceDataService
- * ```
- *
- * @typedef {string} IResourceDefaultEvent
- */
-export type IResourceDefaultEvent =
-  | (IResourceActionName & string)
-  | keyof IResourceDataService;
-
-/**
- * @interface IResourceData
- * Represents the data structure for a resource.
- * This interface extends `IDict`, allowing it to store key-value pairs dynamically.
- *
- * @example
- * ```typescript
- * const resourceData: IResourceData = {
- *   id: "123",
- *   name: "Example ResourceMetadata",
- *   description: "This is an example resource.",
- * };
- * ```
- *
- * @interface IResourceData
- * @extends IDict
- */
-export interface IResourceData extends IDict {}
 
 /**
  * @type IResourcePrimaryKey
@@ -958,7 +884,7 @@ export type IResourcePrimaryKey = string | number | object;
 
  */
 export interface IResourceDataService<
-  DataType extends IResourceData = any,
+  DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
 > {
   /***
@@ -1230,7 +1156,7 @@ export interface IResourceDataService<
  * ];
  */
 export type IResourceManyCriteria<
-  DataType extends IResourceData = any,
+  DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
 > = PrimaryKeyType[] | IMongoQuery<DataType>;
 
@@ -1253,9 +1179,7 @@ export type IResourceManyCriteria<
  *      skip: 0 // Do not skip any results
  * };
  */
-export interface IResourceQueryOptions<
-  DataType extends IResourceData = IResourceData,
-> {
+export interface IResourceQueryOptions<DataType = unknown> {
   /** Fields to include in the response. */
   fields?: Array<keyof DataType>;
   relations?: string[]; // The relations to include in the response.
@@ -1393,9 +1317,7 @@ export interface IResourceQueryOptions<
  *   allowing clients to retrieve data in manageable chunks.
  * - The `links` property facilitates easy navigation between pages, enhancing user experience.
  */
-export interface IResourcePaginatedResult<
-  DataType extends IResourceData = any,
-> {
+export interface IResourcePaginatedResult<DataType = unknown> {
   /** List of fetched resources. */
   data: DataType[];
 
@@ -1461,3 +1383,249 @@ export interface IResourcePaginationMetaData {
    */
   hasPreviousPage?: boolean;
 }
+
+/**
+ * @interface IResourceDefaultEvent
+ * Represents the default events that can be triggered for a resource.
+ * This type is a union of custom action names (`IResourceActionName`) and keys from the `IResourceDataService`.
+ *
+ * @example
+ * ```typescript
+ * const event: IResourceDefaultEvent = "create"; // Example of a resource action name
+ * const event: IResourceDefaultEvent = "update"; // Example of a key from IResourceDataService
+ * ```
+ *
+ * @typedef {string} IResourceDefaultEvent
+ */
+export type IResourceDefaultEvent =
+  | (IResourceActionName & string)
+  | keyof IResourceDataService;
+
+/**
+ * Represents contextual information about a resource for operations like translations, logging, and error handling.
+ *
+ * This interface provides a standardized way to pass resource identification and contextual data
+ * throughout the application. It's primarily used for internationalization, error messages, and
+ * logging where resource-specific information is needed.
+ *
+ * @interface IResourceContext
+ *
+ * @example
+ * ```typescript
+ * // Basic usage in translations
+ * const context: IResourceContext = {
+ *   resourceName: "user",
+ *   resourceLabel: "User",
+ *   operation: "create",
+ *   count: 5
+ * };
+ *
+ * // Used in error messages
+ * i18n.t("resources.notFound", context);
+ * // Results in: "User with ID 123 not found"
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Extended with custom properties
+ * const extendedContext: IResourceContext = {
+ *   resourceName: "product",
+ *   resourceLabel: "Product",
+ *   category: "electronics",
+ *   price: 99.99
+ * };
+ * ```
+ */
+export interface IResourceContext extends Record<string, any> {
+  /** The unique programmatic name of the resource */
+  resourceName: IResourceName;
+
+  /** The human-readable label of the resource for display purposes */
+  resourceLabel: string;
+}
+
+/**
+ * @interface IResourceTranslations
+ *
+ * Represents the translation structure for resources in the application.
+ * This type defines the expected structure of translations for each resource,
+ * including labels, titles, and action-specific translations.
+ *
+ * @example
+ * ```typescript
+ * // resources actions translations structure :
+ * // Here is an example of the structure of the translations for the "user" resource:
+ * const userTranslations: IResourceTranslations = {
+ *   user: {
+ *     label: "User",
+ *     title: "Manage user data",
+ *     create: {
+ *       label: "Create User",
+ *       title: "Click to add a new user.",
+ *     },
+ *     read: {
+ *       label: "View User",
+ *       title: "Click to view a specific user.",
+ *     },
+ *     update: {
+ *       label: "Update User",
+ *       title: "Click to update a specific user.",
+ *       zero: "No users to update.",
+ *       one: "Updated one user.",
+ *       other: "Updated %{count} users.",
+ *     },
+ *     delete: {
+ *       label: "Delete User",
+ *       title: "Click to delete a specific user.",
+ *       zero: "No users to delete.",
+ *       one: "Deleted one user.",
+ *       other: "Deleted %{count} users.",
+ *     },
+ *   }
+ * };
+ * ```
+ */
+export type IResourceTranslations = {
+  [Name in IResourceName]: IResourceTranslation<Name>;
+}[IResourceName];
+
+/**
+ * @interface IResourceTranslation
+ *
+ * Represents the translation structure for a specific resource in the application.
+ * This generic type defines the expected structure of translations for a given resource,
+ * dynamically generating the translation keys based on the resource's defined actions.
+ *
+ * @template Name - The name of the resource for which translations are defined.
+ * Must be a valid `IResourceName`.
+ *
+ * ### Structure:
+ *
+ * - **Core Properties**:
+ *   - `label`: The display name of the resource (required).
+ *   - `title`: The title or heading for the resource (optional).
+ *   - `description`: A detailed description of the resource (optional).
+ *   - `forbiddenError`: Error message when access to the resource is forbidden (required).
+ *   - `notFoundError`: Error message when the resource is not found (required).
+ *
+ * - **Action Translations**: Dynamically generated based on the resource's actions.
+ *   Each action defined in the resource's `actions` property will have:
+ *   - `label`: The display label for the action.
+ *   - `title`: The tooltip or help text for the action.
+ *   - `zero`: Message when no items are affected (for pluralization).
+ *   - `one`: Message when one item is affected (for pluralization).
+ *   - `other`: Message when multiple items are affected (for pluralization).
+ *
+ * - **Additional Properties**: Any additional translation keys can be added via `Record<string, any>`.
+ *
+ * ### Type Generation:
+ *
+ * The type uses conditional types and mapped types to dynamically generate the structure:
+ * - It checks if the resource has an `actions` property.
+ * - For each action, it creates a translation object with the required fields.
+ * - It combines this with the core properties and allows for additional custom properties.
+ *
+ * @example
+ * ```typescript
+ * // For a resource with actions: { read: {...}, create: {...}, update: {...}, delete: {...} }
+ * const userTranslations: IResourceTranslation<"user"> = {
+ *   label: "User",
+ *   title: "Manage user data",
+ *   description: "User management and administration",
+ *   forbiddenError: "You do not have permission to access this resource.",
+ *   notFoundError: "The requested user was not found.",
+ *
+ *   // Action-specific translations (auto-generated based on resource actions)
+ *   read: {
+ *     label: "View User",
+ *     title: "Click to view a specific user.",
+ *     zero: "No users found.",
+ *     one: "Viewing one user.",
+ *     other: "Viewing %{count} users."
+ *   },
+ *   create: {
+ *     label: "Create User",
+ *     title: "Click to add a new user.",
+ *     zero: "No users created.",
+ *     one: "Created one user.",
+ *     other: "Created %{count} users."
+ *   },
+ *   update: {
+ *     label: "Update User",
+ *     title: "Click to update a specific user.",
+ *     zero: "No users updated.",
+ *     one: "Updated one user.",
+ *     other: "Updated %{count} users."
+ *   },
+ *   delete: {
+ *     label: "Delete User",
+ *     title: "Click to delete a specific user.",
+ *     zero: "No users deleted.",
+ *     one: "Deleted one user.",
+ *     other: "Deleted %{count} users."
+ *   },
+ *
+ *   // Additional custom translations
+ *   customAction: "Custom action performed",
+ *   validationError: "Please check your input"
+ * };
+ * ```
+ *
+ * ### Notes:
+ *
+ * - The action translations are automatically inferred from the resource's action definitions.
+ * - The `zero`, `one`, and `other` fields support pluralization in internationalization.
+ * - The `%{count}` placeholder can be used in pluralization messages for dynamic counts.
+ * - Additional properties allow for custom translations specific to the resource's needs.
+ * - This type ensures type safety by tying translations directly to the resource structure.
+ */
+export type IResourceTranslation<Name extends IResourceName> = {
+  /**
+   * The display name of the resource (required).
+   */
+  label: string;
+  /**
+   * The title or heading for the resource (optional).
+   */
+  title?: string;
+  /**
+   * A detailed description of the resource (optional).
+   */
+  description?: string;
+  /**
+   * Error message when access to the resource is forbidden (required).
+   */
+  forbiddenError: string;
+  /**
+   * Error message when the resource is not found (required).
+   */
+  notFoundError: string;
+} & (IResources[Name] extends { actions: infer Actions }
+  ? Actions extends Record<string, IResourceAction>
+    ? {
+        [Key in keyof Actions]: {
+          /**
+           * The display label for the action.
+           */
+          label: string;
+          /**
+           * The tooltip or help text for the action.
+           */
+          title: string;
+          /**
+           * Message when no items are affected (for pluralization).
+           */
+          zero: string;
+          /**
+           * Message when one item is affected (for pluralization).
+           */
+          one: string;
+          /**
+           * Message when multiple items are affected (for pluralization).
+           */
+          other: string;
+        };
+      }[keyof Actions]
+    : {}
+  : {}) &
+  Record<string, any>;

@@ -75,7 +75,7 @@ export interface IMongoComparisonOperators<T = any>
  *     }
  * };
  */
-export interface IMongoLogicalOperators<T = any> {
+export interface IMongoLogicalOperators<T = unknown> {
   $and?: IMongoQuery<T>[]; // An array of filter selectors that must all match
   $or?: IMongoQuery<T>[]; // An array of filter selectors where at least one must match
   $nor?: IMongoQuery<T>[]; // An array of filter selectors where none must match
@@ -109,7 +109,7 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
  * This interface represents a union of logical and comparison operators, allowing you to construct
  * complex MongoDB queries with both logical conditions and value-based comparisons.
  *
- * @template T - The type of the data being queried (default is `any`).
+ * @template T - The type of the data being queried (default is `unknown`).
  *
  * @example
  * // Example usage of IMongoOperators
@@ -145,7 +145,7 @@ export interface IMongoOperators
  * @typedef IMongoOperatorName
  * Represents the names of all available operators (logical and comparison) defined in the `IMongoOperators` interface.
  *
- * This type is a union of the keys from the `IMongoOperators` interface, allowing for a concise way to refer to any operator name
+ * This type is a union of the keys from the `IMongoOperators` interface, allowing for a concise way to refer to nknown operator name
  * that can be used in MongoDB queries. It ensures type safety and reduces the risk of typos in operator names.
  *
  * @example
@@ -259,7 +259,7 @@ type IMongoTypeAtPath<
  * This type is used to define a query that can be used to filter data in a MongoDB collection.
  * 
  * @typedef {object} IMongoQuery
- * @template T - The type of the data being queried (default is any).
+ * @template T - The type of the data being queried (default is nknown).
  * @template D - The depth limit for the query (default is 9).
  * @property {string} [key] - A key in the data being queried.
  * @property {T[key]} [value] - The value of the key in the data being queried.
@@ -321,7 +321,7 @@ type IMongoTypeAtPath<
  * @see {@link IMongoComparisonOperators} for more information on MongoDB comparison operators.
  * @see {@link IMongoLogicalOperators} for more information on MongoDB logical operators.
  */
-export type IMongoQuery<T = any, D extends number = 9> = D extends 0
+export type IMongoQuery<T = unknown, D extends number = 9> = D extends 0
   ? never
   : {
       [P in IMongoCreateDotPaths<T, D> | keyof T]?: P extends keyof T
@@ -354,7 +354,7 @@ export type IMongoQuery<T = any, D extends number = 9> = D extends 0
  *     }
  * };
  */
-export interface IMongoArrayOperators<T = any> {
+export interface IMongoArrayOperators<T = unknown> {
   $in?: T extends Array<any> ? T : T[]; // in array
   $nin?: T extends Array<any> ? T : T[]; // not in array
   $all?: T extends Array<any> ? T : T[];

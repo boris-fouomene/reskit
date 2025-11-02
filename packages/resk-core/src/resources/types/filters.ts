@@ -1,10 +1,10 @@
 /**
  * Interface representing various comparison operators for filtering operations.
- * 
+ *
  * This interface allows you to specify conditions for querying data based on
  * different comparison criteria. Each property corresponds to a specific
  * comparison operation that can be applied to filter results.
- * 
+ *
  * @example
  * // Example of using IMongoComparisonOperators
  * const filter: IMongoComparisonOperators = {
@@ -28,34 +28,34 @@
  *     }
  * };
  */
-export interface IMongoComparisonOperators<T = any> extends IMongoArrayOperators<T> {
-  $eq?: T;              // equals
-  $ne?: T;              // not equals
-  $gt?: T;              // greater than
-  $gte?: T;             // greater than or equal
-  $lt?: T;              // less than
-  $lte?: T;             // less than or equal
-  $exists?: boolean;               // field exists
-  $type?: string;                  // type check
-  $regex?: string | RegExp;  // regular expression
-  $options?: string;             // regex options
-  $size?: number;                  // array size
+export interface IMongoComparisonOperators<T = any>
+  extends IMongoArrayOperators<T> {
+  $eq?: T; // equals
+  $ne?: T; // not equals
+  $gt?: T; // greater than
+  $gte?: T; // greater than or equal
+  $lt?: T; // less than
+  $lte?: T; // less than or equal
+  $exists?: boolean; // field exists
+  $type?: string; // type check
+  $regex?: string | RegExp; // regular expression
+  $options?: string; // regex options
+  $size?: number; // array size
   /***
    * modulo operator.
-   * example : 
+   * example :
    * { age: { $mod: [5, 0] } } - finds documents where age mod 5 equals 0
    */
-  $mod?: [divisor: number, remainder: number];                  // modulo
-};
-
+  $mod?: [divisor: number, remainder: number]; // modulo
+}
 
 /**
  * Interface representing logical operators for filtering operations.
- * 
+ *
  * This interface allows you to combine multiple filter conditions using logical
  * operators. It provides a way to create complex queries by specifying how
  * different conditions relate to each other.
- * 
+ *
  * @example
  * // Example of using IMongoLogicalOperators
  * const filter: IMongoLogicalOperators = {
@@ -77,27 +77,27 @@ export interface IMongoComparisonOperators<T = any> extends IMongoArrayOperators
  */
 export interface IMongoLogicalOperators<T = any> {
   $and?: IMongoQuery<T>[]; // An array of filter selectors that must all match
-  $or?: IMongoQuery<T>[];  // An array of filter selectors where at least one must match
+  $or?: IMongoQuery<T>[]; // An array of filter selectors where at least one must match
   $nor?: IMongoQuery<T>[]; // An array of filter selectors where none must match
   $not?: IMongoQuery<T>; // A filter selector or comparison operator that must not match
 }
 
 /**
  * Represents the names of logical operators defined in the `IMongoLogicalOperators` interface.
- * 
+ *
  * The `IMongoLogicalOperatorName` type is a union of the keys from the `IMongoLogicalOperators` interface.
  * It provides a concise and type-safe way to refer to logical operator names used in MongoDB queries.
- * 
+ *
  * @example
  * ```typescript
  * const logicalOperator: IMongoLogicalOperatorName = "$and"; // Valid, as $and is a logical operator
  * const invalidOperator: IMongoLogicalOperatorName = "$invalid"; // Error: "$invalid" is not a valid logical operator
  * ```
- * 
+ *
  * @remarks
  * - This type is particularly useful when you need to validate or restrict the usage of logical operator names in MongoDB queries.
  * - It ensures type safety and reduces the risk of typos in operator names.
- * 
+ *
  * @see {@link IMongoLogicalOperators} for the structure of logical operators.
  */
 export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
@@ -105,12 +105,12 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
 /**
  * @interface IMongoOperators
  * Combines logical and comparison operators for MongoDB queries.
- * 
+ *
  * This interface represents a union of logical and comparison operators, allowing you to construct
  * complex MongoDB queries with both logical conditions and value-based comparisons.
- * 
+ *
  * @template T - The type of the data being queried (default is `any`).
- * 
+ *
  * @example
  * // Example usage of IMongoOperators
  * interface User {
@@ -118,7 +118,7 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
  *   age: number;
  *   tags: string[];
  * }
- * 
+ *
  * const query: IMongoOperators<User> = {
  *   $and: [
  *     { age: { $gte: 18 } }, // Logical AND: age must be greater than or equal to 18
@@ -129,44 +129,45 @@ export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
  *     { age: { $lt: 30 } } // Logical OR: age is less than 30
  *   ]
  * };
- * 
+ *
  * // This query will match documents where:
  * // - The age is greater than or equal to 18 AND the tags include "active" or "premium".
  * // - OR the name starts with "John" (case-insensitive) OR the age is less than 30.
- * 
+ *
  * @see {@link IMongoLogicalOperators} for logical operators.
  * @see {@link IMongoComparisonOperators} for comparison operators.
  */
-export interface IMongoOperators extends IMongoLogicalOperators, IMongoComparisonOperators { }
-
+export interface IMongoOperators
+  extends IMongoLogicalOperators,
+    IMongoComparisonOperators {}
 
 /**
  * @typedef IMongoOperatorName
  * Represents the names of all available operators (logical and comparison) defined in the `IMongoOperators` interface.
- * 
+ *
  * This type is a union of the keys from the `IMongoOperators` interface, allowing for a concise way to refer to any operator name
  * that can be used in MongoDB queries. It ensures type safety and reduces the risk of typos in operator names.
- * 
+ *
  * @example
  * // Example usage of IMongoOperatorName
  * const operator1: IMongoOperatorName = "$and"; // Valid, as $and is a logical operator
  * const operator2: IMongoOperatorName = "$eq";  // Valid, as $eq is a comparison operator
- * 
+ *
  * // The following would cause a TypeScript error, as "$invalid" is not a defined operator
  * // const invalidOperator: IMongoOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMongoOperatorName'
- * 
+ *
  * @remarks
  * This type is particularly useful when you need to validate or restrict the usage of operator names in MongoDB queries.
  * It provides a type-safe way to reference operator names, ensuring that only valid operators are used.
- * 
+ *
  * @see {@link IMongoOperators} for the full list of logical and comparison operators.
  */
 export type IMongoOperatorName = keyof IMongoOperators;
 /**
  * A type that represents the depth limit for recursion in MongoDB queries.
- * 
+ *
  * This type is used to limit the depth of nested objects in a query, preventing infinite recursion.
- * 
+ *
  * @typedef {number[]} IMongoQueryDepth
  * @example
  * // Example usage of IMongoQueryDepth
@@ -176,9 +177,9 @@ type IMongoQueryDepth = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 /**
  * A type that generates dot notation paths with a depth limit.
- * 
+ *
  * This type is used to create a list of possible dot notation paths in a MongoDB query, taking into account the depth limit.
- * 
+ *
  * @typedef {object} IMongoCreateDotPaths
  * @template T - The type of the object being queried.
  * @template D - The depth limit for the query (default is 9).
@@ -193,24 +194,33 @@ type IMongoQueryDepth = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
  *   'a.b.c': 'a.b.c',
  * };
  */
-type IMongoCreateDotPaths<T, D extends number = 9, Prefix extends string = ''> = D extends 0
+type IMongoCreateDotPaths<
+  T,
+  D extends number = 9,
+  Prefix extends string = "",
+> = D extends 0
   ? never
   : T extends object
-  ? {
-    [K in keyof T]: K extends string
-    ? T[K] extends object
-    ? `${Prefix}${K}` | IMongoCreateDotPaths<T[K], IMongoQueryDepth[D], `${Prefix}${K}.`>
-    : `${Prefix}${K}`
+    ? {
+        [K in keyof T]: K extends string
+          ? T[K] extends object
+            ?
+                | `${Prefix}${K}`
+                | IMongoCreateDotPaths<
+                    T[K],
+                    IMongoQueryDepth[D],
+                    `${Prefix}${K}.`
+                  >
+            : `${Prefix}${K}`
+          : never;
+      }[keyof T]
     : never;
-  }[keyof T]
-  : never;
-
 
 /**
  * A type that resolves the type of a value at a given path in an object.
- * 
+ *
  * This type is used to navigate through nested objects and retrieve the type of a value at a specific path.
- * 
+ *
  * @typedef {object} IMongoTypeAtPath
  * @template T - The type of the object being queried.
  * @template Path - The path to the value in the object (e.g. "a.b.c").
@@ -219,24 +229,28 @@ type IMongoCreateDotPaths<T, D extends number = 9, Prefix extends string = ''> =
  * @example
  * // Example usage of IMongoTypeAtPath
  * const typeAtPath: IMongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.c'> = string;
- * 
+ *
  * // This would resolve to the type of the value at the path 'a.b.c' in the object.
- * 
+ *
  * @example
  * // Example usage of IMongoTypeAtPath with an invalid path
  * const invalidTypeAtPath: IMongoTypeAtPath<{ a: { b: { c: string } } }, 'a.b.d'> = never;
- * 
+ *
  * // This would resolve to never, because the path 'a.b.d' is invalid.
  */
-type IMongoTypeAtPath<T, Path extends string, D extends number = 9> = D extends 0
+type IMongoTypeAtPath<
+  T,
+  Path extends string,
+  D extends number = 9,
+> = D extends 0
   ? never
   : Path extends keyof T
-  ? T[Path]
-  : Path extends `${infer Key}.${infer Rest}`
-  ? Key extends keyof T
-  ? IMongoTypeAtPath<T[Key], Rest, IMongoQueryDepth[D]>
-  : never
-  : never;
+    ? T[Path]
+    : Path extends `${infer Key}.${infer Rest}`
+      ? Key extends keyof T
+        ? IMongoTypeAtPath<T[Key], Rest, IMongoQueryDepth[D]>
+        : never
+      : never;
 
 /**
  * @interface IMongoQuery
@@ -310,20 +324,27 @@ type IMongoTypeAtPath<T, Path extends string, D extends number = 9> = D extends 
 export type IMongoQuery<T = any, D extends number = 9> = D extends 0
   ? never
   : {
-    [P in IMongoCreateDotPaths<T, D> | keyof T]?: P extends keyof T
-    ? T[P] | IMongoComparisonOperators<T[P]> | (T[P] extends object ? IMongoQuery<T[P], IMongoQueryDepth[D]> : never)
-    : P extends string
-    ? IMongoTypeAtPath<T, P, D> | IMongoComparisonOperators<IMongoTypeAtPath<T, P, D>>
-    : never;
-  } & IMongoLogicalOperators<T>;
+      [P in IMongoCreateDotPaths<T, D> | keyof T]?: P extends keyof T
+        ?
+            | T[P]
+            | IMongoComparisonOperators<T[P]>
+            | (T[P] extends object
+                ? IMongoQuery<T[P], IMongoQueryDepth[D]>
+                : never)
+        : P extends string
+          ?
+              | IMongoTypeAtPath<T, P, D>
+              | IMongoComparisonOperators<IMongoTypeAtPath<T, P, D>>
+          : never;
+    } & IMongoLogicalOperators<T>;
 
 /**
  * Interface representing array operators for filtering operations.
- * 
+ *
  * This interface allows you to specify conditions for querying data that involves
  * arrays. It provides options to match documents based on the contents of arrays
  * and their elements.
- * 
+ *
  * @example
  * // Example of using IMongoArrayOperators
  * const filter: IMongoArrayOperators = {
@@ -334,8 +355,8 @@ export type IMongoQuery<T = any, D extends number = 9> = D extends 0
  * };
  */
 export interface IMongoArrayOperators<T = any> {
-  $in?: T extends Array<any> ? T : T[];            // in array
-  $nin?: T extends Array<any> ? T : T[];           // not in array
+  $in?: T extends Array<any> ? T : T[]; // in array
+  $nin?: T extends Array<any> ? T : T[]; // not in array
   $all?: T extends Array<any> ? T : T[];
   $elemMatch?: T extends Array<any> ? IMongoQuery<T[number]> : never;
 }
@@ -343,145 +364,215 @@ export interface IMongoArrayOperators<T = any> {
 /**
  * A type that represents the names of all available comparison operators
  * defined in the `IMongoComparisonOperators` interface.
- * 
+ *
  * This type is a union of the keys from the `IMongoComparisonOperators` interface,
  * allowing for a concise way to refer to any comparison operator name that can
  * be used in MongoDB queries. It ensures type safety and reduces the risk
  * of typos in operator names.
- * 
+ *
  * @type IMongoComparisonOperatorName
  * @example
  * // Example usage of IMongoComparisonOperatorName
  * const comparisonOperator1: IMongoComparisonOperatorName = "$eq"; // Valid, as $eq is a comparison operator
  * const comparisonOperator2: IMongoComparisonOperatorName = "$gt"; // Valid, as $gt is a comparison operator
- * 
+ *
  * // The following would cause a TypeScript error, as "$invalid" is not a defined comparison operator
  * // const invalidComparisonOperator: IMongoComparisonOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMongoComparisonOperatorName'
- * 
+ *
  * @see {@link IMongoComparisonOperators} for a list of comparison operators.
  */
 export type IMongoComparisonOperatorName = keyof IMongoComparisonOperators;
 
 /**
- * @interface {IResourceQueryOptionsOrderByDirection}
- * Type representing the direction of sorting operations.
- * 
- * This type can be either 'asc' |'ASC' for ascending order or 'desc' | 'DESC' for descending order.
- * 
- * @example
- * // Valid examples of IResourceQueryOptionsOrderByDirection
- * const ascending: IResourceQueryOptionsOrderByDirection = 'asc';  // Ascending order
- * const descending: IResourceQueryOptionsOrderByDirection = 'desc'; // Descending order
- */
-export type IResourceQueryOptionsOrderByDirection = 'asc' | 'desc';;
-
-// Base type for a single order by field
-type IResourceQueryOptionsOrderByField<DataType = any> = {
-  [key in keyof DataType]: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
-};
-
-// Type for nested fields
-type IResourceQueryOptionsOrderByNestedField<DataType = any> = Partial<{
-  [key in keyof DataType]: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
-}>;
-
-/**
- * Represents an object with exactly one field derived from the keys of a given type `T`.
+ * Represents the ordering specification for resource queries.
  *
- * This utility type ensures that:
- * - The resulting object has exactly one key-value pair.
- * - The key is one of the keys of `T`.
- * - The value corresponds to the type of the selected key in `T`.
- * - All other keys of `T` are explicitly disallowed by setting their types to `never`.
+ * This type defines how to specify sorting criteria for database queries, supporting both ascending and descending orders
+ * on any leaf property (non-object, non-array values) within the resource type `T`. It allows single-field sorting,
+ * multi-field sorting with arrays, and handles nested object properties using dot notation.
  *
- * @template T - The base type from which the single-field object is derived.
- *              Must be an object type with defined keys.
- *
- * @example
- * ```typescript
- * type ExampleType = { a: number; b: string; c: boolean };
- *
- * // Valid usage
- * const obj1: ISingleFieldOf<ExampleType> = { a: 42 }; // Single field 'a' with a number value
- * const obj2: ISingleFieldOf<ExampleType> = { b: "hello" }; // Single field 'b' with a string value
- * const obj3: ISingleFieldOf<ExampleType> = { c: true }; // Single field 'c' with a boolean value
- *
- * // Invalid usage
- * const invalidObj1: ISingleFieldOf<ExampleType> = { a: 42, b: "hello" }; // Error: More than one field
- * const invalidObj2: ISingleFieldOf<ExampleType> = {}; // Error: No fields
- * ```
+ * @template T - The resource type to generate ordering paths for. Must be an object type.
  *
  * @remarks
- * This type is particularly useful when you need to enforce strict constraints on object structures,
- * such as in APIs or configuration objects where only one property can be specified at a time.
+ * - Ascending order is specified by the field path as a string (e.g., `"name"`, `"address.city"`).
+ * - Descending order is specified by prefixing the field path with a minus sign (e.g., `"-name"`, `"-address.city"`).
+ * - Multiple sorting criteria can be provided as an array, where each element follows the same rules.
+ * - Field paths are limited to a depth of 4 levels to prevent excessive recursion and maintain performance.
+ * - Only leaf properties (primitives, dates, etc.) can be used for sorting; object and array properties are excluded.
  *
- * It uses a mapped type combined with conditional logic to ensure that only one key is allowed.
- * Other keys are explicitly set to `never`, making them invalid if included in the object.
+ * @example
+ * Basic usage with a simple user interface:
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ *   age: number;
+ *   email: string;
+ * }
+ *
+ * // Single ascending field
+ * const orderBy1: IResourceQueryOrderBy<User> = "name";
+ *
+ * // Single descending field
+ * const orderBy2: IResourceQueryOrderBy<User> = "-age";
+ *
+ * // Multiple fields (name ascending, then age descending)
+ * const orderBy3: IResourceQueryOrderBy<User> = ["name", "-age"];
+ * ```
+ *
+ * @example
+ * Usage with nested object properties:
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ *   profile: {
+ *     age: number;
+ *     address: {
+ *       city: string;
+ *       country: {
+ *         name: string;
+ *         code: string;
+ *       };
+ *     };
+ *   };
+ *   tags: string[];
+ * }
+ *
+ * // Sorting by nested properties
+ * const orderBy1: IResourceQueryOrderBy<User> = "profile.age";                    // Ascending by age
+ * const orderBy2: IResourceQueryOrderBy<User> = "-profile.address.city";          // Descending by city
+ * const orderBy3: IResourceQueryOrderBy<User> = "profile.address.country.name";   // Ascending by country name
+ *
+ * // Multiple nested fields
+ * const orderBy4: IResourceQueryOrderBy<User> = [
+ *   "profile.address.country.name",  // Country name ascending
+ *   "-profile.age",                  // Age descending
+ *   "name"                           // Name ascending (as tiebreaker)
+ * ];
+ * ```
+ *
+ * @example
+ * Usage with complex nested structures including arrays (note: arrays themselves cannot be sorted, only their leaf elements if accessed):
+ * ```typescript
+ * interface Product {
+ *   id: string;
+ *   name: string;
+ *   metadata: {
+ *     createdAt: Date;
+ *     updatedAt: Date;
+ *     stats: {
+ *       views: number;
+ *       likes: number;
+ *       ratings: {
+ *         average: number;
+ *         count: number;
+ *       };
+ *     };
+ *   };
+ *   categories: string[];  // Arrays cannot be used directly for sorting
+ * }
+ *
+ * // Valid sorting options
+ * const orderBy1: IResourceQueryOrderBy<Product> = "-metadata.createdAt";              // Newest first
+ * const orderBy2: IResourceQueryOrderBy<Product> = "metadata.stats.likes";              // Most liked first
+ * const orderBy3: IResourceQueryOrderBy<Product> = "metadata.stats.ratings.average";    // Highest rated first
+ *
+ * // Complex multi-field sorting
+ * const orderBy4: IResourceQueryOrderBy<Product> = [
+ *   "-metadata.stats.ratings.average",  // Highest rated first
+ *   "-metadata.stats.likes",            // Then most liked
+ *   "metadata.createdAt"                // Then newest (as tiebreaker)
+ * ];
+ * ```
+ *
+ * @example
+ * Invalid usage examples (these will cause TypeScript errors):
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ *   tags: string[];
+ *   profile: {
+ *     address: {
+ *       coordinates: [number, number];  // Array type
+ *     };
+ *   };
+ * }
+ *
+ * // ❌ Invalid: Cannot sort by array properties
+ * // const invalid1: IResourceQueryOrderBy<User> = "tags";
+ *
+ * // ❌ Invalid: Cannot sort by array elements
+ * // const invalid2: IResourceQueryOrderBy<User> = "profile.address.coordinates";
+ *
+ * // ❌ Invalid: Cannot sort by object properties
+ * // const invalid3: IResourceQueryOrderBy<User> = "profile";
+ * ```
  */
-export type ISingleFieldOf<T> = {
-  /**
-   * Iterates over each key `K` of `T` and constructs a union of objects with exactly one key-value pair.
-   *
-   * @template K - A key of `T`.
-   * @template P - The current key being processed (same as `K`).
-   *
-   * @description
-   * For each key `K` of `T`:
-   * - `{ [P in K]: T[K] }` ensures that the object has a single key `K` with the corresponding value type from `T`.
-   * - `{ [P in Exclude<keyof T, K>]?: never }` ensures that all other keys of `T` are disallowed by setting their types to `never`.
-   *
-   * @example
-   * ```typescript
-   * type ExampleType = { a: number; b: string; c: boolean };
-   *
-   * // For key 'a':
-   * type FieldA = { a: number } & { b?: never; c?: never };
-   * const validA: FieldA = { a: 42 }; // Valid
-   * const invalidA: FieldA = { a: 42, b: "extra" }; // Error: 'b' is not allowed
-   *
-   * // For key 'b':
-   * type FieldB = { b: string } & { a?: never; c?: never };
-   * const validB: FieldB = { b: "hello" }; // Valid
-   * const invalidB: FieldB = { b: "hello", c: true }; // Error: 'c' is not allowed
-   * ```
-   */
-  [K in keyof T]: { [P in K]: T[K] } & { [P in Exclude<keyof T, K>]?: never };
-}[keyof T];
+export type IResourceQueryOrderBy<T> =
+  | NestedPaths<T, 8> // ascending
+  | `-${NestedPaths<T, 8>}` // descending
+  | Array<NestedPaths<T, 8> | `-${NestedPaths<T, 8>}`>;
 
+/* ------------------------------------------------------------------ */
+type Join<K, P, S extends string = "."> = K extends string | number
+  ? P extends string | number
+    ? `${K}${"" extends P ? "" : S}${P}`
+    : never
+  : never;
 
+type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...0[]];
 /**
- * @interface IResourceQueryOptionsOrderBy
- * Represents the sorting options for a resource query.
- * 
- * The `IResourceQueryOptionsOrderBy` type allows specifying sorting criteria for a resource query.
- * It supports sorting by individual fields or nested fields within an object.
- * 
- * @template DataType - The type of the data being queried.
- * 
+ * Generates all nested paths that terminate in leaf values (non-object, non-array properties).
+ *
+ * This utility type recursively traverses an object type `T` up to a maximum depth `D` and produces
+ * a union of all possible nested paths that point to leaf properties. Leaf properties are
+ * considered to be any non-object values (primitives, dates, etc.). The separator between path
+ * segments can be customized.
+ *
+ * @template T - The object type to generate paths for
+ * @template D - The maximum recursion depth (default: 3)
+ * @template S - The separator string to use between path segments (default: ".")
+ *
  * @example
  * ```typescript
  * interface User {
+ *   id: number;
  *   name: string;
- *   age: number;
- *   address: {
- *     city: string;
- *     country: string;
+ *   profile: {
+ *     age: number;
+ *     address: {
+ *       city: string;
+ *       country: string;
+ *     };
  *   };
  * }
- * 
- * const orderBy: IResourceQueryOptionsOrderBy<User> = [
- *   { name: "asc" }, // Sort by name in ascending order
- *   { age: "desc" }, // Sort by age in descending order
- *   { address: { city: "asc", country: "desc" } } // Nested sorting
- * ];
+ *
+ * type UserPaths = NestedPaths<User>;
+ * // Results in: "id" | "name" | "profile.age" | "profile.address.city" | "profile.address.country"
  * ```
- * 
- * @remarks
- * - Sorting direction can be `"asc"` (ascending) or `"desc"` (descending).
- * - Nested sorting is supported by specifying sorting directions for nested fields.
- * 
- * @see {@link IResourceQueryOptionsOrderByDirection} for sorting direction options.
+ *
+ * @example
+ * With custom depth:
+ * ```typescript
+ * type DeepPaths = NestedPaths<VeryDeepObject, 5>; // Allow up to 5 levels deep
+ * ```
+ *
+ * @example
+ * With custom separator:
+ * ```typescript
+ * type BracketPaths = NestedPaths<User, 3, "[]">;
+ * // Results in: "id" | "name" | "profile[]age" | "profile[]address[]city" | "profile[]address[]country"
+ * ```
  */
-export type IResourceQueryOptionsOrderBy<DataType = any> = Array<
-  ISingleFieldOf<IResourceQueryOptionsOrderByField<DataType>>
->;
+export type NestedPaths<T, D extends number = 3, S extends string = "."> = [
+  D,
+] extends [never]
+  ? never
+  : T extends object
+    ? {
+        [K in keyof T]-?: K extends string | number
+          ? Join<K, NestedPaths<T[K], Prev[D], S>, S>
+          : never;
+      }[keyof T]
+    : "";

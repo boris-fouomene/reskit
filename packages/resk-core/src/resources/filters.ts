@@ -1,7 +1,29 @@
-import { IMongoArrayOperators, IMongoComparisonOperatorName, IMongoLogicalOperatorName, IMongoLogicalOperators, IMongoOperatorName } from "./types";
+import {
+  IMongoArrayOperators,
+  IMongoComparisonOperatorName,
+  IMongoLogicalOperatorName,
+  IMongoLogicalOperators,
+  IMongoOperatorName,
+} from "./types";
 
 const LOGICAL: IMongoLogicalOperatorName[] = ["$and", "$or", "$nor", "$not"];
-const COMPARAISON: IMongoComparisonOperatorName[] = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$exists", "$type", "$regex", "$size", "$mod", "$all", "$elemMatch"];
+const COMPARAISON: IMongoComparisonOperatorName[] = [
+  "$eq",
+  "$ne",
+  "$gt",
+  "$gte",
+  "$lt",
+  "$lte",
+  "$in",
+  "$nin",
+  "$exists",
+  "$type",
+  "$regex",
+  "$size",
+  "$mod",
+  "$all",
+  "$elemMatch",
+];
 
 /**
  * A collection of MongoDB operators categorized into logical, comparison, and array operators.
@@ -67,5 +89,10 @@ export const MONGO_OPERATORS: {
   LOGICAL,
   COMPARAISON,
   ALL: [...LOGICAL, ...COMPARAISON],
-  ARRAY: ["$all", "$elemMatch", "$in", "$nin"] as (keyof IMongoArrayOperators)[],
+  ARRAY: [
+    "$all",
+    "$elemMatch",
+    "$in",
+    "$nin",
+  ] as (keyof IMongoArrayOperators)[],
 };

@@ -2,19 +2,18 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "baseUrl": ".",
     "rootDir": "./src",
     "outDir": "./build",
     "paths": {
-      "@logger": ["src/logger"],
-      "@countries/*": ["src/countries/*"],
-      "@countries": ["src/countries"],
-      "@utils/*": ["src/utils/*"],
-      "@react/*": ["src/react/*"],
-      "@session/*": ["src/session/*"],
-      "@fields/*": ["src/fields/*"],
-      "@resources/*": ["src/resources/*"],
-      "@/*": ["src/*"]
+      "@logger": ["./src/logger"],
+      "@countries/*": ["./src/countries/*"],
+      "@countries": ["./src/countries"],
+      "@utils/*": ["./src/utils/*"],
+      "@react/*": ["./src/react/*"],
+      "@session/*": ["./src/session/*"],
+      "@fields/*": ["./src/fields/*"],
+      "@resources/*": ["./src/resources/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

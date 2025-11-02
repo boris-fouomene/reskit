@@ -1,8 +1,7 @@
-import { IResourceQueryOptionsOrderByDirection } from "@resources/types";
-import { isEmpty } from "./isEmpty";
-import { isNumber } from "./isNumber";
-import { isNonNullString } from "./isNonNullString";
 import { defaultBool } from "./defaultBool";
+import { isEmpty } from "./isEmpty";
+import { isNonNullString } from "./isNonNullString";
+import { isNumber } from "./isNumber";
 /**
  * A highly optimized sorting function capable of efficiently handling billions of array elements
  * with support for complex objects and various data types.
@@ -54,7 +53,7 @@ export function sortBy<T, V = any>(
   data: T[],
   getItemValue: (item: T) => V,
   options: {
-    direction?: IResourceQueryOptionsOrderByDirection;
+    direction?: SortOrder;
     inPlace?: boolean;
     chunkSize?: number;
     ignoreCase?: boolean;
@@ -67,8 +66,15 @@ export function sortBy<T, V = any>(
   if (data.length <= 1) return data;
   // Default options
   options = Object.assign({}, options);
-  options.direction = isNonNullString(options.direction) && ["asc", "desc"].includes(options.direction) ? options.direction : "asc";
-  options.chunkSize = isNumber(options.chunkSize) && options.chunkSize > 0 ? options.chunkSize : 10000;
+  options.direction =
+    isNonNullString(options.direction) &&
+    ["asc", "desc"].includes(options.direction)
+      ? options.direction
+      : "asc";
+  options.chunkSize =
+    isNumber(options.chunkSize) && options.chunkSize > 0
+      ? options.chunkSize
+      : 10000;
   options.ignoreCase = defaultBool(options.ignoreCase, true);
   const { direction, chunkSize, ignoreCase } = options;
   // For very large arrays, use a chunked merge sort approach
@@ -85,7 +91,12 @@ export function sortBy<T, V = any>(
  * Chunking merge sort implementation for very large arrays
  * Splits the work into manageable chunks to avoid call stack issues
  */
-function chunkingMergeSort<T, V>(array: T[], getItemValue: (item: T) => V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase: boolean): T[] {
+function chunkingMergeSort<T, V>(
+  array: T[],
+  getItemValue: (item: T) => V,
+  direction: SortOrder,
+  ignoreCase: boolean
+): T[] {
   // Base case
   if (array.length <= 1) {
     return array;
@@ -97,10 +108,21 @@ function chunkingMergeSort<T, V>(array: T[], getItemValue: (item: T) => V, direc
   const right = array.slice(middle);
 
   // Recursively sort both halves
-  return merge(chunkingMergeSort(left, getItemValue, direction, ignoreCase), chunkingMergeSort(right, getItemValue, direction, ignoreCase), getItemValue, direction, ignoreCase);
+  return merge(
+    chunkingMergeSort(left, getItemValue, direction, ignoreCase),
+    chunkingMergeSort(right, getItemValue, direction, ignoreCase),
+    getItemValue,
+    direction,
+    ignoreCase
+  );
 }
 
-function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase?: boolean): number {
+function compare<V = any>(
+  valueA: V,
+  valueB: V,
+  direction: SortOrder,
+  ignoreCase?: boolean
+): number {
   // Inside our compare function:
   // Special handling for null and undefined
   if (isEmpty(valueA) && isEmpty(valueB)) return 0;
@@ -111,7 +133,9 @@ function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptions
   }
   // Handle different types appropriately
   if (valueA instanceof Date && valueB instanceof Date) {
-    return direction === "asc" ? valueA.getTime() - valueB.getTime() : valueB.getTime() - valueA.getTime();
+    return direction === "asc"
+      ? valueA.getTime() - valueB.getTime()
+      : valueB.getTime() - valueA.getTime();
   }
   if (valueA instanceof RegExp && valueB instanceof RegExp) {
     valueA = valueA.toString() as V;
@@ -141,7 +165,7 @@ function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptions
  * @param dir - Direction of comparison ('asc' for ascending, 'desc' for descending)
  * @returns -1 if a comes before b, 0 if equal, 1 if a comes after b
  */
-function compareStrings(a: string, b: string, dir: IResourceQueryOptionsOrderByDirection): -1 | 0 | 1 {
+function compareStrings(a: string, b: string, dir: SortOrder): -1 | 0 | 1 {
   // For empty string checks
   if (!a && b) return dir === "asc" ? -1 : 1;
   if (a && !b) return dir === "asc" ? 1 : -1;
@@ -153,19 +177,35 @@ function compareStrings(a: string, b: string, dir: IResourceQueryOptionsOrderByD
   // Normalize to exactly -1, 0, or 1
   const normalizedComparison = comparison < 0 ? -1 : comparison > 0 ? 1 : 0;
   // Apply direction
-  return (dir === "asc" ? normalizedComparison : -normalizedComparison) as -1 | 0 | 1;
+  return (dir === "asc" ? normalizedComparison : -normalizedComparison) as
+    | -1
+    | 0
+    | 1;
 }
 
 /**
  * Merge two sorted arrays
  */
-function merge<T, V>(left: T[], right: T[], getItemValue: (item: T) => V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase: boolean): T[] {
+function merge<T, V>(
+  left: T[],
+  right: T[],
+  getItemValue: (item: T) => V,
+  direction: SortOrder,
+  ignoreCase: boolean
+): T[] {
   const result: T[] = [];
   let leftIndex = 0;
   let rightIndex = 0;
 
   while (leftIndex < left.length && rightIndex < right.length) {
-    if (compare<V>(getItemValue(left[leftIndex]), getItemValue(right[rightIndex]), direction, ignoreCase) <= 0) {
+    if (
+      compare<V>(
+        getItemValue(left[leftIndex]),
+        getItemValue(right[rightIndex]),
+        direction,
+        ignoreCase
+      ) <= 0
+    ) {
       result.push(left[leftIndex]);
       leftIndex++;
     } else {
@@ -176,3 +216,5 @@ function merge<T, V>(left: T[], right: T[], getItemValue: (item: T) => V, direct
   // Add remaining elements
   return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
 }
+
+type SortOrder = "asc" | "desc";

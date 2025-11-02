@@ -1,11 +1,16 @@
-import { isNonNullString } from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderByDirection } from "./types";
-import { extendObj, isObj } from "@utils/object";
-import { getQueryParams } from "@utils/uri";
-import { isStringNumber } from "@utils/string";
 import { defaultArray } from "@utils/defaultArray";
+import { isNonNullString } from "@utils/isNonNullString";
 import { isNumber } from "@utils/isNumber";
-import { defaultStr } from "@utils/defaultStr";
+import { extendObj, isObj } from "@utils/object";
+import { isStringNumber } from "@utils/string";
+import { getQueryParams } from "@utils/uri";
+import {
+  IResourceData,
+  IResourcePaginationMetaData,
+  IResourceQueryOptions,
+  IResourceQueryOrderBy,
+  NestedPaths,
+} from "./types";
 
 export class ResourcePaginationHelper {
   /**
@@ -46,38 +51,77 @@ export class ResourcePaginationHelper {
   }
 
   /**
-   * Normalizes the `orderBy` object from the query options.
-   * Ensures the order direction is either 'ASC' or 'DESC' and handles multiple fields.
+   * Normalizes orderBy parameters into a structured object format.
    *
-   * @template DataType - The type of the data being queried.
+   * This method takes various input formats for sorting criteria and converts them into a consistent
+   * object where keys are valid nested property paths and values are sort directions ("asc" or "desc").
+   * It handles single strings, arrays of strings, and undefined inputs gracefully.
    *
-   * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The orderBy property from the query options.
-   * @returns  A normalized object suitable for TypeORM's `order` option.
+   * @template T - The resource type to validate paths against
+   * @param orderBy - The orderBy specification in various formats:
+   *   - `string`: Single field like "name" (ascending) or "-name" (descending)
+   *   - `string[]`: Multiple fields like ["name", "-age", "createdAt"]
+   *   - `undefined`: No sorting specified
+   * @returns A partial record mapping valid nested paths to sort directions
    *
    * @example
    * ```typescript
-   * normalizeOrderBy<User>([{ name: 'asc' }, { age: 'desc' }]);
-   * // Output: { lastName: 'ASC', firstName: 'DESC' }
+   * interface User {
+   *   id: number;
+   *   name: string;
+   *   profile: { age: number; address: { city: string } };
+   * }
    *
-   * normalizeOrderBy<User>([{ age: 'asc'}, { createdAt: 'DESC' }]);
-   * // Output: { age: 'ASC', createdAt: 'DESC' }
+   * // Single ascending field
+   * normalizeOrderBy<User>("name")
+   * // Returns: { "name": "asc" }
+   *
+   * // Single descending field
+   * normalizeOrderBy<User>("-profile.age")
+   * // Returns: { "profile.age": "desc" }
+   *
+   * // Multiple fields
+   * normalizeOrderBy<User>(["name", "-profile.age", "profile.address.city"])
+   * // Returns: { "name": "asc", "profile.age": "desc", "profile.address.city": "asc" }
+   *
+   * // Invalid input (filtered out)
+   * normalizeOrderBy<User>([null, "", "name", undefined])
+   * // Returns: { "name": "asc" }
    * ```
+   *
+   * @remarks
+   * - Fields starting with "-" are treated as descending order
+   * - Invalid or empty strings are silently filtered out
+   * - Duplicate fields will log a warning and use the last occurrence
+   * - The method performs type assertion to `NestedPaths<T>` - ensure input paths are valid at call site
    */
-  static normalizeOrderBy<DataType = any>(
-    orderBy?: IResourceQueryOptionsOrderBy<DataType>
-  ): Partial<{
-    [K in keyof DataType]?: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderBy<DataType[K]>;
-  }> {
-    if (!Array.isArray(orderBy)) return {};
-    const r: Record<string, IResourceQueryOptionsOrderByDirection> = {};
-    orderBy.map((o) => {
-      if (!isObj(o)) return;
-      const [field, dir] = Object.entries(o)[0];
-      const newDir = defaultStr(dir).toLowerCase().trim();
-      if (!isNonNullString(field) || ["asc", "desc"].includes(newDir)) return;
-      (r as any)[field] = newDir;
+  static normalizeOrderBy<T = unknown>(
+    orderBy?: IResourceQueryOrderBy<T>
+  ): Partial<Record<NestedPaths<T>, SortOrder>> {
+    const fields = Array.isArray(orderBy)
+      ? orderBy
+      : isNonNullString(orderBy)
+        ? [orderBy]
+        : [];
+
+    const result: Partial<Record<NestedPaths<T>, SortOrder>> = {};
+    fields.forEach((field) => {
+      if (!isNonNullString(field) || String(field).trim() === "") return;
+      const isDescending = String(field).startsWith("-");
+      const direction: SortOrder = isDescending ? "desc" : "asc";
+      const path = isDescending ? String(field).slice(1) : field;
+      // Type assertion - caller should ensure path validity
+      const key = path as NestedPaths<T>;
+      // Warn about duplicates (last one wins)
+      if (result[key] !== undefined) {
+        console.warn(
+          `Duplicate orderBy field: ${path}. Using last occurrence.`
+        );
+      }
+      result[key] = direction;
     });
-    return r;
+
+    return result;
   }
 
   /***
@@ -98,20 +142,31 @@ export class ResourcePaginationHelper {
     }
     return isNumber(queryOptions.limit);
   }
-  static getPaginationMetaData(count: number, queryOptions?: IResourceQueryOptions): IResourcePaginationMetaData {
-    const { limit, page, skip } = ResourcePaginationHelper.normalizePagination(queryOptions);
+  static getPaginationMetaData(
+    count: number,
+    queryOptions?: IResourceQueryOptions
+  ): IResourcePaginationMetaData {
+    const { limit, page, skip } =
+      ResourcePaginationHelper.normalizePagination(queryOptions);
     count = isNumber(count) ? count : 0;
     const meta: IResourcePaginationMetaData = {
       total: count,
     };
-    if (typeof limit === "number" && limit > 0 && typeof page === "number" && page >= 0) {
+    if (
+      typeof limit === "number" &&
+      limit > 0 &&
+      typeof page === "number" &&
+      page >= 0
+    ) {
       meta.currentPage = page;
       meta.pageSize = limit;
       meta.totalPages = Math.ceil(count / limit);
       meta.hasNextPage = meta.currentPage < meta.totalPages;
       meta.hasPreviousPage = meta.currentPage > 1;
       meta.nextPage = meta.hasNextPage ? meta.currentPage + 1 : undefined;
-      meta.previousPage = meta.hasPreviousPage ? meta.currentPage - 1 : undefined;
+      meta.previousPage = meta.hasPreviousPage
+        ? meta.currentPage - 1
+        : undefined;
       meta.lastPage = meta.totalPages;
     }
     return meta;
@@ -123,10 +178,19 @@ export class ResourcePaginationHelper {
    * @param {IResourceQueryOptions} options - The pagination options.
    * @returns {IResourcePaginatedResult<DataType>} The paginated result.
    */
-  static paginate<DataType extends IResourceData = any>(data: DataType[], count: number, options?: IResourceQueryOptions) {
+  static paginate<DataType extends IResourceData = any>(
+    data: DataType[],
+    count: number,
+    options?: IResourceQueryOptions
+  ) {
     const meta = ResourcePaginationHelper.getPaginationMetaData(count, options);
     const { currentPage, pageSize, totalPages } = meta;
-    if (Array.isArray(data) && isNumber(currentPage) && isNumber(pageSize) && isNumber(totalPages)) {
+    if (
+      Array.isArray(data) &&
+      isNumber(currentPage) &&
+      isNumber(pageSize) &&
+      isNumber(totalPages)
+    ) {
       const startIndex = Math.max(0, currentPage - 1) * pageSize;
       const endIndex = startIndex + pageSize;
       data = data.slice(startIndex, endIndex);
@@ -148,18 +212,32 @@ export class ResourcePaginationHelper {
    * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
    * const queryOptions = parseQueryOptions(req);
    */
-  static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string; headers: Record<string, any>; params?: Record<string, any>; filters?: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any> } {
+  static parseQueryOptions<T extends IResourceData = IResourceData>(req: {
+    url: string;
+    headers: Record<string, any>;
+    params?: Record<string, any>;
+    filters?: Record<string, any>;
+  }): IResourceQueryOptions<T> & { queryParams: Record<string, any> } {
     const queryParams = extendObj({}, req?.params, getQueryParams(req?.url));
-    const xFilters = extendObj({}, queryParams, req?.headers?.["x-filters"], req?.filters);
+    const xFilters = extendObj(
+      {},
+      queryParams,
+      req?.headers?.["x-filters"],
+      req?.filters
+    );
     const limit = parseNumber(xFilters.limit);
     const skip = parseNumber(xFilters.skip);
     const page = parseNumber(xFilters.page);
-    const result: IResourceQueryOptions<T> = ResourcePaginationHelper.normalizePagination({ limit, skip, page });
+    const result: IResourceQueryOptions<T> =
+      ResourcePaginationHelper.normalizePagination({ limit, skip, page });
     let distinct = xFilters.distinct;
     if (typeof distinct == "number") {
       distinct = !!distinct;
     }
-    if (typeof distinct === "boolean" || (Array.isArray(distinct) && distinct.length)) {
+    if (
+      typeof distinct === "boolean" ||
+      (Array.isArray(distinct) && distinct.length)
+    ) {
       result.distinct = distinct;
     }
     const defaultOrderBy = xFilters.orderBy;
@@ -219,3 +297,5 @@ const parseNumber = (value: any) => {
   }
   return undefined;
 };
+
+type SortOrder = "asc" | "desc";

@@ -1,11 +1,15 @@
-import { IDict, IUcFirst } from "@/types/dictionary";
-import { IMongoQuery, IResourceQueryOptionsOrderBy } from "./filters";
-import { IInputFormatterOptions } from "@/inputFormatter/types";
 import { IAuthPerm } from "@/auth/types";
+import { IInputFormatterOptions } from "@/inputFormatter/types";
+import { IDict, IUcFirst } from "@/types/dictionary";
+import { IMongoQuery, IResourceQueryOrderBy } from "./filters";
 
 export * from "./filters";
 
-export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
+export interface IFieldBase<
+  FieldType extends IFieldType = IFieldType,
+  ValueType = any,
+> extends Partial<IResourceActionTupleObject>,
+    Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
   /**
    * The type of the field.
    *
@@ -138,9 +142,14 @@ export interface IFieldActionsMap {
   filter: string;
 }
 
-export type IField<T extends IFieldType = IFieldType, ValueType = any> = IFieldMap[T] extends IFieldBase
+export type IField<
+  T extends IFieldType = IFieldType,
+  ValueType = any,
+> = IFieldMap[T] extends IFieldBase
   ? IFieldMap[T] & {
-      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<IFieldMap[keyof IFieldMap]>;
+      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<
+        IFieldMap[keyof IFieldMap]
+      >;
     }
   : never;
 
@@ -407,7 +416,9 @@ export interface IResourceActions {
  *
  * @typedef {keyof IResources[ResourceName]["actions"]} IResourceActionName
  */
-export type IResourceActionName<ResourceName extends IResourceName = IResourceName> = keyof ICheckIResources[ResourceName]["actions"] | keyof IResourceActions;
+export type IResourceActionName<
+  ResourceName extends IResourceName = IResourceName,
+> = keyof ICheckIResources[ResourceName]["actions"] | keyof IResourceActions;
 
 /**
  * @interface IResourceActionTuple
@@ -433,7 +444,11 @@ export type IResourceActionName<ResourceName extends IResourceName = IResourceNa
  * @see {@link IResourceActionTupleArray} for the `IResourceActionTupleArray` type.
  * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
  */
-export type IResourceActionTuple<ResourceName extends IResourceName = IResourceName> = IResourceActionTupleArray<ResourceName> | IResourceActionTupleObject<ResourceName>;
+export type IResourceActionTuple<
+  ResourceName extends IResourceName = IResourceName,
+> =
+  | IResourceActionTupleArray<ResourceName>
+  | IResourceActionTupleObject<ResourceName>;
 
 /**
  * @interface IResourceActionTupleArray
@@ -452,7 +467,9 @@ export type IResourceActionTuple<ResourceName extends IResourceName = IResourceN
  *
  * @typedef {[ResourceName, IResourceActionName<ResourceName>]} IResourceActionTupleArray
  */
-export type IResourceActionTupleArray<ResourceName extends IResourceName = IResourceName> = [
+export type IResourceActionTupleArray<
+  ResourceName extends IResourceName = IResourceName,
+> = [
   /**
    * The name of the resource.
    *
@@ -484,7 +501,9 @@ export type IResourceActionTupleArray<ResourceName extends IResourceName = IReso
  *
  * @interface IResourceActionTupleObject
  */
-export interface IResourceActionTupleObject<ResourceName extends IResourceName = IResourceName> {
+export interface IResourceActionTupleObject<
+  ResourceName extends IResourceName = IResourceName,
+> {
   /**
    * The name of the resource.
    *
@@ -578,7 +597,10 @@ export interface IResourceAction {
  * @property {string} [title] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {Partial<IResourceActions> & Record<string, IResourceAction>} [actions] - The actions associated with the resource.
  */
-export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResource<
+  DataType extends IResourceData = any,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+> {
   /**
    * The internal name of the resource.
    *
@@ -672,7 +694,9 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
  *
  * @typedef {string} IResourceDefaultEvent
  */
-export type IResourceDefaultEvent = (IResourceActionName & string) | keyof IResourceDataService;
+export type IResourceDefaultEvent =
+  | (IResourceActionName & string)
+  | keyof IResourceDataService;
 
 /**
  * @interface IResourceData
@@ -933,7 +957,10 @@ export type IResourcePrimaryKey = string | number | object;
  * approach to data handling in applications.
 
  */
-export interface IResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceDataService<
+  DataType extends IResourceData = any,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+> {
   /***
    * Creates a new resource record.
    * @param record The data for the new resource to be created.
@@ -956,7 +983,10 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
    *     ```
    */
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
+  update(
+    primaryKey: PrimaryKeyType,
+    updatedData: Partial<DataType>
+  ): Promise<DataType>;
   /***
    * Deletes a resource record by its primary key.
    * @param primaryKey The primary key of the resource to delete.
@@ -982,7 +1012,9 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.findOne({ firstName: 1 });
    *     ```
    */
-  findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
+  findOne(
+    options: PrimaryKeyType | IResourceQueryOptions<DataType>
+  ): Promise<DataType | null>;
   /***
    * Retrieves a single resource record by its primary key or throws an error if not found.
    * @param primaryKey The primary key or query options of the resource to retrieve.
@@ -993,7 +1025,9 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.findOneOrFail("resourceId");
    *     ```
    */
-  findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
+  findOneOrFail(
+    options: PrimaryKeyType | IResourceQueryOptions<DataType>
+  ): Promise<DataType>;
   /***
    * Retrieves multiple resource records based on query options.
    * @param options Optional query options to filter the results.
@@ -1016,7 +1050,9 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
    *     ```
    */
-  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<[DataType[], number]>;
+  findAndCount(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<[DataType[], number]>;
 
   /***
    * Retrieves multiple resource records and paginates the results.
@@ -1027,7 +1063,9 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   ```typescript
    *   const result = await dataProvider.findAndPaginate({ limit: 10, skip: 0 });
    */
-  findAndPaginate(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
+  findAndPaginate(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<IResourcePaginatedResult<DataType>>;
 
   /***
    * Creates multiple resource records.
@@ -1051,7 +1089,10 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.updateMany({ status: "active" });
    *     ```
    */
-  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
+  updateMany(
+    criteria: IResourceManyCriteria<DataType, PrimaryKeyType>,
+    data: Partial<DataType>
+  ): Promise<number>;
   /**
    *
    * @param criteria The criteria to filter which resources to delete.
@@ -1062,7 +1103,9 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
    *     ```
    */
-  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
+  deleteMany(
+    criteria: IResourceManyCriteria<DataType, PrimaryKeyType>
+  ): Promise<number>;
   /***
    * Counts the total number of resource records based on query options.
    * @param options Optional query options to filter the count.
@@ -1186,7 +1229,10 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
  *   "user456"
  * ];
  */
-export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> = PrimaryKeyType[] | IMongoQuery<DataType>;
+export type IResourceManyCriteria<
+  DataType extends IResourceData = any,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+> = PrimaryKeyType[] | IMongoQuery<DataType>;
 
 /**
  * Interface representing options for fetching resources.
@@ -1207,11 +1253,13 @@ export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryK
  *      skip: 0 // Do not skip any results
  * };
  */
-export interface IResourceQueryOptions<DataType extends IResourceData = any> {
+export interface IResourceQueryOptions<
+  DataType extends IResourceData = IResourceData,
+> {
   /** Fields to include in the response. */
   fields?: Array<keyof DataType>;
   relations?: string[]; // The relations to include in the response.
-  orderBy?: IResourceQueryOptionsOrderBy<DataType>; // Optional sorting criteria for the results
+  orderBy?: IResourceQueryOrderBy<DataType>; // Optional sorting criteria for the results
   limit?: number; // Optional limit on the number of results to return
   skip?: number; // Optional number of results to skip before returning
   page?: number; // Optional page number for pagination, We can use it instead of skip
@@ -1345,7 +1393,9 @@ export interface IResourceQueryOptions<DataType extends IResourceData = any> {
  *   allowing clients to retrieve data in manageable chunks.
  * - The `links` property facilitates easy navigation between pages, enhancing user experience.
  */
-export interface IResourcePaginatedResult<DataType extends IResourceData = any> {
+export interface IResourcePaginatedResult<
+  DataType extends IResourceData = any,
+> {
   /** List of fetched resources. */
   data: DataType[];
 

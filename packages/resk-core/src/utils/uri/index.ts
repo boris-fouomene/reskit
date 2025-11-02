@@ -1,10 +1,9 @@
-import "../string";
+import { ltrim, rtrim } from "../string";
 
 import queryString, { IParseBaseOptions, IStringifyBaseOptions } from "qs";
 
 import { IDict } from "../../types";
 import { isNonNullString } from "../isNonNullString";
-
 /**
  * Returns the query string from a given URL.
  *
@@ -30,9 +29,9 @@ export const extractQueryString = (
   let parse = parseURI(uri);
   uri = typeof parse.search === "string" ? parse.search : "";
   if (addQuestionSeparator && uri) {
-    return "?" + uri.ltrim("?");
+    return "?" + ltrim(uri, "?");
   } else {
-    uri = uri.trim().ltrim("?").rtrim("?");
+    uri = rtrim(ltrim(uri.trim(), "?"), "?");
   }
   return uri;
 };

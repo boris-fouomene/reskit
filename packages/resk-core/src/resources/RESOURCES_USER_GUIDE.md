@@ -43,67 +43,294 @@ The **Resource** system is an abstract, generic class that provides a standardiz
 
 ## Core Concepts
 
-### 1. Resource Name
+### 1. Resource Name - IResourceName
 
-The unique identifier for a resource within your application:
+**IResourceName** is NOT a string type. It's a **union of all keys defined in the augmented `IResources` interface**.
 
 ```typescript
-type IResourceName = "users" | "products" | "articles" | string;
+// The IResources interface starts empty
+export interface IResources {}
+
+// You augment it by declaring module in your app:
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: IResource<"users", User, string>;
+    products: IResource<"products", Product, string>;
+    orders: IResource<"orders", Order, number>;
+  }
+}
+
+// Now IResourceName = "users" | "products" | "orders"
+type IResourceName = keyof IResources; // ✓ Type-safe union
 ```
 
-- Used for translations, permissions, and resource lookup
-- Should be lowercase and unique
-- Example: `"users"`, `"products"`, `"articles"`
+**Key Points:**
 
-### 2. Data Type
+- **NOT a simple string** - It's a **branded literal union** derived from `IResources` keys
+- Must be **explicitly augmented** via TypeScript module declaration
+- Provides **compile-time type safety** for resource names
+- Each resource name maps to a specific resource metadata
 
-The TypeScript type representing the data structure:
+```typescript
+// ✓ Valid - "users" is in IResources
+const resourceName: IResourceName = "users";
+
+// ✓ Valid - "products" is in IResources
+const resourceName2: IResourceName = "products";
+
+// ✗ TypeScript Error - "invalid" is NOT in IResources
+const invalid: IResourceName = "invalid";
+// Type '"invalid"' is not assignable to type 'IResourceName'
+```
+
+### 2. IResource - Resource Metadata Type
+
+Each property in `IResources` must extend the **`IResource<Name, DataType, PrimaryKeyType, Actions>`** interface:
+
+```typescript
+export interface IResource<
+  Name extends IResourceName = IResourceName,
+  DataType = unknown,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+  Actions extends Record<string, IResourceAction> = Record<
+    string,
+    IResourceAction
+  >,
+> {
+  name?: IResourceName;
+  label?: string;
+  title?: string;
+  actions?: Actions; // Record of available actions
+  className?: string; // Mapped class name
+}
+```
+
+**Example:**
+
+```typescript
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: {
+      // Must extend IResource structure
+      actions: {
+        read: { label: "View User"; title: "View user details" };
+        create: { label: "Create User"; title: "Create new user" };
+        update: { label: "Edit User"; title: "Edit user info" };
+        delete: { label: "Remove User"; title: "Delete user" };
+        ban: { label: "Ban User"; title: "Ban user from system" };
+        unban: { label: "Unban User"; title: "Restore access" };
+      };
+    };
+  }
+}
+```
+
+### 3. Augmenting IResources - Full Example
+
+You must declare resources in your application's type definitions:
+
+```typescript
+// src/types/resources.ts
+import "@resk/core/resources";
+
+declare module "@resk/core/resources" {
+  interface IResources {
+    // Resource 1: Users
+    users: {
+      actions: {
+        read: { label: "View"; title: "View user" };
+        create: { label: "Create"; title: "Create user" };
+        update: { label: "Edit"; title: "Edit user" };
+        delete: { label: "Delete"; title: "Delete user" };
+      };
+    };
+
+    // Resource 2: Products
+    products: {
+      actions: {
+        read: { label: "View"; title: "View product" };
+        create: { label: "Create"; title: "Create product" };
+        update: { label: "Edit"; title: "Edit product" };
+        delete: { label: "Delete"; title: "Delete product" };
+        publish: { label: "Publish"; title: "Make product public" };
+        unpublish: { label: "Unpublish"; title: "Hide product" };
+      };
+    };
+
+    // Resource 3: Orders
+    orders: {
+      actions: {
+        read: { label: "View"; title: "View order" };
+        create: { label: "Create"; title: "Place order" };
+        update: { label: "Edit"; title: "Edit order" };
+        delete: { label: "Cancel"; title: "Cancel order" };
+        ship: { label: "Ship"; title: "Ship order" };
+        track: { label: "Track"; title: "Track order" };
+      };
+    };
+
+    // Resource 4: Categories (minimal)
+    categories: {
+      actions: {
+        read: { label: "View" };
+        create: { label: "Create" };
+        update: { label: "Edit" };
+        delete: { label: "Delete" };
+      };
+    };
+  }
+}
+
+// After this declaration:
+// - IResourceName = "users" | "products" | "orders" | "categories"
+// - Each resource name maps to its metadata
+// - Type system enforces action names per resource
+```
+
+### 4. Action Names - IResourceActionName
+
+Action names are **derived from the augmented resource definition**:
+
+```typescript
+// For users resource with these actions:
+// { read, create, update, delete, ban, unban }
+
+type UserActionNames = IResourceActionName<"users">;
+// Result: "read" | "create" | "update" | "delete" | "ban" | "unban"
+
+type ProductActionNames = IResourceActionName<"products">;
+// Result: "read" | "create" | "update" | "delete" | "publish" | "unpublish"
+
+// Compile-time type safety:
+function performAction(
+  resourceName: "users",
+  actionName: IResourceActionName<"users">
+) {
+  // actionName must be one of the user resource's actions
+}
+
+performAction("users", "read"); // ✓ Valid
+performAction("users", "ban"); // ✓ Valid
+performAction("users", "publish"); // ✗ Error - not a user action
+```
+
+### 5. Data Type
+
+The TypeScript interface representing the actual data:
 
 ```typescript
 interface User {
   id: string;
   name: string;
   email: string;
+  role: "admin" | "user" | "guest";
   createdAt: Date;
 }
 
-class UserResource extends Resource<"users", User> {
-  // ...
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  published: boolean;
 }
 ```
 
-### 3. Primary Key Type
+### 6. Primary Key Type
 
 The type of the unique identifier:
 
 ```typescript
 class UserResource extends Resource<"users", User, string> {
-  // ID is string
+  // Primary key type is string
 }
 
-class CompanyResource extends Resource<"companies", Company, number> {
-  // ID is number
+class OrderResource extends Resource<"orders", Order, number> {
+  // Primary key type is number
 }
 ```
 
-### 4. Data Service
+### 7. Data Service
 
 An interface that handles the actual data operations:
 
 ```typescript
 interface IResourceDataService<DataType, PrimaryKeyType> {
+  // Single record operations
   create(record: Partial<DataType>): Promise<DataType>;
-  read(id: PrimaryKeyType): Promise<DataType | null>;
+  findOne(id: PrimaryKeyType): Promise<DataType | null>;
+  findOneOrFail(id: PrimaryKeyType): Promise<DataType>;
   update(id: PrimaryKeyType, data: Partial<DataType>): Promise<DataType>;
   delete(id: PrimaryKeyType): Promise<boolean>;
+
+  // Multiple record operations
   find(options?: IResourceQueryOptions<DataType>): Promise<DataType[]>;
-  // ... and more
+  findAndCount(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<[DataType[], number]>;
+  findAndPaginate(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<IResourcePaginatedResult<DataType>>;
+  createMany(data: Partial<DataType>[]): Promise<DataType[]>;
+  updateMany(criteria: any, data: Partial<DataType>): Promise<number>;
+  deleteMany(criteria: any): Promise<number>;
+
+  // Utility operations
+  count(options?: IResourceQueryOptions<DataType>): Promise<number>;
+  exists(id: PrimaryKeyType): Promise<boolean>;
 }
 ```
+
+### Type Relationships Summary
+
+````typescript
+// Chain of type dependencies:
+
+IResources (module augmentation)
+  ↓
+IResourceName (extracted keys)
+  ↓
+IResourceActionName<ResourceName> (action names per resource)
+  ↓
+GetResource<ResourceName> (retrieve resource metadata)
+  ↓
+IResourceActions<ResourceName> (all actions for resource)
 
 ---
 
 ## Getting Started
+
+### Step 0: Augment IResources Interface
+
+This is the **critical first step** before creating any resources. Declare your resources in a types file:
+
+```typescript
+// src/types/resources.ts
+import "@resk/core/resources";
+
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: {
+      actions: {
+        read: { label: "View User"; title: "View user details" };
+        create: { label: "Create User"; title: "Create new user" };
+        update: { label: "Edit User"; title: "Edit user" };
+        delete: { label: "Delete User"; title: "Remove user" };
+      };
+    };
+  }
+}
+
+// Now IResourceName = "users"
+// type UserActions = IResourceActionName<"users"> = "read" | "create" | "update" | "delete"
+````
+
+**Why this matters:**
+
+1. **Type safety** - IResourceName becomes a branded type
+2. **Action validation** - Only defined actions are allowed
+3. **Translation structure** - Derived from augmented interface
+4. **Permissions** - Checked against defined actions
 
 ### Step 1: Define Your Data Type
 
@@ -123,26 +350,37 @@ interface User {
 Implement the `IResourceDataService` interface:
 
 ```typescript
-import { IResourceDataService, IResourceQueryOptions } from "@/resources";
+import {
+  IResourceDataService,
+  IResourceQueryOptions,
+} from "@resk/core/resources";
 
 class UserDataService implements IResourceDataService<User, string> {
   private users: Map<string, User> = new Map();
 
-  find(options?: IResourceQueryOptions<User>): Promise<User[]> {
-    return Promise.resolve(Array.from(this.users.values()));
+  async find(options?: IResourceQueryOptions<User>): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
-  findOne(id: string): Promise<User | null> {
-    return Promise.resolve(this.users.get(id) || null);
+  async findOne(
+    options: string | IResourceQueryOptions<User>
+  ): Promise<User | null> {
+    const id =
+      typeof options === "string" ? options : (options.filter?.id as string);
+    return this.users.get(id) || null;
   }
 
-  findOneOrFail(id: string): Promise<User> {
+  async findOneOrFail(
+    options: string | IResourceQueryOptions<User>
+  ): Promise<User> {
+    const id =
+      typeof options === "string" ? options : (options.filter?.id as string);
     const user = this.users.get(id);
     if (!user) throw new Error(`User ${id} not found`);
-    return Promise.resolve(user);
+    return user;
   }
 
-  create(record: Partial<User>): Promise<User> {
+  async create(record: Partial<User>): Promise<User> {
     const id = crypto.randomUUID();
     const user: User = {
       id,
@@ -152,89 +390,86 @@ class UserDataService implements IResourceDataService<User, string> {
       createdAt: new Date(),
     };
     this.users.set(id, user);
-    return Promise.resolve(user);
+    return user;
   }
 
-  update(id: string, data: Partial<User>): Promise<User> {
+  async update(id: string, data: Partial<User>): Promise<User> {
     const user = this.users.get(id);
     if (!user) throw new Error(`User ${id} not found`);
-
     const updated = { ...user, ...data, updatedAt: new Date() };
     this.users.set(id, updated);
-    return Promise.resolve(updated);
+    return updated;
   }
 
-  delete(id: string): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const existed = this.users.has(id);
     this.users.delete(id);
-    return Promise.resolve(existed);
+    return existed;
   }
 
-  findAndCount(
+  async findAndCount(
     options?: IResourceQueryOptions<User>
   ): Promise<[User[], number]> {
     const data = Array.from(this.users.values());
-    return Promise.resolve([data, data.length]);
+    return [data, data.length];
   }
 
-  findAndPaginate(
+  async findAndPaginate(
     options?: IResourceQueryOptions<User>
   ): Promise<IResourcePaginatedResult<User>> {
     const data = Array.from(this.users.values());
-    return Promise.resolve({
-      data,
-      total: data.length,
-      count: data.length,
-    });
+    return { data, total: data.length, count: data.length };
   }
 
-  createMany(data: Partial<User>[]): Promise<User[]> {
+  async createMany(data: Partial<User>[]): Promise<User[]> {
     return Promise.all(data.map((item) => this.create(item)));
   }
 
-  updateMany(criteria: any, data: Partial<User>): Promise<number> {
+  async updateMany(criteria: any, data: Partial<User>): Promise<number> {
     let count = 0;
     this.users.forEach((user) => {
       this.users.set(user.id, { ...user, ...data });
       count++;
     });
-    return Promise.resolve(count);
+    return count;
   }
 
-  deleteMany(criteria: any): Promise<number> {
+  async deleteMany(criteria: any): Promise<number> {
     const count = this.users.size;
     this.users.clear();
-    return Promise.resolve(count);
+    return count;
   }
 
-  count(options?: IResourceQueryOptions<User>): Promise<number> {
-    return Promise.resolve(this.users.size);
+  async count(options?: IResourceQueryOptions<User>): Promise<number> {
+    return this.users.size;
   }
 
-  exists(id: string): Promise<boolean> {
-    return Promise.resolve(this.users.has(id));
+  async exists(id: string): Promise<boolean> {
+    return this.users.has(id);
   }
 }
 ```
 
 ### Step 3: Create a Resource Class
 
-Extend the `Resource` class:
+Extend the `Resource` class with the resource name from your augmented `IResources`:
 
 ```typescript
-import { Resource, ResourceMetadata } from "@/resources";
+// src/resources/user.resource.ts
+import { Resource, ResourceMetadata } from "@resk/core/resources";
+import { IResourceDataService, IResourceName } from "@resk/core/resources";
 
 @ResourceMetadata({
-  name: "users" as IResourceName,
+  name: "users", // Must match IResources key
   label: "Users",
   title: "User Management System",
   actions: {
-    create: { label: "Create User", title: "Create a new user" },
     read: { label: "View User", title: "View user details" },
-    update: { label: "Update User", title: "Modify user information" },
+    create: { label: "Create User", title: "Create new user" },
+    update: { label: "Edit User", title: "Edit user information" },
     delete: { label: "Delete User", title: "Remove user from system" },
   },
-  instanciate: false, // Don't auto-instantiate
+  instanciate: false,
 })
 class UserResource extends Resource<"users", User, string> {
   name: IResourceName = "users";
@@ -249,8 +484,15 @@ class UserResource extends Resource<"users", User, string> {
 }
 
 // Instantiate the resource
-const userResource = new UserResource();
+export const userResource = new UserResource();
 ```
+
+**Key Points:**
+
+- Resource name **must match** a key in augmented `IResources`
+- Type parameters ensure **full type safety**
+- Actions **must be valid for the resource**
+- Data service **must implement full interface**
 
 ---
 
@@ -602,6 +844,130 @@ if (!hasService) {
 
 ## Translations & i18n
 
+### IResourceTranslations Type Structure
+
+**IResourceTranslations** is a complex type that ensures **compile-time type safety** for translations. It's automatically derived from your augmented `IResources` interface.
+
+```typescript
+// Given this augmented resource:
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: {
+      actions: {
+        read: { label: "Read" };
+        create: { label: "Create" };
+        update: { label: "Update" };
+        delete: { label: "Delete" };
+      };
+    };
+  }
+}
+
+// IResourceTranslation<"users"> requires this structure:
+type UserTranslations = IResourceTranslation<"users">;
+
+// Must include:
+// - label (required)
+// - title (optional)
+// - forbiddenError (required)
+// - notFoundError (required)
+// - Translations for EACH action: read, create, update, delete
+//   (each with: label, title, zero, one, other)
+```
+
+### Translation Structure - Complete Example
+
+```typescript
+import { i18n } from "@resk/core/resources";
+
+// Register translations matching IResourceTranslation<ResourceName>
+i18n.registerTranslations({
+  en: {
+    resources: {
+      users: {
+        // Resource-level core properties
+        label: "Users",
+        title: "User Management System",
+        description: "Manage application users",
+        forbiddenError: "You don't have permission to manage users",
+        notFoundError: "User not found",
+
+        // Action translations - MUST match resource actions
+        read: {
+          label: "View User",
+          title: "View user details",
+          zero: "No users to view",
+          one: "Viewing one user",
+          other: "Viewing %{count} users",
+        },
+        create: {
+          label: "Create User",
+          title: "Create a new user",
+          zero: "No users created",
+          one: "Created one user",
+          other: "Created %{count} users",
+        },
+        update: {
+          label: "Edit User",
+          title: "Edit user information",
+          zero: "No users edited",
+          one: "Edited one user",
+          other: "Edited %{count} users",
+        },
+        delete: {
+          label: "Delete User",
+          title: "Remove user from system",
+          zero: "No users deleted",
+          one: "Deleted one user",
+          other: "Deleted %{count} users",
+        },
+
+        // Optional: Custom field translations
+        name: {
+          label: "Full Name",
+          placeholder: "Enter user's full name",
+        },
+        email: {
+          label: "Email Address",
+          placeholder: "user@example.com",
+          validation: {
+            required: "Email is required",
+            format: "Please enter a valid email",
+          },
+        },
+        role: {
+          label: "User Role",
+          options: {
+            admin: "Administrator",
+            user: "Regular User",
+            guest: "Guest User",
+          },
+        },
+      },
+    },
+  },
+  fr: {
+    resources: {
+      users: {
+        label: "Utilisateurs",
+        title: "Système de Gestion des Utilisateurs",
+        forbiddenError:
+          "Vous n'avez pas la permission de gérer les utilisateurs",
+        notFoundError: "Utilisateur introuvable",
+        read: {
+          label: "Voir l'utilisateur",
+          title: "Afficher les détails de l'utilisateur",
+          zero: "Aucun utilisateur à voir",
+          one: "Affichage d'un utilisateur",
+          other: "Affichage de %{count} utilisateurs",
+        },
+        // ... other actions
+      },
+    },
+  },
+});
+```
+
 ### How Translations Work
 
 The Resource system automatically integrates with i18n:
@@ -611,67 +977,35 @@ The Resource system automatically integrates with i18n:
 3. **Updates**: Automatically re-resolves when locale or dictionary changes
 4. **Cleanup**: Removes listeners when destroyed
 
-### Translation Structure
+### Pluralization in Translations
 
-Register translations using i18n:
+Translations support **ICU-style pluralization** with `zero`, `one`, and `other`:
 
 ```typescript
-import { i18n } from "@/i18n";
+// In translation file:
+update: {
+  zero: "No users updated",      // count = 0
+  one: "Updated one user",       // count = 1
+  other: "Updated %{count} users" // count > 1
+}
 
-i18n.registerTranslations({
-  en: {
-    resources: {
-      users: {
-        // Resource-level translations
-        label: "Users",
-        title: "User Management System",
-        notFoundError: "User with ID {id} not found",
+// When using:
+i18n.t("resources.users.update.other", { count: 5 });
+// Result: "Updated 5 users"
+
+i18n.t("resources.users.update.one", { count: 1 });
+// Result: "Updated one user"
+```
+
         forbiddenError: "You don't have permission to {action} users",
-
-        // Action-level translations
-        create: {
-          label: "Create User",
-          title: "Create a new user",
-        },
-        read: {
-          label: "View User",
-          title: "View user details",
-        },
-        update: {
-          label: "Update User",
-          title: "Modify user information",
-        },
-        delete: {
-          label: "Delete User",
-          title: "Remove user from system",
-        },
-
-        // Field-level translations
-        id: {
-          label: "ID",
-          placeholder: "Auto-generated",
-        },
-        name: {
-          label: "Full Name",
-          placeholder: "Enter user name",
-        },
-        email: {
-          label: "Email Address",
-          placeholder: "user@example.com",
-        },
-        role: {
-          label: "User Role",
-          options: {
-            admin: "Administrator",
-            user: "Regular User",
-            guest: "Guest",
-          },
-        },
+        notFoundError: "User with ID {id} not found",
       },
     },
-  },
+
+},
 });
-```
+
+````
 
 ### Getting Translations
 
@@ -692,7 +1026,7 @@ const frenchTranslations = userResource.getTranslations("fr");
 
 // Get current locale
 const locale = i18n.getLocale(); // "en" or "fr"
-```
+````
 
 ### Translating Values
 
@@ -1293,6 +1627,396 @@ class UserResource extends Resource<"users", User, string> {
 
   // Get formatted title
   const title = this.getActionTitle("ban");
+}
+```
+
+---
+
+## Resource Augmentation - Complete Reference
+
+### What is Resource Augmentation?
+
+Resource Augmentation is the process of extending the TypeScript `IResources` interface to declare all resources available in your application. This is **mandatory** for type safety and enables the entire type system.
+
+```typescript
+// ❌ Without augmentation - NO type safety
+type AnyResourceName = string; // Can be anything!
+type AnyAction = string; // Can be anything!
+
+// ✅ With augmentation - FULL type safety
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: { actions: { read: {...}, create: {...} } };
+    products: { actions: { read: {...}, create: {...} } };
+  }
+}
+type ResourceName = "users" | "products"; // ✓ Exact union
+type UserAction = "read" | "create"; // ✓ Exact union
+```
+
+### Single Resource Augmentation
+
+**Example 1: Simple Users Resource**
+
+```typescript
+// src/types/resources/users.ts
+import "@resk/core/resources";
+
+declare module "@resk/core/resources" {
+  interface IResources {
+    users: {
+      actions: {
+        read: {
+          label: "View User";
+          title: "View user details";
+        };
+        create: {
+          label: "Create User";
+          title: "Create a new user";
+        };
+        update: {
+          label: "Edit User";
+          title: "Edit user information";
+        };
+        delete: {
+          label: "Delete User";
+          title: "Remove user from system";
+        };
+      };
+    };
+  }
+}
+
+// Usage:
+type UserResourceName = IResourceName; // "users"
+type UserActions = IResourceActionName<"users">; // "read" | "create" | "update" | "delete"
+```
+
+**Example 2: Products Resource with Custom Actions**
+
+```typescript
+declare module "@resk/core/resources" {
+  interface IResources {
+    products: {
+      actions: {
+        read: { label: "View"; title: "View product" };
+        create: { label: "Create"; title: "Create product" };
+        update: { label: "Edit"; title: "Edit product" };
+        delete: { label: "Delete"; title: "Delete product" };
+        publish: { label: "Publish"; title: "Make public" };
+        unpublish: { label: "Unpublish"; title: "Hide product" };
+        archive: { label: "Archive"; title: "Archive product" };
+      };
+    };
+  }
+}
+
+// Usage:
+type ProductActions = IResourceActionName<"products">;
+// Result: "read" | "create" | "update" | "delete" | "publish" | "unpublish" | "archive"
+```
+
+### Multi-Resource Augmentation
+
+**Example 3: Complete Application Resources**
+
+```typescript
+// src/types/resources.ts
+import "@resk/core/resources";
+
+declare module "@resk/core/resources" {
+  interface IResources {
+    // Resource 1: Users (admin management)
+    users: {
+      actions: {
+        read: { label: "View User" };
+        create: { label: "Create User" };
+        update: { label: "Edit User" };
+        delete: { label: "Delete User" };
+        ban: { label: "Ban User" };
+        unban: { label: "Unban User" };
+        resetPassword: { label: "Reset Password" };
+      };
+    };
+
+    // Resource 2: Products (e-commerce)
+    products: {
+      actions: {
+        read: { label: "View Product" };
+        create: { label: "Create Product" };
+        update: { label: "Edit Product" };
+        delete: { label: "Delete Product" };
+        publish: { label: "Publish" };
+        unpublish: { label: "Unpublish" };
+      };
+    };
+
+    // Resource 3: Orders (e-commerce)
+    orders: {
+      actions: {
+        read: { label: "View Order" };
+        create: { label: "Create Order" };
+        update: { label: "Edit Order" };
+        delete: { label: "Cancel Order" };
+        ship: { label: "Ship Order" };
+        track: { label: "Track Order" };
+      };
+    };
+
+    // Resource 4: Categories (minimal)
+    categories: {
+      actions: {
+        read: { label: "View Category" };
+        create: { label: "Create Category" };
+        update: { label: "Edit Category" };
+        delete: { label: "Delete Category" };
+      };
+    };
+
+    // Resource 5: Blog Posts
+    posts: {
+      actions: {
+        read: { label: "Read Post" };
+        create: { label: "Write Post" };
+        update: { label: "Edit Post" };
+        delete: { label: "Delete Post" };
+        publish: { label: "Publish Post" };
+        draft: { label: "Save Draft" };
+        schedule: { label: "Schedule Post" };
+      };
+    };
+
+    // Resource 6: Comments
+    comments: {
+      actions: {
+        read: { label: "View Comment" };
+        create: { label: "Post Comment" };
+        update: { label: "Edit Comment" };
+        delete: { label: "Delete Comment" };
+        moderate: { label: "Moderate" };
+        approve: { label: "Approve" };
+        reject: { label: "Reject" };
+      };
+    };
+  }
+}
+
+// Now you have:
+type AllResourceNames = IResourceName;
+// "users" | "products" | "orders" | "categories" | "posts" | "comments"
+
+type UserActions = IResourceActionName<"users">;
+// "read" | "create" | "update" | "delete" | "ban" | "unban" | "resetPassword"
+
+type ProductActions = IResourceActionName<"products">;
+// "read" | "create" | "update" | "delete" | "publish" | "unpublish"
+```
+
+### Advanced Augmentation Patterns
+
+**Example 4: Conditional Actions Based on User Type**
+
+```typescript
+declare module "@resk/core/resources" {
+  interface IResources {
+    documents: {
+      actions: {
+        // Standard CRUD actions (all users)
+        read: { label: "View Document" };
+        create: { label: "Create Document" };
+        update: { label: "Edit Document" };
+        delete: { label: "Delete Document" };
+
+        // Advanced actions (requires permissions)
+        share: { label: "Share Document"; title: "Share with others" };
+        collaborate: { label: "Collaborate"; title: "Real-time editing" };
+        archive: { label: "Archive"; title: "Archive document" };
+        restore: { label: "Restore"; title: "Restore from archive" };
+        export: { label: "Export"; title: "Export as PDF/Word" };
+        version: { label: "Version History"; title: "View versions" };
+      };
+    };
+  }
+}
+
+// Type-safe usage
+function getDocumentAction(action: IResourceActionName<"documents">): string {
+  const actions: Record<IResourceActionName<"documents">, string> = {
+    read: "user can view",
+    create: "user can create",
+    update: "user can edit",
+    delete: "user can delete",
+    share: "user can share",
+    collaborate: "user can collaborate",
+    archive: "user can archive",
+    restore: "user can restore",
+    export: "user can export",
+    version: "user can see versions",
+  };
+  return actions[action];
+}
+
+const desc = getDocumentAction("share"); // ✓ Valid
+// const invalid = getDocumentAction("invalid"); // ✗ TypeScript error
+```
+
+**Example 5: Hierarchical Resources**
+
+```typescript
+declare module "@resk/core/resources" {
+  interface IResources {
+    // Parent resource: Organizations
+    organizations: {
+      actions: {
+        read: { label: "View Organization" };
+        create: { label: "Create Organization" };
+        update: { label: "Edit Organization" };
+        delete: { label: "Delete Organization" };
+        invite: { label: "Invite Member" };
+      };
+    };
+
+    // Child resource: Team Members
+    teamMembers: {
+      actions: {
+        read: { label: "View Member" };
+        create: { label: "Add Member" };
+        update: { label: "Edit Member" };
+        delete: { label: "Remove Member" };
+        promote: { label: "Promote to Admin" };
+        demote: { label: "Demote from Admin" };
+      };
+    };
+
+    // Child resource: Projects
+    projects: {
+      actions: {
+        read: { label: "View Project" };
+        create: { label: "Create Project" };
+        update: { label: "Edit Project" };
+        delete: { label: "Delete Project" };
+        archive: { label: "Archive Project" };
+      };
+    };
+
+    // Grandchild resource: Tasks
+    tasks: {
+      actions: {
+        read: { label: "View Task" };
+        create: { label: "Create Task" };
+        update: { label: "Edit Task" };
+        delete: { label: "Delete Task" };
+        assign: { label: "Assign Task" };
+        complete: { label: "Mark Complete" };
+      };
+    };
+  }
+}
+
+// Hierarchical permission checks
+type OrgResourceNames = "organizations" | "teamMembers" | "projects" | "tasks";
+type OrgActions = IResourceActionName<OrgResourceNames>;
+```
+
+### Validation and Type Safety
+
+**Example 6: Enforcing Augmentation**
+
+```typescript
+// Compile-time validation
+const validResources: IResourceName[] = [
+  "users",
+  "products",
+  "orders",
+  // "invalid" // ✗ TypeScript error
+];
+
+// Runtime validation
+function validateResourceName(name: string): name is IResourceName {
+  const validNames = ["users", "products", "orders"] as const;
+  return (validNames as string[]).includes(name);
+}
+
+if (validateResourceName("users")) {
+  // name is typed as IResourceName
+  const resource = ResourcesManager.getResource("users");
+}
+
+// Type-safe action tuple
+const actionTuple: IResourceActionTuple<"users"> = [
+  "users",
+  "read", // ✓ Valid user action
+  // "publish" // ✗ Error - not a user action
+];
+```
+
+### Augmentation Best Practices
+
+1. **Define all resources upfront** - Declare all resources in one central location
+2. **Use consistent naming** - Keep resource names lowercase and plural
+3. **Document actions** - Always include labels and titles for actions
+4. **Group by domain** - Organize resources by domain/module
+5. **Extend cautiously** - Avoid adding too many custom actions initially
+
+```typescript
+// ✓ GOOD - Organized and documented
+declare module "@resk/core/resources" {
+  interface IResources {
+    // User Management Domain
+    users: {
+      actions: {
+        /* ... */
+      };
+    };
+    roles: {
+      actions: {
+        /* ... */
+      };
+    };
+    permissions: {
+      actions: {
+        /* ... */
+      };
+    };
+
+    // E-Commerce Domain
+    products: {
+      actions: {
+        /* ... */
+      };
+    };
+    orders: {
+      actions: {
+        /* ... */
+      };
+    };
+    categories: {
+      actions: {
+        /* ... */
+      };
+    };
+
+    // Content Domain
+    posts: {
+      actions: {
+        /* ... */
+      };
+    };
+    comments: {
+      actions: {
+        /* ... */
+      };
+    };
+  }
+}
+
+// ✗ AVOID - Unorganized and unclear
+declare module "@resk/core/resources" {
+  interface IResources {
+    u: { actions: { a: { label: "x" }; b: { label: "y" } } };
+    p: { actions: { a: { label: "x" } } };
+    // Difficult to understand and maintain
+  }
 }
 ```
 

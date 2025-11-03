@@ -8,7 +8,7 @@ export * from "./filters";
 export interface IFieldBase<
   FieldType extends IFieldType = IFieldType,
   ValueType = any,
-> extends Partial<IResourceActionTupleObject>,
+> extends Partial<IResourceActionTupleObject<IResourceName>>,
     Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
   /**
    * The type of the field.
@@ -135,6 +135,57 @@ export interface IFieldBase<
 // Mapped type that ensures all values in IFieldMap extend IFieldBase
 export interface IFieldMap {}
 
+/**
+ * Interface defining the mapping of field actions to their string identifiers.
+ * Used to specify which actions are available for different field operations.
+ *
+ * This interface provides a standardized way to reference field actions throughout
+ * the application, ensuring consistency in field operation naming.
+ *
+ * @interface IFieldActionsMap
+ *
+ * @example
+ * ```typescript
+ * // Basic usage - defining field actions for a form
+ * const fieldActions: IFieldActionsMap = {
+ *   create: "createField",
+ *   update: "updateField",
+ *   createOrUpdate: "createOrUpdateField",
+ *   filter: "filterField"
+ * };
+ *
+ * // Usage in field configuration
+ * const textField: IField = {
+ *   type: "text",
+ *   name: "username",
+ *   forCreate: { required: true, minLength: 3 },
+ *   forUpdate: { required: false },
+ *   forFilter: { caseSensitive: false }
+ * };
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Advanced usage - conditional field actions based on user permissions
+ * function getFieldActions(userRole: string): Partial<IFieldActionsMap> {
+ *   const actions: Partial<IFieldActionsMap> = {};
+ *
+ *   if (userRole === 'admin') {
+ *     actions.create = 'adminCreate';
+ *     actions.update = 'adminUpdate';
+ *     actions.createOrUpdate = 'adminCreateOrUpdate';
+ *     actions.filter = 'adminFilter';
+ *   } else if (userRole === 'editor') {
+ *     actions.update = 'editorUpdate';
+ *     actions.filter = 'editorFilter';
+ *   } else {
+ *     actions.filter = 'readonlyFilter';
+ *   }
+ *
+ *   return actions;
+ * }
+ * ```
+ */
 export interface IFieldActionsMap {
   create: string;
   update: string;
@@ -153,8 +204,186 @@ export type IField<
     }
   : never;
 
+/**
+ * Type representing a collection of fields where each key is a string and each value is an IField.
+ * This type is used to define the structure of fields for a resource or form.
+ *
+ * This type provides a flexible way to define multiple fields with their configurations,
+ * validation rules, and action-specific overrides. It's commonly used when defining
+ * the schema for resources, forms, or data validation.
+ *
+ * @type IFields
+ *
+ * @example
+ * ```typescript
+ * // Basic field collection for a user resource
+ * const userFields: IFields = {
+ *   username: {
+ *     type: "text",
+ *     name: "username",
+ *     required: true,
+ *     minLength: 3,
+ *     maxLength: 50,
+ *     forCreate: { required: true },
+ *     forUpdate: { required: false }
+ *   },
+ *   email: {
+ *     type: "email",
+ *     name: "email",
+ *     required: true,
+ *     unique: true,
+ *     forCreate: { required: true },
+ *     forUpdate: { required: true }
+ *   },
+ *   age: {
+ *     type: "number",
+ *     name: "age",
+ *     required: false,
+ *     min: 0,
+ *     max: 150,
+ *     forFilter: { allowRange: true }
+ *   }
+ * };
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Dynamic field collection based on user permissions
+ * function createFieldsForUser(userRole: string): IFields {
+ *   const baseFields: IFields = {
+ *     id: { type: "uuid", name: "id", primaryKey: true, readOnly: true },
+ *     createdAt: { type: "date", name: "createdAt", readOnly: true },
+ *     updatedAt: { type: "date", name: "updatedAt", readOnly: true }
+ *   };
+ *
+ *   if (userRole === 'admin') {
+ *     return {
+ *       ...baseFields,
+ *       adminNotes: {
+ *         type: "textarea",
+ *         name: "adminNotes",
+ *         required: false,
+ *         maxLength: 1000
+ *       },
+ *       isActive: {
+ *         type: "boolean",
+ *         name: "isActive",
+ *         required: true,
+ *         defaultValue: true
+ *       }
+ *     };
+ *   }
+ *
+ *   return baseFields;
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Form validation using field collection
+ * function validateFormData(fields: IFields, data: Record<string, any>): ValidationResult {
+ *   const errors: string[] = [];
+ *
+ *   for (const [fieldName, fieldConfig] of Object.entries(fields)) {
+ *     const value = data[fieldName];
+ *
+ *     // Check required fields
+ *     if (fieldConfig.required && (value === undefined || value === null || value === '')) {
+ *       errors.push(`${fieldConfig.name || fieldName} is required`);
+ *     }
+ *
+ *     // Check string length constraints
+ *     if (typeof value === 'string') {
+ *       if (fieldConfig.minLength && value.length < fieldConfig.minLength) {
+ *         errors.push(`${fieldName} must be at least ${fieldConfig.minLength} characters`);
+ *       }
+ *       if (fieldConfig.maxLength && value.length > fieldConfig.maxLength) {
+ *         errors.push(`${fieldName} must be at most ${fieldConfig.maxLength} characters`);
+ *       }
+ *     }
+ *   }
+ *
+ *   return { isValid: errors.length === 0, errors };
+ * }
+ * ```
+ */
 export type IFields = Record<string, IField>;
 
+/**
+ * Type representing the union of all possible field types defined in IFieldMap.
+ * This type is used to constrain field types to only those defined in the field map.
+ *
+ * This type ensures type safety by only allowing field types that have been
+ * explicitly defined in the IFieldMap interface. It prevents typos and ensures
+ * that all field types are known and properly configured.
+ *
+ * @type IFieldType
+ *
+ * @example
+ * ```typescript
+ * // Basic usage - defining a field with a valid type
+ * const textField: IFieldBase<"text"> = {
+ *   type: "text", // ✓ Valid - "text" is in IFieldMap
+ *   name: "username",
+ *   required: true
+ * };
+ *
+ * const emailField: IFieldBase<"email"> = {
+ *   type: "email", // ✓ Valid - "email" is in IFieldMap
+ *   name: "userEmail",
+ *   required: true
+ * };
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Type-safe field type checking
+ * function createField<T extends IFieldType>(
+ *   type: T,
+ *   config: Omit<IFieldBase<T>, 'type'>
+ * ): IFieldBase<T> {
+ *   return { type, ...config };
+ * }
+ *
+ * // Usage with type safety
+ * const numberField = createField("number", {
+ *   name: "age",
+ *   required: true,
+ *   min: 0,
+ *   max: 150
+ * });
+ *
+ * const dateField = createField("date", {
+ *   name: "birthDate",
+ *   required: false
+ * });
+ *
+ * // This would cause a TypeScript error:
+ * // const invalidField = createField("invalidType", { name: "test" });
+ * // Error: "invalidType" is not assignable to IFieldType
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Dynamic field type validation
+ * function isValidFieldType(type: string): type is IFieldType {
+ *   const validTypes: IFieldType[] = ["text", "number", "boolean", "date", "email"];
+ *   return validTypes.includes(type as IFieldType);
+ * }
+ *
+ * // Usage in runtime validation
+ * function validateFieldType(input: string): IFieldType {
+ *   if (!isValidFieldType(input)) {
+ *     throw new Error(`Invalid field type: ${input}. Valid types are: text, number, boolean, date, email`);
+ *   }
+ *   return input;
+ * }
+ *
+ * // Safe usage
+ * const fieldType = validateFieldType("text"); // ✓ Valid
+ * // const invalidType = validateFieldType("invalid"); // ✗ Throws error
+ * ```
+ */
 export type IFieldType = keyof IFieldMap;
 
 /**
@@ -207,69 +436,541 @@ export type IFieldType = keyof IFieldMap;
  */
 export interface IResources {}
 
-type IEnforceIResources<T> = {
-  [K in keyof T]: T[K] extends IResource ? T[K] : never; // ❌ Invalid types will result in 'never'
+type ValidatedResourceRegistry = {
+  [K in keyof IResources]: ValidateResource<IResources[K]>;
 };
 
-type ICheckIResources = IEnforceIResources<IResources>;
+type ValidateResource<T> = T extends IResource ? T : never;
 
+// Helper type to get a specific resource's metadata (validated)
 /**
- * Represents the type of names that can be used to identify resources.
- * This type is a union of the keys of the `IResources` object, enforced to conform to the `IResource` interface.
- * The resulting type is a string literal type that represents the valid resource names.
- * @remarks
- * You must ensure that the `IResources` object conforms to the `IResource` interface before using this type.
- * This type is particularly useful for working with resource names in your code.
- * each property of the `IResources` object must conform to the `IResource` interface.
+ * Helper type to get a specific resource's metadata (validated).
+ * Ensures that the resource conforms to the IResource interface structure.
+ *
+ * This type provides type-safe access to resource definitions, ensuring that
+ * only valid resources (those defined in IResources) can be accessed and that
+ * they conform to the expected IResource structure.
+ *
+ * @type GetResource
+ * @template ResourceName - The name of the resource to retrieve
+ *
  * @example
  * ```typescript
- * // Assuming IResources is defined as follows:
- * // interface IResources {
- * //     users: IResource;
- * //     products: IResource;
- * //     other:any; // Invalid resource type
- * // }
- * // Then, IResourceName would be equivalent to:
- * // type IResourceName = "users" | "products";
+ * // Basic usage - getting a validated resource type
+ * import "@resk/core";
+ *
+ * declare module "@resk/core" {
+ *   interface IResources {
+ *     users: {
+ *       actions: {
+ *         read: { label: "Read User" };
+ *         create: { label: "Create User" };
+ *         update: { label: "Update User" };
+ *       }
+ *     };
+ *     posts: {
+ *       actions: {
+ *         read: { label: "Read Post" };
+ *         publish: { label: "Publish Post" };
+ *       }
+ *     };
+ *   }
+ * }
+ *
+ * // Type-safe resource access
+ * type UserResource = GetResource<"users">;
+ * // Result: The validated users resource with proper typing
+ *
+ * type PostResource = GetResource<"posts">;
+ * // Result: The validated posts resource with proper typing
  * ```
  *
- * @typedef {keyof IEnforceIResources<IResources> & string} IResourceName
- */
-export type IResourceName = keyof ICheckIResources;
-
-/**
- * Represents the default actions that can be performed on a resource.
- * This interface defines the structure for the actions, including read, create, update, delete, and all.
+ * @example
+ * ```typescript
+ * // Using with resource functions
+ * function processResource<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName,
+ *   data: GetResource<ResourceName>
+ * ) {
+ *   // TypeScript knows the exact structure of data based on resourceName
+ *   console.log(`Processing ${resourceName}:`, data.actions);
+ * }
+ *
+ * // Usage
+ * const userResource: GetResource<"users"> = {
+ *   actions: {
+ *     read: { label: "Read User" },
+ *     create: { label: "Create User" },
+ *     update: { label: "Update User" }
+ *   }
+ * };
+ *
+ * processResource("users", userResource); // ✓ Valid
+ * // processResource("invalid", userResource); // ✗ TypeScript error
+ * ```
  *
  * @example
  * ```typescript
- * const defaultActions: IResourceActions = {
- *     read: {
- *         label: "Read Resource",
- *         title: "Click to read a specific resource.",
- *     },
- *     create: {
- *         label: "Create Resource",
- *         title: "Click to create a new resource.",
- *     },
- *     update: {
- *         label: "Update Resource",
- *         title: "Click to update a specific resource.",
- *     },
- *     delete: {
- *         label: "Delete Resource",
- *         title: "Click to delete a specific resource.",
- *     },
- *     all: {
- *         label: "All Actions",
- *         title: "Click to perform all actions on the resource.",
- *     },
+ * // Advanced usage - resource registry
+ * class ResourceRegistry {
+ *   private resources = new Map<IResourceName, GetResource<IResourceName>>();
+ *
+ *   register<ResourceName extends IResourceName>(
+ *     name: ResourceName,
+ *     resource: GetResource<ResourceName>
+ *   ) {
+ *     this.resources.set(name, resource);
+ *   }
+ *
+ *   get<ResourceName extends IResourceName>(
+ *     name: ResourceName
+ *   ): GetResource<ResourceName> | undefined {
+ *     return this.resources.get(name) as GetResource<ResourceName>;
+ *   }
+ * }
+ *
+ * // Usage
+ * const registry = new ResourceRegistry();
+ *
+ * registry.register("users", {
+ *   actions: {
+ *     read: { label: "Read User" },
+ *     create: { label: "Create User" }
+ *   }
+ * });
+ *
+ * const userResource = registry.get("users");
+ * // TypeScript knows userResource has the users resource structure
+ * ```
+ */
+export type GetResource<ResourceName extends IResourceName> =
+  ValidatedResourceRegistry[ResourceName];
+
+export type IResourceName = keyof ValidatedResourceRegistry;
+
+/**
+ * Type representing the action names for a specific resource.
+ * This type extracts the literal action name strings from a resource's actions.
+ *
+ * This type provides compile-time safety by ensuring that only valid action names
+ * for a specific resource can be used. It preserves literal types, enabling better
+ * autocomplete and error detection.
+ *
+ * @type IResourceActionName
+ * @template ResourceName - The name of the resource (optional, defaults to all resources)
+ *
+ * @example
+ * ```typescript
+ * // Basic usage with specific resource
+ * import "@resk/core";
+ *
+ * declare module "@resk/core" {
+ *   interface IResources {
+ *     users: {
+ *       actions: {
+ *         read: { label: "Read User" };
+ *         create: { label: "Create User" };
+ *         update: { label: "Update User" };
+ *         archive: { label: "Archive User" };
+ *       }
+ *     };
+ *   }
+ * }
+ *
+ * // Type-safe action names for users resource
+ * type UserActionName = IResourceActionName<"users">;
+ * // Result: "read" | "create" | "update" | "archive"
+ *
+ * function performUserAction(action: UserActionName) {
+ *   console.log(`Performing ${action} on user`);
+ * }
+ *
+ * performUserAction("read"); // ✓ Valid
+ * performUserAction("create"); // ✓ Valid
+ * // performUserAction("delete"); // ✗ TypeScript error - not a valid user action
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Generic function with resource-specific actions
+ * function createActionHandler<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName,
+ *   actionName: IResourceActionName<ResourceName>
+ * ) {
+ *   return {
+ *     execute: () => console.log(`Executing ${actionName} on ${resourceName}`),
+ *     getActionName: (): IResourceActionName<ResourceName> => actionName
+ *   };
+ * }
+ *
+ * // Usage with type safety
+ * const userReadHandler = createActionHandler("users", "read");
+ * // TypeScript knows actionName must be a valid user action
+ *
+ * const userCreateHandler = createActionHandler("users", "create");
+ * // TypeScript knows actionName must be a valid user action
+ *
+ * // This would cause a TypeScript error:
+ * // const invalidHandler = createActionHandler("users", "delete");
+ * // Error: "delete" is not assignable to IResourceActionName<"users">
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Runtime action validation
+ * function isValidAction<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName,
+ *   actionName: string
+ * ): actionName is IResourceActionName<ResourceName> {
+ *   // This would typically check against the resource's defined actions
+ *   const validActions = getResourceActions(resourceName);
+ *   return validActions.includes(actionName as IResourceActionName<ResourceName>);
+ * }
+ *
+ * // Usage
+ * if (isValidAction("users", "read")) {
+ *   // TypeScript now knows actionName is IResourceActionName<"users">
+ *   const handler = createActionHandler("users", "read");
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Action name arrays with type safety
+ * function getAllActionNames<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName
+ * ): IResourceActionName<ResourceName>[] {
+ *   // Implementation would return all action names for the resource
+ *   return [] as IResourceActionName<ResourceName>[];
+ * }
+ *
+ * // Usage
+ * const userActions = getAllActionNames("users");
+ * // TypeScript knows userActions contains only valid user action names
+ *
+ * userActions.forEach(action => {
+ *   // action is typed as IResourceActionName<"users">
+ *   console.log(`User action: ${action}`);
+ * });
+ * ```
+ */
+export type IResourceActionName<
+  ResourceName extends IResourceName = IResourceName,
+> = IResourceGetActionNames<GetResource<ResourceName>>;
+
+/**
+ * @interface IResourceActionTuple
+ * Represents a tuple that contains a resource name and an action name.
+ * This type is a union of two possible tuple formats: `IResourceActionTupleArray` and `IResourceActionTupleObject`.
+ *
+ * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
+ *
+ * @example
+ * ```typescript
+ * // Using IResourceActionTupleArray
+ * const actionTuple: IResourceActionTuple = ["users", "read"];
+ *
+ * // Using IResourceActionTupleObject
+ * const actionTuple: IResourceActionTuple = { resourceName: "users", action: "read" };
+ * ```
+ *
+ * @typeParam ResourceName - The name of the resource.
+ * @default IResourceName
+ *
+ * @typedef {(IResourceActionTupleArray<ResourceName> | IResourceActionTupleObject<ResourceName>)} IResourceActionTuple
+ *
+ * @see {@link IResourceActionTupleArray} for the `IResourceActionTupleArray` type.
+ * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
+ */
+export type IResourceActionTuple<ResourceName extends IResourceName> =
+  | IResourceActionTupleArray<ResourceName>
+  | IResourceActionTupleObject<ResourceName>;
+
+/**
+ * @interface IResourceActionTupleArray
+ * Represents a tuple that contains a resource name and an action name in an array format.
+ * This type is a tuple with two elements: the resource name and the action name.
+ *
+ * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
+ *
+ * @example
+ * ```typescript
+ * const actionTuple: IResourceActionTupleArray = ["users", "read"];
+ * ```
+ *
+ * @typeParam ResourceName - The name of the resource.
+ * @default IResourceName
+ *
+ * @typedef {[ResourceName, IResourceActionName<ResourceName>]} IResourceActionTupleArray
+ */
+export type IResourceActionTupleArray<ResourceName extends IResourceName> = [
+  /**
+   * The name of the resource.
+   *
+   * @type {ResourceName}
+   */
+  ResourceName,
+  /**
+   * The name of the action.
+   *
+   * @type {IResourceActionName<ResourceName>}
+   */
+  IResourceActionName<ResourceName>,
+];
+
+/**
+ * @interface IResourceActionTupleObject
+ * Represents a tuple that contains a resource name and an action name in an object format.
+ * This type is an object with two properties: `resourceName` and `action`.
+ *
+ * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
+ *
+ * @example
+ * ```typescript
+ * const actionTuple: IResourceActionTupleObject = { resourceName: "users", action: "read" };
+ * ```
+ *
+ * @typeParam ResourceName - The name of the resource.
+ * @default IResourceName
+ *
+ * @interface IResourceActionTupleObject
+ */
+export interface IResourceActionTupleObject<
+  ResourceName extends IResourceName,
+> {
+  /**
+   * The name of the resource.
+   *
+   * @type {ResourceName}
+   */
+  resourceName: ResourceName;
+
+  /**
+   * The name of the action.
+   *
+   * @type {IResourceActionName<ResourceName>}
+   */
+  action: IResourceActionName<ResourceName>;
+}
+/**
+ * @interface IResourceAction
+ *
+ * Represents the structure of an action that can be performed on a resource within the application.
+ * This interface defines the essential properties that describe the action, allowing for a
+ * consistent representation of actions across different resources.
+ *
+ * ### Properties
+ *
+ * - `label` (optional): A user-friendly label for the action. This label is typically
+ *   displayed in the user interface (UI) to help users understand what the action does.
+ *   It should be concise and descriptive.
+ *
+ * - `title` (optional): A short text that appears when the user hovers over the action
+ *   in the UI. The title provides extra information about the action, helping users
+ *   understand its purpose without cluttering the interface.
+ *
+ * ### Example Usage
+ *
+ * Here is an example of how the `IResourceAction` interface can be utilized:
+ *
+ * ```typescript
+ * // Define a resource action for creating a new document
+ * const createDocumentAction: IResourceAction = {
+ *     label: "Create Document",
+ *     title: "Click to add a new document."
+ * };
+ *
+ * // Function to display action information
+ * function displayActionInfo(action: IResourceAction) {
+ *     console.log(`Action: ${action.label}`);
+ *     console.log(`Title: ${action.title}`);
+ * }
+ *
+ * // Example of displaying action information
+ * displayActionInfo(createDocumentAction);
+ * // Output:
+ * // Action: Create Document
+ * // Title: Create a new document in the system
+ * // Tooltip: Click to add a new document.
+ * ```
+ *
+ * ### Notes
+ *
+ * - The `IResourceAction` interface is designed to be flexible, allowing developers to
+ *   define actions with varying levels of details based on the needs of their application.
+ * - By providing clear labels, titles, and tooltips, developers can enhance the user
+ *   experience and make the application more intuitive.
+ */
+export interface IResourceAction {
+  label?: string;
+  title?: string;
+}
+
+type IResourceActionsRecord<TActions> =
+  TActions extends Record<string, IResourceAction>
+    ? TActions & Partial<IResourceDefaultActions>
+    : never;
+
+/**
+ * Type representing the actions record for a specific resource.
+ * This type extracts the actions from a resource's definition, ensuring type safety.
+ *
+ * This type provides access to the complete actions object for a resource,
+ * maintaining the exact structure and types as defined in the resource's configuration.
+ * It's useful when you need to work with the entire set of actions for a resource.
+ *
+ * @type IResourceActions
+ * @template ResourceName - The name of the resource
+ *
+ * @example
+ * ```typescript
+ * // Basic usage - getting resource actions type
+ * import "@resk/core";
+ *
+ * declare module "@resk/core" {
+ *   interface IResources {
+ *     users: {
+ *       actions: {
+ *         read: { label: "Read User", title: "View user details" };
+ *         create: { label: "Create User", title: "Add new user" };
+ *         update: { label: "Update User", title: "Modify user data" };
+ *         archive: { label: "Archive User", title: "Soft delete user" };
+ *       }
+ *     };
+ *   }
+ * }
+ *
+ * // Type-safe access to user actions
+ * type UserActions = IResourceActions<"users">;
+ * // Result: The complete actions record for users resource
+ *
+ * const userActions: UserActions = {
+ *   read: { label: "Read User", title: "View user details" },
+ *   create: { label: "Create User", title: "Add new user" },
+ *   update: { label: "Update User", title: "Modify user data" },
+ *   archive: { label: "Archive User", title: "Soft delete user" }
  * };
  * ```
  *
- * @interface IResourceActions
+ * @example
+ * ```typescript
+ * // Function that works with resource actions
+ * function validateResourceActions<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName,
+ *   actions: IResourceActions<ResourceName>
+ * ): boolean {
+ *   // Check if all required actions are present
+ *   const requiredActions: (keyof IResourceActions<ResourceName>)[] = ['read', 'create', 'update'];
+ *
+ *   return requiredActions.every(action =>
+ *     action in actions && actions[action] !== undefined
+ *   );
+ * }
+ *
+ * // Usage
+ * const validUserActions = validateResourceActions("users", {
+ *   read: { label: "Read" },
+ *   create: { label: "Create" },
+ *   update: { label: "Update" },
+ *   archive: { label: "Archive" }
+ * }); // Returns true
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Building action handlers with type safety
+ * function createActionHandlers<ResourceName extends IResourceName>(
+ *   resourceName: ResourceName,
+ *   actions: IResourceActions<ResourceName>
+ * ) {
+ *   const handlers: Record<string, () => void> = {};
+ *
+ *   // TypeScript knows the exact action names available
+ *   for (const actionName in actions) {
+ *     handlers[actionName] = () => {
+ *       const action = actions[actionName as keyof IResourceActions<ResourceName>];
+ *       console.log(`Executing ${action?.label} on ${resourceName}`);
+ *     };
+ *   }
+ *
+ *   return handlers;
+ * }
+ *
+ * // Usage
+ * const userActionHandlers = createActionHandlers("users", {
+ *   read: { label: "Read User" },
+ *   create: { label: "Create User" },
+ *   update: { label: "Update User" }
+ * });
+ *
+ * userActionHandlers.read(); // ✓ Valid - calls read handler
+ * userActionHandlers.create(); // ✓ Valid - calls create handler
+ * // userActionHandlers.delete(); // ✗ TypeScript error - delete not in user actions
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Permission system based on resource actions
+ * class PermissionManager {
+ *   private permissions = new Map<IResourceName, Set<string>>();
+ *
+ *   grantPermission<ResourceName extends IResourceName>(
+ *     resourceName: ResourceName,
+ *     actions: (keyof IResourceActions<ResourceName>)[]
+ *   ) {
+ *     const current = this.permissions.get(resourceName) || new Set();
+ *     actions.forEach(action => current.add(action as string));
+ *     this.permissions.set(resourceName, current);
+ *   }
+ *
+ *   hasPermission<ResourceName extends IResourceName>(
+ *     resourceName: ResourceName,
+ *     action: keyof IResourceActions<ResourceName>
+ *   ): boolean {
+ *     const resourcePerms = this.permissions.get(resourceName);
+ *     return resourcePerms?.has(action as string) ?? false;
+ *   }
+ * }
+ *
+ * // Usage
+ * const permManager = new PermissionManager();
+ * permManager.grantPermission("users", ["read", "create"]);
+ *
+ * permManager.hasPermission("users", "read"); // true
+ * permManager.hasPermission("users", "update"); // false
+ * // permManager.hasPermission("users", "invalid"); // ✗ TypeScript error
+ * ```
  */
-export interface IResourceActions {
+export type IResourceActions<ResourceName extends IResourceName> =
+  IResources[ResourceName] extends { actions: Record<string, IResourceAction> }
+    ? IResourceActionsRecord<IResources[ResourceName]["actions"]>
+    : never;
+
+/**
+ * Utility type to extract action names from a resource actions record.
+ * This preserves the literal types of the action keys.
+ *
+ * @template T - The actions record type
+ * @example
+ * ```typescript
+ * const actions = {
+ *   read: { label: "Read" },
+ *   create: { label: "Create" },
+ *   custom: { label: "Custom" }
+ * } as const;
+ *
+ * type ActionNames = IResourceActionNames<typeof actions>;
+ * // Result: "read" | "create" | "custom"
+ * ```
+ */
+export type IResourceActionNames<T extends Record<string, IResourceAction>> =
+  keyof T & string;
+
+type IResourceGetActionNames<
+  TResource extends { actions?: Record<string, IResourceAction> },
+> = keyof IResourceActionsRecord<TResource["actions"]> & string;
+
+export interface IResourceDefaultActions {
   /**
    * The read action for the resource.
    * This action is used to retrieve a specific resource.
@@ -346,222 +1047,14 @@ export interface IResourceActions {
   all: IResourceAction;
 }
 
-/**
- * @interface IResourceActionName
- * Represents the name of an action that can be performed on a resource.
- * This type is a union of the action names defined in the `IResources` for a specific resource,
- * and the default action names defined in `IResourceActions`.
- *
- * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
- *
- * @example
- * ```typescript
- * // Assuming IResources is defined as follows:
- * // interface IResources {
- * //     users: {
- * //         actions: {
- * //             read: IResourceAction;
- * //             create: IResourceAction;
- * //             update: IResourceAction;
- * //             delete: IResourceAction;
- * //             customAction: IResourceAction;
- * //         };
- * //     };
- * // }
- *
- * // Then, IResourceActionName would be equivalent to:
- * // type IResourceActionName = "read" | "create" | "update" | "delete" | "customAction" | "all";
- * ```
- *
- * @typeParam ResourceName - The name of the resource.
- * @default IResourceName
- *
- * @typedef {keyof IResources[ResourceName]["actions"]} IResourceActionName
- */
-export type IResourceActionName<
-  ResourceName extends IResourceName = IResourceName,
-> = keyof ICheckIResources[ResourceName]["actions"] | keyof IResourceActions;
-
-/**
- * @interface IResourceActionTuple
- * Represents a tuple that contains a resource name and an action name.
- * This type is a union of two possible tuple formats: `IResourceActionTupleArray` and `IResourceActionTupleObject`.
- *
- * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
- *
- * @example
- * ```typescript
- * // Using IResourceActionTupleArray
- * const actionTuple: IResourceActionTuple = ["users", "read"];
- *
- * // Using IResourceActionTupleObject
- * const actionTuple: IResourceActionTuple = { resourceName: "users", action: "read" };
- * ```
- *
- * @typeParam ResourceName - The name of the resource.
- * @default IResourceName
- *
- * @typedef {(IResourceActionTupleArray<ResourceName> | IResourceActionTupleObject<ResourceName>)} IResourceActionTuple
- *
- * @see {@link IResourceActionTupleArray} for the `IResourceActionTupleArray` type.
- * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
- */
-export type IResourceActionTuple<
-  ResourceName extends IResourceName = IResourceName,
-> =
-  | IResourceActionTupleArray<ResourceName>
-  | IResourceActionTupleObject<ResourceName>;
-
-/**
- * @interface IResourceActionTupleArray
- * Represents a tuple that contains a resource name and an action name in an array format.
- * This type is a tuple with two elements: the resource name and the action name.
- *
- * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
- *
- * @example
- * ```typescript
- * const actionTuple: IResourceActionTupleArray = ["users", "read"];
- * ```
- *
- * @typeParam ResourceName - The name of the resource.
- * @default IResourceName
- *
- * @typedef {[ResourceName, IResourceActionName<ResourceName>]} IResourceActionTupleArray
- */
-export type IResourceActionTupleArray<
-  ResourceName extends IResourceName = IResourceName,
-> = [
-  /**
-   * The name of the resource.
-   *
-   * @type {ResourceName}
-   */
-  ResourceName,
-  /**
-   * The name of the action.
-   *
-   * @type {IResourceActionName<ResourceName>}
-   */
-  IResourceActionName<ResourceName>,
-];
-
-/**
- * @interface IResourceActionTupleObject
- * Represents a tuple that contains a resource name and an action name in an object format.
- * This type is an object with two properties: `resourceName` and `action`.
- *
- * @template ResourceName - The name of the resource. Defaults to `IResourceName`.
- *
- * @example
- * ```typescript
- * const actionTuple: IResourceActionTupleObject = { resourceName: "users", action: "read" };
- * ```
- *
- * @typeParam ResourceName - The name of the resource.
- * @default IResourceName
- *
- * @interface IResourceActionTupleObject
- */
-export interface IResourceActionTupleObject<
-  ResourceName extends IResourceName = IResourceName,
-> {
-  /**
-   * The name of the resource.
-   *
-   * @type {ResourceName}
-   */
-  resourceName: ResourceName;
-
-  /**
-   * The name of the action.
-   *
-   * @type {IResourceActionName<ResourceName>}
-   */
-  action: IResourceActionName<ResourceName>;
-}
-/**
- * @interface IResourceAction
- *
- * Represents the structure of an action that can be performed on a resource within the application.
- * This interface defines the essential properties that describe the action, allowing for a
- * consistent representation of actions across different resources.
- *
- * ### Properties
- *
- * - `label` (optional): A user-friendly label for the action. This label is typically
- *   displayed in the user interface (UI) to help users understand what the action does.
- *   It should be concise and descriptive.
- *
- * - `title` (optional): A short text that appears when the user hovers over the action
- *   in the UI. The title provides extra information about the action, helping users
- *   understand its purpose without cluttering the interface.
- *
- * ### Example Usage
- *
- * Here is an example of how the `IResourceAction` interface can be utilized:
- *
- * ```typescript
- * // Define a resource action for creating a new document
- * const createDocumentAction: IResourceAction = {
- *     label: "Create Document",
- *     title: "Click to add a new document."
- * };
- *
- * // Function to display action information
- * function displayActionInfo(action: IResourceAction) {
- *     console.log(`Action: ${action.label}`);
- *     console.log(`Title: ${action.title}`);
- * }
- *
- * // Example of displaying action information
- * displayActionInfo(createDocumentAction);
- * // Output:
- * // Action: Create Document
- * // Title: Create a new document in the system
- * // Tooltip: Click to add a new document.
- * ```
- *
- * ### Notes
- *
- * - The `IResourceAction` interface is designed to be flexible, allowing developers to
- *   define actions with varying levels of details based on the needs of their application.
- * - By providing clear labels, titles, and tooltips, developers can enhance the user
- *   experience and make the application more intuitive.
- */
-export interface IResourceAction {
-  label?: string;
-  title?: string;
-}
-
-/**
-   @interface The IResource interface represents the base structure for a resource in the application. 
-    A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
-    the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
-    Each resource usually has attributes such as a name, label, or title.
- * A **resource** can also be seen as an entity that contains data and can be referenced, displayed or manipulated
- * by the system.\n
- * this is a base interface for defining a resource in the application.
- * Common examples of resources are users, products, or database tables.
- * This interface provides the basic structure for a resource by defining key properties
- * such as `name`, `label`, and `title`, which are used for internal reference and UI display.
- *
- * @typeParam DataType - An optional type representing the data that this resource holds. Defaults to `any`.
- */
-/**
- * Represents a resource with a data provider and various metadata properties.
- *
- * @template DataType - The type of data the resource handles.
-
- * @property {IResourceDataService<DataType>} dataProvider - The data provider for the resource.
- * @property {IResourceName} [name] - The internal name of the resource used for programmatic referencing.
- * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
- * @property {string} [title] - A short text that appears when the user hovers over the resource, providing additional context.
- * @property {Partial<IResourceActions> & Record<string, IResourceAction>} [actions] - The actions associated with the resource.
- */
 export interface IResource<
+  Name extends IResourceName = IResourceName,
   DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+  Actions extends Record<string, IResourceAction> = Record<
+    string,
+    IResourceAction
+  >,
 > {
   /**
    * The internal name of the resource.
@@ -602,38 +1095,28 @@ export interface IResource<
    */
   title?: string;
 
-  /***
-   * The actions associated with the resource.
-   * This property is used to define the actions that can be performed on the resource.
-   * It is an object where each key represents an action name and the value is an object that contains the action's properties.
+  /**
+   * The actions associated with this resource.
+   * This is a well-typed record that preserves key inference while satisfying Record<string, IResourceAction>.
    *
    * @example
    * ```typescript
-   * const resourceActions = {
-   *     read: {
-   *         label: "Read Resource",
-   *         title: "Click to read a specific resource.",
-   *     },
-   *     create: {
-   *         label: "Create Resource",
-   *         title: "Click to create a new resource.",
-   *     },
-   *     update: {
-   *         label: "Update Resource",
-   *         title: "Click to update a specific resource.",
-   *     },
-   *     delete: {
-   *         label: "Delete Resource",
-   *         title: "Click to delete a specific resource.",
-   *     },
-   *     all: {
-   *         label: "All Actions",
-   *         title: "Click to perform all actions on the resource.",
-   *     },
+   * const userResource: IResource = {
+   *   actions: {
+   *     read: { label: "Read User" },
+   *     create: { label: "Create User" },
+   *     archive: { label: "Archive User" } // Custom action
+   *   }
    * };
+   *
+   * // TypeScript infers: "read" | "create" | "archive"
+   * type UserActionNames = IResourceGetActionNames<typeof userResource>;
+   *
+   * // Still compatible with generic Record<string, IResourceAction>
+   * const genericActions: Record<string, IResourceAction> = userResource.actions;
    * ```
    */
-  actions?: Partial<IResourceActions>;
+  actions: IResourceActionsRecord<Actions>;
 
   /***
    * The class name of the resource
@@ -700,188 +1183,187 @@ export type IResourcePrimaryKey = string | number | object;
 
 /**
  * @interface IResourceDataService
- * 
+ *
  * Represents a data provider interface for managing resources.
  * This interface defines methods for performing CRUD (Create, Read, Update, Delete)
  * operations on resources, allowing for flexible data management.
- * 
+ *
  * @template DataType - The type of the resource data being managed. Defaults to `any`,
  * allowing for flexibility in the type of data handled by the provider.
- * 
+ *
  * @template PrimaryKeyType - The type of the primary key used to identify resources.
- * 
- * 
+ *
+ *
  * ### Methods:
- * 
+ *
  * - **create(record: Partial<DataType>)**: Creates a new resource record.
  *   - **Parameters**:
  *     - `record`: The data for the new resource to be created.
- *   - **Returns**: A promise that resolves to an `DataType`, 
+ *   - **Returns**: A promise that resolves to an `DataType`,
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.create({ name: "New ResourceMetadata" });
  *     ```
- * 
+ *
  * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to update.
  *     - `updatedData`: An object containing the updated data for the resource.
- *   - **Returns**: A promise that resolves to an `DataType`, 
+ *   - **Returns**: A promise that resolves to an `DataType`,
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
  *     ```
- * 
+ *
  * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
  *   - **Parameters**:
- *     - `primaryKey`: The primary key of the resource to delete. 
+ *     - `primaryKey`: The primary key of the resource to delete.
  *     indicating the success or failure of the delete operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.delete("resourceId");
  *     ```
- * 
+ *
  * - **findOne(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
- *   - **Returns**: A promise that resolves to an `DataType | null`, 
+ *   - **Returns**: A promise that resolves to an `DataType | null`,
  *     containing the requested resource record or null if not found.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.findOne("resourceId");
  *     ```
- * 
+ *
  * - **findOneOrFail(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key or throws an error if not found.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
- *   - **Returns**: A promise that resolves to an `DataType`, 
+ *   - **Returns**: A promise that resolves to an `DataType`,
  *     containing the requested resource record.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.findOneOrFail("resourceId");
  *     ```
- * 
+ *
  * - **find(options?: IResourceQueryOptions<DataType>)**: Retrieves multiple resource records based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the results.
- *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+ *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`,
  *     containing the list of resource records.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.find({ limit: 10, skip: 0 });
  *     ```
- * 
+ *
  * - **findAndCount(options?: IResourceQueryOptions<DataType>)**: Retrieves multiple resource records and the total count based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the results.
- *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+ *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`,
  *     containing the list of resource records and the total count.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
  *     ```
- * 
+ *
  * - **createMany(data: Partial<DataType>[])**: Creates multiple resource records.
  *   - **Parameters**:
  *     - `data`: An array of data for the new resources to be created.
- *   - **Returns**: A promise that resolves to an `DataType[]`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`,
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.createMany([{ name: "ResourceMetadata 1" }, { name: "ResourceMetadata 2" }]);
  *     ```
- * 
+ *
  * - **updateMany(data: IResourceManyCriteria<PrimaryKeyType,DataType>)**: Updates multiple resource records.
  *   - **Parameters**:
  *     - `data`: An object containing the updated data for the resources.
- *   - **Returns**: A promise that resolves to an `DataType[]`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`,
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.updateMany({ status: "active" });
  *     ```
- * 
+ *
  * - **deleteMany(criteria: IResourceQueryOptions<DataType>)**: Deletes multiple resource records based on criteria.
  *   - **Parameters**:
  *     - `criteria`: The criteria to filter which resources to delete.
- *   - **Returns**: A promise that resolves to an `number`, 
+ *   - **Returns**: A promise that resolves to an `number`,
  *     indicating the success or failure of the delete operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
  *     ```
- * 
+ *
  * - **count(options?: IResourceQueryOptions<DataType>)**: Counts the total number of resource records based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the count.
- *   - **Returns**: A promise that resolves to an `number`, 
+ *   - **Returns**: A promise that resolves to an `number`,
  *     containing the total count of resource records.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.count({ filters: { status: "active" } });
  *     ```
- * 
+ *
  * - **exists(primaryKey: PrimaryKeyType)**: Checks if a resource record exists by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to check.
- *   - **Returns**: A promise that resolves to an `boolean`, 
+ *   - **Returns**: A promise that resolves to an `boolean`,
  *     indicating whether the resource exists.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.exists("resourceId");
  *     ```
- * 
+ *
  * - **distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType>)**: Retrieves distinct values for a specified field.
  *   - **Parameters**:
  *     - `field`: The field for which to retrieve distinct values.
  *     - `options`: Optional query options to filter the results.
- *   - **Returns**: A promise that resolves to an `DataType[]`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`,
  *     containing the distinct values.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.distinct("category");
  *     ```
- * 
+ *
  * - **aggregate?(pipeline: any[])**: Performs aggregation operations on the resource data.
  *   - **Parameters**:
  *     - `pipeline`: An array representing the aggregation pipeline.
- *   - **Returns**: A promise that resolves to an `number`, 
+ *   - **Returns**: A promise that resolves to an `number`,
  *     containing the aggregated results.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.aggregate([{ $group: { _id: "$category", count: { $sum: 1 } } }]);
  *     ```
- * 
+ *
  * ### Notes:
  * - This interface provides a standard way to interact with resource data,
  *   ensuring that all operations return consistent results.
  * - The use of promises allows for asynchronous operations, making it suitable
  *   for use in modern web applications.
- * 
+ *
  * ### Example Usage:
  * Here’s how you might implement the `IResourceDataService` interface:
- * 
+ *
  * ```typescript
  * class MyDataProvider implements IResourceDataService<MyResourceType> {
  *     async create(record: MyResourceType) {
  *         // Implementation for creating a resource
  *     }
- * 
+ *
  *     async list() {
  *         // Implementation for fetching resources
  *     }
- * 
+ *
  *     // Implement other methods...
  * }
  * ```
- * 
+ *
  * ### Summary:
  * The `IResourceDataService` interface defines a comprehensive set of methods
  * for managing resources, facilitating CRUD operations and ensuring a consistent
  * approach to data handling in applications.
-
  */
 export interface IResourceDataService<
   DataType = unknown,
@@ -1385,20 +1867,211 @@ export interface IResourcePaginationMetaData {
 }
 
 /**
- * @interface IResourceDefaultEvent
- * Represents the default events that can be triggered for a resource.
- * This type is a union of custom action names (`IResourceActionName`) and keys from the `IResourceDataService`.
+ * Type representing default events that can occur on a resource.
+ * This includes both action names and data service method names.
+ *
+ * This type combines resource-specific action names with standard data service
+ * operations to provide a comprehensive set of events that can be tracked or
+ * handled for a given resource. It's useful for event-driven architectures,
+ * logging, auditing, and reactive systems.
+ *
+ * @type IResourceDefaultEvent
+ * @template ResourceName - The name of the resource
  *
  * @example
  * ```typescript
- * const event: IResourceDefaultEvent = "create"; // Example of a resource action name
- * const event: IResourceDefaultEvent = "update"; // Example of a key from IResourceDataService
+ * // Basic usage - event type for a specific resource
+ * import "@resk/core";
+ *
+ * declare module "@resk/core" {
+ *   interface IResources {
+ *     users: {
+ *       actions: {
+ *         read: { label: "Read User" };
+ *         create: { label: "Create User" };
+ *         update: { label: "Update User" };
+ *         archive: { label: "Archive User" };
+ *       }
+ *     };
+ *   }
+ * }
+ *
+ * // All possible events for the users resource
+ * type UserEvent = IResourceDefaultEvent<"users">;
+ * // Result: "read" | "create" | "update" | "archive" | "create" | "update" | "delete" | "findOne" | "find" | ...
+ *
+ * // Note: Includes both resource actions and data service methods
  * ```
  *
- * @typedef {string} IResourceDefaultEvent
+ * @example
+ * ```typescript
+ * // Event-driven resource management
+ * class ResourceEventEmitter<ResourceName extends IResourceName> {
+ *   private listeners = new Map<IResourceDefaultEvent<ResourceName>, Function[]>();
+ *
+ *   on(event: IResourceDefaultEvent<ResourceName>, listener: Function) {
+ *     const current = this.listeners.get(event) || [];
+ *     current.push(listener);
+ *     this.listeners.set(event, current);
+ *   }
+ *
+ *   emit(event: IResourceDefaultEvent<ResourceName>, data?: any) {
+ *     const listeners = this.listeners.get(event) || [];
+ *     listeners.forEach(listener => listener(data));
+ *   }
+ * }
+ *
+ * // Usage
+ * const userEmitter = new ResourceEventEmitter<"users">();
+ *
+ * userEmitter.on("create", (userData) => {
+ *   console.log("User created:", userData);
+ *   // Send welcome email, update analytics, etc.
+ * });
+ *
+ * userEmitter.on("findOne", (userId) => {
+ *   console.log("User accessed:", userId);
+ *   // Log access, update last accessed time, etc.
+ * });
+ *
+ * // Trigger events
+ * userEmitter.emit("create", { id: 1, name: "John" });
+ * userEmitter.emit("findOne", 1);
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Audit logging with typed events
+ * interface AuditLog<ResourceName extends IResourceName> {
+ *   resource: ResourceName;
+ *   event: IResourceDefaultEvent<ResourceName>;
+ *   userId: string;
+ *   timestamp: Date;
+ *   data?: any;
+ * }
+ *
+ * class ResourceAuditor {
+ *   private logs: AuditLog<IResourceName>[] = [];
+ *
+ *   log<ResourceName extends IResourceName>(
+ *     resource: ResourceName,
+ *     event: IResourceDefaultEvent<ResourceName>,
+ *     userId: string,
+ *     data?: any
+ *   ) {
+ *     this.logs.push({
+ *       resource,
+ *       event,
+ *       userId,
+ *       timestamp: new Date(),
+ *       data
+ *     });
+ *   }
+ *
+ *   getLogsForResource<ResourceName extends IResourceName>(
+ *     resource: ResourceName
+ *   ): AuditLog<ResourceName>[] {
+ *     return this.logs.filter(log => log.resource === resource) as AuditLog<ResourceName>[];
+ *   }
+ * }
+ *
+ * // Usage
+ * const auditor = new ResourceAuditor();
+ *
+ * auditor.log("users", "create", "user123", { name: "John Doe" });
+ * auditor.log("users", "update", "user456", { id: 1, name: "Jane Doe" });
+ * auditor.log("users", "find", "user789"); // Data service method
+ *
+ * const userLogs = auditor.getLogsForResource("users");
+ * // TypeScript knows these are user-related events
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Reactive resource hooks
+ * function useResourceEvent<ResourceName extends IResourceName>(
+ *   resource: ResourceName,
+ *   event: IResourceDefaultEvent<ResourceName>,
+ *   callback: (data?: any) => void
+ * ) {
+ *   // Implementation would set up event listeners
+ *   console.log(`Setting up ${event} listener for ${resource}`);
+ *   // Return cleanup function, etc.
+ * }
+ *
+ * // Usage in a React-like component
+ * function UserComponent() {
+ *   // Type-safe event handling
+ *   useResourceEvent("users", "create", (userData) => {
+ *     console.log("New user created:", userData);
+ *     // Update UI, refresh data, etc.
+ *   });
+ *
+ *   useResourceEvent("users", "update", (updateData) => {
+ *     console.log("User updated:", updateData);
+ *     // Refresh user data, show notification, etc.
+ *   });
+ *
+ *   useResourceEvent("users", "findOne", (userId) => {
+ *     console.log("User profile viewed:", userId);
+ *     // Track analytics, etc.
+ *   });
+ *
+ *   return <div>User Management Component</div>;
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Middleware system with typed events
+ * type MiddlewareFn<ResourceName extends IResourceName> = (
+ *   event: IResourceDefaultEvent<ResourceName>,
+ *   data: any,
+ *   next: () => void
+ * ) => void;
+ *
+ * class ResourceMiddleware<ResourceName extends IResourceName> {
+ *   private middlewares: MiddlewareFn<ResourceName>[] = [];
+ *
+ *   use(middleware: MiddlewareFn<ResourceName>) {
+ *     this.middlewares.push(middleware);
+ *   }
+ *
+ *   async execute(event: IResourceDefaultEvent<ResourceName>, data: any) {
+ *     let index = 0;
+ *
+ *     const next = () => {
+ *       if (index < this.middlewares.length) {
+ *         this.middlewares[index++](event, data, next);
+ *       }
+ *     };
+ *
+ *     next();
+ *   }
+ * }
+ *
+ * // Usage
+ * const userMiddleware = new ResourceMiddleware<"users">();
+ *
+ * userMiddleware.use((event, data, next) => {
+ *   console.log(`Pre-${event} validation`);
+ *   // Validate permissions, data, etc.
+ *   next();
+ * });
+ *
+ * userMiddleware.use((event, data, next) => {
+ *   console.log(`Post-${event} logging`);
+ *   // Log the event, send notifications, etc.
+ *   next();
+ * });
+ *
+ * // Execute middleware for events
+ * userMiddleware.execute("create", { name: "John" });
+ * userMiddleware.execute("findOne", 123);
+ * ```
  */
-export type IResourceDefaultEvent =
-  | (IResourceActionName & string)
+export type IResourceDefaultEvent<ResourceName extends IResourceName> =
+  | IResourceActionName<ResourceName>
   | keyof IResourceDataService;
 
 /**

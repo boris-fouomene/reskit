@@ -1,4 +1,8 @@
-import { IResourceActionName, IResourceActionTuple, IResourceName } from "@resources/types";
+import {
+  IResourceActionName,
+  IResourceActionTuple,
+  IResourceName,
+} from "@resources/types";
 import { IDict } from "../types/dictionary";
 /**
  * @interface IAuthUser
@@ -252,7 +256,11 @@ export interface IAuthSessionStorage {
  * @see {@link IResourceName} for the `IResourceName` type.
  * @typedef {((user: IAuthUser) => boolean) | false | IResourceActionTuple<ResourceName> | IResourceActionTuple<ResourceName>[]} IAuthPerm
  */
-export type IAuthPerm<ResourceName extends IResourceName = IResourceName> = ((user: IAuthUser) => boolean) | false | IResourceActionTuple<ResourceName> | IResourceActionTuple<ResourceName>[];
+export type IAuthPerm<ResourceName extends IResourceName = IResourceName> =
+  | ((user: IAuthUser) => boolean)
+  | false
+  | IResourceActionTuple<ResourceName>
+  | IResourceActionTuple<ResourceName>[];
 
 /**
  * Represents a mapping of authentication permissions for resources.

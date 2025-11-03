@@ -1,13 +1,25 @@
-import { i18n } from "../i18n";
-import { Session as $session } from "../session";
-import { IResourceActionName, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "@resources/types";
-import { IDict } from "../types/dictionary";
-import { isObj, JsonHelper, isNonNullString, stringify } from "../utils";
 import { IObservable, observable } from "@/observable";
-import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
-import "./types";
+import {
+  IResourceActionName,
+  IResourceActionTupleArray,
+  IResourceActionTupleObject,
+  IResourceName,
+} from "@resources/types";
 import CryptoJS from "crypto-js";
+import { i18n } from "../i18n";
 import { Logger } from "../logger";
+import { Session as $session } from "../session";
+import { IDict } from "../types/dictionary";
+import { isNonNullString, isObj, JsonHelper, stringify } from "../utils";
+import "./types";
+import {
+  IAuthEvent,
+  IAuthPerm,
+  IAuthPerms,
+  IAuthRole,
+  IAuthSessionStorage,
+  IAuthUser,
+} from "./types";
 
 export * from "./types";
 
@@ -287,7 +299,9 @@ export class Auth {
   static isMasterAdmin?: (user?: IAuthUser) => boolean;
   private static _isMasterAdmin(user?: IAuthUser): boolean {
     user = isObj(user) ? user : (Auth.getSignedUser() as IAuthUser);
-    return typeof Auth.isMasterAdmin == "function" ? Auth.isMasterAdmin(user) : false;
+    return typeof Auth.isMasterAdmin == "function"
+      ? Auth.isMasterAdmin(user)
+      : false;
   }
 
   /**
@@ -598,7 +612,9 @@ export class Auth {
       if (isObj(uToSave)) {
         uToSave.authSessionCreatedAt = new Date().getTime();
       }
-      encrypted = uToSave ? encrypt(JSON.stringify(uToSave), SESSION_ENCRYPT_KEY).toString() : null;
+      encrypted = uToSave
+        ? encrypt(JSON.stringify(uToSave), SESSION_ENCRYPT_KEY).toString()
+        : null;
     } catch (e) {
       Auth.localUserRef.current = null;
       Logger.log(e, " setting local user");
@@ -795,7 +811,10 @@ export class Auth {
    * - Compatible with SSR/SPA applications through secure session storage
    * - Supports both traditional and modern authentication workflows
    */
-  static async signIn(user: IAuthUser, triggerEvent: boolean = true): Promise<IAuthUser> {
+  static async signIn(
+    user: IAuthUser,
+    triggerEvent: boolean = true
+  ): Promise<IAuthUser> {
     if (!isObj(user)) {
       throw new Error(i18n.t("auth.invalidSignInUser"));
     }
@@ -1021,11 +1040,30 @@ export class Auth {
     return await Auth.setSignedUser(null, triggerEvent);
   }
 
-  private static isResourceActionTupleArray<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>): perm is IResourceActionTupleArray<ResourceName> {
-    return Array.isArray(perm) && perm.length === 2 && isNonNullString(perm[0]) && isNonNullString(perm[1]);
+  private static isResourceActionTupleArray<
+    ResourceName extends IResourceName = IResourceName,
+  >(
+    perm: IAuthPerm<ResourceName>
+  ): perm is IResourceActionTupleArray<ResourceName> {
+    return (
+      Array.isArray(perm) &&
+      perm.length === 2 &&
+      isNonNullString(perm[0]) &&
+      isNonNullString(perm[1])
+    );
   }
-  private static isResourceActionTupleObject<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>): perm is IResourceActionTupleObject<ResourceName> {
-    return !Array.isArray(perm) && typeof perm === "object" && isObj(perm) && isNonNullString(perm.resourceName) && isNonNullString(perm.action);
+  private static isResourceActionTupleObject<
+    ResourceName extends IResourceName = IResourceName,
+  >(
+    perm: IAuthPerm<ResourceName>
+  ): perm is IResourceActionTupleObject<ResourceName> {
+    return (
+      !Array.isArray(perm) &&
+      typeof perm === "object" &&
+      isObj(perm) &&
+      isNonNullString(perm.resourceName) &&
+      isNonNullString(perm.action)
+    );
   }
   /**
    * Determines whether a user has permission to access a resource or perform an action.
@@ -1131,18 +1169,23 @@ export class Auth {
    * @since 1.0.0
    * @public
    */
-  static isAllowed<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>, user?: IAuthUser): boolean {
+  static isAllowed<ResourceName extends IResourceName = IResourceName>(
+    perm: IAuthPerm<ResourceName>,
+    user?: IAuthUser
+  ): boolean {
     user = Object.assign({}, user || (Auth.getSignedUser() as IAuthUser));
     if (typeof perm === "boolean") return perm;
     if (Auth._isMasterAdmin(user)) return true;
     if (!perm) return true;
     if (typeof perm === "function") return !!perm(user);
     if (Auth.isResourceActionTupleObject(perm)) {
-      if (Auth.checkUserPermission(user, perm.resourceName, perm.action as IResourceActionName)) {
+      if (
+        Auth.checkUserPermission(user, perm.resourceName, perm.action as any)
+      ) {
         return true;
       }
     } else if (Auth.isResourceActionTupleArray(perm)) {
-      if (Auth.checkUserPermission(user, perm[0], perm[1] as IResourceActionName)) {
+      if (Auth.checkUserPermission(user, perm[0], perm[1] as any)) {
         return true;
       }
     } else if (Array.isArray(perm)) {
@@ -1428,15 +1471,29 @@ export class Auth {
    * - Does not throw exceptions, making it safe for use in conditional statements
    * - Logs errors internally for debugging purposes without exposing sensitive information
    */
-  static checkUserPermission(user: IAuthUser, resource: IResourceName, action: IResourceActionName = "read") {
+  static checkUserPermission<
+    ResourceName extends IResourceName = IResourceName,
+  >(
+    user: IAuthUser,
+    resource: ResourceName,
+    action: IResourceActionName = "read"
+  ) {
     if (!isObj(user) || !user) return false;
-    if (isObj(user.perms) && user.perms && Auth.checkPermission(user.perms, resource, action)) {
+    if (
+      isObj(user.perms) &&
+      user.perms &&
+      Auth.checkPermission(user.perms, resource, action)
+    ) {
       return true;
     }
     if (Array.isArray(user?.roles)) {
       for (let i in user.roles) {
         const role = user.roles[i];
-        if (isObj(role) && isObj(role.perms) && Auth.checkPermission(role.perms, resource, action)) {
+        if (
+          isObj(role) &&
+          isObj(role.perms) &&
+          Auth.checkPermission(role.perms, resource, action)
+        ) {
           return true;
         }
       }
@@ -1715,7 +1772,11 @@ export class Auth {
    * - Provides meaningful return values that can be safely used in conditional statements
    * - Logs internal errors for debugging without exposing sensitive permission details
    */
-  static checkPermission(perms: IAuthPerms, resource: IResourceName, action: IResourceActionName = "read") {
+  static checkPermission(
+    perms: IAuthPerms,
+    resource: IResourceName,
+    action: IResourceActionName = "read"
+  ) {
     perms = Object.assign({}, perms);
     resource = isNonNullString(resource) ? resource : ("" as IResourceName);
     if (!isObj(perms) || !resource) {
@@ -1725,7 +1786,10 @@ export class Auth {
     action = isNonNullString(action) ? action : "read";
     let userActions: IResourceActionName[] = [];
     for (let i in perms) {
-      if (String(i).toLowerCase().trim() === resourceStr && Array.isArray(perms[i as keyof IAuthPerms])) {
+      if (
+        String(i).toLowerCase().trim() === resourceStr &&
+        Array.isArray(perms[i as keyof IAuthPerms])
+      ) {
         userActions = perms[i as keyof IAuthPerms] as IResourceActionName[];
         break;
       }
@@ -1978,11 +2042,17 @@ export class Auth {
    * - Validate edge cases (empty strings, null, undefined)
    * - Ensure consistent behavior across different JavaScript environments
    */
-  static isAllowedForAction<ResourceName extends IResourceName = IResourceName>(permission: IResourceActionName<ResourceName>, action: IResourceActionName<ResourceName>) {
+  static isAllowedForAction<ResourceName extends IResourceName = IResourceName>(
+    permission: IResourceActionName<ResourceName>,
+    action: IResourceActionName<ResourceName>
+  ) {
     if (!isNonNullString(action) || !isNonNullString(permission)) {
       return false;
     }
-    return String(action).trim().toLowerCase() === String(permission).trim().toLowerCase();
+    return (
+      String(action).trim().toLowerCase() ===
+      String(permission).trim().toLowerCase()
+    );
   }
 
   /**

@@ -42,9 +42,10 @@ const resourcesMetaDataKey = Symbol("resources");
 const resourcesClassNameMetaData = Symbol("resourceFromClassName");
 
 export abstract class Resource<
+  Name extends IResourceName = IResourceName,
   DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
-  EventType = IResourceDefaultEvent,
+  EventType = IResourceDefaultEvent<Name>,
 > {
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
@@ -59,14 +60,16 @@ export abstract class Resource<
     );
     this.init();
   }
-  actions?: Partial<IResourceActions>;
-  getMetaData(): IResource<DataType> {
+  actions?: Partial<IResourceActions<Name>>;
+  getMetaData(): IResource<Name, DataType> {
     return Object.assign(
       {},
       Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor)
     );
   }
-  static events = observableFactory<IResourceDefaultEvent | string>();
+  static events = observableFactory<
+    IResourceDefaultEvent<IResourceName> | string
+  >();
   /**
    * The internal name of the resource.
    *
@@ -185,7 +188,7 @@ export abstract class Resource<
    * When the event is triggered, the events observable is also triggered.
    * @param args - The arguments to pass to the event.
    */
-  trigger(event: EventType | IResourceDefaultEvent, ...args: any[]) {
+  trigger(event: EventType | IResourceDefaultEvent<Name>, ...args: any[]) {
     Resource.events.trigger(event as any, this.getResourceContext(), ...args);
   }
   /**
@@ -204,7 +207,7 @@ export abstract class Resource<
    * await resource.authorizeAction('create');
    * ```
    */
-  async authorizeAction(action: IResourceActionName): Promise<void> {
+  async authorizeAction(action: IResourceActionName<Name>): Promise<void> {
     if (!this.hasDataService()) {
       throw new Error(this.INVALID_DATA_PROVIDER_ERROR);
     }
@@ -226,7 +229,7 @@ export abstract class Resource<
         break;
       default:
         // For custom actions, check if user is allowed
-        hasPermission = this.isAllowed(action as IResourceActionName);
+        hasPermission = this.isAllowed(action as IResourceActionName<Name>);
         break;
     }
 
@@ -591,7 +594,9 @@ export abstract class Resource<
         });
     });
   }
-  updateMetadata(options: IResource<DataType>): IResource<DataType> {
+  updateMetadata(
+    options: IResource<Name, DataType>
+  ): IResource<Name, DataType> {
     options = Object.assign({}, options);
     const metadata = extendObj({}, this.getMetaData(), options);
     Reflect.defineMetadata(
@@ -702,18 +707,18 @@ export abstract class Resource<
   /**
    * Retrieves the name of the resource.
    * Alias for getResourceName
-   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
+   * @returns {Name} The name of the resource, cast to the Name type.
    */
-  getName(): IResourceName {
+  getName(): Name {
     return this.getResourceName();
   }
   /**
    * Retrieves the name of the resource.
    *
-   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
+   * @returns {Name} The name of the resource, cast to the Name type.
    */
-  getResourceName(): IResourceName {
-    return defaultStr(this.getMetaData().name, this.name) as IResourceName;
+  getResourceName(): Name {
+    return defaultStr(this.getMetaData().name, this.name) as Name;
   }
   /**
    * Retrieves the actions associated with the resource.
@@ -722,7 +727,7 @@ export abstract class Resource<
    *
    * @returns  The map of resource actions.
    */
-  getActions(): Partial<IResourceActions> {
+  getActions(): Partial<IResourceActions<Name>> {
     if (!isObj(this.actions) || !this.actions) {
       this.actions = {};
     }
@@ -733,7 +738,7 @@ export abstract class Resource<
    * @param action - The action to check
    * @returns true if the action exists, false otherwise
    */
-  hasAction(action: IResourceActionName): boolean {
+  hasAction(action: string): action is IResourceActionName<Name> {
     if (!isNonNullString(action)) return false;
     const actions = this.getActions();
     return (
@@ -759,22 +764,17 @@ export abstract class Resource<
    * 5. If the action is "all" or matches any of the resource's actions, it returns true.
    * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
    */
-  isAllowed<ResourceName extends IResourceName = IResourceName>(
-    action?:
-      | IResourceActionName<ResourceName>
-      | IResourceActionName<ResourceName>[],
+  isAllowed(
+    action?: IResourceActionName<Name> | IResourceActionName<Name>[],
     user?: IAuthUser
   ): boolean {
-    const perms: IResourceActionTupleArray[] = [];
+    const perms: IResourceActionTupleArray<Name>[] = [];
     if (isNonNullString(action)) {
-      perms.push([
-        this.getName(),
-        action as IResourceActionName<IResourceName>,
-      ]);
+      perms.push([this.getName(), action as IResourceActionName<Name>]);
     } else if (Array.isArray(action)) {
       action.forEach((a) => {
         if (isNonNullString(a)) {
-          perms.push([this.getName(), a as IResourceActionName<IResourceName>]);
+          perms.push([this.getName(), a as IResourceActionName<Name>]);
         }
       });
     }
@@ -923,7 +923,7 @@ export abstract class Resource<
    * @returns The formatted action label.
    */
   getActionLabel(
-    actionName: IResourceActionName,
+    actionName: IResourceActionName<Name>,
     params?: Record<string, any>
   ) {
     return this.sprintf(this.getAction(actionName)?.label, params);
@@ -936,7 +936,7 @@ export abstract class Resource<
    * @returns The formatted title of the specified action.
    */
   getActionTitle(
-    actionName: IResourceActionName,
+    actionName: IResourceActionName<Name>,
     params?: Record<string, any>
   ) {
     return this.sprintf(this.getAction(actionName)?.title, params);
@@ -944,17 +944,13 @@ export abstract class Resource<
   /**
    * Retrieves a specific action by its name.
    *
-   * @param {IResourceActionName} actionName - The name of the action to retrieve.
+   * @param {IResourceActionName<Name>} actionName - The name of the action to retrieve.
    * @returns {IResourceAction} The action object if found, otherwise an empty object.
    */
-  getAction(actionName: IResourceActionName): IResourceAction {
+  getAction(actionName: IResourceActionName<Name>): IResourceAction {
     if (!isNonNullString(actionName)) return {};
     const actions = this.getActions();
-    return (
-      (isObj(actions[actionName as keyof IResourceActions]) &&
-        actions[actionName as keyof IResourceActions]) ||
-      {}
-    );
+    return (isObj(actions[actionName]) && actions[actionName]) || {};
   }
 
   /**
@@ -980,7 +976,7 @@ export abstract class Resource<
  *
  * The `ResourcesManager` class provides static methods to store, retrieve, and manage resource instances.
  * It maintains a global record of all instantiated resources, allowing for easy access and management.
- * Each resource is identified by a unique name, which is derived from the `IResourceName` type.
+ * Each resource is identified by a unique name, which is derived from the `Name` type.
  *
  * @example
  * // Instantiate and add resources to the manager
@@ -1021,9 +1017,9 @@ export class ResourcesManager {
    * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
    *
-   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
+   * @returns {Record<IResourceName, IResource>} A copy of the resource metaData record.
    */
-  public static getAllMetaData(): Record<IResourceName, IResource<any>> {
+  public static getAllMetaData(): Record<IResourceName, IResource> {
     return Object.assign(
       {},
       Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager)
@@ -1036,12 +1032,9 @@ export class ResourcesManager {
    * The updated record is then stored as metadata on the `ResourcesManager` class.
    *
    * @param {IResourceName} resourceName - The unique name of the resource.
-   * @param {IResource<any>} metaData - The resource metaData to be associated with the given `resourceName`.
+   * @param {IResource} metaData - The resource metaData to be associated with the given `resourceName`.
    */
-  public static addMetaData(
-    resourceName: IResourceName,
-    metaData: IResource<any>
-  ) {
+  public static addMetaData(resourceName: IResourceName, metaData: IResource) {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     metaData = Object.assign({}, metaData);
@@ -1099,11 +1092,11 @@ export class ResourcesManager {
    * non-null string, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
-   * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
+   * @returns {IResource | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
   public static getMetaDataFromName(
     resourceName: IResourceName
-  ): IResource<any> | undefined {
+  ): IResource | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
@@ -1120,7 +1113,7 @@ export class ResourcesManager {
    */
   public static getMetaDataFromTarget(
     target: IClassConstructor
-  ): IResource<any> | undefined {
+  ): IResource | undefined {
     return Object.assign(
       {},
       Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype)
@@ -1139,7 +1132,7 @@ export class ResourcesManager {
    */
   public static getMetaDataByClassName(
     className: string
-  ): IResource<any> | undefined {
+  ): IResource | undefined {
     const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaDataFromName(resourceName);
@@ -1198,7 +1191,7 @@ export class ResourcesManager {
    * Adds a new resource instance to the manager.
    *
    * @param {IResourceName} name - The unique name of the resource to add.
-   * @param {Resource<DataType>} resource - The resource instance to be added.
+   * @param {Resource<Name,DataType>} resource - The resource instance to be added.
    * @template DataType The type of data associated with the resource.
    *
    * @example
@@ -1206,9 +1199,9 @@ export class ResourcesManager {
    * ResourcesManager.addResource('productResource', productResource);
    * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
    */
-  public static addResource<DataType = unknown>(
-    name: IResourceName,
-    resource: Resource<DataType>
+  public static addResource<Name extends IResourceName, DataType = unknown>(
+    name: Name,
+    resource: Resource<Name, DataType>
   ) {
     if (
       typeof name === "string" &&
@@ -1293,26 +1286,27 @@ export class ResourcesManager {
  * ```
  */
 export function ResourceMetadata<
+  Name extends IResourceName = IResourceName,
   DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
 >(
-  metaData?: IResource<DataType, PrimaryKeyType> & {
+  metaData?: IResource<Name, DataType, PrimaryKeyType> & {
     /***
      * whether the resource should be instanciated or not
      */
     instanciate?: boolean;
   }
 ) {
-  return function (target: typeof Resource<DataType, PrimaryKeyType>) {
+  return function (target: typeof Resource<Name, DataType, PrimaryKeyType>) {
     metaData = Object.assign({}, metaData);
     metaData.className = defaultStr(metaData.className, target?.name);
     if (typeof target == "function") {
       if (metaData?.instanciate) {
         try {
-          const resource = new (target as any)() as Resource<DataType>;
+          const resource = new (target as any)() as Resource<Name, DataType>;
           resource.updateMetadata(metaData);
-          ResourcesManager.addResource<DataType>(
-            metaData.name as IResourceName,
+          ResourcesManager.addResource<Name, DataType>(
+            metaData.name as any,
             resource
           );
         } catch {}
@@ -1322,28 +1316,3 @@ export function ResourceMetadata<
     ResourcesManager.addMetaData(metaData.name as IResourceName, metaData);
   };
 }
-
-/**
- * @interface {IResourceInferPrimaryKey}
- * Infers the primary key type of a resource.
- *
- * This type is used to extract the primary key type from a resource.
- * It uses the `infer` keyword to infer the type of the primary key.
- *
- * @template ResourceType The type of the resource.
- * @description
- * This type is useful when you need to access the primary key type of a resource
- * without having to manually specify it.
- *
- * @example
- * ```typescript
- * class MyResource extends Resource<MyData, MyPrimaryKey> {}
- *
- * type MyPrimaryKeyType = IResourceInferPrimaryKey<typeof MyResource>;
- * // MyPrimaryKeyType is now MyPrimaryKey
- * ```
- *
- * @returns The inferred primary key type of the resource.
- */
-export type IResourceInferPrimaryKey<ResourceType extends Resource<any, any>> =
-  ResourceType extends Resource<any, infer S> ? S : IResourcePrimaryKey;

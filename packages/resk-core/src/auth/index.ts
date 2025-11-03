@@ -623,7 +623,8 @@ export class Auth {
       const event = isObj(uToSave) && isObj(encrypted) ? "SIGN_IN" : "SIGN_OUT";
       Auth.events.trigger(event, uToSave);
     }
-    return await $session.set(USER_SESSION_KEY, encrypted);
+    await $session.set(USER_SESSION_KEY, encrypted);
+    return u;
   }
 
   /**
@@ -818,7 +819,7 @@ export class Auth {
     if (!isObj(user)) {
       throw new Error(i18n.t("auth.invalidSignInUser"));
     }
-    return await Auth.setSignedUser(user, triggerEvent);
+    return (await Auth.setSignedUser(user, triggerEvent)) as IAuthUser;
   }
 
   /**
@@ -1036,7 +1037,7 @@ export class Auth {
    * - Consider implementing cross-tab communication for better user experience
    * - Be careful with silent sign-outs in multi-tab scenarios to avoid confusion
    */
-  static async signOut(triggerEvent: boolean = true): Promise<void> {
+  static async signOut(triggerEvent: boolean = true) {
     return await Auth.setSignedUser(null, triggerEvent);
   }
 
@@ -1476,7 +1477,7 @@ export class Auth {
   >(
     user: IAuthUser,
     resource: ResourceName,
-    action: IResourceActionName = "read"
+    action: IResourceActionName<ResourceName> = "read"
   ) {
     if (!isObj(user) || !user) return false;
     if (
@@ -1530,6 +1531,8 @@ export class Auth {
    * - **Efficient Iteration**: Stops processing at the first matching permission
    * - **Memory Safety**: Creates defensive copies of input objects to prevent mutation
    * - **Minimal Processing**: Only processes relevant permission entries
+   *
+   * @template ResourceName - The resource name type constraint extending IResourceName
    *
    * @param perms - The permission object containing resource-to-actions mappings.
    *                Must be a valid `IAuthPerms` object where keys are resource names
@@ -1772,13 +1775,13 @@ export class Auth {
    * - Provides meaningful return values that can be safely used in conditional statements
    * - Logs internal errors for debugging without exposing sensitive permission details
    */
-  static checkPermission(
+  static checkPermission<ResourceName extends IResourceName = IResourceName>(
     perms: IAuthPerms,
-    resource: IResourceName,
-    action: IResourceActionName = "read"
+    resource: ResourceName,
+    action: IResourceActionName<ResourceName> = "read"
   ) {
     perms = Object.assign({}, perms);
-    resource = isNonNullString(resource) ? resource : ("" as IResourceName);
+    resource = (isNonNullString(resource) ? resource : "") as ResourceName;
     if (!isObj(perms) || !resource) {
       return false;
     }
@@ -1799,7 +1802,7 @@ export class Auth {
       return true;
     }
     for (let i in userActions) {
-      if (Auth.isAllowedForAction(userActions[i], action)) {
+      if (Auth.isAllowedForAction<ResourceName>(userActions[i], action)) {
         return true;
       }
     }
@@ -1835,7 +1838,7 @@ export class Auth {
    *
    * @template ResourceName - The resource name type constraint extending IResourceName
    *
-   * @param permission - The permission action to check against.
+   * @param permFromResource - The permission action to check against.
    *                     Must be a valid string conforming to `IResourceActionName<ResourceName>`.
    *                     This represents the action that is granted by a permission entry.
    *                     Examples: "read", "write", "delete", "create", "all", "custom_action".
@@ -2043,15 +2046,15 @@ export class Auth {
    * - Ensure consistent behavior across different JavaScript environments
    */
   static isAllowedForAction<ResourceName extends IResourceName = IResourceName>(
-    permission: IResourceActionName<ResourceName>,
+    permFromResource: IResourceActionName<ResourceName>,
     action: IResourceActionName<ResourceName>
   ) {
-    if (!isNonNullString(action) || !isNonNullString(permission)) {
+    if (!isNonNullString(action) || !isNonNullString(permFromResource)) {
       return false;
     }
     return (
       String(action).trim().toLowerCase() ===
-      String(permission).trim().toLowerCase()
+      String(permFromResource).trim().toLowerCase()
     );
   }
 

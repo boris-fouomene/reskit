@@ -299,17 +299,7 @@ export type IAuthPerm<ResourceName extends IResourceName = IResourceName> =
  * @typedef {Partial<{ [ResourceName in IResourceName]: Partial<IResourceActionName<ResourceName>[]> }>} IAuthPerms
  */
 export type IAuthPerms = Partial<{
-  /**
-   * Each key in the object is a resource name.
-   *
-   * @type {[ResourceName in IResourceName]}
-   */
-  [ResourceName in IResourceName]: /**
-   * Each value is a partial array of action names for the corresponding resource.
-   *
-   * @type {Partial<IResourceActionName<ResourceName>[]>}
-   */
-  Partial<IResourceActionName<ResourceName>[]>;
+  [ResourceName in IResourceName]: Partial<IResourceActionName<ResourceName>[]>;
 }>;
 
 /**

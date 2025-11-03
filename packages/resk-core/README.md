@@ -11,7 +11,7 @@
 
 ## 🚀 Key **Features**
 
-- **Decorator-Driven ResourceMetadata Management**: Use decorators to intuitively define and manage resources, resulting in cleaner, more expressive code.
+- **Decorator-Driven ResourceMeta Management**: Use decorators to intuitively define and manage resources, resulting in cleaner, more expressive code.
 - **Modular Architecture**: Treat every component as a resource, promoting reusability and better organization of application logic.
 - **Extensible Framework**: Effortlessly extend core functionalities by adding custom field types, decorators, and plugins tailored to specific project needs.
 - **Customizable Field Types**: Support for various built-in field types (such as number, dropdown, selectResource) that can be customized with specific properties for flexible data handling.
@@ -79,7 +79,7 @@ import "reflect-metadata";
 
 ### Resources
 
-- **Resources** are the foundation of ResKit. Use the `@ResourceMetadata` decorator to define any logical entity (models, components, etc.).
+- **Resources** are the foundation of ResKit. Use the `@ResourceMeta` decorator to define any logical entity (models, components, etc.).
 - **Fields**: Add fields to your resources using the `@Field` decorator, specifying field types and options.
 
 ### Built-In Field Types
@@ -97,9 +97,9 @@ Once you have installed the necessary packages and set up TypeScript, you can st
 
 ```typescript
 import "reflect-metadata";
-import { ResourceMetadata, Field } from "@resk";
+import { ResourceMeta, Field } from "@resk";
 
-@ResourceMetadata()
+@ResourceMeta()
 class User {
   @Field({ type: "string" })
   name: string;
@@ -132,7 +132,12 @@ You can easily create and register new decorators to extend the functionality of
 function CustomField(options: { customProp: string }) {
   return function (target: any, propertyKey: string) {
     // Custom decorator logic
-    Reflect.defineMetadata("customProp", options.customProp, target, propertyKey);
+    Reflect.defineMetadata(
+      "customProp",
+      options.customProp,
+      target,
+      propertyKey
+    );
   };
 }
 ```
@@ -167,7 +172,7 @@ color: string;
 You can create new resources and leverage the existing decorators for rich resource definitions.
 
 ```typescript
-@ResourceMetadata()
+@ResourceMeta()
 class Product {
   @Field({ type: "string" })
   productName: string;
@@ -192,7 +197,7 @@ function IsPositive(target: any, propertyKey: string) {
     }
 }
 
-@ResourceMetadata()
+@ResourceMeta()
 class Order {
     @Field({ type: 'number' })
     @IsPositive
@@ -208,7 +213,7 @@ class Order {
 Here’s how you can use the newly defined field types in a resource:
 
 ```typescript
-@ResourceMetadata()
+@ResourceMeta()
 class EnhancedUser {
   @Field({ type: "string" })
   name: string;
@@ -225,7 +230,7 @@ ResKit can be extended with plugins and custom modules. Define new decorators, e
 ### Example: Custom Decorator Plugin
 
 ```typescript
-import { ResourceMetadata, Field, customDecorator } from '@resk';
+import { ResourceMeta, Field, customDecorator } from '@resk';
 
 function LogField() {
   return customDecorator((target, key) =&gt; {
@@ -233,7 +238,7 @@ function LogField() {
   });
 }
 
-@ResourceMetadata
+@ResourceMeta
 class Product {
   @LogField()
   @Field({ type: "number" })

@@ -1121,7 +1121,7 @@ export interface IResource<
   /***
    * The class name of the resource
    * This information is used to identify the resource class in the application.
-   * It is retrieved from the target class passed to the @ResourceMetadata decorator.
+   * It is retrieved from the target class passed to the @ResourceMeta decorator.
    */
   className?: string;
 }
@@ -1164,7 +1164,7 @@ export interface IResource<
  * retrieves a resource by its primary key:
  *
  * ```typescript
- * function getResourceById(id: PrimaryKeyType): ResourceMetadata {
+ * function getResourceById(id: PrimaryKeyType): ResourceMeta {
  *     // Implementation to list the resource based on the provided primary key
  * }
  *
@@ -1203,7 +1203,7 @@ export type IResourcePrimaryKey = string | number | object;
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.create({ name: "New ResourceMetadata" });
+ *     const result = await dataProvider.create({ name: "New ResourceMeta" });
  *     ```
  *
  * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
@@ -1214,7 +1214,7 @@ export type IResourcePrimaryKey = string | number | object;
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
+ *     const result = await dataProvider.update("resourceId", { name: "Updated ResourceMeta" });
  *     ```
  *
  * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
@@ -1273,7 +1273,7 @@ export type IResourcePrimaryKey = string | number | object;
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.createMany([{ name: "ResourceMetadata 1" }, { name: "ResourceMetadata 2" }]);
+ *     const result = await dataProvider.createMany([{ name: "ResourceMeta 1" }, { name: "ResourceMeta 2" }]);
  *     ```
  *
  * - **updateMany(data: IResourceManyCriteria<PrimaryKeyType,DataType>)**: Updates multiple resource records.
@@ -1376,7 +1376,7 @@ export interface IResourceDataService<
    * indicating the success or failure of the operation.
    * @example
    *   ```typescript
-   *   const result = await dataProvider.create({ name: "New ResourceMetadata" });
+   *   const result = await dataProvider.create({ name: "New ResourceMeta" });
    *     ```
    */
   create(record: Partial<DataType>): Promise<DataType>;
@@ -1388,7 +1388,7 @@ export interface IResourceDataService<
    * indicating the success or failure of the update operation.
    * @example
    *   ```typescript
-   *   const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
+   *   const result = await dataProvider.update("resourceId", { name: "Updated ResourceMeta" });
    *     ```
    */
   update(
@@ -1482,7 +1482,7 @@ export interface IResourceDataService<
    * indicating the success or failure of the operation.
    * @example
    *   ```typescript
-   *   const result = await dataProvider.createMany([{ name: "ResourceMetadata 1" }, { name: "ResourceMetadata 2" }]);
+   *   const result = await dataProvider.createMany([{ name: "ResourceMeta 1" }, { name: "ResourceMeta 2" }]);
    *     ```
    */
   createMany(data: Partial<DataType>[]): Promise<DataType[]>;

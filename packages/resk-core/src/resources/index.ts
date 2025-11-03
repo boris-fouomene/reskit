@@ -1105,7 +1105,7 @@ export class ResourcesManager {
   /**
    * Retrieves the resource metadata associated with the given target class.
    *
-   * This function uses reflection to access the metadata stored on the target class using the `@ResourceMetadata` decorator.
+   * This function uses reflection to access the metadata stored on the target class using the `@ResourceMeta` decorator.
    * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
    *
    * @param {any} target - The target class or instance from which to retrieve the metadata.
@@ -1212,7 +1212,6 @@ export class ResourcesManager {
       (this.resources as any)[name] = resource;
     }
   }
-
   /**
    * Removes a resource instance from the manager by its name.
    *
@@ -1276,7 +1275,7 @@ export class ResourcesManager {
  *
  * @example
  * ```typescript
- * @ResourceMetadata({
+ * @ResourceMeta({
  *   name: "user",
  *   label: "User",
  *   title: "User Management",
@@ -1285,7 +1284,7 @@ export class ResourcesManager {
  *
  * ```
  */
-export function ResourceMetadata<
+export function ResourceMeta<
   Name extends IResourceName = IResourceName,
   DataType = unknown,
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,

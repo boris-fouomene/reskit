@@ -619,11 +619,14 @@ export class Auth {
       Auth.localUserRef.current = null;
       Logger.log(e, " setting local user");
     }
+    await $session.set(USER_SESSION_KEY, encrypted);
     if (triggerEvent) {
-      const event = isObj(uToSave) && isObj(encrypted) ? "SIGN_IN" : "SIGN_OUT";
+      const event =
+        isObj(uToSave) && encrypted && encrypted !== null
+          ? "SIGN_IN"
+          : "SIGN_OUT";
       Auth.events.trigger(event, uToSave);
     }
-    await $session.set(USER_SESSION_KEY, encrypted);
     return u;
   }
 

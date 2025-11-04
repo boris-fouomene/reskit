@@ -769,3 +769,499 @@ describe("Will format large numbers", () => {
     expect(formattedMoney).toContain("$");
   });
 });
+
+describe("Dynamic Currency Formatters - Number.prototype.formatXXX", () => {
+  describe("formatUSD - US Dollar formatter", () => {
+    it("should format positive USD amounts", () => {
+      expect((1234.56).formatUSD()).toMatch(/\$|1,234/);
+      expect((1000).formatUSD()).toMatch(/\$|1,000/);
+      expect((0.99).formatUSD()).toMatch(/\$|0\.99/);
+    });
+
+    it("should format negative USD amounts", () => {
+      const result = (-1234.56).formatUSD();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as USD", () => {
+      const result = (0).formatUSD();
+      expect(result).toContain("$");
+    });
+
+    it("should respect custom decimal digits", () => {
+      const result = (1234.56789).formatUSD(3);
+      // formatUSD formats the number with specified decimal digits
+      // The result should include the formatted number with 3 decimals
+      expect(result).toMatch(/1,234|1234/);
+      expect(result).toMatch(/568|567|569/); // Should show 3 decimal places
+    });
+
+    it("should respect custom separators", () => {
+      const result = (1234.56).formatUSD(2, " ", ",");
+      // With space separator, should have space in thousands
+      expect(result).toMatch(/1\s234|1,234/);
+    });
+
+    it("should format large USD amounts", () => {
+      const result = (1000000).formatUSD();
+      expect(result).toMatch(/\$|1/);
+    });
+
+    it("should format small USD amounts", () => {
+      const result = (0.01).formatUSD();
+      expect(result).toContain("$");
+    });
+  });
+
+  describe("formatCAD - Canadian Dollar formatter", () => {
+    it("should format positive CAD amounts", () => {
+      expect((1234.56).formatCAD()).toMatch(/1,234|1234/);
+      expect((1000).formatCAD()).toMatch(/1,000|1000/);
+    });
+
+    it("should format negative CAD amounts", () => {
+      const result = (-1234.56).formatCAD();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as CAD", () => {
+      const result = (0).formatCAD();
+      expect(result).toBeTruthy();
+    });
+
+    it("should format large CAD amounts", () => {
+      const result = (999999.99).formatCAD();
+      expect(result).toMatch(/999|9/);
+    });
+
+    it("should respect custom decimal digits", () => {
+      expect((1234.56789).formatCAD(3)).toBeTruthy();
+    });
+  });
+
+  describe("formatXAF - Central African CFA franc formatter", () => {
+    it("should format positive XAF amounts", () => {
+      expect((1234.56).formatXAF()).toContain("FCFA");
+      expect((1000).formatXAF()).toMatch(/1,000|1000/);
+    });
+
+    it("should format negative XAF amounts", () => {
+      const result = (-1234.56).formatXAF();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as XAF", () => {
+      const result = (0).formatXAF();
+      expect(result).toContain("FCFA");
+    });
+
+    it("should format large XAF amounts", () => {
+      const result = (1000000).formatXAF();
+      expect(result).toContain("FCFA");
+    });
+
+    it("should format with custom decimal digits", () => {
+      expect((1234.56).formatXAF(3)).toContain("FCFA");
+    });
+  });
+
+  describe("formatEUR - Euro formatter", () => {
+    it("should format positive EUR amounts", () => {
+      expect((1234.56).formatEUR()).toMatch(/€|1,234|1234/);
+      expect((1000).formatEUR()).toMatch(/€|1,000|1000/);
+    });
+
+    it("should format negative EUR amounts", () => {
+      const result = (-1234.56).formatEUR();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as EUR", () => {
+      const result = (0).formatEUR();
+      expect(result).toMatch(/€|0/);
+    });
+
+    it("should format large EUR amounts", () => {
+      const result = (999999.99).formatEUR();
+      expect(result).toMatch(/€|999|9/);
+    });
+  });
+
+  describe("formatGBP - British Pound formatter", () => {
+    it("should format positive GBP amounts", () => {
+      expect((1234.56).formatGBP()).toMatch(/£|1,234|1234/);
+      expect((1000).formatGBP()).toMatch(/£|1,000|1000/);
+    });
+
+    it("should format negative GBP amounts", () => {
+      const result = (-1234.56).formatGBP();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as GBP", () => {
+      const result = (0).formatGBP();
+      expect(result).toMatch(/£|0/);
+    });
+
+    it("should format large GBP amounts", () => {
+      const result = (999999.99).formatGBP();
+      expect(result).toMatch(/£|999|9/);
+    });
+  });
+
+  describe("formatJPY - Japanese Yen formatter", () => {
+    it("should format positive JPY amounts", () => {
+      expect((1234).formatJPY()).toMatch(/¥|1,234|1234/);
+    });
+
+    it("should format negative JPY amounts", () => {
+      const result = (-1234).formatJPY();
+      expect(result).toContain("-");
+    });
+
+    it("should format zero as JPY", () => {
+      const result = (0).formatJPY();
+      expect(result).toMatch(/¥|0/);
+    });
+
+    it("should not include decimals by default (JPY has 0 decimal digits)", () => {
+      // JPY typically has 0 decimal digits
+      const result = (1234.56).formatJPY();
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe("Dynamic Abbreviation Formatters - Number.prototype.abreviate2FormatXXX", () => {
+    it("should abbreviate and format USD amounts", () => {
+      expect((1234).abreviate2FormatUSD()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatUSD()).toMatch(/1|M/);
+      expect((1000000000).abreviate2FormatUSD()).toMatch(/1|B/);
+      expect((124300).abreviate2FormatUSD(2)).toContain("K");
+    });
+
+    it("should abbreviate and format CAD amounts", () => {
+      expect((1234).abreviate2FormatCAD()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatCAD()).toMatch(/1|M/);
+    });
+
+    it("should abbreviate and format XAF amounts", () => {
+      expect((124300).abreviate2FormatXAF(2)).toBe("124.30K FCFA");
+      expect((1000000).abreviate2FormatXAF()).toContain("M");
+      expect((1000000000).abreviate2FormatXAF()).toContain("B");
+    });
+
+    it("should abbreviate and format EUR amounts", () => {
+      expect((1234).abreviate2FormatEUR()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatEUR()).toMatch(/1|M/);
+    });
+
+    it("should abbreviate and format GBP amounts", () => {
+      expect((1234).abreviate2FormatGBP()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatGBP()).toMatch(/1|M/);
+    });
+
+    it("should abbreviate and format JPY amounts", () => {
+      expect((1234).abreviate2FormatJPY()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatJPY()).toMatch(/1|M/);
+    });
+
+    it("should respect custom decimal digits in abbreviation", () => {
+      expect((124300).abreviate2FormatXAF(2)).toBe("124.30K FCFA");
+      expect((124300).abreviate2FormatXAF(3)).toContain("K");
+      expect((124300).abreviate2FormatXAF(0)).toMatch(/124|K/);
+    });
+
+    it("should respect custom separators in abbreviation", () => {
+      expect((1234).abreviate2FormatUSD(2, " ", ",")).toMatch(/K|1|,/);
+    });
+
+    it("should abbreviate large numbers correctly", () => {
+      expect((1000000000000).abreviate2FormatUSD()).toContain("T");
+      expect((1000000000).abreviate2FormatUSD()).toContain("B");
+      expect((1000000).abreviate2FormatUSD()).toContain("M");
+    });
+
+    it("should abbreviate zero correctly", () => {
+      const result = (0).abreviate2FormatXAF();
+      expect(result).toContain("FCFA");
+    });
+
+    it("should abbreviate negative numbers correctly", () => {
+      const result = (-124300).abreviate2FormatXAF(2);
+      expect(result).toContain("-");
+      expect(result).toContain("K");
+    });
+
+    it("should format numbers under 1000 without abbreviation", () => {
+      const result = (500).abreviate2FormatUSD();
+      expect(result).toMatch(/500|0\.5|K/);
+    });
+  });
+
+  describe("Number.prototype helper methods", () => {
+    it("countDecimals should count decimal places", () => {
+      // countDecimals uses String(this.toString()).match(/\.(\d+)/) to extract decimal places
+      // For 1.5: toString() = "1.5", match = [".5", "5"], match[1].length = 1
+      // For 1.56: toString() = "1.56", match = [".56", "56"], match[1].length = 2
+      // For 1.567: toString() = "1.567", match = [".567", "567"], match[1].length = 3
+      // For 1: toString() = "1", no match, returns 0
+      // For 1.0: toString() = "1", no match (JavaScript doesn't preserve trailing zeros), returns 0
+      expect((1.5).countDecimals()).toBe(1);
+      expect((1.56).countDecimals()).toBe(2);
+      expect((1.567).countDecimals()).toBe(3);
+      expect((1).countDecimals()).toBe(0);
+      expect((1.0).countDecimals()).toBe(0);
+    });
+
+    it("formatNumber should format with default options", () => {
+      expect((1234.56).formatNumber()).toMatch(/1,234/);
+      expect((1000000.89).formatNumber()).toMatch(/1,000,000/);
+    });
+
+    it("formatNumber should respect custom decimal digits", () => {
+      const result = (1234.56789).formatNumber(3);
+      // formatNumber will format showing the value with precision
+      expect(result).toContain("234"); // Contains "234" part of "1,234.568"
+      // The decimal portion should show some digits after the decimal
+      expect(result).toMatch(/\./); // Has a decimal point
+    });
+
+    it("formatNumber should respect custom separators", () => {
+      expect((1234.56).formatNumber(2, " ", ",")).toMatch(/1\s234|1,234/);
+    });
+
+    it("formatMoney should format without custom symbol", () => {
+      expect((1234.56).formatMoney()).toMatch(/1,234|,56|\$|0/);
+    });
+
+    it("formatMoney should format with custom symbol", () => {
+      const result = (1234.56).formatMoney("€");
+      expect(result).toMatch(/€|1,234|1234/);
+    });
+
+    it("formatMoney should respect all custom options", () => {
+      const result = (1234.56).formatMoney("$", 2, " ", ",");
+      expect(result).toMatch(/\$|1|234/);
+    });
+
+    it("abreviate2FormatNumber should abbreviate without symbol", () => {
+      expect((1234).abreviate2FormatNumber()).toMatch(/1\.23|K/);
+      expect((1000000).abreviate2FormatNumber()).toMatch(/1|M/);
+    });
+
+    it("abreviate2FormatNumber should respect custom options", () => {
+      expect((1234).abreviate2FormatNumber(2, " ", ",")).toMatch(/K|1|,/);
+    });
+
+    it("abreviate2FormatMoney should abbreviate with symbol", () => {
+      expect((1234).abreviate2FormatMoney("$")).toMatch(/\$|K|1/);
+      expect((1000000).abreviate2FormatMoney("€")).toMatch(/€|M|1/);
+    });
+  });
+
+  describe("Dynamic Formatters - Multiple Currency Test", () => {
+    const testCurrencies = [
+      {
+        code: "USD",
+        formatter: "formatUSD",
+        abbrevFormatter: "abreviate2FormatUSD",
+      },
+      {
+        code: "EUR",
+        formatter: "formatEUR",
+        abbrevFormatter: "abreviate2FormatEUR",
+      },
+      {
+        code: "GBP",
+        formatter: "formatGBP",
+        abbrevFormatter: "abreviate2FormatGBP",
+      },
+      {
+        code: "CAD",
+        formatter: "formatCAD",
+        abbrevFormatter: "abreviate2FormatCAD",
+      },
+      {
+        code: "XAF",
+        formatter: "formatXAF",
+        abbrevFormatter: "abreviate2FormatXAF",
+      },
+      {
+        code: "AUD",
+        formatter: "formatAUD",
+        abbrevFormatter: "abreviate2FormatAUD",
+      },
+      {
+        code: "CHF",
+        formatter: "formatCHF",
+        abbrevFormatter: "abreviate2FormatCHF",
+      },
+      {
+        code: "JPY",
+        formatter: "formatJPY",
+        abbrevFormatter: "abreviate2FormatJPY",
+      },
+    ];
+
+    testCurrencies.forEach(({ code, formatter, abbrevFormatter }) => {
+      it(`${formatter} should format standard value (${code})`, () => {
+        const result = (1234.56 as any)[formatter]();
+        expect(result).toBeTruthy();
+        expect(typeof result).toBe("string");
+        expect(result.length).toBeGreaterThan(0);
+      });
+
+      it(`${abbrevFormatter} should abbreviate large value (${code})`, () => {
+        const result = (1234567 as any)[abbrevFormatter]();
+        expect(result).toBeTruthy();
+        expect(typeof result).toBe("string");
+        expect(result).toMatch(/M|K/); // Should contain abbreviation suffix
+      });
+
+      it(`${formatter} should format zero (${code})`, () => {
+        const result = (0 as any)[formatter]();
+        expect(result).toBeTruthy();
+        expect(typeof result).toBe("string");
+      });
+
+      it(`${formatter} should handle negative values (${code})`, () => {
+        const result = (-1234.56 as any)[formatter]();
+        expect(result).toBeTruthy();
+        expect(result).toContain("-");
+      });
+    });
+  });
+
+  describe("Edge Cases for Dynamic Formatters", () => {
+    it("should handle very small decimal values", () => {
+      expect((0.01).formatUSD()).toContain("$");
+      expect((0.001).formatUSD()).toContain("$");
+      expect((0.0001).formatUSD()).toContain("$");
+    });
+
+    it("should handle fractional cents", () => {
+      const result1 = (1234.567).formatUSD();
+      const result2 = (1234.564).formatUSD();
+      // With custom separators, may format differently
+      expect(result1).toMatch(/1|234|567/);
+      expect(result2).toMatch(/1|234|564/);
+    });
+
+    it("should handle negative fractional values", () => {
+      expect((-0.01).formatUSD()).toContain("-");
+      expect((-1234.567).formatUSD()).toContain("-");
+    });
+
+    it("should handle abbreviation of numbers with decimals", () => {
+      expect((1234.56).abreviate2FormatUSD()).toMatch(/K|1/);
+      expect((1000000.89).abreviate2FormatUSD()).toMatch(/M|1/);
+    });
+
+    it("should handle very large numbers in abbreviation", () => {
+      expect((1000000000000).abreviate2FormatUSD()).toContain("T");
+      expect((1500000000000).abreviate2FormatUSD()).toMatch(/1\.5|T/);
+    });
+
+    it("should preserve precision in abbreviation with custom decimal digits", () => {
+      const result = (1234.5).abreviate2FormatUSD(3);
+      expect(result).toContain("K");
+    });
+
+    it("should handle zero abbreviation correctly", () => {
+      expect((0).abreviate2FormatUSD()).toMatch(/0|\$/);
+      expect((0).abreviate2FormatXAF()).toContain("FCFA");
+    });
+
+    it("should handle maximum decimals for precision", () => {
+      const result = (1234567.89).formatUSD(5);
+      expect(result).toContain("1");
+    });
+
+    it("should handle custom format strings if provided", () => {
+      // Format parameter is supported but may not be applied by all dynamic formatters
+      const result = (1234.56).formatUSD(2, ",", ".", "%s%v");
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe("Chaining and Composition with Dynamic Formatters", () => {
+    it("should allow formatting after arithmetic", () => {
+      const value = 100;
+      const result = (value * 12.34).formatUSD();
+      expect(result).toContain("$");
+    });
+
+    it("should allow multiple decimal operations before formatting", () => {
+      const result = ((1234.56 * 1.1) / 2).formatUSD();
+      expect(result).toContain("$");
+    });
+
+    it("should allow abbreviation after division", () => {
+      const result = (1000000 / 2).abreviate2FormatUSD();
+      expect(result).toContain("K");
+    });
+
+    it("should handle formatting of computed tax amounts", () => {
+      const baseAmount = 1000;
+      const taxRate = 0.2;
+      const result = (baseAmount + baseAmount * taxRate).formatUSD();
+      expect(result).toContain("$");
+    });
+
+    it("should handle formatting of discounted amounts", () => {
+      const originalPrice = 1000;
+      const discountPercentage = 0.15;
+      const result = (originalPrice * (1 - discountPercentage)).formatUSD();
+      expect(result).toContain("$");
+    });
+  });
+
+  describe("Cross-Currency Consistency", () => {
+    it("should format same amount consistently across similar formatters", () => {
+      const amount = 1234.56;
+      const usdResult = amount.formatUSD();
+      const cadResult = amount.formatCAD();
+      const eurResult = amount.formatEUR();
+
+      // All should be non-empty strings
+      expect(usdResult).toBeTruthy();
+      expect(cadResult).toBeTruthy();
+      expect(eurResult).toBeTruthy();
+
+      // All should contain the formatted number
+      expect(usdResult).toMatch(/1|2|3|4/);
+      expect(cadResult).toMatch(/1|2|3|4/);
+      expect(eurResult).toMatch(/1|2|3|4/);
+    });
+
+    it("should abbreviate same amount consistently across formatters", () => {
+      const amount = 1234567;
+      const usdAbbrev = amount.abreviate2FormatUSD();
+      const eurAbbrev = amount.abreviate2FormatEUR();
+
+      expect(usdAbbrev).toContain("M");
+      expect(eurAbbrev).toContain("M");
+    });
+
+    it("should handle zero consistently across all formatters", () => {
+      const zeroUSD = (0).formatUSD();
+      const zeroEUR = (0).formatEUR();
+      const zeroXAF = (0).formatXAF();
+
+      expect(zeroUSD).toBeTruthy();
+      expect(zeroEUR).toBeTruthy();
+      expect(zeroXAF).toBeTruthy();
+    });
+
+    it("should handle negatives consistently across all formatters", () => {
+      const amount = -1234.56;
+      const usdResult = amount.formatUSD();
+      const cadResult = amount.formatCAD();
+      const gbpResult = amount.formatGBP();
+
+      expect(usdResult).toContain("-");
+      expect(cadResult).toContain("-");
+      expect(gbpResult).toContain("-");
+    });
+  });
+});

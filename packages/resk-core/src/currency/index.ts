@@ -417,7 +417,7 @@ const formatMoneyAsObject = (
   if (decimalSeparator !== undefined) {
     toPrepare.decimalSeparator = decimalSeparator;
   }
-  if (format !== undefined) {
+  if (isNonNullString(format)) {
     toPrepare.format = format;
   }
 
@@ -616,6 +616,7 @@ export const Currency = {
   toFixed,
   formatDescription,
   prepareOptions,
+  parseFormat,
 };
 
 export * from "./types";

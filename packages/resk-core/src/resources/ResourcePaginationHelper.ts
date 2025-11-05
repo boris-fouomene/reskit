@@ -13,24 +13,151 @@ import {
 
 export class ResourcePaginationHelper {
   /**
-   * Normalizes pagination parameters by calculating the `page` from `skip` if provided,
-   * or calculating `skip` from `page` if only `page` is provided.
+   * Normalizes pagination parameters into a consistent format, calculating missing values and ensuring valid pagination state.
    *
-   * @param {IResourceQueryOptions} options - The pagination options.
-   * @param {number} options.limit - The number of records per page.
-   * @param {number} optioins.page - The requested page number (optional).
-   * @param {number} options.skip - The number of records to skip (optional).
-   * @returns {{ page: number, skip: number,limit:number }} The normalized pagination options : "page" and "skip" are calculated from "limit" and "skip" or "page" and "limit" if provided.
+   * This method takes pagination options and normalizes them by calculating the missing pagination parameters
+   * (`page`, `skip`, `limit`) based on the provided values. It handles the relationship between page-based
+   * and offset-based pagination, ensuring that all three parameters are consistent and valid.
+   *
+   * **Normalization Logic:**
+   * - If `limit` is not a valid number, returns an empty object (no pagination)
+   * - If `skip` is provided, calculates the corresponding `page` number
+   * - If `page` is provided, calculates the corresponding `skip` offset
+   * - If neither `skip` nor `page` are provided, defaults to page 1 with skip 0
+   * - Ensures all returned values are valid numbers
+   *
+   * **Parameter Relationships:**
+   * - `page`: 1-based page number (first page = 1)
+   * - `skip`: 0-based offset (number of records to skip)
+   * - `limit`: Maximum records per page
+   * - Formula: `skip = (page - 1) * limit`
+   *
+   * @template DataType - The resource data type (used for type consistency with IResourceQueryOptions)
+   * @param {IResourceQueryOptions<DataType>} [options] - Pagination options containing page, skip, and/or limit
+   * @param {number} [options.page] - The page number (1-based)
+   * @param {number} [options.skip] - The number of records to skip (0-based offset)
+   * @param {number} [options.limit] - The maximum number of records per page
+   * @returns {{page?: number, skip?: number, limit?: number}} Normalized pagination parameters:
+   *   - `page`: Calculated or provided page number
+   *   - `skip`: Calculated or provided skip offset
+   *   - `limit`: The limit value (unchanged if valid, omitted if invalid)
    *
    * @example
    * ```typescript
-   * normalizePagination({ limit: 10, skip: 20 }); // { page: 3, skip: 20 }
-   * normalizePagination({ limit: 10 }); // { page: 1, skip: 0 }
-   * normalizePagination({ page: 3, limit: 10 }); // { page: 3, skip: 0 }
-   * normalizePagination({ page: 3, skip: 20 }); // { page: 3, skip: 20 }
+   * // Page-based pagination - calculates skip automatically
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   page: 3,
+   *   limit: 10
+   * });
+   * // Result: { page: 3, skip: 20, limit: 10 }
+   * // (skip = (3-1) * 10 = 20)
    * ```
+   *
+   * @example
+   * ```typescript
+   * // Offset-based pagination - calculates page automatically
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   skip: 50,
+   *   limit: 25
+   * });
+   * // Result: { page: 3, skip: 50, limit: 25 }
+   * // (page = floor(50/25) + 1 = 3)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Default pagination - no parameters provided
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   limit: 20
+   * });
+   * // Result: { page: 1, skip: 0, limit: 20 }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Invalid limit - returns empty object (no pagination)
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   page: 2,
+   *   limit: "invalid"
+   * });
+   * // Result: {}
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Zero or negative values - defaults to first page
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   page: 0,
+   *   limit: 15
+   * });
+   * // Result: { page: 1, skip: 0, limit: 15 }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Large skip values
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   skip: 1000,
+   *   limit: 50
+   * });
+   * // Result: { page: 21, skip: 1000, limit: 50 }
+   * // (page = floor(1000/50) + 1 = 21)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Fractional skip values (floor operation)
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   skip: 37,
+   *   limit: 10
+   * });
+   * // Result: { page: 4, skip: 37, limit: 10 }
+   * // (page = floor(37/10) + 1 = 4)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Mixed parameters - skip takes precedence over page
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   page: 2,
+   *   skip: 30,
+   *   limit: 15
+   * });
+   * // Result: { page: 3, skip: 30, limit: 15 }
+   * // (skip provided, so page is recalculated from skip)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Database cursor scenario
+   * const result = ResourcePaginationHelper.normalizePagination({
+   *   skip: 500,
+   *   limit: 100
+   * });
+   * // Result: { page: 6, skip: 500, limit: 100 }
+   * // Useful for database queries with OFFSET
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // API pagination with user input
+   * const userOptions = { page: 5, limit: 20 };
+   * const result = ResourcePaginationHelper.normalizePagination(userOptions);
+   * // Result: { page: 5, skip: 80, limit: 20 }
+   * // Ready for database query: LIMIT 20 OFFSET 80
+   * ```
+   *
+   * @remarks
+   * - Page numbers are 1-based (first page = 1, not 0)
+   * - Skip values are 0-based (skip 0 = first record)
+   * - Invalid limit values disable pagination entirely
+   * - When both page and skip are provided, skip takes precedence for page calculation
+   * - Negative or zero page values default to page 1
+   * - Fractional skip values are floored when calculating page numbers
    */
-  static normalizePagination(options?: IResourceQueryOptions) {
+  static normalizePagination<DataType = unknown>(
+    options?: IResourceQueryOptions<DataType>
+  ) {
     let { page, skip, limit } = Object.assign({}, options);
     if (!isNumber(limit)) {
       return {};
@@ -126,6 +253,7 @@ export class ResourcePaginationHelper {
   /***
    * Determines if result can be paginated based on the provided query options.
    * It checks if the query options have a `limit` property of type number.
+   * @template DataType The type of resource data.
    * @param {IResourceQueryOptions} queryOptions - The query options.
    * @returns {boolean} Whether the result can be paginated.
    *
@@ -135,15 +263,17 @@ export class ResourcePaginationHelper {
    * canPaginateResult({ page: 3, limit: 10 }); // true
    * canPaginateResult({ page: 3, skip: 20 }); // true
    */
-  static canPaginateResult(queryOptions: IResourceQueryOptions): boolean {
+  static canPaginateResult<DataType = unknown>(
+    queryOptions: IResourceQueryOptions<DataType>
+  ): boolean {
     if (!isObj(queryOptions)) {
       return false;
     }
     return isNumber(queryOptions.limit);
   }
-  static getPaginationMetaData(
+  static getPaginationMetaData<DataType = unknown>(
     count: number,
-    queryOptions?: IResourceQueryOptions
+    queryOptions?: IResourceQueryOptions<DataType>
   ): IResourcePaginationMetaData {
     const { limit, page, skip } =
       ResourcePaginationHelper.normalizePagination(queryOptions);
@@ -170,17 +300,146 @@ export class ResourcePaginationHelper {
     }
     return meta;
   }
-  /***
-   * Paginates the result based on the provided options.
-   * @param {DataType[]} data - The data to paginate.
-   * @param {number} count - The total count of the data.
-   * @param {IResourceQueryOptions} options - The pagination options.
-   * @returns {IResourcePaginatedResult<DataType>} The paginated result.
+
+  /**
+   * Paginates an array of data based on the provided query options and total count.
+   *
+   * This method applies pagination logic to slice the data array according to the specified
+   * page size and current page, while also generating comprehensive pagination metadata.
+   * It's designed to work seamlessly with database query results and API responses.
+   *
+   * **Pagination Logic:**
+   * - Calculates the correct slice of data based on `page` and `limit` parameters
+   * - Generates metadata including total pages, current page, navigation flags, etc.
+   * - Handles edge cases like invalid page numbers or missing pagination parameters
+   *
+   * **Data Slicing:**
+   * - Uses zero-based indexing for array slicing
+   * - Ensures start/end indices are within array bounds
+   * - Returns empty array if pagination parameters are invalid
+   *
+   * @template DataType - The type of individual data items in the array
+   * @param {DataType[]} data - The complete array of data to be paginated
+   * @param {number} count - The total number of records available (may be different from data.length for database queries)
+   * @param {IResourceQueryOptions<DataType>} [options] - Pagination and query options
+   * @returns {{
+   *   data: DataType[],
+   *   total: number,
+   *   meta: IResourcePaginationMetaData
+   * }} An object containing:
+   *   - `data`: The paginated slice of the original data array
+   *   - `total`: The total count of records (unchanged from input)
+   *   - `meta`: Comprehensive pagination metadata
+   *
+   * @example
+   * ```typescript
+   * // Basic pagination - page 1 with 10 items per page
+   * const users = [{id: 1}, {id: 2}, ..., {id: 25}]; // 25 total users
+   * const result = ResourcePaginationHelper.paginate(users, 25, {
+   *   page: 1,
+   *   limit: 10
+   * });
+   * // Result:
+   * // {
+   * //   data: [{id: 1}, {id: 2}, ..., {id: 10}], // First 10 users
+   * //   total: 25,
+   * //   meta: {
+   * //     total: 25,
+   * //     currentPage: 1,
+   * //     pageSize: 10,
+   * //     totalPages: 3,
+   * //     hasNextPage: true,
+   * //     hasPreviousPage: false,
+   * //     nextPage: 2,
+   * //     previousPage: undefined,
+   * //     lastPage: 3
+   * //   }
+   * // }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Middle page pagination
+   * const result = ResourcePaginationHelper.paginate(users, 25, {
+   *   page: 2,
+   *   limit: 10
+   * });
+   * // Result: data contains items 11-20, meta shows navigation to pages 1 and 3
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Last page with fewer items
+   * const result = ResourcePaginationHelper.paginate(users, 25, {
+   *   page: 3,
+   *   limit: 10
+   * });
+   * // Result: data contains items 21-25 (5 items), meta shows no next page
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Using skip instead of page
+   * const result = ResourcePaginationHelper.paginate(users, 25, {
+   *   skip: 15,
+   *   limit: 5
+   * });
+   * // Result: data contains items 16-20, meta shows currentPage: 4
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // No pagination options - returns all data
+   * const result = ResourcePaginationHelper.paginate(users, 25);
+   * // Result: data contains all 25 users, meta is minimal (only total)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Invalid page number - clamps to valid range
+   * const result = ResourcePaginationHelper.paginate(users, 25, {
+   *   page: 999,
+   *   limit: 10
+   * });
+   * // Result: data is empty array, meta shows page: 999 but no valid data slice
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Database scenario - data array smaller than total count
+   * const dbResult = [{id: 101}, {id: 102}, {id: 103}]; // Only 3 records from DB
+   * const result = ResourcePaginationHelper.paginate(dbResult, 150, {
+   *   page: 34,
+   *   limit: 3
+   * });
+   * // Result: data contains the 3 DB records, total: 150, meta shows page 34 of ~50
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Empty data array
+   * const result = ResourcePaginationHelper.paginate([], 0, {
+   *   page: 1,
+   *   limit: 10
+   * });
+   * // Result: data is empty array, total: 0, meta shows single empty page
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Large dataset pagination
+   * const largeDataset = Array.from({length: 10000}, (_, i) => ({id: i + 1}));
+   * const result = ResourcePaginationHelper.paginate(largeDataset, 10000, {
+   *   page: 500,
+   *   limit: 20
+   * });
+   * // Result: data contains items 9981-10000, meta shows page 500 of 500
+   * ```
    */
   static paginate<DataType = unknown>(
     data: DataType[],
     count: number,
-    options?: IResourceQueryOptions
+    options?: IResourceQueryOptions<DataType>
   ) {
     const meta = ResourcePaginationHelper.getPaginationMetaData(count, options);
     const { currentPage, pageSize, totalPages } = meta;
@@ -200,16 +459,176 @@ export class ResourcePaginationHelper {
       meta,
     };
   }
+
   /**
-   * Parses query options from the provided request object.
-   * It extracts query parameters, headers, and other relevant information to construct a query options object.
-   * @template T The type of resource data.
-   * @param req The request object containing the URL and headers.
-   * @returns {IResourceQueryOptions<T> & {queryParams: Record<string, any>}} The parsed query options object.
+   * Parses query options from HTTP request data, extracting and normalizing parameters from multiple sources.
+   *
+   * This method consolidates query parameters from URL query strings, request headers, route parameters,
+   * and custom filters into a standardized `IResourceQueryOptions` object. It's designed for REST API
+   * endpoints that need to handle complex query parameters for filtering, sorting, pagination, and more.
+   *
+   * **Parameter Sources (in precedence order):**
+   * 1. URL query parameters (`req.url`)
+   * 2. Route parameters (`req.params`)
+   * 3. X-Filters header (`req.headers['x-filters']`)
+   * 4. Custom filters (`req.filters`)
+   *
+   * **Supported Parameters:**
+   * - **Pagination**: `limit`, `skip`, `page`
+   * - **Sorting**: `orderBy` (string, array, or object)
+   * - **Filtering**: `where` (object, array, or string conditions)
+   * - **Relations**: `include`, `relations` (related data to load)
+   * - **Caching**: `cache`, `cacheTTL`
+   * - **Soft Deletes**: `includeDeleted`
+   * - **Distinct**: `distinct` (unique results)
+   *
+   * @template T - The resource data type for type-safe query options
+   * @param {Object} req - The request object containing query data from multiple sources
+   * @param {string} req.url - The request URL containing query parameters
+   * @param {Record<string, any>} req.headers - Request headers (may include 'x-filters')
+   * @param {Record<string, any>} [req.params] - Route parameters from URL path
+   * @param {Record<string, any>} [req.filters] - Custom filter object
+   * @returns {IResourceQueryOptions<T> & {queryParams: Record<string, any>}} Normalized query options with:
+   *   - All standard `IResourceQueryOptions<T>` properties
+   *   - `queryParams`: Raw parsed query parameters for reference
    *
    * @example
-   * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
-   * const queryOptions = parseQueryOptions(req);
+   * ```typescript
+   * // Basic pagination from URL query
+   * const req = {
+   *   url: '/api/users?limit=10&page=2',
+   *   headers: {}
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { limit: 10, page: 2, skip: 10, queryParams: { limit: '10', page: '2' } }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Complex query with multiple sources
+   * const req = {
+   *   url: '/api/users?limit=20&orderBy=name',
+   *   headers: {
+   *     'x-filters': {
+   *       where: { active: true },
+   *       include: ['profile', 'roles']
+   *     }
+   *   },
+   *   params: { userId: '123' },
+   *   filters: { cache: true }
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result includes all merged parameters with proper precedence
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Sorting with multiple fields
+   * const req = {
+   *   url: '/api/users?orderBy[]=name&orderBy[]=-createdAt',
+   *   headers: {}
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { orderBy: { name: 'asc', createdAt: 'desc' }, ... }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Filtering with complex where conditions
+   * const req = {
+   *   url: '/api/users',
+   *   headers: {
+   *     'x-filters': {
+   *       where: {
+   *         age: { $gte: 18 },
+   *         status: 'active',
+   *         $or: [{ role: 'admin' }, { role: 'moderator' }]
+   *       }
+   *     }
+   *   }
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result includes complex where conditions for database queries
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Including related data
+   * const req = {
+   *   url: '/api/posts?include[]=author&include[]=comments',
+   *   headers: {
+   *     'x-filters': {
+   *       relations: ['tags', 'categories']
+   *     }
+   *   }
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { include: ['author', 'comments'], relations: ['tags', 'categories'], ... }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Caching configuration
+   * const req = {
+   *   url: '/api/users?cache=1&cacheTTL=300',
+   *   headers: {}
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { cache: true, cacheTTL: 300, ... }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Distinct results and soft deletes
+   * const req = {
+   *   url: '/api/users?distinct=1&includeDeleted=true',
+   *   headers: {}
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { distinct: true, includeDeleted: true, ... }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Express.js style request object
+   * const expressReq = {
+   *   url: '/api/users?limit=5&page=1&orderBy=name',
+   *   headers: {
+   *     'x-filters': JSON.stringify({ where: { active: true } })
+   *   },
+   *   params: { tenantId: 'abc123' },
+   *   query: { search: 'john' } // Additional query params
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(expressReq);
+   * // Handles all Express.js request formats automatically
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Minimal request - only URL parameters
+   * const req = {
+   *   url: '/api/users',
+   *   headers: {}
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: { queryParams: {} } - minimal options, no pagination/sorting
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Mixed data types and type coercion
+   * const req = {
+   *   url: '/api/users?limit=10&page=2&cache=true&includeDeleted=0',
+   *   headers: {
+   *     'x-filters': {
+   *       distinct: '1',  // String '1' becomes boolean true
+   *       cacheTTL: '600' // String '600' becomes number 600
+   *     }
+   *   }
+   * };
+   * const options = ResourcePaginationHelper.parseQueryOptions(req);
+   * // Result: proper type coercion for all parameters
+   * ```
    */
   static parseQueryOptions<T = unknown>(req: {
     url: string;

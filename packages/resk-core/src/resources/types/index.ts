@@ -1536,12 +1536,155 @@ export interface IResourceDataService<
    *     ```
    */
   exists(primaryKey: PrimaryKeyType): Promise<boolean>;
+
   /**
-   * Returns distinct values for a field
-   * @param field The field to check for distinct values.
-   * @param options
+   * Retrieves distinct values for a specific field across all resource records.
+   *
+   * This method returns an array of unique values for the specified field from all records
+   * in the resource collection. It's useful for generating dropdown options, filtering criteria,
+   * or understanding the data distribution across a particular field.
+   *
+   * **Use Cases:**
+   * - Generating filter dropdowns (e.g., unique categories, statuses, tags)
+   * - Data analysis and reporting (e.g., unique values in a dataset)
+   * - Form validation (e.g., checking existing values)
+   * - Search suggestions and autocomplete
+   *
+   * **Query Filtering:**
+   * - The `options.where` parameter can filter which records are considered for distinct values
+   * - Other query options like `includeDeleted` affect which records are included
+   * - Results are always deduplicated regardless of the underlying data
+   *
+   * @template DataType - The resource data type for type-safe field selection
+   * @param {keyof DataType} field - The field name to get distinct values for
+   * @param {IResourceQueryOptions<DataType>} [options] - Optional query options to filter the records
+   * @returns {Promise<any[]>} Array of distinct values for the specified field
+   *
+   * @example
+   * ```typescript
+   * // Get all unique user roles
+   * interface User {
+   *   id: number;
+   *   name: string;
+   *   role: 'admin' | 'user' | 'moderator';
+   *   department: string;
+   * }
+   *
+   * const userRoles = await dataService.distinct('role');
+   * // Result: ['admin', 'user', 'moderator']
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Get distinct departments for active users only
+   * const departments = await dataService.distinct('department', {
+   *   where: { status: 'active' }
+   * });
+   * // Result: ['Engineering', 'Sales', 'Marketing'] (only from active users)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Get unique tags from published posts
+   * interface Post {
+   *   id: number;
+   *   title: string;
+   *   tags: string[];
+   *   status: 'draft' | 'published';
+   * }
+   *
+   * const tags = await dataService.distinct('tags', {
+   *   where: { status: 'published' }
+   * });
+   * // Result: ['javascript', 'typescript', 'react', 'node.js']
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Get distinct product categories
+   * const categories = await dataService.distinct('category');
+   * // Result: ['Electronics', 'Clothing', 'Books', 'Home & Garden']
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Get unique order statuses with filtering
+   * const orderStatuses = await dataService.distinct('status', {
+   *   where: {
+   *     createdAt: { $gte: new Date('2024-01-01') } // Only recent orders
+   *   }
+   * });
+   * // Result: ['pending', 'shipped', 'delivered'] (from orders in 2024+)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Include soft-deleted records in distinct values
+   * const allStatuses = await dataService.distinct('status', {
+   *   includeDeleted: true
+   * });
+   * // Result: ['active', 'inactive', 'suspended', 'archived'] (including deleted)
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Get distinct values for nested object fields
+   * interface User {
+   *   id: number;
+   *   profile: {
+   *     city: string;
+   *     country: string;
+   *   };
+   * }
+   *
+   * const cities = await dataService.distinct('profile.city');
+   * // Result: ['New York', 'London', 'Tokyo', 'Paris']
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Use in form validation - check if email already exists
+   * const existingEmails = await dataService.distinct('email');
+   * const isEmailTaken = existingEmails.includes('newuser@example.com');
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Generate filter options for a search interface
+   * const filterOptions = {
+   *   categories: await dataService.distinct('category'),
+   *   statuses: await dataService.distinct('status'),
+   *   priorities: await dataService.distinct('priority')
+   * };
+   * // Use these in dropdown components
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Data analysis - count frequency of values
+   * const colors = await dataService.distinct('color');
+   * const colorCounts = {};
+   * for (const color of colors) {
+   *   colorCounts[color] = await dataService.count({
+   *     where: { color }
+   *   });
+   * }
+   * // Result: { 'red': 15, 'blue': 8, 'green': 12, 'yellow': 5 }
+   * ```
+   *
+   * @remarks
+   * - Results are automatically deduplicated (no duplicate values in the array)
+   * - The order of returned values is not guaranteed (depends on database implementation)
+   * - Null and undefined values are typically excluded from results
+   * - For array fields, individual array elements become separate distinct values
+   * - The method is optional - not all data service implementations may support it
+   * - Performance may vary based on field cardinality and data size
+   * - Consider indexing the field for better performance on large datasets
    */
-  distinct?(field: keyof DataType): Promise<any[]>;
+  distinct?(
+    field: keyof DataType,
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<any[]>;
 
   /**
    * // Supports MongoDB-style aggregation pipelines

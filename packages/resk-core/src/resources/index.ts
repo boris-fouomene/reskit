@@ -8,7 +8,8 @@ import { IClassConstructor } from "../types/index";
 import {
   defaultStr,
   extendObj,
-  isEmpty,
+  IInterpolateOptions,
+  interpolate,
   isNonNullString,
   isObj,
   stringify,
@@ -247,7 +248,7 @@ export abstract class Resource<
    * @param {IResourceQueryOptions<DataType>} options - Optional options for fetching resources.
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  find(options?: IResourceQueryOptions<DataType>) {
+  async find(options?: IResourceQueryOptions<DataType>) {
     return this.authorizeAction("read").then(() => {
       return this.getDataService()
         ?.find(options)
@@ -262,7 +263,7 @@ export abstract class Resource<
    * @param {PrimaryKeyType | IResourceQueryOptions<DataType>} options - The primary key or query options of the resource to retrieve.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
+  async findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
     return this.authorizeAction("read").then(() => {
       return this.getDataService()
         .findOne(options)
@@ -409,7 +410,7 @@ export abstract class Resource<
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: Partial<DataType>) {
+  async create(record: Partial<DataType>) {
     return this.authorizeAction("create").then(() => {
       return this.beforeCreate(record).then(() => {
         return this.getDataService()
@@ -429,7 +430,7 @@ export abstract class Resource<
    * @param dataToUpdate
    * @returns
    */
-  update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
+  async update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
     return this.authorizeAction("update").then(async () => {
       return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
         return this.getDataService()
@@ -455,7 +456,7 @@ export abstract class Resource<
    * @param primaryKey {PrimaryKeyType} The primary key of the resource to delete.
    * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
-  delete(primaryKey: PrimaryKeyType) {
+  async delete(primaryKey: PrimaryKeyType) {
     return this.authorizeAction("delete").then(() => {
       return this.beforeDelete(primaryKey).then(() => {
         return this.getDataService()
@@ -475,7 +476,7 @@ export abstract class Resource<
    * @param options - Optional query options to filter, sort, and paginate the results.
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
-  findAndCount(options?: IResourceQueryOptions<DataType>) {
+  async findAndCount(options?: IResourceQueryOptions<DataType>) {
     return this.authorizeAction("read").then(() => {
       return this.getDataService()
         .findAndCount(options)
@@ -501,7 +502,7 @@ export abstract class Resource<
    * @param data - An array of partial data objects to create.
    * @returns A promise that resolves to the result of the create operation.
    */
-  createMany(data: Partial<DataType>[]) {
+  async createMany(data: Partial<DataType>[]) {
     return this.authorizeAction("create").then(() => {
       return this.beforeCreateMany(data).then(() => {
         return this.getDataService()
@@ -521,7 +522,7 @@ export abstract class Resource<
    * @param data - An array of partial data objects to update.
    * @returns A promise that resolves to the result of the update operation.
    */
-  updateMany(
+  async updateMany(
     criteria: IResourceManyCriteria<DataType, PrimaryKeyType>,
     data: Partial<DataType>
   ) {
@@ -550,7 +551,7 @@ export abstract class Resource<
    * @param criteria - The query options to filter the records to be deleted.
    * @returns A promise that resolves to the result of the delete operation.
    */
-  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
+  async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
     return this.authorizeAction("delete").then(() => {
       return this.beforeDeleteMany(criteria).then(() => {
         return this.getDataService()
@@ -569,7 +570,7 @@ export abstract class Resource<
    * @param options - Optional query options to filter the results.
    * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
-  count(options?: IResourceQueryOptions<DataType>) {
+  async count(options?: IResourceQueryOptions<DataType>) {
     return this.authorizeAction("read").then(() => {
       return this.getDataService()
         .count(options)
@@ -584,7 +585,7 @@ export abstract class Resource<
    * @param {PrimaryKeyType} primaryKey - The primary key of the record to check.
    * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */
-  exists(primaryKey: PrimaryKeyType): Promise<boolean> {
+  async exists(primaryKey: PrimaryKeyType): Promise<boolean> {
     return this.authorizeAction("read").then(() => {
       return this.getDataService()
         .exists(primaryKey)
@@ -898,22 +899,84 @@ export abstract class Resource<
   }
 
   /**
-   * Formats a string by replacing placeholders with corresponding values from a parameters object.
+   * Interpolates placeholders in a string with values from a parameters object, automatically including resource context.
    *
-   * @param text - The string containing placeholders in the format `{key}` to be replaced.
-   * @param params - An object containing key-value pairs where the key corresponds to the placeholder in the text and the value is the replacement.
-   * @returns The formatted string with placeholders replaced by corresponding values from the params object.
+   * This method provides a convenient wrapper around the global `interpolate` function, automatically
+   * merging the provided parameters with the resource's context information (resource name, label, etc.).
+   * This is particularly useful for internationalization and dynamic string generation within resource operations.
+   *
+   * **Placeholder Format:**
+   * - Uses the default `{key}` format for placeholders
+   * - Keys can contain dots (e.g., `{user.name}`) but are treated as flat object keys
+   * - Custom regex patterns can be specified via options for different placeholder formats
+   *
+   * **Resource Context:**
+   * - Automatically includes `resourceName`, `resourceLabel`, and any additional context from `getResourceContext()`
+   * - Provided parameters take precedence over resource context values
+   *
+   * **Value Handling:**
+   * - Missing keys or undefined/null values result in empty strings
+   * - Values are automatically formatted using the default formatter that handles all JavaScript types
+   * - Custom formatters can be provided for specialized formatting requirements
+   *
+   * @param {string} [text] - The template string containing placeholders to be replaced.
+   *                          If null, undefined, or empty, returns an empty string.
+   * @param {Record<string, any>} [params] - An object containing key-value pairs for interpolation.
+   *                                         These parameters will be merged with the resource context.
+   *                                         If null, undefined, or empty object, only resource context is used.
+   * @param {IInterpolateOptions} [options] - Optional configuration object for advanced interpolation behavior.
+   *                                          Note: The `tagRegex` option will override the default `{key}` pattern.
+   * @returns {string} The interpolated string with all placeholders replaced by their corresponding values.
+   *                   Placeholders without matching keys are replaced with empty strings.
+   *
+   * @example
+   * // Basic interpolation with resource context
+   * const message = resource.interpolate("Welcome to {resourceLabel}!", { user: "Alice" });
+   * // Result: "Welcome to User!" (assuming resource label is "User")
+   *
+   * @example
+   * // Using resource context values
+   * const title = resource.interpolate("{resourceName}: {action}", { action: "created" });
+   * // Result: "user: created" (assuming resource name is "user")
+   *
+   * @example
+   * // Parameters override resource context
+   * const custom = resource.interpolate("{resourceLabel}", { resourceLabel: "Custom Label" });
+   * // Result: "Custom Label" (parameter takes precedence)
+   *
+   * @example
+   * // Complex objects are JSON stringified
+   * const dataMsg = resource.interpolate("Data: {info}", { info: { count: 5 } });
+   * // Result: "Data: {"count":5}"
+   *
+   * @example
+   * // Custom formatter for specialized formatting
+   * const formatted = resource.interpolate("Price: {amount}", { amount: 99.99 }, {
+   *   valueFormatter: (value, tagName) => {
+   *     if (tagName === 'amount' && typeof value === 'number') {
+   *       return `$${value.toFixed(2)}`;
+   *     }
+   *     return String(value);
+   *   }
+   * });
+   * // Result: "Price: $99.99"
+   *
+   * @example
+   * // Custom regex for different placeholder syntax
+   * const customSyntax = resource.interpolate("Hello [[name]]!", { name: "World" }, {
+   *   tagRegex: /\[\[([^\]]+)\]\]/g
+   * });
+   * // Result: "Hello World!"
    */
-  sprintf(text?: string, params?: Record<string, any>): string {
-    let t: string = defaultStr(text);
-    if (text && isObj(params) && params) {
-      for (let i in params) {
-        if (!isEmpty(params[i])) {
-          t = t.replaceAll(`{${i}}`, stringify(params[i]));
-        }
-      }
-    }
-    return t;
+  interpolate(
+    text?: string,
+    params?: Record<string, any>,
+    options?: IInterpolateOptions
+  ) {
+    return interpolate(text, this.getResourceContext(params), {
+      tagRegex: /\{([^}]+)\}/g,
+      ...options,
+    });
   }
   /**
    * Retrieves the label for a specified action, optionally formatting it with provided parameters.
@@ -926,7 +989,7 @@ export abstract class Resource<
     actionName: IResourceActionName<Name>,
     params?: Record<string, any>
   ) {
-    return this.sprintf(this.getAction(actionName)?.label, params);
+    return this.interpolate(this.getAction(actionName)?.label, params);
   }
   /**
    * Retrieves the title of a specified action, optionally formatting it with provided parameters.
@@ -939,7 +1002,7 @@ export abstract class Resource<
     actionName: IResourceActionName<Name>,
     params?: Record<string, any>
   ) {
-    return this.sprintf(this.getAction(actionName)?.title, params);
+    return this.interpolate(this.getAction(actionName)?.title, params);
   }
   /**
    * Retrieves a specific action by its name.

@@ -1,32 +1,31 @@
 import { isNumber } from "./isNumber";
 
-export * from "./numbers";
-export * from "./json";
-export { isRegExp as isRegex } from "./isRegex";
-export { uniqid } from "./uniqid";
-export * from "./dom";
-export { defaultStr } from "./defaultStr";
-export { isNonNullString } from "./isNonNullString";
 export * from "./date";
-export { isPromise } from "./isPromise";
-export { stringify } from "./stringify";
-export { defaultVal } from "./defaultVal";
-export { defaultBool } from "./defaultBool";
-export * from "./image";
-export * from "./date";
-export * from "./sort";
-export * from "./defaultArray";
-export * from "./object";
-export * from "./isNumber";
 export * from "./debounce";
 export { debounce } from "./debounce";
+export * from "./defaultArray";
+export { defaultBool } from "./defaultBool";
+export { defaultStr } from "./defaultStr";
+export { defaultVal } from "./defaultVal";
+export * from "./dom";
+export * from "./image";
+export { isNonNullString } from "./isNonNullString";
+export * from "./isNumber";
+export { isPromise } from "./isPromise";
+export { isRegExp as isRegex } from "./isRegex";
+export * from "./json";
+export * from "./numbers";
+export * from "./object";
+export * from "./sort";
+export { stringify } from "./stringify";
+export { uniqid } from "./uniqid";
 export * from "./uri";
 
+export * from "./global";
+export { isPrimitive } from "./isPrimitive";
+export * from "./isValidEmail";
 export * from "./string";
 export * from "./uri";
-export * from "./isValidEmail";
-export { isPrimitive } from "./isPrimitive";
-export * from "./global";
 
 /**
  * Checks if a value is an integer.
@@ -44,5 +43,7 @@ export * from "./isNullable";
 
 export { isClass } from "./isClass";
 
-export { isEmpty } from "./isEmpty";
 export { areEquals } from "./areEquals";
+export { isEmpty } from "./isEmpty";
+
+export * from "./interpolate";

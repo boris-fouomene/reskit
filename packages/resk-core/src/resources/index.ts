@@ -48,6 +48,18 @@ export abstract class Resource<
   PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
   EventType = IResourceDefaultEvent<Name>,
 > {
+  /**
+   * The internal name of the resource.
+   *
+   * This name is used within the system for referencing the resource programmatically.
+   * It is often a short, unique identifier for the resource.
+   *
+   * @example
+   * ```typescript
+   * const userResource: IResource = { name: "user" };
+   * ```
+   */
+  protected name: Name = "" as unknown as Name;
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
   constructor() {
@@ -71,18 +83,6 @@ export abstract class Resource<
   static events = observableFactory<
     IResourceDefaultEvent<IResourceName> | string
   >();
-  /**
-   * The internal name of the resource.
-   *
-   * This name is used within the system for referencing the resource programmatically.
-   * It is often a short, unique identifier for the resource.
-   *
-   * @example
-   * ```typescript
-   * const userResource: IResource = { name: "user" };
-   * ```
-   */
-  name?: IResourceName;
 
   /**
    * A user-friendly label for the resource.
@@ -237,7 +237,7 @@ export abstract class Resource<
     if (!hasPermission) {
       throw new Error(
         i18n.t(
-          `resources.${this.getName()}.forbiddenError`,
+          this.buildTranslationPath("forbiddenError"),
           this.getResourceContext({ action })
         )
       );
@@ -273,6 +273,33 @@ export abstract class Resource<
         });
     });
   }
+  /**
+   * Builds a translation path for the resource by combining the resource prefix with the provided key.
+   *
+   * This method constructs hierarchical translation paths used by the i18n system. It creates paths
+   * like "resources.user.notFoundError" or "resources.user.forbiddenError" that correspond to
+   * nested translation keys in the internationalization files.
+   *
+   * @param {string} key - The specific translation key to append to the resource prefix.
+   *                      Leading dots are automatically trimmed to avoid double dots in the path.
+   * @returns {string} The complete translation path. If no key is provided, returns just the resource prefix.
+   *
+   * @example
+   * ```typescript
+   * // For a resource named "user"
+   * resource.buildTranslationPath("notFoundError"); // "resources.user.notFoundError"
+   * resource.buildTranslationPath("forbiddenError"); // "resources.user.forbiddenError"
+   * resource.buildTranslationPath(); // "resources.user."
+   * ```
+   */
+  buildTranslationPath(key?: string): string {
+    const name = this.getName();
+    const prefix = `resources${isNonNullString(name) ? `.${name}` : ""}.`;
+    if (isNonNullString(key)) {
+      return `${prefix}${key.trim().ltrim(".")}`;
+    }
+    return prefix;
+  }
   /***
    * fetches a single record from the resource.
    * If the record is not found, it throws an error.
@@ -285,7 +312,7 @@ export abstract class Resource<
     if (!isObj(result) || !result) {
       throw new Error(
         i18n.t(
-          `resources.${this.getName()}.notFoundError`,
+          this.buildTranslationPath("notFoundError"),
           Object.assign(
             {},
             { options: JSON.stringify(options) },

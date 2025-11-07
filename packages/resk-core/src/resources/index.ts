@@ -59,7 +59,7 @@ export abstract class Resource<
    * const userResource: IResource = { name: "user" };
    * ```
    */
-  protected name: Name = "" as unknown as Name;
+  protected abstract name: Name;
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
   constructor() {
@@ -734,19 +734,10 @@ export abstract class Resource<
 
   /**
    * Retrieves the name of the resource.
-   * Alias for getResourceName
    * @returns {Name} The name of the resource, cast to the Name type.
    */
   getName(): Name {
-    return this.getResourceName();
-  }
-  /**
-   * Retrieves the name of the resource.
-   *
-   * @returns {Name} The name of the resource, cast to the Name type.
-   */
-  getResourceName(): Name {
-    return defaultStr(this.getMetaData().name, this.name) as Name;
+    return defaultStr(this.name, this.getMetaData().name) as Name;
   }
   /**
    * Retrieves the actions associated with the resource.

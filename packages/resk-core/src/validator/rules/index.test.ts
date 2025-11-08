@@ -348,8 +348,8 @@ describe("Validator Rules", () => {
             emptyField: "",
             optionalEmail: "",
           });
-          expect(result.data.emptyField).toBe("");
-          expect(result.data.optionalEmail).toBe("");
+          expect(result.data?.emptyField).toBe("");
+          expect(result.data?.optionalEmail).toBe("");
         });
 
         it("should apply other rules when not empty string", async () => {
@@ -466,9 +466,9 @@ describe("Validator Rules", () => {
             optionalEmail: null,
             strictString: null,
           });
-          expect(result.data.nullableField).toBe(null);
-          expect(result.data.optionalEmail).toBe(null);
-          expect(result.data.strictString).toBe(null);
+          expect(result.data?.nullableField).toBe(null);
+          expect(result.data?.optionalEmail).toBe(null);
+          expect(result.data?.strictString).toBe(null);
         });
 
         it("should skip validation for undefined with decorator", async () => {
@@ -477,9 +477,9 @@ describe("Validator Rules", () => {
             optionalEmail: undefined,
             strictString: undefined,
           });
-          expect(result.data.nullableField).toBe(undefined);
-          expect(result.data.optionalEmail).toBe(undefined);
-          expect(result.data.strictString).toBe(undefined);
+          expect(result.data?.nullableField).toBe(undefined);
+          expect(result.data?.optionalEmail).toBe(undefined);
+          expect(result.data?.strictString).toBe(undefined);
         });
 
         it("should apply other rules when value is empty string", async () => {
@@ -498,9 +498,9 @@ describe("Validator Rules", () => {
             optionalEmail: "test@example.com",
             strictString: "non-empty",
           });
-          expect(result.data.nullableField).toBe("valid");
-          expect(result.data.optionalEmail).toBe("test@example.com");
-          expect(result.data.strictString).toBe("non-empty");
+          expect(result.data?.nullableField).toBe("valid");
+          expect(result.data?.optionalEmail).toBe("test@example.com");
+          expect(result.data?.strictString).toBe("non-empty");
         });
       });
     });
@@ -610,9 +610,9 @@ describe("Validator Rules", () => {
             optionalEmail: undefined,
             strictString: undefined,
           });
-          expect(result.data.sometimesField).toBe(undefined);
-          expect(result.data.optionalEmail).toBe(undefined);
-          expect(result.data.strictString).toBe(undefined);
+          expect(result.data?.sometimesField).toBe(undefined);
+          expect(result.data?.optionalEmail).toBe(undefined);
+          expect(result.data?.strictString).toBe(undefined);
         });
 
         it("should skip validation when field is absent from data", async () => {
@@ -646,9 +646,9 @@ describe("Validator Rules", () => {
             optionalEmail: "test@example.com",
             strictString: "non-empty",
           });
-          expect(result.data.sometimesField).toBe("valid");
-          expect(result.data.optionalEmail).toBe("test@example.com");
-          expect(result.data.strictString).toBe("non-empty");
+          expect(result.data?.sometimesField).toBe("valid");
+          expect(result.data?.optionalEmail).toBe("test@example.com");
+          expect(result.data?.strictString).toBe("non-empty");
         });
       });
     });
@@ -813,9 +813,9 @@ describe("Validator Rules", () => {
           nullableRequired: null,
           // sometimesEmail and sometimesRequired are absent
         });
-        expect(result.data.requiredEmail).toBe("test@example.com");
-        expect(result.data.emptyRequired).toBe("");
-        expect(result.data.nullableRequired).toBe(null);
+        expect(result.data?.requiredEmail).toBe("test@example.com");
+        expect(result.data?.emptyRequired).toBe("");
+        expect(result.data?.nullableRequired).toBe(null);
       });
     });
   });

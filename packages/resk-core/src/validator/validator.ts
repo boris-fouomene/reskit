@@ -678,9 +678,6 @@ export class Validator {
 
   static validate<Context = unknown>({
     rules,
-    value,
-    context,
-    data,
     ...extra
   }: IValidatorValidateOptions<Array<any>, Context>): Promise<
     IValidatorValidateResult<Context>
@@ -689,6 +686,7 @@ export class Validator {
     const { sanitizedRules, invalidRules } =
       Validator.parseAndValidateRules(rules);
     const separators = Validator.getErrorMessageSeparators();
+    const { value, context, data } = extra;
     const successOrErrorData = {
       context,
       value,
@@ -884,16 +882,21 @@ export class Validator {
       }, 0);
     });
   }
-  isSuccess<Context = unknown>(
+  static isSuccess<Context = unknown>(
     result: IValidatorValidateResult<Context>
   ): result is IValidatorValidateSuccess<Context> {
     return isObj(result) && result.success === true;
   }
 
   static isFailure<Context = unknown>(
-    result: IValidatorValidateResult<Context>
+    result: any
   ): result is IValidatorValidateFailure<Context> {
-    return isObj(result) && result.success === false;
+    return (
+      isObj(result) &&
+      result.success === false &&
+      isObj(result.error) &&
+      result.error.name == "ValidatorValidationError"
+    );
   }
 
   static validateTarget<T extends IClassConstructor = any, Context = unknown>(
@@ -1026,7 +1029,7 @@ export class Validator {
                 context,
               },
               startTime
-            )
+            ) as any
           );
         } else {
           const message = i18n.translate("validator.failedForNFields", {

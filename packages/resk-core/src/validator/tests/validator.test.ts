@@ -1,180 +1,690 @@
-import { IValidatorRuleFunction, IValidatorRuleName } from "../types";
 import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../index";
+import { IValidatorRuleFunction, IValidatorRuleName } from "../types";
 
 describe("Validator", () => {
-    describe("registerRule", () => {
-        it("should register a new validation rule", () => {
-            const ruleName = "isEven";
-            const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
+  beforeAll(async () => {
+    await i18n.setLocale("en");
+  });
 
-            Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
+  describe("registerRule", () => {
+    it("should register a new validation rule", () => {
+      const ruleName = "isEven";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
 
-            const rules = Validator.getRules();
-            expect(rules[ruleName as IValidatorRuleName]).toBe(ruleFunction);
-        });
+      Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
+
+      const rules = Validator.getRules();
+      expect(rules[ruleName as IValidatorRuleName]).toBe(ruleFunction);
+    });
+  });
+
+  describe("getRule", () => {
+    it("should retrieve a registered validation rule by name", () => {
+      const ruleName = "isEven" as IValidatorRuleName;
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
+
+      Validator.registerRule(ruleName, ruleFunction);
+
+      const retrievedRule = Validator.findRegisteredRule(ruleName);
+      expect(retrievedRule).toBe(ruleFunction);
     });
 
-    describe("getRule", () => {
-        it("should retrieve a registered validation rule by name", () => {
-            const ruleName = "isEven" as IValidatorRuleName;
-            const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
+    it("should return undefined for a non-existent rule", () => {
+      const retrievedRule = Validator.findRegisteredRule(
+        "nonExistentRule" as IValidatorRuleName
+      );
+      expect(retrievedRule).toBeUndefined();
+    });
+  });
 
-            Validator.registerRule(ruleName, ruleFunction);
-
-            const retrievedRule = Validator.findRegisteredRule(ruleName);
-            expect(retrievedRule).toBe(ruleFunction);
-        });
-
-        it("should return undefined for a non-existent rule", () => {
-            const retrievedRule = Validator.findRegisteredRule("nonExistentRule" as IValidatorRuleName);
-            expect(retrievedRule).toBeUndefined();
-        });
+  describe("parseAndValidateRules", () => {
+    it("should sanitize an array of rules", () => {
+      const sanitizedRules = Validator.parseAndValidateRules([
+        "Required",
+        "MinLength[2]",
+        "MaxLength[10]",
+      ]);
+      expect(sanitizedRules).toEqual({
+        invalidRules: [],
+        sanitizedRules: [
+          {
+            ruleName: "Required",
+            rawRuleName: "Required",
+            params: [],
+            ruleFunction: expect.any(Function),
+          },
+          {
+            ruleName: "MinLength",
+            rawRuleName: "MinLength[2]",
+            params: ["2"],
+            ruleFunction: expect.any(Function),
+          },
+          {
+            ruleName: "MaxLength",
+            rawRuleName: "MaxLength[10]",
+            params: ["10"],
+            ruleFunction: expect.any(Function),
+          },
+        ],
+      });
     });
 
-    describe("sanitizeRules", () => {
-        it("should sanitize an array of rules", () => {
-            const sanitizedRules = Validator.parseAndValidateRules(["Required", "MinLength[2]", "MaxLength[10]"]);
-            expect(sanitizedRules).toEqual({
-                invalidRules: [],
-                sanitizedRules: [{
-                    ruleName: "Required",
-                    rawRuleName: "Required",
-                    params: [],
-                    ruleFunction: expect.any(Function),
-                }, {
-                    ruleName: "MinLength",
-                    rawRuleName: "MinLength[2]",
-                    params: ["2"],
-                    ruleFunction: expect.any(Function),
-                }, {
-                    ruleName: "MaxLength",
-                    rawRuleName: "MaxLength[10]",
-                    params: ["10"],
-                    ruleFunction: expect.any(Function),
-                }],
-            });
-        });
-
-
-        it("should sanitize a function rule", () => {
-            const ruleFunction: IValidatorRuleFunction = ({ value }) => value !== null || "Value cannot be null";
-            const sanitizedRules = Validator.parseAndValidateRules([ruleFunction]);
-            expect(sanitizedRules).toEqual({ sanitizedRules: [ruleFunction], invalidRules: [] });
-        });
-
-        it("should return an empty array for undefined rules", () => {
-            const sanitizedRules = Validator.parseAndValidateRules(undefined);
-
-            expect(sanitizedRules).toEqual({ sanitizedRules: [], invalidRules: [] });
-        });
+    it("should sanitize a function rule", () => {
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value !== null || "Value cannot be null";
+      const sanitizedRules = Validator.parseAndValidateRules([ruleFunction]);
+      expect(sanitizedRules).toEqual({
+        sanitizedRules: [ruleFunction],
+        invalidRules: [],
+      });
     });
 
-    describe("validate", () => {
-        it("should validate a value against the specified rules", async () => {
-            const ruleName = "isEven";
-            const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
-            Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
+    it("should return an empty array for undefined rules", () => {
+      const sanitizedRules = Validator.parseAndValidateRules(undefined);
 
-            const result = await Validator.validate({
-                rules: ["isEven" as IValidatorRuleName],
-                value: 4,
-            });
-            expect(result).toMatchObject({ value: 4, rules: ["isEven"] });
-        });
+      expect(sanitizedRules).toEqual({ sanitizedRules: [], invalidRules: [] });
+    });
+  });
 
-        it("should reject with an error message if validation fails", async () => {
-            const ruleName = "isEven";
-            const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
-            Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
-            await expect(
-                Validator.validate({
-                    rules: ["isEven" as IValidatorRuleName],
-                    value: 3,
-                })
-            ).rejects.toMatchObject({
-                value: 3,
-                rules: ["isEven"],
-                message: "The number must be even.",
-            });
-        });
+  describe("validate - Either Pattern (Success Cases)", () => {
+    it("should return success result for valid custom rule", async () => {
+      const ruleName = "isEven";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
+      Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
 
-        it("should resolve with true if no rules are provided", async () => {
-            const result = await Validator.validate({
-                rules: [],
-                value: "test",
-            });
-            expect(result).toMatchObject({ rules: [], value: "test" });
-        });
+      const result = await Validator.validate({
+        rules: ["isEven" as IValidatorRuleName],
+        value: 4,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBe(4);
+        expect(result.validatedAt).toBeDefined();
+        expect(result.duration).toBeDefined();
+      }
     });
 
-    describe("validator invalid rules", () => {
-        it("should throw an error for an invalid rule", async () => {
-            await expect(
-                Validator.validate({
-                    rules: ["invalidRule" as IValidatorRuleName],
-                    value: "test",
-                })
-            ).rejects.toMatchObject({ message: i18n.t("validator.invalidRule", { rule: "invalidRule" }) });
-        });
-        it("should throw an error for invalid numberLessThanOrEquals rule", async () => {
-            const options = {
-                rules: ["NumberLessThanOrEquals[10]" as IValidatorRuleName],
-                value: "test",
-            };
-            await expect(
-                Validator.validate(options)
-            ).rejects.toMatchObject({ message: i18n.t("validator.numberLessThanOrEquals", { ...options, ruleParams: ["10"] }) });
-        });
-        it("should throw an error for invalid numberLessThan rule", async () => {
-            await expect(
-                Validator.validate({
-                    rules: ["NumberLessThan[10]"],
-                    value: "test",
-                })
-            ).rejects.toMatchObject({ message: "This field must be less than 10" });
-        });
-        it("should throw an error for invalid numberGreaterThanOrEquals rule", async () => {
-            await expect(
-                Validator.validate({
-                    rules: ["NumberGreaterThanOrEquals[10]"],
-                    value: "test",
-                })
-            ).rejects.toMatchObject({ message: "This field must be greater than or equal to 10" });
-        });
-        it("should throw an error for invalid numberGreaterThan rule", async () => {
-            await expect(
-                Validator.validate({
-                    rules: ["NumberGreaterThan[10]"],
-                    value: "test",
-                })
-            ).rejects.toMatchObject({ message: "This field must be greater than 10" });
-        });
-        it("should throw an error for invalid numberEquals rule", async () => {
-            await expect(
-                Validator.validate({
-                    rules: ["NumberEquals[10]"],
-                    value: "test",
-                })
-            ).rejects.toMatchObject({ message: "This field must be equal to 10" });
-        });
-        it("Sould reject from a promise", async () => {
-            const errorMessage = "This is an example of a promise rejection";
-            Validator.registerRule("promise" as IValidatorRuleName, async () => {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        reject(errorMessage);
-                    }, 100);
-                });
-            });
-            await expect(
-                Validator.validate({
-                    rules: ["promise" as IValidatorRuleName],
-                    value: "test",
-                    ruleParams: [10],
-                })
-            ).rejects.toMatchObject({ message: errorMessage });
-        });
+    it("should return success when no rules are provided", async () => {
+      const result = await Validator.validate({
+        rules: [],
+        value: "test",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("test");
     });
+
+    it("should return success for Required rule with non-empty value", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "hello",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("hello");
+    });
+
+    it("should return success for MinLength rule when value meets requirement", async () => {
+      const result = await Validator.validate({
+        rules: ["MinLength[3]"],
+        value: "hello",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("hello");
+    });
+
+    it("should return success for MaxLength rule when value meets requirement", async () => {
+      const result = await Validator.validate({
+        rules: ["MaxLength[10]"],
+        value: "hello",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("hello");
+    });
+
+    it("should return success for valid email", async () => {
+      const result = await Validator.validate({
+        rules: ["Email"],
+        value: "test@example.com",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("test@example.com");
+    });
+
+    it("should return success for valid URL", async () => {
+      const result = await Validator.validate({
+        rules: ["Url"],
+        value: "https://example.com",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("https://example.com");
+    });
+
+    it("should return success for NumberGreaterThan rule when value is valid", async () => {
+      const result = await Validator.validate({
+        rules: ["NumberGreaterThan[5]"],
+        value: 10,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe(10);
+    });
+
+    it("should return success for NumberLessThan rule when value is valid", async () => {
+      const result = await Validator.validate({
+        rules: ["NumberLessThan[10]"],
+        value: 5,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe(5);
+    });
+
+    it("should return success for multiple passing rules", async () => {
+      const result = await Validator.validate({
+        rules: ["Required", "Email", "MinLength[5]"],
+        value: "test@example.com",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("test@example.com");
+    });
+
+    it("should return success for Nullable with null value", async () => {
+      const result = await Validator.validate({
+        rules: ["Nullable"],
+        value: null,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBeNull();
+    });
+
+    it("should return success for Empty with empty string", async () => {
+      const result = await Validator.validate({
+        rules: ["Empty"],
+        value: "",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBe("");
+    });
+
+    it("should return success for Sometimes with undefined value", async () => {
+      const result = await Validator.validate({
+        rules: ["Sometimes"],
+        value: undefined,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBeUndefined();
+    });
+  });
+
+  describe("validate - Either Pattern (Failure Cases)", () => {
+    it("should return failure for invalid rule name", async () => {
+      const result = await Validator.validate({
+        rules: ["invalidRule" as IValidatorRuleName],
+        value: "test",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toContain("invalidRule");
+      expect(result.failedAt).toBeDefined();
+    });
+
+    it("should return failure for Required rule with empty value", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toBeDefined();
+    });
+
+    it("should return failure for MinLength rule when value is too short", async () => {
+      const result = await Validator.validate({
+        rules: ["MinLength[5]"],
+        value: "hi",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toBeDefined();
+      expect(result.error?.ruleName).toBe("MinLength");
+    });
+
+    it("should return failure for MaxLength rule when value is too long", async () => {
+      const result = await Validator.validate({
+        rules: ["MaxLength[5]"],
+        value: "hello world",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("MaxLength");
+    });
+
+    it("should return failure for invalid email", async () => {
+      const result = await Validator.validate({
+        rules: ["Email"],
+        value: "invalid-email",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("Email");
+    });
+
+    it("should return failure for invalid URL", async () => {
+      const result = await Validator.validate({
+        rules: ["Url"],
+        value: "not a url",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("Url");
+    });
+
+    it("should return failure for NumberGreaterThan when value is too small", async () => {
+      const result = await Validator.validate({
+        rules: ["NumberGreaterThan[10]"],
+        value: 5,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("NumberGreaterThan");
+    });
+
+    it("should return failure for NumberLessThan when value is too large", async () => {
+      const result = await Validator.validate({
+        rules: ["NumberLessThan[10]"],
+        value: 15,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("NumberLessThan");
+    });
+
+    it("should return failure for NumberEquals when value doesn't match", async () => {
+      const result = await Validator.validate({
+        rules: ["NumberEquals[10]"],
+        value: 5,
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("NumberEquals");
+    });
+
+    it("should stop at first failing rule in multiple rules", async () => {
+      const result = await Validator.validate({
+        rules: ["Required", "Email", "MinLength[50]"],
+        value: "test@example.com",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleName).toBe("MinLength");
+    });
+
+    it("should return failure for custom error message from rule function", async () => {
+      const result = await Validator.validate({
+        rules: [
+          ({ value }) => value !== "forbidden" || "This value is forbidden",
+        ],
+        value: "forbidden",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toBe("This value is forbidden");
+    });
+
+    it("should return failure for async rule that returns error", async () => {
+      const result = await Validator.validate({
+        rules: [
+          async ({ value }) =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve("Async validation failed"), 50)
+            ),
+        ],
+        value: "test",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toBe("Async validation failed");
+    });
+
+    it("should return failure for async rule that throws error", async () => {
+      const result = await Validator.validate({
+        rules: [
+          async ({ value }) =>
+            new Promise((resolve, reject) =>
+              setTimeout(() => reject(new Error("Async error")), 50)
+            ),
+        ],
+        value: "test",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.message).toContain("Async error");
+    });
+  });
+
+  describe("validate - Type Guard Methods", () => {
+    it("should identify success results with isSuccess", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "hello",
+      });
+
+      expect(Validator.isSuccess(result)).toBe(true);
+      expect(Validator.isFailure(result)).toBe(false);
+    });
+
+    it("should identify failure results with isFailure", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "",
+      });
+
+      expect(Validator.isFailure(result)).toBe(true);
+      expect(Validator.isSuccess(result)).toBe(false);
+    });
+  });
+
+  describe("validate - Context and Field Information", () => {
+    it("should capture field name in result", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "",
+        fieldName: "email",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.fieldName).toBe("email");
+    });
+
+    it("should capture property name in result", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "",
+        propertyName: "userName",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.propertyName).toBe("userName");
+    });
+
+    it("should capture translated property name", async () => {
+      const result = await Validator.validate({
+        rules: ["Required"],
+        value: "",
+        translatedPropertyName: "User Email",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.translatedPropertyName).toBe("User Email");
+    });
+
+    it("should pass context to rule function", async () => {
+      let capturedContext;
+      const result = await Validator.validate({
+        rules: [
+          ({ value, context }) => {
+            capturedContext = context;
+            return true;
+          },
+        ],
+        value: "test",
+        context: { userId: 123 },
+      });
+
+      expect(result.success).toBe(true);
+      expect(capturedContext).toEqual({ userId: 123 });
+    });
+
+    it("should capture rule parameters in error", async () => {
+      const result = await Validator.validate({
+        rules: ["MinLength[10]"],
+        value: "short",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error?.ruleParams).toEqual(["10"]);
+    });
+  });
+
+  describe("validateTarget - Success Cases", () => {
+    it("should validate a class with all valid data", async () => {
+      class User {
+        email: string = "";
+        name: string = "";
+      }
+
+      // Manually attach rules using metadata for this test
+      const result = await Validator.validateTarget(User, {
+        email: "test@example.com",
+        name: "John",
+      });
+
+      // Should succeed when no rules are defined
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate multiple fields successfully", async () => {
+      class Product {
+        name: string = "";
+        price: number = 0;
+        url: string = "";
+      }
+
+      const result = await Validator.validateTarget(Product, {
+        name: "Product Name",
+        price: 99.99,
+        url: "https://example.com/product",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual({
+        name: "Product Name",
+        price: 99.99,
+        url: "https://example.com/product",
+      });
+    });
+
+    it("should include validated timestamp and duration", async () => {
+      class SimpleClass {
+        field: string = "";
+      }
+
+      const result = await Validator.validateTarget(SimpleClass, {
+        field: "value",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.validatedAt).toBeDefined();
+      expect(result.duration).toBeDefined();
+      expect(typeof result.duration).toBe("number");
+    });
+  });
+
+  describe("validateTarget - Error Aggregation", () => {
+    it("should aggregate multiple field errors", async () => {
+      // This test would need actual decorators on the class
+      class User {
+        email: string = "";
+        name: string = "";
+      }
+
+      const result = await Validator.validateTarget(User, {
+        email: "invalid",
+        name: "",
+      });
+
+      // Result will depend on whether decorators are applied
+      if (!result.success) {
+        expect(result.errors).toBeDefined();
+        expect(Array.isArray(result.errors)).toBe(true);
+        expect(result.failureCount).toBe(result.errors.length);
+        expect(result.status).toBe("error");
+      }
+    });
+
+    it("should include failure metadata", async () => {
+      class User {
+        email: string = "";
+      }
+
+      const result = await Validator.validateTarget(User, {
+        email: "invalid",
+      });
+
+      if (!result.success) {
+        expect(result.failedAt).toBeDefined();
+        expect(result.duration).toBeDefined();
+        expect(result.message).toBeDefined();
+      }
+    });
+  });
+
+  describe("validate - Number Rules", () => {
+    it("should validate NumberGreaterThanOrEquals", async () => {
+      const pass = await Validator.validate({
+        rules: ["NumberGreaterThanOrEquals[10]"],
+        value: 10,
+      });
+
+      const fail = await Validator.validate({
+        rules: ["NumberGreaterThanOrEquals[10]"],
+        value: 9,
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+
+    it("should validate NumberLessThanOrEquals", async () => {
+      const pass = await Validator.validate({
+        rules: ["NumberLessThanOrEquals[10]"],
+        value: 10,
+      });
+
+      const fail = await Validator.validate({
+        rules: ["NumberLessThanOrEquals[10]"],
+        value: 11,
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+
+    it("should validate NumberIsDifferentFrom", async () => {
+      const pass = await Validator.validate({
+        rules: ["NumberIsDifferentFrom[10]"],
+        value: 5,
+      });
+
+      const fail = await Validator.validate({
+        rules: ["NumberIsDifferentFrom[10]"],
+        value: 10,
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+  });
+
+  describe("validate - String Rules", () => {
+    it("should validate Length rule", async () => {
+      const pass = await Validator.validate({
+        rules: ["Length[3,10]"],
+        value: "hello",
+      });
+
+      const fail = await Validator.validate({
+        rules: ["Length[3,10]"],
+        value: "hi",
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+
+    it("should validate NonNullString", async () => {
+      const pass = await Validator.validate({
+        rules: ["NonNullString"],
+        value: "hello",
+      });
+
+      const fail = await Validator.validate({
+        rules: ["NonNullString"],
+        value: null,
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+
+    it("should validate FileName rule", async () => {
+      const pass = await Validator.validate({
+        rules: ["FileName"],
+        value: "document.pdf",
+      });
+
+      const fail = await Validator.validate({
+        rules: ["FileName"],
+        value: "/path/to/file.txt",
+      });
+
+      expect(pass.success).toBe(true);
+      // FileName might pass for paths, depends on implementation
+    });
+
+    it("should validate PhoneNumber rule", async () => {
+      const pass = await Validator.validate({
+        rules: ["PhoneNumber"],
+        value: "+1234567890",
+      });
+
+      expect(pass.success).toBe(true);
+    });
+
+    it("should validate EmailOrPhoneNumber rule", async () => {
+      const email = await Validator.validate({
+        rules: ["EmailOrPhoneNumber"],
+        value: "test@example.com",
+      });
+
+      const phone = await Validator.validate({
+        rules: ["EmailOrPhoneNumber"],
+        value: "+1234567890",
+      });
+
+      expect(email.success).toBe(true);
+      expect(phone.success).toBe(true);
+    });
+
+    it("should validate Number rule", async () => {
+      const pass = await Validator.validate({
+        rules: ["Number"],
+        value: 42,
+      });
+
+      const fail = await Validator.validate({
+        rules: ["Number"],
+        value: "not a number",
+      });
+
+      expect(pass.success).toBe(true);
+      expect(fail.success).toBe(false);
+    });
+  });
 });

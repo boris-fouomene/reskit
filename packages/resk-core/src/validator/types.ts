@@ -566,7 +566,8 @@ export interface IValidatorValidationError {
 }
 
 // Single value validation (reuse base types directly)
-export interface IValidatorValidateSuccess<Context = unknown> extends BaseData {
+export interface IValidatorValidateSuccess<Context = unknown>
+  extends BaseData<Context> {
   /** Discriminant for type narrowing */
   success: true;
 
@@ -575,6 +576,10 @@ export interface IValidatorValidateSuccess<Context = unknown> extends BaseData {
 
   /** How long validation took (in milliseconds) */
   duration?: number;
+
+  error?: undefined;
+
+  failedAt?: undefined;
 }
 interface BaseData<Context = unknown> {
   /**
@@ -614,6 +619,8 @@ export interface IValidatorValidateFailure<Context = unknown>
 
   /** How long validation took before failing (in milliseconds) */
   duration?: number;
+
+  validatedAt?: undefined;
 }
 
 export type IValidatorValidateResult<Context = unknown> =
@@ -628,10 +635,8 @@ export type IValidatorValidateResult<Context = unknown> =
  */
 
 // Target validation failure result (specialized for multiple field errors)
-export interface IValidatorValidateTargetFailure<
-  T = unknown,
-  Context = unknown,
-> {
+export interface IValidatorValidateTargetFailure<T = unknown, Context = unknown>
+  extends Omit<BaseData<Context>, "value"> {
   /** Discriminant - always false for failures */
   success: false;
 
@@ -654,6 +659,8 @@ export interface IValidatorValidateTargetFailure<
   duration?: number;
 
   context?: Context;
+
+  validatedAt?: undefined;
 }
 
 // Main Either type for class target validation results

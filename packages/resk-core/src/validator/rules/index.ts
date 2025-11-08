@@ -554,3 +554,105 @@ Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
 export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator([
   "EmailOrPhoneNumber",
 ]);
+
+// Nullable validation rules - allow skipping validation under specific conditions
+
+Validator.registerRule("Empty", function Empty() {
+  // This rule always passes - its presence indicates that empty string values should skip validation
+  return true;
+});
+
+/**
+ * ### Empty Decorator
+ *
+ * Marks a field as allowing empty strings, meaning validation will be skipped if the value is an empty string ("").
+ * If the value is not an empty string, other validation rules will still be applied.
+ *
+ * @example
+ * ```typescript
+ * class User {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsEmpty
+ *   @IsString  // Only skipped if bio is an empty string
+ *   bio: string;
+ * }
+ * ```
+ *
+ * @decorator
+ * @since 1.23.0
+ * @public
+ */
+export const IsEmpty = Validator.createPropertyDecorator(["Empty"]);
+
+Validator.registerRule("Nullable", function Nullable() {
+  // This rule always passes - its presence indicates that null/undefined values should skip validation
+  return true;
+});
+
+/**
+ * ### Nullable Decorator
+ *
+ * Marks a field as nullable, meaning validation will be skipped if the value is null or undefined.
+ * If the value is not null or undefined, other validation rules will still be applied.
+ *
+ * @example
+ * ```typescript
+ * class User {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsNullable
+ *   @IsString  // Only skipped if bio is null or undefined
+ *   bio?: string;
+ * }
+ * ```
+ *
+ * @decorator
+ * @since 1.23.0
+ * @public
+ */
+export const IsNullable = Validator.createPropertyDecorator(["Nullable"]);
+
+Validator.registerRule("Sometimes", function Sometimes() {
+  // This rule always passes - its presence indicates that undefined values should skip validation
+  return true;
+});
+
+/**
+ * ### Sometimes Decorator
+ *
+ * Marks a field as sometimes validated, meaning validation will be skipped if the value is undefined.
+ * If the field is not present in the data object, validation is also skipped.
+ * This is useful for optional fields that should only be validated when explicitly provided.
+ *
+ * @example
+ * ```typescript
+ * class User {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsSometimes
+ *   @IsUrl  // Only validated if website is present in data and not undefined
+ *   website?: string;
+ * }
+ * ```
+ *
+ * @decorator
+ * @since 1.23.0
+ * @public
+ */
+export const IsSometimes = Validator.createPropertyDecorator(["Sometimes"]);
+
+/**
+ * Ensures that all validation rules are registered.
+ * This function is called to guarantee that rule registration side effects have occurred.
+ */
+export function ensureRulesRegistered() {
+  // Rules are registered as side effects when this module is imported
+  return Validator.getRules();
+}

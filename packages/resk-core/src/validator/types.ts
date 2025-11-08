@@ -319,6 +319,21 @@ export interface IValidatorRules<
    * Validator rule that checks if a value is a valid email or phone number.
    */
   EmailOrPhoneNumber: IValidatorRuleFunction<ParamType, Context>;
+
+  /**
+   * Validator rule that marks a field as allowing empty strings (validation skipped if "").
+   */
+  Empty: IValidatorRuleFunction<ParamType, Context>;
+
+  /**
+   * Validator rule that marks a field as nullable (validation skipped if null or undefined).
+   */
+  Nullable: IValidatorRuleFunction<ParamType, Context>;
+
+  /**
+   * Validator rule that marks a field as sometimes validated (validation skipped if undefined).
+   */
+  Sometimes: IValidatorRuleFunction<ParamType, Context>;
 }
 
 /**

@@ -1,5 +1,7 @@
 import "../translations";
-import "./rules";
-export * from './validator';
-export * from './types';
+import { ensureRulesRegistered } from "./rules";
+// Ensure rules are loaded
+ensureRulesRegistered();
 export * from "./rules";
+export * from "./types";
+export * from "./validator";

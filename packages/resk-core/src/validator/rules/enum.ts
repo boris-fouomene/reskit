@@ -19,6 +19,7 @@ function Enum<T extends IPrimitive = IPrimitive>({
     });
     return message;
   }
+  const arrayValue = Array.isArray(value) ? value : [value];
   const exists = ruleParams.some((v) => {
     return (
       v === value ||

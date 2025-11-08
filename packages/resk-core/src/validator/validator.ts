@@ -1313,9 +1313,7 @@ export class Validator {
         }
       ) => string;
     }
-  ): Promise<
-    IValidatorValidateTargetResult<Partial<Record<keyof InstanceType<T>, any>>>
-  > {
+  ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
     const targetRules = Validator.getTargetRules<T>(target);
     const messageSeparators = Validator.getErrorMessageSeparators();
@@ -1403,11 +1401,7 @@ export class Validator {
       );
     }
 
-    return new Promise<
-      IValidatorValidateTargetResult<
-        Partial<Record<keyof InstanceType<T>, any>>
-      >
-    >((resolve) => {
+    return new Promise<IValidatorValidateTargetResult<Context>>((resolve) => {
       return Promise.all(validationPromises).then(() => {
         const isValidationSuccessful = !validationErrors.length;
 

@@ -510,7 +510,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.validatedAt).toBeDefined();
+      expect((result as any).validatedAt).toBeDefined();
       expect(result.duration).toBeDefined();
       expect(typeof result.duration).toBe("number");
     });

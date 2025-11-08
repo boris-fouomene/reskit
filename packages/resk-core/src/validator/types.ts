@@ -1248,8 +1248,6 @@ export type IValidatorValidateResult<Context = unknown> =
  *   });
  * }
  * ```
- *
- * @template T - Type of the data being validated (usually a class instance)
  * @template Context - Type of the optional validation context
  *
  * @public
@@ -1258,7 +1256,7 @@ export type IValidatorValidateResult<Context = unknown> =
  * @see {@link IValidatorValidationError}
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetFailure<T = unknown, Context = unknown>
+export interface IValidatorValidateTargetFailure<Context = unknown>
   extends Omit<BaseData<Context>, "value"> {
   /** Discriminant for type narrowing - always `false` for failures */
   success: false;
@@ -1327,9 +1325,6 @@ export interface IValidatorValidateTargetFailure<T = unknown, Context = unknown>
 
   /** Validation context (if provided) */
   context?: Context;
-
-  /** Always `undefined` for target failures (type narrowing aid) */
-  validatedAt?: undefined;
 }
 
 /**
@@ -1411,7 +1406,6 @@ export interface IValidatorValidateTargetFailure<T = unknown, Context = unknown>
  * }
  * ```
  *
- * @template T - Type of the validated data (usually a class type)
  * @template Context - Type of the optional validation context
  *
  * @public
@@ -1420,22 +1414,10 @@ export interface IValidatorValidateTargetFailure<T = unknown, Context = unknown>
  * @see {@link IValidatorValidateSuccess} - Single-value equivalent
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetSuccess<
-  T = unknown,
-  Context = unknown,
-> {
+export interface IValidatorValidateTargetSuccess<Context = unknown>
+  extends BaseData<Context> {
   /** Discriminant for type narrowing - always `true` for success */
   success: true;
-
-  /**
-   * The validated data - the class instance with all fields passing validation
-   *
-   * This is the instance you pass to validateTarget with all decorated fields
-   * having passed their validation rules.
-   *
-   * @type {T}
-   */
-  data: T;
 
   /**
    * Status indicator for this result
@@ -1467,15 +1449,6 @@ export interface IValidatorValidateTargetSuccess<
    * @example 23 (milliseconds)
    */
   duration?: number;
-
-  /** Validation context (if provided) */
-  context?: Context;
-
-  /** Always `undefined` for target success (type narrowing aid) */
-  value?: undefined;
-
-  /** Always `undefined` for target success (type narrowing aid) */
-  errors?: undefined;
 }
 
 /**
@@ -1570,7 +1543,6 @@ export interface IValidatorValidateTargetSuccess<
  * - {@link IValidatorValidateTargetSuccess} - When all fields pass (success: true)
  * - {@link IValidatorValidateTargetFailure} - When one or more fields fail (success: false)
  *
- * @template T - Type of the validated data/class being validated
  * @template Context - Type of the optional validation context
  *
  * @public
@@ -1582,6 +1554,6 @@ export interface IValidatorValidateTargetSuccess<
  * @see {@link Validator.isFailure} - Type guard for failure
  * @see {@link IValidatorValidateResult} - Single-value equivalent
  */
-export type IValidatorValidateTargetResult<T = unknown, Context = unknown> =
-  | IValidatorValidateTargetSuccess<T, Context>
-  | IValidatorValidateTargetFailure<T, Context>;
+export type IValidatorValidateTargetResult<Context = unknown> =
+  | IValidatorValidateTargetSuccess<Context>
+  | IValidatorValidateTargetFailure<Context>;

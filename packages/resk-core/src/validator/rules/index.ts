@@ -12,8 +12,12 @@ import { InputFormatter } from "../../inputFormatter";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
+export * from "./array";
 export * from "./boolean";
+export * from "./date";
 export * from "./enum";
+export * from "./file";
+export * from "./format";
 export * from "./numeric";
 export * from "./string";
 

@@ -406,7 +406,8 @@ export interface IValidatorRules<
 export interface IValidatorValidateOptions<
   ParamType extends Array<any> = Array<any>,
   Context = unknown,
-> extends Partial<IInputFormatterResult> {
+> extends Omit<Partial<IInputFormatterResult>, "value">,
+    BaseData<Context> {
   /**
    * The list of validation rules to apply that have been passed through the `Validator.validate` method.
    *
@@ -439,20 +440,6 @@ export interface IValidatorValidateOptions<
    * ```
    */
   rule?: IValidatorRule<ParamType, Context>;
-
-  /**
-   * The value to use for performing the validation.
-   * This is the actual data that will be validated against the specified rules.
-   *
-   * @example
-   * ```typescript
-   * const options: IValidatorValidateOptions = {
-   *     rules: { required: true },
-   *     value: "some input",
-   * };
-   * ```
-   */
-  value: any;
 
   /**
    * Parameters related to the definition of the rule.
@@ -525,15 +512,6 @@ export interface IValidatorValidateOptions<
    * It is used to provide a clearer error message for the property.
    */
   translatedPropertyName?: string;
-
-  context?: Context;
-  /**
-   * Optional data for context
-   * This property is used to provide additional context for the validation rule.
-   * It can be used to pass any additional data that might be needed for validation,
-   * such as form data or other relevant information.
-   */
-  data?: Record<string, any>;
 }
 
 /**
@@ -544,15 +522,20 @@ export interface IValidatorValidateOptions<
  */
 
 // Base error interface for validation failures
-interface ValidationError {
-  /** Human-readable error message */
-  message: string;
+export interface IValidatorValidationError {
+  /** Always 'error' for failures */
+  status: "error";
 
-  /** The field that failed validation */
+  name: "ValidatorValidationError";
+
+  /** The property name that failed validation (required) */
   fieldName?: string;
 
-  /** Alias for fieldName */
+  /** Alias for fieldName (required) */
   propertyName?: string;
+
+  /** The validation error message (required) */
+  message: string;
 
   /** Localized field name for user-facing messages */
   translatedPropertyName?: string;
@@ -566,20 +549,8 @@ interface ValidationError {
   /** The value that failed validation */
   value?: any;
 
-  /** Always 'error' for failures */
-  status: "error";
-
-  /** The raw rule that failed */
-  rule?: IValidatorRule;
-
   /** Raw rule name with parameters (e.g., "minLength[5]") */
   rawRuleName?: string;
-
-  /** All rules that were applied */
-  rules?: IValidatorRule[];
-
-  /** Validation context data */
-  context?: any;
 
   /** Error code for programmatic handling */
   code?: string;
@@ -594,31 +565,87 @@ interface ValidationError {
   metadata?: Record<string, any>;
 }
 
-// Success result type (Right side of Either)
-export interface IValidatorValidateSuccess<T = unknown> {
+// Single value validation (reuse base types directly)
+export interface IValidatorValidateSuccess<Context = unknown> extends BaseData {
   /** Discriminant for type narrowing */
   success: true;
-
-  /** The validated data */
-  data: T;
 
   /** When validation completed successfully */
   validatedAt?: Date;
 
   /** How long validation took (in milliseconds) */
   duration?: number;
-
-  /** Additional success metadata */
-  metadata?: Record<string, any>;
 }
+interface BaseData<Context = unknown> {
+  /**
+   * The value to use for performing the validation.
+   * This is the actual data that will be validated against the specified rules.
+   *
+   * @example
+   * ```typescript
+   * const options: IValidatorValidateOptions = {
+   *     rules: { required: true },
+   *     value: "some input",
+   * };
+   * ```
+   */
+  value: any;
 
-// Failure result type (Left side of Either)
-export interface IValidatorValidateFailure<E = ValidationError> {
+  /**
+   * Optional data for context
+   * This property is used to provide additional context for the validation rule.
+   * It can be used to pass any additional data that might be needed for validation,
+   * such as form data or other relevant information.
+   */
+  data?: Record<string, any>;
+
+  context?: Context;
+}
+export interface IValidatorValidateFailure<Context = unknown>
+  extends BaseData<Context> {
   /** Discriminant for type narrowing */
   success: false;
 
   /** The validation error details */
-  error: E;
+  error: IValidatorValidationError;
+
+  /** When validation failed */
+  failedAt?: Date;
+
+  /** How long validation took before failing (in milliseconds) */
+  duration?: number;
+}
+
+export type IValidatorValidateResult<Context = unknown> =
+  | IValidatorValidateSuccess<Context>
+  | IValidatorValidateFailure<Context>;
+
+/**
+ * ## Validate Target Result Types
+ *
+ * Types for class-based validation using decorators.
+ * Supports accumulation of multiple field errors.
+ */
+
+// Target validation failure result (specialized for multiple field errors)
+export interface IValidatorValidateTargetFailure<
+  T = unknown,
+  Context = unknown,
+> {
+  /** Discriminant - always false for failures */
+  success: false;
+
+  /** Summary message for all failures */
+  message: string;
+
+  /** Array of validation errors for each failed field */
+  errors: IValidatorValidationError[];
+
+  /** Number of fields that failed validation */
+  failureCount: number;
+
+  /** Always "error" for failures */
+  status: "error";
 
   /** When validation failed */
   failedAt?: Date;
@@ -626,11 +653,10 @@ export interface IValidatorValidateFailure<E = ValidationError> {
   /** How long validation took before failing (in milliseconds) */
   duration?: number;
 
-  /** Additional failure metadata */
-  metadata?: Record<string, any>;
+  context?: Context;
 }
 
-// Main Either type for validation results
-export type IValidatorValidateResult<T = any, E = ValidationError> =
-  | IValidatorValidateSuccess<T>
-  | IValidatorValidateFailure<E>;
+// Main Either type for class target validation results
+export type IValidatorValidateTargetResult<T = unknown, E = unknown> =
+  | Omit<IValidatorValidateSuccess<T>, "value">
+  | Omit<IValidatorValidateTargetFailure<E>, "value">;

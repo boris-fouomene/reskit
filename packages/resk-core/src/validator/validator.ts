@@ -5,7 +5,6 @@ import {
 import { IClassConstructor, IDict } from "@/types";
 import {
   defaultStr,
-  defaultVal,
   extendObj,
   isEmpty,
   isNonNullString,
@@ -23,11 +22,36 @@ import {
   IValidatorValidateOptions,
   IValidatorValidateResult,
   IValidatorValidateSuccess,
+  IValidatorValidateTargetResult,
 } from "./types";
 
 // Enhanced metadata keys with consistent naming convention
 const VALIDATOR_TARGET_RULES_METADATA_KEY = Symbol("validatorTargetRules");
 const VALIDATOR_TARGET_OPTIONS_METADATA_KEY = Symbol("validatorTargetOptions");
+
+function createTargetFailureResult(
+  message: string,
+  errors: IValidatorValidationError[],
+  startTime: number
+): {
+  success: false;
+  message: string;
+  errors: IValidatorValidationError[];
+  failureCount: number;
+  status: "error";
+  failedAt: Date;
+  duration: number;
+} {
+  return {
+    success: false,
+    message,
+    errors,
+    failureCount: errors.length,
+    status: "error",
+    failedAt: new Date(),
+    duration: Date.now() - startTime,
+  };
+}
 
 /**
  * # Validator Class
@@ -652,133 +676,25 @@ export class Validator {
     return { valid: validRules, invalid: invalidRules };
   }
 
-  /**
-   * ## Validate Value Against Rules
-   *
-   * Performs comprehensive validation of a single value against a set of validation rules.
-   * This is the core validation method that supports both synchronous and asynchronous
-   * validation with detailed error reporting and internationalization support.
-   *
-   * ### Validation Process
-   * 1. **Rule Parsing**: Converts input rules to standardized format
-   * 2. **Rule Validation**: Checks that all rules are registered and valid
-   * 3. **Sequential Execution**: Runs rules one by one, stopping at first failure
-   * 4. **Error Handling**: Provides detailed error information with context
-   * 5. **Internationalization**: Supports localized error messages
-   *
-   * ### Rule Execution Order
-   * Rules are executed in the order they appear in the rules array. Validation stops
-   * at the first rule that fails, ensuring efficient validation and consistent behavior.
-   *
-   * ### Error Handling
-   * - **Invalid Rules**: Immediately rejects with list of unregistered rules
-   * - **Validation Failures**: Rejects with detailed error context
-   * - **Rule Exceptions**: Catches and formats rule execution errors
-   *
-   * @example
-   * ```typescript
-   * // Basic validation
-   * try {
-   *   const result = await Validator.validate({
-   *     value: 'user@example.com',
-   *     rules: ['Required', 'Email'],
-   *     fieldName: 'email'
-   *   });
-   *   console.log('Validation passed!', result);
-   * } catch (error) {
-   *   console.error('Validation failed:', error.message);
-   * }
-   *
-   * // Complex validation with context
-   * const validationOptions = {
-   *   value: 'newPassword123',
-   *   rules: [
-   *     'Required',
-   *     'MinLength[8]',
-   *     { StrongPassword: [] },
-   *     async ({ value, context }) => {
-   *       const isUsed = await checkPasswordHistory(value, context.userId);
-   *       return !isUsed || 'Password was recently used';
-   *     }
-   *   ],
-   *   fieldName: 'password',
-   *   translatedPropertyName: 'Password',
-   *   context: { userId: 123 }
-   * };
-   *
-   * try {
-   *   await Validator.validate(validationOptions);
-   * } catch (error) {
-   *   // Error contains: message, status, rule, ruleName, ruleParams, etc.
-   *   console.log('Failed rule:', error.ruleName);
-   *   console.log('Error message:', error.message);
-   * }
-   *
-   * // Validation with custom parameters
-   * const numericValidation = await Validator.validate({
-   *   value: 25,
-   *   rules: ['Required', 'Number', 'Between[18,65]'],
-   *   fieldName: 'age',
-   *   propertyName: 'userAge'
-   * });
-   * ```
-   *
-   * ### Advanced Usage
-   * ```typescript
-   * // Custom validation context
-   * interface ValidationContext {
-   *   currentUser: { id: number; role: string };
-   *   formData: Record<string, any>;
-   * }
-   *
-   * const contextValidation = await Validator.validate<ValidationContext>({
-   *   value: 'admin-action',
-   *   rules: [
-   *     'required',
-   *     ({ value, context }) => {
-   *       return context.currentUser.role === 'admin' || 'Admin access required';
-   *     }
-   *   ],
-   *   context: {
-   *     currentUser: { id: 1, role: 'user' },
-   *     formData: { action: 'admin-action' }
-   *   }
-   * });
-   * ```
-   *
-   * @template Context - Type of the validation context object passed to rules
-   *
-   * @param options - Validation configuration object
-   * @param options.rules - Array of validation rules to apply
-   * @param options.value - The value to validate
-   * @param options.fieldName - Name of the field being validated
-   * @param options.propertyName - Property name (alias for fieldName)
-   * @param options.translatedPropertyName - Localized field name for error messages
-   * @param options.context - Additional context data passed to validation rules
-   * @param options.extra - Any additional properties passed through to rules
-   *
-   * @returns Promise that resolves with validation success data or rejects with error details
-   *
-   * @throws {ValidationError} When validation fails, includes detailed error context
-   * @throws {RuleError} When invalid rules are detected
-   *
-   * @since 1.0.0
-   * @see {@link parseAndValidateRules} - Rule parsing used internally
-   * @see {@link validateTarget} - Class-based validation
-   * @see {@link registerRule} - Register custom rules
-   * @public
-   */
   static validate<Context = unknown>({
     rules,
     value,
+    context,
+    data,
     ...extra
   }: IValidatorValidateOptions<Array<any>, Context>): Promise<
-    IValidatorValidateOptions<Array<any>, Context> & { success: boolean }
+    IValidatorValidateResult<Context>
   > {
+    const startTime = Date.now();
     const { sanitizedRules, invalidRules } =
       Validator.parseAndValidateRules(rules);
     const separators = Validator.getErrorMessageSeparators();
-
+    const successOrErrorData = {
+      context,
+      value,
+      data,
+    };
+    // Handle invalid rules - return failure result instead of rejecting
     if (invalidRules.length) {
       const message = invalidRules
         .map((rule) =>
@@ -787,11 +703,22 @@ export class Validator {
           })
         )
         .join(separators.multiple);
-      return Promise.reject({ rules, value, ...extra, message });
+      const error = createValidationError(message, {
+        value,
+        fieldName: extra.fieldName,
+        propertyName: extra.propertyName,
+      });
+      return Promise.resolve(
+        createFailureResult<Context>(error, successOrErrorData, startTime)
+      );
     }
 
-    if (!sanitizedRules.length)
-      return Promise.resolve({ rules, value, ...extra, success: false });
+    // No rules to validate - return success
+    if (!sanitizedRules.length) {
+      return Promise.resolve(
+        createSuccessResult<Context>(successOrErrorData, startTime)
+      );
+    }
 
     // Check for nullable rules - if value meets nullable conditions, skip validation
     let skipValidation = false;
@@ -819,7 +746,9 @@ export class Validator {
     }
     if (skipValidation) {
       // Value meets nullable conditions - validation succeeds
-      return Promise.resolve({ rules, value, ...extra, success: true });
+      return Promise.resolve(
+        createSuccessResult<Context>(successOrErrorData, startTime)
+      );
     }
 
     extra.fieldName = extra.propertyName = defaultStr(
@@ -831,14 +760,15 @@ export class Validator {
       value,
       rules,
     };
-    return new Promise((resolve, reject) => {
+
+    return new Promise((resolve) => {
       setTimeout(() => {
         let index = -1;
         const rulesLength = sanitizedRules.length;
         const next = async function (): Promise<any> {
           index++;
           if (index >= rulesLength) {
-            return resolve({ value, rules, ...extra, success: true });
+            return resolve(createSuccessResult(successOrErrorData, startTime));
           }
           const rule = sanitizedRules[index];
           let ruleName = undefined;
@@ -852,16 +782,7 @@ export class Validator {
             ruleName = rule.ruleName;
             rawRuleName = rule.rawRuleName;
           }
-          const valResult = {
-            value,
-            status: "error",
-            rule,
-            ruleName,
-            rawRuleName,
-            ruleParams,
-            rules,
-            ...extra,
-          };
+
           const i18nRuleOptions = {
             ...i18nRulesOptions,
             rule: defaultStr(ruleName),
@@ -869,6 +790,7 @@ export class Validator {
             rawRuleName,
             ruleParams,
           };
+
           const handleResult = (result: any) => {
             result =
               typeof result === "string"
@@ -877,23 +799,69 @@ export class Validator {
                   : i18n.t("validator.invalidMessage", i18nRuleOptions)
                 : result;
             if (result === false) {
-              return reject({
-                ...valResult,
-                message: i18n.t("validator.invalidMessage", i18nRuleOptions),
-              });
+              const error = createValidationError(
+                i18n.t("validator.invalidMessage", i18nRuleOptions),
+                {
+                  value,
+                  ruleName,
+                  rawRuleName,
+                  ruleParams,
+                  fieldName: extra.fieldName,
+                  propertyName: extra.propertyName,
+                  translatedPropertyName: extra.translatedPropertyName,
+                }
+              );
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             } else if (isNonNullString(result)) {
-              return reject({ ...valResult, message: result });
+              const error = createValidationError(result, {
+                value,
+                ruleName,
+                rawRuleName,
+                ruleParams,
+                fieldName: extra.fieldName,
+                propertyName: extra.propertyName,
+                translatedPropertyName: extra.translatedPropertyName,
+              });
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             } else if ((result as any) instanceof Error) {
-              return reject({ ...valResult, message: stringify(result) });
+              const error = createValidationError(stringify(result), {
+                value,
+                ruleName,
+                rawRuleName,
+                ruleParams,
+                fieldName: extra.fieldName,
+                propertyName: extra.propertyName,
+                translatedPropertyName: extra.translatedPropertyName,
+              });
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             }
             return next();
           };
+
           if (typeof ruleFunc !== "function") {
-            return reject({
-              ...valResult,
-              message: i18n.t("validator.invalidRule", i18nRuleOptions),
-            });
+            const error = createValidationError(
+              i18n.t("validator.invalidRule", i18nRuleOptions),
+              {
+                value,
+                ruleName,
+                rawRuleName,
+                ruleParams,
+                fieldName: extra.fieldName,
+                propertyName: extra.propertyName,
+                translatedPropertyName: extra.translatedPropertyName,
+              }
+            );
+            return resolve(
+              createFailureResult(error, successOrErrorData, startTime)
+            );
           }
+
           try {
             const result = await ruleFunc({
               ...extra,
@@ -916,167 +884,18 @@ export class Validator {
       }, 0);
     });
   }
-  isSuccess<T, E>(
-    result: IValidatorValidateResult<T, E>
-  ): result is IValidatorValidateSuccess<T> {
+  isSuccess<Context = unknown>(
+    result: IValidatorValidateResult<Context>
+  ): result is IValidatorValidateSuccess<Context> {
     return isObj(result) && result.success === true;
   }
 
-  static isFailure<T, E>(
-    result: IValidatorValidateResult<T, E>
-  ): result is IValidatorValidateFailure<E> {
+  static isFailure<Context = unknown>(
+    result: IValidatorValidateResult<Context>
+  ): result is IValidatorValidateFailure<Context> {
     return isObj(result) && result.success === false;
   }
-  /**
-   * ## Validate Class Target with Decorators
-   *
-   * Validates data against a class that has been decorated with validation rules using
-   * property decorators. This method provides a powerful way to define validation schemas
-   * at the class level and validate entire objects against those schemas.
-   *
-   * ### Decorator-Based Validation
-   * This method works with classes that use validation decorators on their properties.
-   * Each decorated property defines the validation rules that should be applied to
-   * the corresponding data field.
-   *
-   * ### Validation Process
-   * 1. **Rule Extraction**: Retrieves validation rules from class metadata
-   * 2. **Property Translation**: Gets localized property names for error messages
-   * 3. **Parallel Validation**: Validates all properties concurrently for performance
-   * 4. **Error Aggregation**: Collects all validation errors across properties
-   * 5. **Result Formatting**: Provides comprehensive success/failure information
-   *
-   * ### Error Message Customization
-   * The optional `errorMessageBuilder` function allows complete customization of
-   * how validation errors are formatted and presented.
-   *
-   * @example
-   * ```typescript
-   * // Define a class with validation decorators
-   * class UserRegistration {
-   *   @IsRequired
-   *   @IsEmail
-   *   email: string;
-   *
-   *   @IsRequired
-   *   @MinLength([8])
-   *   @HasPattern([/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain uppercase, lowercase and number'])
-   *   password: string;
-   *
-   *   @IsRequired
-   *   @MinLength([2])
-   *   @MaxLength([50])
-   *   name: string;
-   *
-   *   @IsOptional
-   *   @IsNumber
-   *   @Between([18, 120])
-   *   age?: number;
-   * }
-   *
-   * // Validate user data
-   * const userData = {
-   *   email: 'user@example.com',
-   *   password: 'SecurePass123',
-   *   name: 'John Doe',
-   *   age: 25
-   * };
-   *
-   * try {
-   *   const result = await Validator.validateTarget(UserRegistration, userData);
-   *   console.log('User data is valid!', result.data);
-   * } catch (error) {
-   *   console.error('Validation failed:');
-   *   error.errors.forEach(err => {
-   *     console.log(`${err.fieldName}: ${err.message}`);
-   *   });
-   * }
-   * ```
-   *
-   * ### Advanced Usage with Custom Error Builder
-   * ```typescript
-   * const customOptions = {
-   *   errorMessageBuilder: (translatedName, error, builderOptions) => {
-   *     // Custom error format with field highlighting
-   *     return `⚠️ ${translatedName.toUpperCase()}: ${error}`;
-   *   }
-   * };
-   *
-   * try {
-   *   await Validator.validateTarget(UserRegistration, invalidData, customOptions);
-   * } catch (error) {
-   *   // Errors will use custom format: "⚠️ EMAIL: Invalid email format"
-   * }
-   * ```
-   *
-   * ### Context-Aware Validation
-   * ```typescript
-   * // Class with context-dependent validation
-   * class AdminUser {
-   *   @IsRequired
-   *   @IsEmail
-   *   email: string;
-   *
-   *   @CustomRule([
-   *     ({ value, context }) => {
-   *       return context.isAdmin || 'Admin privileges required';
-   *     }
-   *   ])
-   *   adminAction: string;
-   * }
-   *
-   * const adminData = {
-   *   email: 'admin@company.com',
-   *   adminAction: 'delete-user'
-   * };
-   *
-   * // Validate with context
-   * interface AdminContext {
-   *   isAdmin: boolean;
-   *   permissions: string[];
-   * }
-   *
-   * const result = await Validator.validateTarget<typeof AdminUser, AdminContext>(
-   *   AdminUser,
-   *   adminData,
-   *   { context: { isAdmin: true, permissions: ['delete', 'modify'] } }
-   * );
-   * ```
-   *
-   * ### Internationalization Support
-   * ```typescript
-   * // Property names are automatically translated based on i18n configuration
-   * // Error messages will use localized property names
-   *
-   * // English: "Email: Invalid email format"
-   * // French: "E-mail : Format d'e-mail invalide"
-   * // Spanish: "Correo electrónico: Formato de correo inválido"
-   * ```
-   *
-   * @template T - The class constructor type being validated
-   * @template Context - Type of validation context passed to rules
-   *
-   * @param target - The class constructor with validation decorators
-   * @param data - Object containing data to validate against the class schema
-   * @param options - Optional configuration for validation behavior
-   * @param options.errorMessageBuilder - Custom function to format error messages
-   *
-   * @returns Promise resolving to object with validated data
-   * @returns returns.data - The input data (potentially transformed by validation)
-   *
-   * @throws {ValidationError} Contains detailed validation failure information
-   * @throws returns.status - Always "error" for validation failures
-   * @throws returns.message - Summary message with failure count
-   * @throws returns.errors - Array of individual field validation errors
-   * @throws returns.success - Always false for validation failures
-   *
-   * @since 1.0.0
-   * @see {@link getTargetRules} - Extracts validation rules from class
-   * @see {@link validate} - Core validation method used internally
-   * @see {@link IsRequired} - Common validation decorator
-   * @see {@link IsEmail} - Email validation decorator
-   * @public
-   */
+
   static validateTarget<T extends IClassConstructor = any, Context = unknown>(
     target: T,
     data: Partial<Record<keyof InstanceType<T>, any>>,
@@ -1100,7 +919,10 @@ export class Validator {
         }
       ) => string;
     }
-  ): Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }> {
+  ): Promise<
+    IValidatorValidateTargetResult<Partial<Record<keyof InstanceType<T>, any>>>
+  > {
+    const startTime = Date.now();
     const targetRules = Validator.getTargetRules<T>(target);
     const messageSeparators = Validator.getErrorMessageSeparators();
     const { context, errorMessageBuilder, ...restOptions } = extendObj(
@@ -1116,13 +938,9 @@ export class Validator {
         : (translatedPropertyName: string, error: string) =>
             `[${String(translatedPropertyName)}] : ${error}`;
 
-    const validationErrors: {
-      fieldName: string;
-      propertyName: string;
-      message: string;
-    }[] = [];
-    const validationPromises: Promise<any>[] = [];
-    let errorCount = 0;
+    const validationErrors: IValidatorValidationError[] = [];
+    const validationPromises: Promise<IValidatorValidateResult<Context>>[] = [];
+    let validatedFieldCount = 0;
 
     const translatedPropertyNames = i18n.translateTarget(target, { data });
 
@@ -1158,50 +976,68 @@ export class Validator {
           fieldName: propertyKey,
           propertyName: propertyKey,
           rules: targetRules[propertyKey],
-        }).catch((validationError) => {
-          const errorMessage = stringify(
-            defaultVal(validationError?.message, validationError)
-          );
-          errorCount++;
-          const formattedMessage = buildErrorMessage(
-            translatedPropertyName,
-            errorMessage,
-            {
-              ...Object.assign({}, validationError),
-              separators: messageSeparators,
-              data,
+        }).then((validationResult) => {
+          if (validationResult.success) {
+            validatedFieldCount++;
+          } else {
+            const errorMessage = stringify(validationResult.error?.message);
+            const formattedMessage = buildErrorMessage(
+              translatedPropertyName,
+              errorMessage,
+              {
+                ...Object.assign({}, validationResult.error),
+                separators: messageSeparators,
+                data,
+                propertyName: propertyKey,
+                translatedPropertyName: translatedPropertyName,
+              }
+            );
+            validationErrors.push({
+              name: "ValidatorValidationError",
+              status: "error" as const,
+              fieldName: propertyKey,
+              value: validationResult.value,
               propertyName: propertyKey,
-              translatedPropertyName: translatedPropertyName,
-            }
-          );
-          validationErrors.push({
-            fieldName: propertyKey,
-            propertyName: propertyKey,
-            message: formattedMessage,
-          });
+              message: formattedMessage,
+              ruleName: validationResult.error?.ruleName,
+              ruleParams: validationResult.error?.ruleParams,
+              rawRuleName: validationResult.error?.rawRuleName,
+            });
+          }
+          return validationResult;
         })
       );
     }
 
-    return new Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }>(
-      (resolve, reject) => {
-        return Promise.all(validationPromises).then(() => {
-          const isIValidatorValidateSuccessful = !validationErrors.length;
-          if (isIValidatorValidateSuccessful) {
-            resolve({ data });
-          } else {
-            reject({
-              status: "error",
-              message: i18n.translate("validator.failedForNFields", {
-                count: errorCount,
-              }),
-              errors: validationErrors,
-              success: false,
-            });
-          }
-        });
-      }
-    );
+    return new Promise<
+      IValidatorValidateTargetResult<
+        Partial<Record<keyof InstanceType<T>, any>>
+      >
+    >((resolve) => {
+      return Promise.all(validationPromises).then(() => {
+        const isValidationSuccessful = !validationErrors.length;
+
+        if (isValidationSuccessful) {
+          resolve(
+            createSuccessResult<Context>(
+              {
+                data,
+                value: undefined,
+                context,
+              },
+              startTime
+            )
+          );
+        } else {
+          const message = i18n.translate("validator.failedForNFields", {
+            count: validationErrors.length,
+          });
+          resolve(
+            createTargetFailureResult(message, validationErrors, startTime)
+          );
+        }
+      });
+    });
   }
 
   /**
@@ -1340,7 +1176,7 @@ export class Validator {
    * @see {@link ValidationTargetOptions} - Decorator to set these options
    * @public
    */
-  public static getValidateTargetOptions<T extends IClassConstructor = any>(
+  public static getValidateTargetOptions<T extends IClassConstructor>(
     target: T
   ): Parameters<typeof Validator.validateTarget>[2] {
     return Object.assign(
@@ -1925,5 +1761,70 @@ export function ValidationTargetOptions(
       validationOptions,
       targetClass
     );
+  };
+}
+
+function createValidationError(
+  message: string,
+  params: {
+    value?: any;
+    fieldName?: string;
+    propertyName?: string;
+    translatedPropertyName?: string;
+    ruleName?: IValidatorRuleName;
+    rawRuleName?: string;
+    ruleParams?: any[];
+  }
+): IValidatorValidationError {
+  return {
+    name: "ValidatorValidationError",
+    message,
+    status: "error",
+    value: params.value,
+    fieldName: params.fieldName ?? "",
+    propertyName: params.propertyName ?? "",
+    translatedPropertyName: params.translatedPropertyName,
+    ruleName: params.ruleName,
+    rawRuleName: params.rawRuleName,
+    ruleParams: params.ruleParams,
+  };
+}
+
+type IValidatorValidationError = IValidatorValidateFailure<{}>["error"];
+
+function createSuccessResult<Context = unknown>(
+  options: {
+    context?: Context;
+    value: any;
+    data?: Record<string, any>;
+  },
+  startTime: number
+): IValidatorValidateSuccess<Context> {
+  return {
+    ...options,
+    success: true,
+    validatedAt: new Date(),
+    duration: Date.now() - startTime,
+  };
+}
+/**
+ * ## Helper: Create Failure Result
+ * Reduces duplication in failure result creation across methods
+ * @private
+ */
+function createFailureResult<Context = unknown>(
+  error: IValidatorValidationError,
+  options: {
+    context?: Context;
+    value: any;
+  },
+  startTime: number
+): IValidatorValidateFailure<Context> {
+  return {
+    ...options,
+    error,
+    success: false,
+    failedAt: new Date(),
+    duration: Date.now() - startTime,
   };
 }

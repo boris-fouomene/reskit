@@ -548,6 +548,230 @@ contact: string;
 // Accepts valid email OR valid phone number
 ```
 
+### Array Rules
+
+#### Array
+```typescript
+@IsArray
+items: any[];
+
+// Value must be an array
+```
+
+#### ArrayMinLength
+```typescript
+@ArrayMinLength([3])
+items: any[];
+
+// Array must have at least 3 elements
+```
+
+#### ArrayMaxLength
+```typescript
+@ArrayMaxLength([10])
+items: any[];
+
+// Array must have at most 10 elements
+```
+
+#### ArrayLength
+```typescript
+@ArrayLength([5])
+coordinates: number[];
+
+// Array must have exactly 5 elements
+```
+
+#### ArrayContains
+```typescript
+@ArrayContains(['admin'])
+roles: string[];
+
+// Array must contain 'admin'
+```
+
+#### ArrayUnique
+```typescript
+@ArrayUnique
+tags: string[];
+
+// All array elements must be unique
+```
+
+### Date Rules
+
+#### Date
+```typescript
+@IsDate
+birthDate: string;
+
+// Value must be a valid date
+```
+
+#### DateAfter
+```typescript
+@DateAfter(['2023-01-01'])
+eventDate: string;
+
+// Date must be after January 1, 2023
+```
+
+#### DateBefore
+```typescript
+@DateBefore(['2023-12-31'])
+deadline: string;
+
+// Date must be before December 31, 2023
+```
+
+#### DateBetween
+```typescript
+@DateBetween(['2023-01-01', '2023-12-31'])
+vacationDate: string;
+
+// Date must be between Jan 1 and Dec 31, 2023
+```
+
+#### DateEquals
+```typescript
+@DateEquals(['2023-06-15'])
+meetingDate: string;
+
+// Date must equal June 15, 2023
+```
+
+#### FutureDate
+```typescript
+@FutureDate
+appointmentDate: string;
+
+// Date must be in the future
+```
+
+#### PastDate
+```typescript
+@PastDate
+birthDate: string;
+
+// Date must be in the past
+```
+
+### File Rules
+
+#### File
+```typescript
+@IsFile
+document: File;
+
+// Value must be a valid file object
+```
+
+#### FileSize
+```typescript
+@FileSize([1024000])
+image: File;
+
+// File size must be exactly 1MB
+```
+
+#### FileType
+```typescript
+@FileType(['image/jpeg'])
+photo: File;
+
+// File must be JPEG image
+```
+
+#### Image
+```typescript
+@IsImage
+picture: File;
+
+// File must be a valid image
+```
+
+#### FileExtension
+```typescript
+@FileExtension(['.pdf'])
+document: File;
+
+// File must have .pdf extension
+```
+
+#### MinFileSize
+```typescript
+@MinFileSize([100])
+thumbnail: File;
+
+// File size must be at least 100 bytes
+```
+
+### Format Rules
+
+#### UUID
+```typescript
+@IsUUID
+id: string;
+
+// Value must be a valid UUID
+```
+
+#### JSON
+```typescript
+@IsJSON
+config: string;
+
+// Value must be valid JSON
+```
+
+#### Base64
+```typescript
+@IsBase64
+encodedData: string;
+
+// Value must be valid Base64
+```
+
+#### HexColor
+```typescript
+@IsHexColor
+color: string;
+
+// Value must be valid hex color (#FFF, #FFFFFF)
+```
+
+#### CreditCard
+```typescript
+@IsCreditCard
+cardNumber: string;
+
+// Value must be valid credit card number
+```
+
+#### IP
+```typescript
+@IsIP
+address: string;
+
+// Value must be valid IP address
+```
+
+#### MACAddress
+```typescript
+@IsMACAddress
+mac: string;
+
+// Value must be valid MAC address
+```
+
+#### Regex
+```typescript
+@Regex(['^[A-Z]+$'])
+code: string;
+
+// Value must match regex pattern
+```
+
 ---
 
 ## Decorator Reference
@@ -567,6 +791,20 @@ contact: string;
 @IsNullable             // Allow null/undefined
 @IsEmpty                // Allow empty string
 @IsSometimes            // Allow undefined
+@IsArray                // Must be an array
+@IsDate                 // Must be valid date
+@IsFile                 // Must be valid file
+@IsImage                // Must be valid image
+@IsUUID                 // Must be valid UUID
+@IsJSON                 // Must be valid JSON
+@IsBase64               // Must be valid Base64
+@IsHexColor             // Must be valid hex color
+@IsCreditCard           // Must be valid credit card
+@IsIP                   // Must be valid IP address
+@IsMACAddress           // Must be valid MAC address
+@ArrayUnique            // Array elements must be unique
+@FutureDate             // Date must be in future
+@PastDate               // Date must be in past
 ```
 
 ### Rule Decorators (With Parameters)
@@ -585,6 +823,19 @@ contact: string;
 @EndsWith(['.jpg', '.png'])
 @IsEnum(['active', 'inactive'])
 @Equals(['password'])
+@ArrayMinLength([3])
+@ArrayMaxLength([10])
+@ArrayLength([5])
+@ArrayContains(['item'])
+@DateAfter(['2023-01-01'])
+@DateBefore(['2023-12-31'])
+@DateBetween(['2023-01-01', '2023-12-31'])
+@DateEquals(['2023-06-15'])
+@FileSize([1024000])
+@FileType(['image/jpeg'])
+@FileExtension(['.jpg'])
+@MinFileSize([100])
+@Regex(['^[A-Z]+$'])
 ```
 
 ### Decorator Stacking

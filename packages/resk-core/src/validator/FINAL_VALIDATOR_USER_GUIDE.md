@@ -1,6 +1,6 @@
 # Validator - Complete User Guide
 
-> A comprehensive, production-ready validation library for TypeScript with Either pattern support, decorator-based validation, and 69+ Laravel-compatible rules.
+> A comprehensive, production-ready validation library for TypeScript with Either pattern support, decorator-based validation, and 75+ Laravel-compatible rules.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![NPM](https://img.shields.io/badge/NPM-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/)
@@ -30,7 +30,7 @@ The **Validator** is a powerful, type-safe validation library for TypeScript tha
 
 - ✅ **Either Pattern**: Discriminated unions for type-safe error handling (no exceptions thrown)
 - ✅ **Decorator-Based Validation**: Property decorators for clean, declarative validation
-- ✅ **69+ Built-in Rules**: Laravel-compatible validation rules (Email, URL, Numbers, Strings, etc.)
+- ✅ **75+ Built-in Rules**: Laravel-compatible validation rules (Email, URL, Numbers, Strings, etc.)
 - ✅ **Async Support**: Database/API validation with async rules
 - ✅ **Context-Aware**: Pass context data to validation rules
 - ✅ **Internationalization**: Localized error messages
@@ -60,7 +60,7 @@ import { Validator } from "@resk/core/validator";
 | **Class-Based**    | Decorate class properties for multi-field validation |
 | **Async Rules**    | Support for database/API validation                  |
 | **Context**        | Pass data to rules (user permissions, etc.)          |
-| **69+ Rules**      | Email, URL, numbers, strings, enums, dates, etc.     |
+| **75+ Rules**      | Email, URL, numbers, strings, enums, dates, etc.     |
 | **Custom Rules**   | Register your own validation logic                   |
 | **Decorators**     | Property decorators for clean syntax                 |
 | **i18n**           | Localized error messages                             |
@@ -535,7 +535,7 @@ class PaymentForm {
 
 ## All Available Rules
 
-The Validator includes 69+ built-in rules organized by category.
+The Validator includes 75+ built-in rules organized by category.
 
 ### String Rules
 
@@ -591,6 +591,53 @@ The Validator includes 69+ built-in rules organized by category.
 | ------------------ | ----------------------- | ------------------ | ----------------------- |
 | PhoneNumber        | `@IsPhoneNumber`        | Valid phone number | `@IsPhoneNumber`        |
 | EmailOrPhoneNumber | `@IsEmailOrPhoneNumber` | Email or phone     | `@IsEmailOrPhoneNumber` |
+
+### Array Rules
+
+| Rule            | Decorator                  | Description                    | Example                    |
+| --------------- | -------------------------- | ------------------------------ | -------------------------- |
+| Array           | `@IsArray`                 | Value must be an array         | `@IsArray`                 |
+| ArrayMinLength  | `@ArrayMinLength([n])`     | Array minimum length           | `@ArrayMinLength([3])`     |
+| ArrayMaxLength  | `@ArrayMaxLength([n])`     | Array maximum length           | `@ArrayMaxLength([10])`    |
+| ArrayLength     | `@ArrayLength([n])`        | Array exact length             | `@ArrayLength([5])`        |
+| ArrayContains   | `@ArrayContains([value])`  | Array must contain value       | `@ArrayContains(['admin'])` |
+| ArrayUnique     | `@ArrayUnique`             | Array elements must be unique  | `@ArrayUnique`             |
+
+### Date Rules
+
+| Rule        | Decorator                      | Description                | Example                          |
+| ----------- | ------------------------------ | -------------------------- | -------------------------------- |
+| Date        | `@IsDate`                      | Value must be valid date   | `@IsDate`                        |
+| DateAfter   | `@DateAfter(['date'])`         | Date after specified date  | `@DateAfter(['2023-01-01'])`     |
+| DateBefore  | `@DateBefore(['date'])`        | Date before specified date | `@DateBefore(['2023-12-31'])`    |
+| DateBetween | `@DateBetween(['start','end'])`| Date between range         | `@DateBetween(['2023-01-01','2023-12-31'])` |
+| DateEquals  | `@DateEquals(['date'])`        | Date equals specified date | `@DateEquals(['2023-06-15'])`    |
+| FutureDate  | `@FutureDate`                  | Date in future             | `@FutureDate`                    |
+| PastDate    | `@PastDate`                    | Date in past               | `@PastDate`                      |
+
+### File Rules
+
+| Rule          | Decorator                    | Description                | Example                      |
+| ------------- | ---------------------------- | -------------------------- | ---------------------------- |
+| File          | `@IsFile`                    | Value must be file object  | `@IsFile`                    |
+| FileSize      | `@FileSize([bytes])`         | File exact size            | `@FileSize([1024000])`       |
+| FileType      | `@FileType(['mime'])`        | File MIME type             | `@FileType(['image/jpeg'])`  |
+| Image         | `@IsImage`                   | File must be image         | `@IsImage`                   |
+| FileExtension | `@FileExtension(['.ext'])`   | File extension             | `@FileExtension(['.pdf'])`   |
+| MinFileSize   | `@MinFileSize([bytes])`      | File minimum size          | `@MinFileSize([100])`        |
+
+### Format Rules
+
+| Rule        | Decorator              | Description                | Example                      |
+| ----------- | ---------------------- | -------------------------- | ---------------------------- |
+| UUID        | `@IsUUID`              | Value must be valid UUID   | `@IsUUID`                    |
+| JSON        | `@IsJSON`              | Value must be valid JSON   | `@IsJSON`                    |
+| Base64      | `@IsBase64`            | Value must be Base64       | `@IsBase64`                  |
+| HexColor    | `@IsHexColor`          | Value must be hex color    | `@IsHexColor`                |
+| CreditCard  | `@IsCreditCard`        | Value must be credit card  | `@IsCreditCard`              |
+| IP          | `@IsIP`                | Value must be IP address   | `@IsIP`                      |
+| MACAddress  | `@IsMACAddress`        | Value must be MAC address  | `@IsMACAddress`              |
+| Regex       | `@Regex(['pattern'])`  | Value must match regex     | `@Regex(['^[A-Z]+$'])`       |
 
 ### Examples of All Rules
 
@@ -656,6 +703,39 @@ class ComprehensiveForm {
   @IsEmpty
   @IsNumber
   favoriteNumber?: number;
+
+  // Array rules
+  @IsRequired
+  @IsArray
+  @ArrayMinLength([1])
+  @ArrayUnique
+  tags: string[];
+
+  // Date rules
+  @IsRequired
+  @IsDate
+  @FutureDate
+  eventDate: string;
+
+  // File rules
+  @IsRequired
+  @IsFile
+  @FileSize([2097152]) // 2MB max
+  @IsImage
+  profilePicture: File;
+
+  // Format rules
+  @IsRequired
+  @IsUUID
+  productId: string;
+
+  @IsRequired
+  @IsJSON
+  configuration: string;
+
+  @IsRequired
+  @IsCreditCard
+  paymentCard: string;
 }
 ```
 
@@ -2176,7 +2256,7 @@ The Validator module provides a comprehensive, type-safe validation solution wit
 
 - **Either Pattern**: Type-safe error handling without exceptions
 - **Decorator-Based**: Clean, declarative validation syntax
-- **69+ Rules**: Extensive built-in validation rules
+- **75+ Rules**: Extensive built-in validation rules
 - **Async Support**: Database and API validation
 - **Context-Aware**: Pass data to validation rules
 - **Internationalization**: Localized error messages

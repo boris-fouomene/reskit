@@ -19,7 +19,7 @@ Your entry point to the Validator module. Covers:
 - ✅ Single-value validation guide
 - ✅ Class-based validation with decorators
 - ✅ All built-in rules (Email, URL, MinLength, MaxLength, Numbers, Enums, etc.)
-- ✅ Available decorators (40+ rules)
+- ✅ Available decorators (50+ rules)
 - ✅ Advanced features (Context, Async, Custom Rules)
 - ✅ 6 complete real-world examples
 - ✅ Best practices & tips
@@ -38,7 +38,7 @@ Deep dive reference for each feature:
 - ✅ Result types & Either pattern in-depth
 - ✅ All single-value validation methods
 - ✅ Class-based validation details
-- ✅ **Complete rules reference** (all 40+ rules with examples)
+- ✅ **Complete rules reference** (all 50+ rules with examples)
 - ✅ **Complete decorator reference** (property & parameterized)
 - ✅ **8 different error handling patterns**
 - ✅ **10+ advanced patterns** (context, async, custom rules, performance)
@@ -52,7 +52,7 @@ Deep dive reference for each feature:
 
 ### 3. 🍳 RECIPES.md (Real-World Production Code)
 
-**~40 pages | 40+ ready-to-use examples | 8 categories**
+**~40 pages | 50+ ready-to-use examples | 8 categories**
 
 Copy-paste ready solutions for common scenarios:
 
@@ -135,7 +135,7 @@ Navigation hub with:
 
 - **Total pages:** ~130 pages of comprehensive documentation
 - **Code examples:** 110+ complete, working examples
-- **Rules documented:** All 40+ rules with examples
+- **Rules documented:** All 50+ rules with examples
 - **Decorators documented:** All property & parameterized decorators
 - **Patterns covered:** 20+ different validation patterns
 
@@ -165,7 +165,7 @@ README_COMPREHENSIVE.md
 ├── Validation Results (Understanding Either pattern)
 ├── Single-Value Validation (How to validate single values)
 ├── Class-Based Validation (Decorator patterns)
-├── Rules Reference (All 40+ rules)
+├── Rules Reference (All 50+ rules)
 ├── Advanced Features (Context, Async, Custom)
 ├── Best Practices (8 patterns)
 └── Complete Examples (6 real-world scenarios)
@@ -174,7 +174,7 @@ FEATURE_REFERENCE.md
 ├── Result Types (Detailed Either pattern)
 ├── Single-Value Methods (All validation approaches)
 ├── Class-Based Details (Decorator stacking)
-├── Complete Rules Reference (All 40+ rules with tables)
+├── Complete Rules Reference (All 50+ rules with tables)
 ├── Decorator Reference (All decorators listed)
 ├── Error Handling (8 different patterns)
 ├── Advanced Patterns (10+ techniques)
@@ -220,7 +220,7 @@ INDEX.md
 ✅ 8 different error handling patterns  
 ✅ Error grouping & mapping
 
-### Rules (All 40+)
+### Rules (All 50+)
 
 ✅ String rules (Required, Email, MinLength, MaxLength, etc.)  
 ✅ Numeric rules (GreaterThan, LessThan, Between, Equals, etc.)  
@@ -278,7 +278,7 @@ INDEX.md
 
 - ✅ Every feature of Validator explained
 - ✅ All rules documented with examples
-- ✅ 40+ real-world code examples
+- ✅ 50+ real-world code examples
 - ✅ Multiple patterns for each task
 
 ### Production Ready
@@ -551,7 +551,7 @@ After reading these documents, you'll understand:
 - ✅ How to validate single values
 - ✅ How to validate entire classes
 - ✅ How to handle errors safely (type narrowing)
-- ✅ All 40+ built-in rules
+- ✅ All 50+ built-in rules
 - ✅ How to create custom rules
 - ✅ How to create custom decorators
 - ✅ Advanced patterns (context, async, performance)

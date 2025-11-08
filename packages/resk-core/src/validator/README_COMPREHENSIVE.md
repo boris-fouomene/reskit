@@ -96,6 +96,55 @@ if (result.success) {
 }
 ```
 
+### Advanced Validation Examples
+
+```typescript
+import { Validator, IsArray, ArrayMinLength, IsDate, FutureDate, IsFile, FileSize, IsUUID } from "resk-core";
+
+// Array validation
+const arrayResult = await Validator.validate({
+  value: [1, 2, 3, 4, 5],
+  rules: ["Array", "ArrayMinLength[3]"],
+});
+
+// Date validation
+const dateResult = await Validator.validate({
+  value: "2024-12-25",
+  rules: ["Date", "FutureDate"],
+});
+
+// File validation (with file object)
+const fileResult = await Validator.validate({
+  value: fileObject,
+  rules: ["File", "FileSize[1024000]"], // Max 1MB
+});
+
+// Format validation
+const uuidResult = await Validator.validate({
+  value: "550e8400-e29b-41d4-a716-446655440000",
+  rules: ["UUID"],
+});
+
+// Class with new validation rules
+class ProductForm {
+  @IsRequired
+  @IsArray
+  @ArrayMinLength([1])
+  tags: string[];
+
+  @IsDate
+  @FutureDate
+  releaseDate: string;
+
+  @IsFile
+  @FileSize([2097152]) // 2MB max
+  image: File;
+
+  @IsUUID
+  productId: string;
+}
+```
+
 ---
 
 ## 📋 Validation Results & Error Handling
@@ -381,6 +430,53 @@ class UserProfile {
 | ---------------------- | ---------- | -------------------------------------- | ----------------------- |
 | **PhoneNumber**        | None       | Valid phone number (uses country code) | `@IsPhoneNumber`        |
 | **EmailOrPhoneNumber** | None       | Valid email OR phone number            | `@IsEmailOrPhoneNumber` |
+
+### Array Rules
+
+| Rule                | Parameters     | Description                                    | Example                           |
+| ------------------- | -------------- | ---------------------------------------------- | --------------------------------- |
+| **Array**           | None           | Value must be an array                         | `@IsArray`                        |
+| **ArrayMinLength**  | `[number]`     | Array must have at least N elements            | `@ArrayMinLength([3])`            |
+| **ArrayMaxLength**  | `[number]`     | Array must have at most N elements             | `@ArrayMaxLength([10])`           |
+| **ArrayLength**     | `[number]`     | Array must have exactly N elements             | `@ArrayLength([5])`               |
+| **ArrayContains**   | `[value]`      | Array must contain the specified value         | `@ArrayContains(['item'])`        |
+| **ArrayUnique**     | None           | Array elements must be unique                  | `@ArrayUnique`                    |
+
+### Date Rules
+
+| Rule                | Parameters          | Description                                    | Example                           |
+| ------------------- | ------------------- | ---------------------------------------------- | --------------------------------- |
+| **Date**            | None                | Value must be a valid date                     | `@IsDate`                         |
+| **DateAfter**       | `[date]`            | Date must be after the specified date          | `@DateAfter(['2023-01-01'])`      |
+| **DateBefore**      | `[date]`            | Date must be before the specified date         | `@DateBefore(['2023-12-31'])`     |
+| **DateBetween**     | `[start, end]`      | Date must be between start and end dates       | `@DateBetween(['2023-01-01', '2023-12-31'])` |
+| **DateEquals**      | `[date]`            | Date must equal the specified date             | `@DateEquals(['2023-06-15'])`     |
+| **FutureDate**      | None                | Date must be in the future                     | `@FutureDate`                     |
+| **PastDate**        | None                | Date must be in the past                       | `@PastDate`                       |
+
+### File Rules
+
+| Rule                | Parameters          | Description                                    | Example                           |
+| ------------------- | ------------------- | ---------------------------------------------- | --------------------------------- |
+| **File**            | None                | Value must be a valid file object              | `@IsFile`                         |
+| **FileSize**        | `[bytes]`           | File size must be exactly N bytes              | `@FileSize([1024])`               |
+| **FileType**        | `[mimeType]`        | File must have the specified MIME type         | `@FileType(['image/jpeg'])`       |
+| **Image**           | None                | File must be a valid image                     | `@IsImage`                        |
+| **FileExtension**   | `[extension]`       | File must have the specified extension         | `@FileExtension(['.jpg'])`        |
+| **MinFileSize**     | `[bytes]`           | File size must be at least N bytes             | `@MinFileSize([100])`             |
+
+### Format Rules
+
+| Rule                | Parameters          | Description                                    | Example                           |
+| ------------------- | ------------------- | ---------------------------------------------- | --------------------------------- |
+| **UUID**            | None                | Value must be a valid UUID                     | `@IsUUID`                         |
+| **JSON**            | None                | Value must be valid JSON                       | `@IsJSON`                         |
+| **Base64**          | None                | Value must be valid Base64 encoded             | `@IsBase64`                       |
+| **HexColor**        | None                | Value must be a valid hex color code           | `@IsHexColor`                     |
+| **CreditCard**      | None                | Value must be a valid credit card number       | `@IsCreditCard`                   |
+| **IP**              | None                | Value must be a valid IP address               | `@IsIP`                           |
+| **MACAddress**      | None                | Value must be a valid MAC address              | `@IsMACAddress`                   |
+| **Regex**           | `[pattern]`         | Value must match the specified regex pattern   | `@Regex(['^[A-Z]+$'])`            |
 
 ---
 

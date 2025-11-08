@@ -594,50 +594,50 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Array Rules
 
-| Rule            | Decorator                  | Description                    | Example                    |
-| --------------- | -------------------------- | ------------------------------ | -------------------------- |
-| Array           | `@IsArray`                 | Value must be an array         | `@IsArray`                 |
-| ArrayMinLength  | `@ArrayMinLength([n])`     | Array minimum length           | `@ArrayMinLength([3])`     |
-| ArrayMaxLength  | `@ArrayMaxLength([n])`     | Array maximum length           | `@ArrayMaxLength([10])`    |
-| ArrayLength     | `@ArrayLength([n])`        | Array exact length             | `@ArrayLength([5])`        |
-| ArrayContains   | `@ArrayContains([value])`  | Array must contain value       | `@ArrayContains(['admin'])` |
-| ArrayUnique     | `@ArrayUnique`             | Array elements must be unique  | `@ArrayUnique`             |
+| Rule           | Decorator                 | Description                   | Example                     |
+| -------------- | ------------------------- | ----------------------------- | --------------------------- |
+| Array          | `@IsArray`                | Value must be an array        | `@IsArray`                  |
+| ArrayMinLength | `@ArrayMinLength([n])`    | Array minimum length          | `@ArrayMinLength([3])`      |
+| ArrayMaxLength | `@ArrayMaxLength([n])`    | Array maximum length          | `@ArrayMaxLength([10])`     |
+| ArrayLength    | `@ArrayLength([n])`       | Array exact length            | `@ArrayLength([5])`         |
+| ArrayContains  | `@ArrayContains([value])` | Array must contain value      | `@ArrayContains(['admin'])` |
+| ArrayUnique    | `@ArrayUnique`            | Array elements must be unique | `@ArrayUnique`              |
 
 ### Date Rules
 
-| Rule        | Decorator                      | Description                | Example                          |
-| ----------- | ------------------------------ | -------------------------- | -------------------------------- |
-| Date        | `@IsDate`                      | Value must be valid date   | `@IsDate`                        |
-| DateAfter   | `@DateAfter(['date'])`         | Date after specified date  | `@DateAfter(['2023-01-01'])`     |
-| DateBefore  | `@DateBefore(['date'])`        | Date before specified date | `@DateBefore(['2023-12-31'])`    |
-| DateBetween | `@DateBetween(['start','end'])`| Date between range         | `@DateBetween(['2023-01-01','2023-12-31'])` |
-| DateEquals  | `@DateEquals(['date'])`        | Date equals specified date | `@DateEquals(['2023-06-15'])`    |
-| FutureDate  | `@FutureDate`                  | Date in future             | `@FutureDate`                    |
-| PastDate    | `@PastDate`                    | Date in past               | `@PastDate`                      |
+| Rule        | Decorator                       | Description                | Example                                     |
+| ----------- | ------------------------------- | -------------------------- | ------------------------------------------- |
+| Date        | `@IsDate`                       | Value must be valid date   | `@IsDate`                                   |
+| DateAfter   | `@DateAfter(['date'])`          | Date after specified date  | `@DateAfter(['2023-01-01'])`                |
+| DateBefore  | `@DateBefore(['date'])`         | Date before specified date | `@DateBefore(['2023-12-31'])`               |
+| DateBetween | `@DateBetween(['start','end'])` | Date between range         | `@DateBetween(['2023-01-01','2023-12-31'])` |
+| DateEquals  | `@DateEquals(['date'])`         | Date equals specified date | `@DateEquals(['2023-06-15'])`               |
+| FutureDate  | `@FutureDate`                   | Date in future             | `@FutureDate`                               |
+| PastDate    | `@PastDate`                     | Date in past               | `@PastDate`                                 |
 
 ### File Rules
 
-| Rule          | Decorator                    | Description                | Example                      |
-| ------------- | ---------------------------- | -------------------------- | ---------------------------- |
-| File          | `@IsFile`                    | Value must be file object  | `@IsFile`                    |
-| FileSize      | `@FileSize([bytes])`         | File exact size            | `@FileSize([1024000])`       |
-| FileType      | `@FileType(['mime'])`        | File MIME type             | `@FileType(['image/jpeg'])`  |
-| Image         | `@IsImage`                   | File must be image         | `@IsImage`                   |
-| FileExtension | `@FileExtension(['.ext'])`   | File extension             | `@FileExtension(['.pdf'])`   |
-| MinFileSize   | `@MinFileSize([bytes])`      | File minimum size          | `@MinFileSize([100])`        |
+| Rule          | Decorator                  | Description               | Example                     |
+| ------------- | -------------------------- | ------------------------- | --------------------------- |
+| File          | `@IsFile`                  | Value must be file object | `@IsFile`                   |
+| FileSize      | `@FileSize([bytes])`       | File exact size           | `@FileSize([1024000])`      |
+| FileType      | `@FileType(['mime'])`      | File MIME type            | `@FileType(['image/jpeg'])` |
+| Image         | `@IsImage`                 | File must be image        | `@IsImage`                  |
+| FileExtension | `@FileExtension(['.ext'])` | File extension            | `@FileExtension(['.pdf'])`  |
+| MinFileSize   | `@MinFileSize([bytes])`    | File minimum size         | `@MinFileSize([100])`       |
 
 ### Format Rules
 
-| Rule        | Decorator              | Description                | Example                      |
-| ----------- | ---------------------- | -------------------------- | ---------------------------- |
-| UUID        | `@IsUUID`              | Value must be valid UUID   | `@IsUUID`                    |
-| JSON        | `@IsJSON`              | Value must be valid JSON   | `@IsJSON`                    |
-| Base64      | `@IsBase64`            | Value must be Base64       | `@IsBase64`                  |
-| HexColor    | `@IsHexColor`          | Value must be hex color    | `@IsHexColor`                |
-| CreditCard  | `@IsCreditCard`        | Value must be credit card  | `@IsCreditCard`              |
-| IP          | `@IsIP`                | Value must be IP address   | `@IsIP`                      |
-| MACAddress  | `@IsMACAddress`        | Value must be MAC address  | `@IsMACAddress`              |
-| Regex       | `@Regex(['pattern'])`  | Value must match regex     | `@Regex(['^[A-Z]+$'])`       |
+| Rule       | Decorator             | Description               | Example                |
+| ---------- | --------------------- | ------------------------- | ---------------------- |
+| UUID       | `@IsUUID`             | Value must be valid UUID  | `@IsUUID`              |
+| JSON       | `@IsJSON`             | Value must be valid JSON  | `@IsJSON`              |
+| Base64     | `@IsBase64`           | Value must be Base64      | `@IsBase64`            |
+| HexColor   | `@IsHexColor`         | Value must be hex color   | `@IsHexColor`          |
+| CreditCard | `@IsCreditCard`       | Value must be credit card | `@IsCreditCard`        |
+| IP         | `@IsIP`               | Value must be IP address  | `@IsIP`                |
+| MACAddress | `@IsMACAddress`       | Value must be MAC address | `@IsMACAddress`        |
+| Regex      | `@Regex(['pattern'])` | Value must match regex    | `@Regex(['^[A-Z]+$'])` |
 
 ### Examples of All Rules
 

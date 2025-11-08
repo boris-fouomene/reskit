@@ -22,6 +22,7 @@ The Validator uses an **Either pattern** (discriminated union) to ensure type-sa
 ### Single-Value Validation Result
 
 **Success Case:**
+
 ```typescript
 {
   success: true,
@@ -35,6 +36,7 @@ The Validator uses an **Either pattern** (discriminated union) to ensure type-sa
 ```
 
 **Failure Case:**
+
 ```typescript
 {
   success: false,
@@ -51,6 +53,7 @@ The Validator uses an **Either pattern** (discriminated union) to ensure type-sa
 ### Class Validation Result
 
 **Success Case:**
+
 ```typescript
 {
   success: true,
@@ -63,6 +66,7 @@ The Validator uses an **Either pattern** (discriminated union) to ensure type-sa
 ```
 
 **Failure Case:**
+
 ```typescript
 {
   success: false,
@@ -82,20 +86,21 @@ The Validator uses an **Either pattern** (discriminated union) to ensure type-sa
 interface IValidatorValidationError {
   name: "ValidatorValidationError";
   status: "error";
-  fieldName?: string;                 // Form field identifier
-  propertyName?: string;              // Class property name
-  message: string;                    // Error message
-  translatedPropertyName?: string;    // Localized property name
-  ruleName?: string;                  // Which rule failed
-  ruleParams?: any[];                 // Rule parameters
-  rawRuleName?: string;               // Original rule specification
-  value?: any;                        // Value that failed
+  fieldName?: string; // Form field identifier
+  propertyName?: string; // Class property name
+  message: string; // Error message
+  translatedPropertyName?: string; // Localized property name
+  ruleName?: string; // Which rule failed
+  ruleParams?: any[]; // Rule parameters
+  rawRuleName?: string; // Original rule specification
+  value?: any; // Value that failed
 }
 ```
 
 ### Type Narrowing
 
 **Method 1: Check `success` property**
+
 ```typescript
 const result = await Validator.validate({...});
 
@@ -113,6 +118,7 @@ if (result.success) {
 ```
 
 **Method 2: Type guards**
+
 ```typescript
 if (Validator.isSuccess(result)) {
   // TypeScript knows it's success
@@ -126,13 +132,14 @@ if (Validator.isFailure(result)) {
 ```
 
 **Method 3: Switch on status**
+
 ```typescript
 switch (result.status) {
-  case 'success':
+  case "success":
     // result is success type
     await handleSuccess(result.value);
     break;
-  case 'error':
+  case "error":
     // result is failure type
     await handleError(result.message);
     break;
@@ -147,8 +154,8 @@ switch (result.status) {
 
 ```typescript
 await Validator.validate({
-  value: 'test@example.com',
-  rules: ['Required', 'Email']
+  value: "test@example.com",
+  rules: ["Required", "Email"],
 });
 ```
 
@@ -157,21 +164,21 @@ await Validator.validate({
 ```typescript
 const result = await Validator.validate<any, MyContext>({
   // Core options
-  value: 'test@example.com',
-  rules: ['Required', 'Email', 'MaxLength[100]'],
-  
+  value: "test@example.com",
+  rules: ["Required", "Email", "MaxLength[100]"],
+
   // Identification
-  fieldName: 'email_input',           // HTML form field ID
-  propertyName: 'email',              // Object/class property name
-  translatedPropertyName: 'Email Address',  // User-friendly name
-  
+  fieldName: "email_input", // HTML form field ID
+  propertyName: "email", // Object/class property name
+  translatedPropertyName: "Email Address", // User-friendly name
+
   // Customization
-  message: 'Invalid email address',   // Override error message
-  
+  message: "Invalid email address", // Override error message
+
   // Context
   context: {
     // Any data your rules need
-  }
+  },
 });
 ```
 
@@ -179,8 +186,8 @@ const result = await Validator.validate<any, MyContext>({
 
 ```typescript
 await Validator.validate({
-  value: 'test',
-  rules: ['Email']  // Just one rule
+  value: "test",
+  rules: ["Email"], // Just one rule
 });
 ```
 
@@ -188,13 +195,8 @@ await Validator.validate({
 
 ```typescript
 await Validator.validate({
-  value: 'password123',
-  rules: [
-    'Required',
-    'MinLength[8]',
-    'MaxLength[50]',
-    'NonNullString'
-  ]
+  value: "password123",
+  rules: ["Required", "MinLength[8]", "MaxLength[50]", "NonNullString"],
 });
 ```
 
@@ -202,13 +204,13 @@ await Validator.validate({
 
 ```typescript
 await Validator.validate({
-  value: 'test',
+  value: "test",
   rules: [
-    'MinLength[5]',              // Parameter in rule name
-    'MaxLength[20]',
-    'NumberGreaterThan[0]',
-    'Enum[active,inactive,pending]'
-  ]
+    "MinLength[5]", // Parameter in rule name
+    "MaxLength[20]",
+    "NumberGreaterThan[0]",
+    "Enum[active,inactive,pending]",
+  ],
 });
 ```
 
@@ -216,21 +218,21 @@ await Validator.validate({
 
 ```typescript
 await Validator.validate({
-  value: 'test',
+  value: "test",
   rules: [
-    'Required',
-    
+    "Required",
+
     // Sync custom rule
     ({ value }) => {
-      return value.length >= 5 || 'Minimum 5 characters';
+      return value.length >= 5 || "Minimum 5 characters";
     },
-    
+
     // Async custom rule
     async ({ value, context }) => {
       const isUnique = await checkUniqueness(value);
-      return isUnique || 'Value already exists';
-    }
-  ]
+      return isUnique || "Value already exists";
+    },
+  ],
 });
 ```
 
@@ -252,8 +254,8 @@ class UserForm {
 }
 
 const result = await Validator.validateTarget(UserForm, {
-  email: 'user@example.com',
-  password: 'SecurePass123'
+  email: "user@example.com",
+  password: "SecurePass123",
 });
 ```
 
@@ -265,9 +267,11 @@ const result = await Validator.validateTarget<UserForm, MyContext>(
   data,
   {
     // Options object
-    context: { /* validation context */ },
+    context: {
+      /* validation context */
+    },
     errorMessageBuilder: (fieldName, error) => `❌ ${fieldName}: ${error}`,
-    locale: 'fr'  // Language for error messages
+    locale: "fr", // Language for error messages
   }
 );
 ```
@@ -277,16 +281,16 @@ const result = await Validator.validateTarget<UserForm, MyContext>(
 ```typescript
 if (result.success) {
   // All fields valid
-  console.log(result.data);           // Fully typed as UserForm
-  console.log(result.duration);       // Time taken
-  
+  console.log(result.data); // Fully typed as UserForm
+  console.log(result.duration); // Time taken
+
   // Safe to use the validated data
   await saveUser(result.data);
 } else {
   // Some fields invalid
-  console.log(result.failureCount);   // Number of failed fields
-  
-  result.errors.forEach(error => {
+  console.log(result.failureCount); // Number of failed fields
+
+  result.errors.forEach((error) => {
     console.error(`${error.propertyName}: ${error.message}`);
     // Output:
     // email: Must be a valid email
@@ -298,13 +302,13 @@ if (result.success) {
 ### Error Details
 
 ```typescript
-result.errors.forEach(error => {
+result.errors.forEach((error) => {
   console.log({
-    field: error.propertyName,        // 'email'
-    message: error.message,           // 'Must be valid email'
-    value: error.value,               // 'invalid-email'
-    ruleName: error.ruleName,         // 'Email'
-    fieldName: error.fieldName        // 'email_input'
+    field: error.propertyName, // 'email'
+    message: error.message, // 'Must be valid email'
+    value: error.value, // 'invalid-email'
+    ruleName: error.ruleName, // 'Email'
+    fieldName: error.fieldName, // 'email_input'
   });
 });
 ```
@@ -316,6 +320,7 @@ result.errors.forEach(error => {
 ### String Rules
 
 #### Required
+
 ```typescript
 // Rejects: null, undefined, ""
 // Accepts: "text", 0, false, [], {}
@@ -325,6 +330,7 @@ email: string;
 ```
 
 #### Email
+
 ```typescript
 @IsEmail
 email: string;
@@ -334,6 +340,7 @@ email: string;
 ```
 
 #### MinLength
+
 ```typescript
 @IsMinLength([5])
 username: string;
@@ -342,6 +349,7 @@ username: string;
 ```
 
 #### MaxLength
+
 ```typescript
 @IsMaxLength([50])
 bio: string;
@@ -350,6 +358,7 @@ bio: string;
 ```
 
 #### Length (Exact or Range)
+
 ```typescript
 @HasLength([5])        // Exactly 5
 name: string;
@@ -359,6 +368,7 @@ code: string;
 ```
 
 #### Url
+
 ```typescript
 @IsUrl
 website: string;
@@ -368,6 +378,7 @@ website: string;
 ```
 
 #### NonNullString
+
 ```typescript
 @IsNonNullString
 value: string;
@@ -377,6 +388,7 @@ value: string;
 ```
 
 #### FileName
+
 ```typescript
 @IsFileName
 filename: string;
@@ -386,6 +398,7 @@ filename: string;
 ```
 
 #### StartsWithOneOf
+
 ```typescript
 @StartsWith(['Mr.', 'Mrs.', 'Ms.'])
 title: string;
@@ -395,6 +408,7 @@ title: string;
 ```
 
 #### EndsWithOneOf
+
 ```typescript
 @EndsWith(['.jpg', '.png', '.gif'])
 imageFile: string;
@@ -406,6 +420,7 @@ imageFile: string;
 ### Numeric Rules
 
 #### Number
+
 ```typescript
 @IsNumber
 age: number;
@@ -415,6 +430,7 @@ age: number;
 ```
 
 #### NumberGreaterThan
+
 ```typescript
 @IsNumberGreaterThan([0])
 count: number;
@@ -424,6 +440,7 @@ count: number;
 ```
 
 #### NumberGreaterThanOrEquals
+
 ```typescript
 @IsNumberGreaterThanOrEquals([18])
 age: number;
@@ -433,6 +450,7 @@ age: number;
 ```
 
 #### NumberLessThan
+
 ```typescript
 @IsNumberLessThan([100])
 percentage: number;
@@ -442,6 +460,7 @@ percentage: number;
 ```
 
 #### NumberLessThanOrEquals
+
 ```typescript
 @IsNumberLessThanOrEquals([100])
 percentage: number;
@@ -451,6 +470,7 @@ percentage: number;
 ```
 
 #### NumberEquals
+
 ```typescript
 @IsNumberEquals([42])
 value: number;
@@ -460,6 +480,7 @@ value: number;
 ```
 
 #### NumberIsDifferentFrom
+
 ```typescript
 @IsNumberNotEqual([0])
 value: number;
@@ -471,6 +492,7 @@ value: number;
 ### Boolean Rules
 
 #### Boolean
+
 ```typescript
 @IsBoolean
 active: boolean;
@@ -482,6 +504,7 @@ active: boolean;
 ### Enum Rules
 
 #### Enum
+
 ```typescript
 @IsEnum(['active', 'inactive', 'pending'])
 status: string;
@@ -490,6 +513,7 @@ status: string;
 ```
 
 #### Equals
+
 ```typescript
 @Equals(['password'])
 confirmPassword: string;
@@ -500,6 +524,7 @@ confirmPassword: string;
 ### Nullable/Optional Rules
 
 #### Nullable
+
 ```typescript
 @IsNullable
 @IsEmail
@@ -510,6 +535,7 @@ emailOptional?: string;
 ```
 
 #### Empty
+
 ```typescript
 @IsEmpty
 @IsNumber
@@ -520,6 +546,7 @@ numbersOptional?: string;
 ```
 
 #### Sometimes
+
 ```typescript
 @IsSometimes
 @IsUrl
@@ -532,6 +559,7 @@ website?: string;
 ### Contact Rules
 
 #### PhoneNumber
+
 ```typescript
 @IsPhoneNumber
 phone: string;
@@ -541,6 +569,7 @@ phone: string;
 ```
 
 #### EmailOrPhoneNumber
+
 ```typescript
 @IsEmailOrPhoneNumber
 contact: string;
@@ -551,6 +580,7 @@ contact: string;
 ### Array Rules
 
 #### Array
+
 ```typescript
 @IsArray
 items: any[];
@@ -559,6 +589,7 @@ items: any[];
 ```
 
 #### ArrayMinLength
+
 ```typescript
 @ArrayMinLength([3])
 items: any[];
@@ -567,6 +598,7 @@ items: any[];
 ```
 
 #### ArrayMaxLength
+
 ```typescript
 @ArrayMaxLength([10])
 items: any[];
@@ -575,6 +607,7 @@ items: any[];
 ```
 
 #### ArrayLength
+
 ```typescript
 @ArrayLength([5])
 coordinates: number[];
@@ -583,6 +616,7 @@ coordinates: number[];
 ```
 
 #### ArrayContains
+
 ```typescript
 @ArrayContains(['admin'])
 roles: string[];
@@ -591,6 +625,7 @@ roles: string[];
 ```
 
 #### ArrayUnique
+
 ```typescript
 @ArrayUnique
 tags: string[];
@@ -601,6 +636,7 @@ tags: string[];
 ### Date Rules
 
 #### Date
+
 ```typescript
 @IsDate
 birthDate: string;
@@ -609,6 +645,7 @@ birthDate: string;
 ```
 
 #### DateAfter
+
 ```typescript
 @DateAfter(['2023-01-01'])
 eventDate: string;
@@ -617,6 +654,7 @@ eventDate: string;
 ```
 
 #### DateBefore
+
 ```typescript
 @DateBefore(['2023-12-31'])
 deadline: string;
@@ -625,6 +663,7 @@ deadline: string;
 ```
 
 #### DateBetween
+
 ```typescript
 @DateBetween(['2023-01-01', '2023-12-31'])
 vacationDate: string;
@@ -633,6 +672,7 @@ vacationDate: string;
 ```
 
 #### DateEquals
+
 ```typescript
 @DateEquals(['2023-06-15'])
 meetingDate: string;
@@ -641,6 +681,7 @@ meetingDate: string;
 ```
 
 #### FutureDate
+
 ```typescript
 @FutureDate
 appointmentDate: string;
@@ -649,6 +690,7 @@ appointmentDate: string;
 ```
 
 #### PastDate
+
 ```typescript
 @PastDate
 birthDate: string;
@@ -659,6 +701,7 @@ birthDate: string;
 ### File Rules
 
 #### File
+
 ```typescript
 @IsFile
 document: File;
@@ -667,6 +710,7 @@ document: File;
 ```
 
 #### FileSize
+
 ```typescript
 @FileSize([1024000])
 image: File;
@@ -675,6 +719,7 @@ image: File;
 ```
 
 #### FileType
+
 ```typescript
 @FileType(['image/jpeg'])
 photo: File;
@@ -683,6 +728,7 @@ photo: File;
 ```
 
 #### Image
+
 ```typescript
 @IsImage
 picture: File;
@@ -691,6 +737,7 @@ picture: File;
 ```
 
 #### FileExtension
+
 ```typescript
 @FileExtension(['.pdf'])
 document: File;
@@ -699,6 +746,7 @@ document: File;
 ```
 
 #### MinFileSize
+
 ```typescript
 @MinFileSize([100])
 thumbnail: File;
@@ -709,6 +757,7 @@ thumbnail: File;
 ### Format Rules
 
 #### UUID
+
 ```typescript
 @IsUUID
 id: string;
@@ -717,6 +766,7 @@ id: string;
 ```
 
 #### JSON
+
 ```typescript
 @IsJSON
 config: string;
@@ -725,6 +775,7 @@ config: string;
 ```
 
 #### Base64
+
 ```typescript
 @IsBase64
 encodedData: string;
@@ -733,6 +784,7 @@ encodedData: string;
 ```
 
 #### HexColor
+
 ```typescript
 @IsHexColor
 color: string;
@@ -741,6 +793,7 @@ color: string;
 ```
 
 #### CreditCard
+
 ```typescript
 @IsCreditCard
 cardNumber: string;
@@ -749,6 +802,7 @@ cardNumber: string;
 ```
 
 #### IP
+
 ```typescript
 @IsIP
 address: string;
@@ -757,6 +811,7 @@ address: string;
 ```
 
 #### MACAddress
+
 ```typescript
 @IsMACAddress
 mac: string;
@@ -765,6 +820,7 @@ mac: string;
 ```
 
 #### Regex
+
 ```typescript
 @Regex(['^[A-Z]+$'])
 code: string;
@@ -842,13 +898,13 @@ code: string;
 
 ```typescript
 class User {
-  @IsRequired          // Must exist
-  @IsEmail             // Must be email format
-  @IsMaxLength([100])  // Max 100 chars
+  @IsRequired // Must exist
+  @IsEmail // Must be email format
+  @IsMaxLength([100]) // Max 100 chars
   email: string;
 
-  @IsSometimes         // Optional
-  @IsUrl               // If provided, must be URL
+  @IsSometimes // Optional
+  @IsUrl // If provided, must be URL
   website?: string;
 }
 ```
@@ -958,7 +1014,7 @@ if (emailResult.success && passwordResult.success) {
 // Even with Either pattern, async operations can throw
 try {
   const result = await Validator.validate({...});
-  
+
   if (result.success) {
     await saveData(result.value);
   } else {
@@ -973,8 +1029,8 @@ try {
 
 ```typescript
 const results = await Promise.all([
-  Validator.validate({ value: email, rules: ['Email'] }),
-  Validator.validate({ value: username, rules: ['Required'] })
+  Validator.validate({ value: email, rules: ["Email"] }),
+  Validator.validate({ value: username, rules: ["Required"] }),
 ]);
 
 const successValues = results
@@ -993,25 +1049,31 @@ const errors = results
 ### 1. Context-Aware Validation
 
 **Define Context Interface:**
+
 ```typescript
 interface ValidationContext {
   userId: number;
-  userRole: 'user' | 'admin';
+  userRole: "user" | "admin";
   permissions: string[];
 }
 ```
 
 **Register Custom Rule:**
-```typescript
-Validator.registerRule('HasPermission', ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
-  const { permissions } = context;
-  return permissions.includes(value) || `Permission '${value}' not granted`;
-});
 
-const HasPermission = Validator.createPropertyDecorator(['HasPermission']);
+```typescript
+Validator.registerRule(
+  "HasPermission",
+  ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
+    const { permissions } = context;
+    return permissions.includes(value) || `Permission '${value}' not granted`;
+  }
+);
+
+const HasPermission = Validator.createPropertyDecorator(["HasPermission"]);
 ```
 
 **Use in Class:**
+
 ```typescript
 class AdminAction {
   @IsRequired
@@ -1022,13 +1084,13 @@ class AdminAction {
 // Usage
 const result = await Validator.validateTarget<AdminAction, ValidationContext>(
   AdminAction,
-  { action: 'delete_user' },
+  { action: "delete_user" },
   {
     context: {
       userId: 1,
-      userRole: 'admin',
-      permissions: ['view', 'edit', 'delete_user']
-    }
+      userRole: "admin",
+      permissions: ["view", "edit", "delete_user"],
+    },
   }
 );
 ```
@@ -1040,15 +1102,15 @@ class OptionalField {
   @IsRequired
   email: string;
 
-  @IsSometimes        // Validate only if present
+  @IsSometimes // Validate only if present
   @IsUrl
   website?: string;
 
-  @IsNullable         // Validate if not null/undefined
+  @IsNullable // Validate if not null/undefined
   @IsMinLength([10])
   bio?: string;
 
-  @IsEmpty            // Validate if not empty string
+  @IsEmpty // Validate if not empty string
   @IsNumber
   favoriteNumber?: string;
 }
@@ -1058,18 +1120,21 @@ class OptionalField {
 
 ```typescript
 // Async database check
-Validator.registerRule('UniqueEmail', async ({ value }: IValidatorValidateOptions) => {
-  const exists = await User.findOne({ email: value });
-  return !exists || 'Email already registered';
-});
+Validator.registerRule(
+  "UniqueEmail",
+  async ({ value }: IValidatorValidateOptions) => {
+    const exists = await User.findOne({ email: value });
+    return !exists || "Email already registered";
+  }
+);
 
-const IsUniqueEmail = Validator.createPropertyDecorator(['UniqueEmail']);
+const IsUniqueEmail = Validator.createPropertyDecorator(["UniqueEmail"]);
 
 // Use it
 class RegistrationForm {
   @IsRequired
   @IsEmail
-  @IsUniqueEmail        // This will check database
+  @IsUniqueEmail // This will check database
   email: string;
 }
 ```
@@ -1078,12 +1143,15 @@ class RegistrationForm {
 
 ```typescript
 // Rule with parameters
-const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
+const minValueRule = ({
+  value,
+  ruleParams,
+}: IValidatorValidateOptions<[number]>) => {
   const [minValue] = ruleParams;
   return value >= minValue || `Must be at least ${minValue}`;
 };
 
-Validator.registerRule('MinValue', minValueRule);
+Validator.registerRule("MinValue", minValueRule);
 
 // Create parameterized decorator
 const IsMinValue = Validator.createRuleDecorator<[number]>(minValueRule);
@@ -1102,12 +1170,15 @@ const result = await Validator.validateTarget(ComplexForm, data);
 
 if (!result.success) {
   // Group errors by field
-  const groupedErrors = result.errors.reduce((acc, error) => {
-    const field = error.propertyName || 'unknown';
-    if (!acc[field]) acc[field] = [];
-    acc[field].push(error.message);
-    return acc;
-  }, {} as Record<string, string[]>);
+  const groupedErrors = result.errors.reduce(
+    (acc, error) => {
+      const field = error.propertyName || "unknown";
+      if (!acc[field]) acc[field] = [];
+      acc[field].push(error.message);
+      return acc;
+    },
+    {} as Record<string, string[]>
+  );
 
   // Output:
   // {
@@ -1128,9 +1199,9 @@ const result = await Validator.validateTarget(LargeForm, data);
 if (result.success) {
   console.log(`✓ Validation completed in ${result.duration}ms`);
   console.log(`  Started: ${result.validatedAt}`);
-  
+
   if (result.duration > 1000) {
-    console.warn('⚠ Validation took > 1 second, consider optimizing rules');
+    console.warn("⚠ Validation took > 1 second, consider optimizing rules");
   }
 }
 ```
@@ -1138,19 +1209,19 @@ if (result.success) {
 ### 7. Locale-Specific Validation
 
 ```typescript
-import { i18n } from 'resk-core/i18n';
+import { i18n } from "resk-core/i18n";
 
 // Switch locale
-await i18n.setLocale('fr');
+await i18n.setLocale("fr");
 
 const result = await Validator.validate({
-  value: 'invalid',
-  rules: ['Email']
+  value: "invalid",
+  rules: ["Email"],
   // Error message will be in French
 });
 
 // Switch back
-await i18n.setLocale('en');
+await i18n.setLocale("en");
 ```
 
 ### 8. Custom Error Formatting
@@ -1159,7 +1230,7 @@ await i18n.setLocale('en');
 const result = await Validator.validateTarget(UserForm, data, {
   errorMessageBuilder: (propertyName, error) => {
     return `❌ [${propertyName}]: ${error}`;
-  }
+  },
 });
 ```
 
@@ -1167,10 +1238,7 @@ const result = await Validator.validateTarget(UserForm, data, {
 
 ```typescript
 // All fields validated in parallel automatically
-const result = await Validator.validateTarget(
-  LargeForm,
-  data
-);
+const result = await Validator.validateTarget(LargeForm, data);
 
 // Duration is not sum of individual field times
 console.log(`All fields validated in ${result.duration}ms`);
@@ -1184,7 +1252,7 @@ class PartialForm {
   @IsRequired
   @IsEmail
   email: string;
-  
+
   @IsRequired
   @IsMinLength([8])
   password: string;
@@ -1201,6 +1269,7 @@ const result = await Validator.validateTarget(PartialForm, data);
 ### Q: How do I check if validation succeeded?
 
 **A:** Use the `success` property with type narrowing:
+
 ```typescript
 if (result.success) {
   // Validation passed
@@ -1210,6 +1279,7 @@ if (result.success) {
 ### Q: Can I throw errors instead of using Either pattern?
 
 **A:** The Validator returns Either patterns instead of throwing. To convert to throws:
+
 ```typescript
 const result = await Validator.validate({...});
 
@@ -1222,21 +1292,23 @@ return result.value;
 ### Q: How do I validate async operations (database checks)?
 
 **A:** Use async custom rules:
+
 ```typescript
 await Validator.validate({
   value: username,
   rules: [
     async ({ value }) => {
       const exists = await database.users.exists(value);
-      return !exists || 'Username already taken';
-    }
-  ]
+      return !exists || "Username already taken";
+    },
+  ],
 });
 ```
 
 ### Q: Can I reuse validation across multiple forms?
 
 **A:** Create a base class with common fields:
+
 ```typescript
 class BaseUserForm {
   @IsRequired
@@ -1254,20 +1326,21 @@ class LoginForm extends BaseUserForm {
 ### Q: How do I handle optional fields?
 
 **A:** Use `@IsSometimes`, `@IsNullable`, or `@IsEmpty`:
+
 ```typescript
 class Form {
-  @IsRequired                // Required
+  @IsRequired // Required
   email: string;
 
-  @IsSometimes              // Skip if undefined
+  @IsSometimes // Skip if undefined
   @IsUrl
   website?: string;
 
-  @IsNullable               // Skip if null/undefined
+  @IsNullable // Skip if null/undefined
   @IsMinLength([10])
   bio?: string;
 
-  @IsEmpty                  // Skip if empty string
+  @IsEmpty // Skip if empty string
   @IsNumber
   age?: number;
 }
@@ -1276,36 +1349,39 @@ class Form {
 ### Q: How do I customize error messages?
 
 **A:** Pass `message` option:
+
 ```typescript
 await Validator.validate({
   value: email,
-  rules: ['Email'],
-  message: 'Please enter a valid email (e.g., user@company.com)'
+  rules: ["Email"],
+  message: "Please enter a valid email (e.g., user@company.com)",
 });
 ```
 
 ### Q: Can I validate without decorators?
 
 **A:** Yes, use single-value validation:
+
 ```typescript
 await Validator.validate({
   value: email,
-  rules: ['Required', 'Email', 'MaxLength[100]']
+  rules: ["Required", "Email", "MaxLength[100]"],
 });
 ```
 
 ### Q: How do I create a custom decorator?
 
 **A:** Register a rule and create a decorator:
+
 ```typescript
 // 1. Define rule
-const customRule = ({ value }) => value.length > 5 || 'Too short';
+const customRule = ({ value }) => value.length > 5 || "Too short";
 
 // 2. Register rule
-Validator.registerRule('CustomRule', customRule);
+Validator.registerRule("CustomRule", customRule);
 
 // 3. Create decorator
-const IsCustom = Validator.createPropertyDecorator(['CustomRule']);
+const IsCustom = Validator.createPropertyDecorator(["CustomRule"]);
 
 // 4. Use decorator
 class MyClass {
@@ -1317,6 +1393,7 @@ class MyClass {
 ### Q: What's the difference between rules, rule, and ruleParams?
 
 **A:**
+
 - `rules` - Array of rules to apply in sequence
 - `rule` - Single rule to apply (alternative to `rules`)
 - `ruleParams` - Parameters for the current rule (extracted from rule name)
@@ -1324,6 +1401,7 @@ class MyClass {
 ### Q: How do I see validation performance metrics?
 
 **A:** Check the `duration` and timestamps:
+
 ```typescript
 const result = await Validator.validate({...});
 
@@ -1336,6 +1414,7 @@ if (result.success) {
 ### Q: Can I run validation multiple times?
 
 **A:** Yes, validation results are never cached:
+
 ```typescript
 const result1 = await Validator.validate({...});
 const result2 = await Validator.validate({...}); // Fresh validation
@@ -1344,12 +1423,13 @@ const result2 = await Validator.validate({...}); // Fresh validation
 ### Q: How do I handle form submission with validation?
 
 **A:** Validate then save:
+
 ```typescript
 async function handleSubmit(formData) {
   const result = await Validator.validateTarget(MyForm, formData);
 
   if (!result.success) {
-    return { errors: result.errors };  // Return errors to UI
+    return { errors: result.errors }; // Return errors to UI
   }
 
   // All valid, save data
@@ -1363,16 +1443,19 @@ async function handleSubmit(formData) {
 ## Performance Considerations
 
 ### Parallel Field Validation
+
 - All fields are validated concurrently in `validateTarget`
 - Duration is NOT the sum of individual field times
 - More efficient than sequential validation
 
 ### Async Rules
+
 - Use async rules sparingly (database/API calls)
 - Consider caching results if checking same values
 - Each async rule runs in parallel with others
 
 ### Rule Optimization
+
 - Simple sync rules run faster than complex custom rules
 - Combine simple rules rather than creating complex ones
 - Order rules by likelihood of failure (fast failing first)
@@ -1415,4 +1498,3 @@ if (result.success) {
 ---
 
 This reference provides comprehensive coverage of all Validator features and patterns. For additional help, check the main README_COMPREHENSIVE.md or the test files in `/tests/`.
-

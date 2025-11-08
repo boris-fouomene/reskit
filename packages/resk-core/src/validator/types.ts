@@ -1325,6 +1325,9 @@ export interface IValidatorValidateTargetFailure<Context = unknown>
 
   /** Validation context (if provided) */
   context?: Context;
+
+  /** Always `undefined` for target failures (type narrowing aid) */
+  validatedAt?: undefined;
 }
 
 /**
@@ -1418,6 +1421,8 @@ export interface IValidatorValidateTargetSuccess<Context = unknown>
   extends BaseData<Context> {
   /** Discriminant for type narrowing - always `true` for success */
   success: true;
+
+  message?: undefined;
 
   /**
    * Status indicator for this result

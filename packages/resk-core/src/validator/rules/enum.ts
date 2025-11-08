@@ -19,13 +19,7 @@ function Enum<T extends IPrimitive = IPrimitive>({
     });
     return message;
   }
-  const arrayValue = Array.isArray(value) ? value : [value];
-  const exists = ruleParams.some((v) => {
-    return (
-      v === value ||
-      (v !== undefined && v !== null && String(value) == String(v))
-    );
-  });
+  const exists = allInRules(value, ruleParams);
   if (!exists) {
     return i18n.t("validator.invalidEnumValue", {
       field: translatedPropertyName || fieldName,
@@ -59,3 +53,25 @@ declare module "../types" {
     Enum: IValidatorRuleFunction<ParamType, Context>;
   }
 }
+
+/**
+ * Validates that all values exist in rule parameters using O(1) lookups.
+ * Performs both strict and type-coerced comparisons (null/undefined excluded).
+ *
+ * @param value - Single value or array of values to check
+ * @param ruleParams - Allowed parameter values
+ * @returns true if ALL values are found in ruleParams, false otherwise
+ */
+const allInRules = (value: any, ruleParams: any[]): boolean => {
+  // Normalize input to array for uniform processing
+  const values = Array.isArray(value) ? value : [value];
+
+  // Set for strict equality checks
+  const strictSet = new Set(ruleParams);
+
+  // Set for string-based comparison (filters out null/undefined first)
+  const stringSet = new Set(ruleParams.filter((v) => v != null).map(String));
+
+  // Verify every value exists in either set
+  return values.every((v) => strictSet.has(v) || stringSet.has(String(v)));
+};

@@ -19,7 +19,10 @@ import {
   IValidatorRuleName,
   IValidatorRules,
   IValidatorSanitizedRules,
+  IValidatorValidateFailure,
   IValidatorValidateOptions,
+  IValidatorValidateResult,
+  IValidatorValidateSuccess,
 } from "./types";
 
 // Enhanced metadata keys with consistent naming convention
@@ -913,7 +916,17 @@ export class Validator {
       }, 0);
     });
   }
+  isSuccess<T, E>(
+    result: IValidatorValidateResult<T, E>
+  ): result is IValidatorValidateSuccess<T> {
+    return isObj(result) && result.success === true;
+  }
 
+  static isFailure<T, E>(
+    result: IValidatorValidateResult<T, E>
+  ): result is IValidatorValidateFailure<E> {
+    return isObj(result) && result.success === false;
+  }
   /**
    * ## Validate Class Target with Decorators
    *
@@ -1115,12 +1128,20 @@ export class Validator {
 
     for (const propertyKey in targetRules) {
       const rules = targetRules[propertyKey];
-
       // Skip validation for Sometimes fields that are not present in data
       if (rules.includes("Sometimes") && !(propertyKey in data)) {
         continue;
       }
-
+      const value = data[propertyKey];
+      if (
+        isEmpty(value) &&
+        ((rules.includes("Nullable") &&
+          (value === null || value === undefined)) ||
+          (rules.includes("Empty") && value === ""))
+      ) {
+        // Skip validation for Nullable fields with null/undefined value
+        continue;
+      }
       const translatedPropertyName: string = isNonNullString(
         (translatedPropertyNames as any)[propertyKey]
       )
@@ -1131,7 +1152,7 @@ export class Validator {
         Validator.validate<Context>({
           context,
           ...restOptions,
-          value: data[propertyKey],
+          value,
           data,
           translatedPropertyName,
           fieldName: propertyKey,
@@ -1165,8 +1186,8 @@ export class Validator {
     return new Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }>(
       (resolve, reject) => {
         return Promise.all(validationPromises).then(() => {
-          const isValidationSuccessful = !validationErrors.length;
-          if (isValidationSuccessful) {
+          const isIValidatorValidateSuccessful = !validationErrors.length;
+          if (isIValidatorValidateSuccessful) {
             resolve({ data });
           } else {
             reject({

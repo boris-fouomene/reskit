@@ -535,3 +535,102 @@ export interface IValidatorValidateOptions<
    */
   data?: Record<string, any>;
 }
+
+/**
+ * ## Validation Result Types (Either Pattern)
+ *
+ * Uses the Either<L, R> pattern where Left represents failure and Right represents success.
+ * This provides strong type safety and prevents accessing wrong properties based on the result state.
+ */
+
+// Base error interface for validation failures
+interface ValidationError {
+  /** Human-readable error message */
+  message: string;
+
+  /** The field that failed validation */
+  fieldName?: string;
+
+  /** Alias for fieldName */
+  propertyName?: string;
+
+  /** Localized field name for user-facing messages */
+  translatedPropertyName?: string;
+
+  /** The specific rule that failed */
+  ruleName?: IValidatorRuleName;
+
+  /** Parameters passed to the failing rule */
+  ruleParams?: any[];
+
+  /** The value that failed validation */
+  value?: any;
+
+  /** Always 'error' for failures */
+  status: "error";
+
+  /** The raw rule that failed */
+  rule?: IValidatorRule;
+
+  /** Raw rule name with parameters (e.g., "minLength[5]") */
+  rawRuleName?: string;
+
+  /** All rules that were applied */
+  rules?: IValidatorRule[];
+
+  /** Validation context data */
+  context?: any;
+
+  /** Error code for programmatic handling */
+  code?: string;
+
+  /** Error severity level */
+  severity?: "error" | "warning" | "info";
+
+  /** When the validation failed */
+  timestamp?: Date;
+
+  /** Additional error metadata */
+  metadata?: Record<string, any>;
+}
+
+// Success result type (Right side of Either)
+export interface IValidatorValidateSuccess<T = unknown> {
+  /** Discriminant for type narrowing */
+  success: true;
+
+  /** The validated data */
+  data: T;
+
+  /** When validation completed successfully */
+  validatedAt?: Date;
+
+  /** How long validation took (in milliseconds) */
+  duration?: number;
+
+  /** Additional success metadata */
+  metadata?: Record<string, any>;
+}
+
+// Failure result type (Left side of Either)
+export interface IValidatorValidateFailure<E = ValidationError> {
+  /** Discriminant for type narrowing */
+  success: false;
+
+  /** The validation error details */
+  error: E;
+
+  /** When validation failed */
+  failedAt?: Date;
+
+  /** How long validation took before failing (in milliseconds) */
+  duration?: number;
+
+  /** Additional failure metadata */
+  metadata?: Record<string, any>;
+}
+
+// Main Either type for validation results
+export type IValidatorValidateResult<T = any, E = ValidationError> =
+  | IValidatorValidateSuccess<T>
+  | IValidatorValidateFailure<E>;

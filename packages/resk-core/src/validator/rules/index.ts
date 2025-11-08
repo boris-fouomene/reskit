@@ -299,7 +299,13 @@ export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<
 
 Validator.registerRule("Required", function Required(options) {
   const value = options?.value;
-  return !isEmpty(value) || i18n.t("validator.required");
+  // Check if value is truly empty (null, undefined, or empty string)
+  // Empty arrays, empty objects, 0, false, NaN are NOT considered empty
+  const isValueEmpty =
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value === "");
+  return !isValueEmpty || i18n.t("validator.required");
 });
 
 function numberHasLength({ value, ruleParams }: IValidatorValidateOptions) {

@@ -291,21 +291,19 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is not empty string", async () => {
-          await expect(
-            Validator.validate({
-              value: null,
-              rules: ["Empty", "Required"],
-            })
-          ).rejects.toBeDefined();
+          const result = await Validator.validate({
+            value: null,
+            rules: ["Empty", "Required"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is undefined", async () => {
-          await expect(
-            Validator.validate({
-              value: undefined,
-              rules: ["Empty", "Required"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: undefined,
+            rules: ["Empty", "Required"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
@@ -317,12 +315,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is invalid", async () => {
-          await expect(
-            Validator.validate({
-              value: "",
-              rules: ["Empty", "Email"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: "not-empty",
+            rules: ["Empty", "Email"],
+          });
+          expect(result.success).toBe(false);
         });
       });
 
@@ -353,12 +350,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when not empty string", async () => {
-          await expect(
-            Validator.validateTarget(TestEntity, {
-              emptyField: null,
-              optionalEmail: "invalid-email",
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validateTarget(TestEntity, {
+            emptyField: null,
+            optionalEmail: "invalid-email",
+          });
+          expect(result.success).toBe(false);
         });
       });
     });
@@ -396,12 +392,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is empty string", async () => {
-          await expect(
-            Validator.validate({
-              value: "",
-              rules: ["Nullable", "Required"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: "",
+            rules: ["Nullable", "Required"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
@@ -413,12 +408,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is invalid", async () => {
-          await expect(
-            Validator.validate({
-              value: "invalid-email",
-              rules: ["Nullable", "Email"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: "invalid-email",
+            rules: ["Nullable", "Email"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should skip validation for null even with strict rules", async () => {
@@ -483,13 +477,12 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is empty string", async () => {
-          await expect(
-            Validator.validateTarget(TestEntity, {
-              nullableField: "",
-              optionalEmail: "invalid-email",
-              strictString: "",
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validateTarget(TestEntity, {
+            nullableField: "",
+            optionalEmail: "invalid-email",
+            strictString: "",
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
@@ -530,21 +523,19 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is null", async () => {
-          await expect(
-            Validator.validate({
-              value: null,
-              rules: ["Sometimes", "Required"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: null,
+            rules: ["Sometimes", "Required"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is empty string", async () => {
-          await expect(
-            Validator.validate({
-              value: "",
-              rules: ["Sometimes", "Required"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: "",
+            rules: ["Sometimes", "Required"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
@@ -556,12 +547,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is invalid", async () => {
-          await expect(
-            Validator.validate({
-              value: "invalid-email",
-              rules: ["Sometimes", "Email"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: "invalid-email",
+            rules: ["Sometimes", "Email"],
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should skip validation for undefined even with strict rules", async () => {
@@ -573,12 +563,11 @@ describe("Validator Rules", () => {
         });
 
         it("should apply validation for null with strict rules", async () => {
-          await expect(
-            Validator.validate({
-              value: null,
-              rules: ["Sometimes", "NonNullString"],
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validate({
+            value: null,
+            rules: ["Sometimes", "NonNullString"],
+          });
+          expect(result.success).toBe(false);
         });
       });
 
@@ -621,23 +610,21 @@ describe("Validator Rules", () => {
         });
 
         it("should apply other rules when value is null", async () => {
-          await expect(
-            Validator.validateTarget(TestEntity, {
-              sometimesField: null,
-              optionalEmail: "invalid-email",
-              strictString: null,
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validateTarget(TestEntity, {
+            sometimesField: null,
+            optionalEmail: "invalid-email",
+            strictString: null,
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is empty string", async () => {
-          await expect(
-            Validator.validateTarget(TestEntity, {
-              sometimesField: "",
-              optionalEmail: "invalid-email",
-              strictString: "",
-            })
-          ).rejects.toThrow();
+          const result = await Validator.validateTarget(TestEntity, {
+            sometimesField: "",
+            optionalEmail: "invalid-email",
+            strictString: "",
+          });
+          expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
@@ -679,12 +666,11 @@ describe("Validator Rules", () => {
       });
 
       it("should apply validation when no nullable conditions are met", async () => {
-        await expect(
-          Validator.validate({
-            value: "invalid",
-            rules: ["Empty", "Nullable", "Sometimes", "Email"],
-          })
-        ).rejects.toThrow();
+        const result = await Validator.validate({
+          value: "invalid",
+          rules: ["Empty", "Nullable", "Sometimes", "Email"],
+        });
+        expect(result.success).toBe(false);
       });
     });
 
@@ -780,30 +766,28 @@ describe("Validator Rules", () => {
       });
 
       it("should fail when required fields are missing", async () => {
-        await expect(
-          Validator.validateTarget(ComprehensiveEntity, {
-            emptyEmail: "",
-            nullableEmail: null,
-            sometimesEmail: undefined,
-            emptyRequired: "",
-            nullableRequired: null,
-            sometimesRequired: undefined,
-          })
-        ).rejects.toThrow();
+        const result = await Validator.validateTarget(ComprehensiveEntity, {
+          emptyEmail: "",
+          nullableEmail: null,
+          sometimesEmail: undefined,
+          emptyRequired: "",
+          nullableRequired: null,
+          sometimesRequired: undefined,
+        });
+        expect(result.success).toBe(false);
       });
 
       it("should fail when nullable fields have invalid values", async () => {
-        await expect(
-          Validator.validateTarget(ComprehensiveEntity, {
-            requiredEmail: "test@example.com",
-            emptyEmail: "invalid-email",
-            nullableEmail: "invalid-email",
-            sometimesEmail: "invalid-email",
-            emptyRequired: "",
-            nullableRequired: null,
-            sometimesRequired: undefined,
-          })
-        ).rejects.toThrow();
+        const result = await Validator.validateTarget(ComprehensiveEntity, {
+          requiredEmail: "test@example.com",
+          emptyEmail: "invalid-email",
+          nullableEmail: "invalid-email",
+          sometimesEmail: "invalid-email",
+          emptyRequired: "",
+          nullableRequired: null,
+          sometimesRequired: undefined,
+        });
+        expect(result.success).toBe(false);
       });
 
       it("should skip Sometimes fields when absent from data", async () => {

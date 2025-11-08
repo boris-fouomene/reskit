@@ -676,7 +676,7 @@ export class Validator {
     return { valid: validRules, invalid: invalidRules };
   }
 
-  static validate<Context = unknown>({
+  static async validate<Context = unknown>({
     rules,
     ...extra
   }: IValidatorValidateOptions<Array<any>, Context>): Promise<
@@ -706,16 +706,12 @@ export class Validator {
         fieldName: extra.fieldName,
         propertyName: extra.propertyName,
       });
-      return Promise.resolve(
-        createFailureResult<Context>(error, successOrErrorData, startTime)
-      );
+      return createFailureResult<Context>(error, successOrErrorData, startTime);
     }
 
     // No rules to validate - return success
     if (!sanitizedRules.length) {
-      return Promise.resolve(
-        createSuccessResult<Context>(successOrErrorData, startTime)
-      );
+      return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
     // Check for nullable rules - if value meets nullable conditions, skip validation
@@ -744,9 +740,7 @@ export class Validator {
     }
     if (skipValidation) {
       // Value meets nullable conditions - validation succeeds
-      return Promise.resolve(
-        createSuccessResult<Context>(successOrErrorData, startTime)
-      );
+      return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
     extra.fieldName = extra.propertyName = defaultStr(
@@ -899,7 +893,10 @@ export class Validator {
     );
   }
 
-  static validateTarget<T extends IClassConstructor = any, Context = unknown>(
+  static async validateTarget<
+    T extends IClassConstructor = any,
+    Context = unknown,
+  >(
     target: T,
     data: Partial<Record<keyof InstanceType<T>, any>>,
     options?: {
@@ -955,7 +952,7 @@ export class Validator {
       }
       const value = data[propertyKey];
       if (
-        isEmpty(value) &&
+        (value === "" || value === undefined || value === null) &&
         ((rules.includes("Nullable") &&
           (value === null || value === undefined)) ||
           (rules.includes("Empty") && value === ""))

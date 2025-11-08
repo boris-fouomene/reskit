@@ -104,7 +104,7 @@ describe("Validator", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toBe(4);
+        expect(result.value).toBe(4);
         expect(result.validatedAt).toBeDefined();
         expect(result.duration).toBeDefined();
       }
@@ -117,7 +117,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("test");
+      expect(result.value).toBe("test");
     });
 
     it("should return success for Required rule with non-empty value", async () => {
@@ -127,7 +127,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("hello");
+      expect(result.value).toBe("hello");
     });
 
     it("should return success for MinLength rule when value meets requirement", async () => {
@@ -137,7 +137,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("hello");
+      expect(result.value).toBe("hello");
     });
 
     it("should return success for MaxLength rule when value meets requirement", async () => {
@@ -147,7 +147,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("hello");
+      expect(result.value).toBe("hello");
     });
 
     it("should return success for valid email", async () => {
@@ -157,7 +157,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("test@example.com");
+      expect(result.value).toBe("test@example.com");
     });
 
     it("should return success for valid URL", async () => {
@@ -167,7 +167,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("https://example.com");
+      expect(result.value).toBe("https://example.com");
     });
 
     it("should return success for NumberGreaterThan rule when value is valid", async () => {
@@ -177,7 +177,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe(10);
+      expect(result.value).toBe(10);
     });
 
     it("should return success for NumberLessThan rule when value is valid", async () => {
@@ -187,7 +187,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe(5);
+      expect(result.value).toBe(5);
     });
 
     it("should return success for multiple passing rules", async () => {
@@ -197,7 +197,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("test@example.com");
+      expect(result.value).toBe("test@example.com");
     });
 
     it("should return success for Nullable with null value", async () => {
@@ -207,7 +207,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBeNull();
+      expect(result.value).toBeNull();
     });
 
     it("should return success for Empty with empty string", async () => {
@@ -217,7 +217,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBe("");
+      expect(result.value).toBe("");
     });
 
     it("should return success for Sometimes with undefined value", async () => {
@@ -227,7 +227,7 @@ describe("Validator", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.data).toBeUndefined();
+      expect(result.value).toBeUndefined();
     });
   });
 
@@ -651,7 +651,7 @@ describe("Validator", () => {
     it("should validate PhoneNumber rule", async () => {
       const pass = await Validator.validate({
         rules: ["PhoneNumber"],
-        value: "+1234567890",
+        value: "+16505550123",
       });
 
       expect(pass.success).toBe(true);
@@ -665,7 +665,7 @@ describe("Validator", () => {
 
       const phone = await Validator.validate({
         rules: ["EmailOrPhoneNumber"],
-        value: "+1234567890",
+        value: "+16505550123",
       });
 
       expect(email.success).toBe(true);

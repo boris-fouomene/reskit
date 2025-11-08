@@ -676,6 +676,183 @@ export class Validator {
     return { valid: validRules, invalid: invalidRules };
   }
 
+  /**
+   * ## Validate a Single Value
+   *
+   * Performs validation on a single value using a set of specified validation rules.
+   * This is the main validation method for validating individual values outside of
+   * class-based validation contexts.
+   *
+   * ### Key Features
+   * - **Synchronous Rule Support**: Handles both synchronous and asynchronous validation rules
+   * - **Multiple Rules**: Supports validation with multiple rules applied sequentially
+   * - **Error Handling**: Never throws errors; returns a result object with success/failure status
+   * - **Type Safe**: Full TypeScript support with generic typing for context
+   * - **Nullable Handling**: Supports Empty, Nullable, and Sometimes rules for conditional validation
+   * - **Performance**: Tracks validation duration and timestamps
+   *
+   * ### Return Type: IValidatorValidateResult
+   * The method returns a discriminated union that can be narrowed:
+   * ```typescript
+   * type IValidatorValidateResult<Context> =
+   *   | IValidatorValidateSuccess<Context>  // success: true
+   *   | IValidatorValidateFailure<Context>  // success: false
+   * ```
+   *
+   * #### Success Result (success: true)
+   * - `success`: true
+   * - `value`: The original value that was validated
+   * - `validatedAt`: ISO timestamp when validation completed
+   * - `duration`: Milliseconds elapsed during validation
+   * - `data`: Optional context data passed to rules
+   * - `context`: Optional validation context of type Context
+   *
+   * #### Failure Result (success: false)
+   * - `success`: false
+   * - `value`: The original value that failed validation
+   * - `error`: IValidatorValidationError containing:
+   *   - `message`: Error message (translated if i18n available)
+   *   - `ruleName`: Name of the rule that failed
+   *   - `ruleParams`: Parameters passed to the rule
+   *   - `fieldName`: Optionally provided field identifier
+   * - `failedAt`: ISO timestamp when validation failed
+   * - `duration`: Milliseconds elapsed before failure
+   *
+   * ### Nullable Rules
+   * Special handling for conditional validation rules:
+   * - **Empty**: Skips validation if value is empty string ""
+   * - **Nullable**: Skips validation if value is null or undefined
+   * - **Sometimes**: Skips validation if value is undefined only
+   *
+   * Priority order: Empty > Nullable > Sometimes
+   *
+   * ### Examples
+   *
+   * #### Basic Single Rule Validation
+   * ```typescript
+   * const result = await Validator.validate({
+   *   value: "user@example.com",
+   *   rules: ["Required", "Email"],
+   * });
+   *
+   * if (result.success) {
+   *   console.log("Email is valid:", result.value);
+   * } else {
+   *   console.error("Validation failed:", result.error.message);
+   * }
+   * ```
+   *
+   * #### Validation with Parameters
+   * ```typescript
+   * const result = await Validator.validate({
+   *   value: "hello",
+   *   rules: [
+   *     "Required",
+   *     "MinLength[5]",  // Validates length >= 5
+   *     "MaxLength[20]", // Validates length <= 20
+   *   ],
+   * });
+   * ```
+   *
+   * #### Custom Error Messages with i18n
+   * ```typescript
+   * const result = await Validator.validate({
+   *   value: "",
+   *   rules: ["Required"],
+   *   fieldName: "email",  // For context in error messages
+   * });
+   *
+   * if (!result.success) {
+   *   // Error message can include field name if i18n is configured
+   *   console.error(result.error.message);
+   * }
+   * ```
+   *
+   * #### Async Rule with Context
+   * ```typescript
+   * interface MyContext {
+   *   userId: number;
+   *   permissions: string[];
+   * }
+   *
+   * const result = await Validator.validate<MyContext>({
+   *   value: "admin_action",
+   *   rules: ["Required", "UniqueAction"],
+   *   context: {
+   *     userId: 123,
+   *     permissions: ["admin"],
+   *   },
+   * });
+   * ```
+   *
+   * #### Nullable Rule Examples
+   * ```typescript
+   * // Null is valid with Nullable rule
+   * const result1 = await Validator.validate({
+   *   value: null,
+   *   rules: ["Nullable", "Required"],
+   * });
+   * // result1.success === true (skips Required check)
+   *
+   * // Empty string is valid with Empty rule
+   * const result2 = await Validator.validate({
+   *   value: "",
+   *   rules: ["Empty", "Email"],
+   * });
+   * // result2.success === true (skips Email check)
+   *
+   * // Undefined is valid with Sometimes rule
+   * const result3 = await Validator.validate({
+   *   value: undefined,
+   *   rules: ["Sometimes", "MinLength[5]"],
+   * });
+   * // result3.success === true (skips MinLength check)
+   * ```
+   *
+   * #### Type Guards for Result Narrowing
+   * ```typescript
+   * const result = await Validator.validate({
+   *   value: "test",
+   *   rules: ["Required"],
+   * });
+   *
+   * // Using type guards
+   * if (Validator.isSuccess(result)) {
+   *   // TypeScript knows result.success === true
+   *   console.log("Valid value:", result.value);
+   * } else if (Validator.isFailure(result)) {
+   *   // TypeScript knows result.success === false
+   *   console.error("Error:", result.error.message);
+   * }
+   * ```
+   *
+   * @template Context - Optional type for the validation context object
+   *
+   * @param options - Validation options (IValidatorValidateOptions)
+   * @param options.value - The value to validate (required)
+   * @param options.rules - Array of validation rules to apply
+   * @param options.context - Optional context object passed to rule functions
+   * @param options.data - Optional data object for rule context
+   * @param options.fieldName - Optional field identifier for error messages
+   * @param options.propertyName - Optional property identifier for error messages
+   * @param options.translatedPropertyName - Optional translated property name
+   * @param options.message - Optional custom error message prefix
+   *
+   * @returns Promise resolving to IValidatorValidateResult<Context>
+   *          - Success: object with success=true, value, validatedAt, duration
+   *          - Failure: object with success=false, error, failedAt, duration
+   *
+   * @throws {Never} This method never throws. All errors are returned in the result object.
+   *
+   * @since 1.0.0
+   * @see {@link validateTarget} - For class-based validation using decorators
+   * @see {@link registerRule} - To register custom validation rules
+   * @see {@link IValidatorValidateResult} - Result type documentation
+   * @see {@link IValidatorValidationError} - Error details type
+   *
+   * @public
+   * @async
+   */
   static async validate<Context = unknown>({
     rules,
     ...extra
@@ -893,6 +1070,223 @@ export class Validator {
     );
   }
 
+  /**
+   * ## Validate Target - Class-Based Validation
+   *
+   * Performs validation on all decorated properties of a class instance using decorator-based rules.
+   * This method supports complex, multi-field validation with field-level error accumulation.
+   *
+   * ### Key Features
+   * - **Decorator Support**: Uses @IsEmail, @IsRequired, @MinLength, etc. decorators
+   * - **Multi-Field Validation**: Validates all decorated properties in parallel
+   * - **Error Accumulation**: Collects all field validation errors into a single result
+   * - **Field Mapping**: Maps validated data back to original structure with proper types
+   * - **Internationalization**: Supports translated property names and error messages
+   * - **Custom Error Formatting**: Allows custom error message builders per field
+   * - **Async Rules**: Supports both sync and async validation rules for each field
+   * - **Type Safe**: Full TypeScript support with generic typing for class instances
+   *
+   * ### Return Type: IValidatorValidateTargetResult
+   * Returns a discriminated union that can be narrowed:
+   * ```typescript
+   * type IValidatorValidateTargetResult<T> =
+   *   | IValidatorValidateTargetSuccess<T>  // success: true
+   *   | IValidatorValidateTargetFailure<T>  // success: false
+   * ```
+   *
+   * #### Success Result (success: true)
+   * - `success`: true
+   * - `data`: Validated object data matching the class structure
+   * - `value`: undefined for target validation
+   * - `validatedAt`: ISO timestamp when validation completed
+   * - `duration`: Milliseconds elapsed during validation
+   * - `status`: "success"
+   * - `context`: Optional validation context of type Context
+   *
+   * #### Failure Result (success: false)
+   * - `success`: false
+   * - `data`: undefined for target failures
+   * - `errors`: Array of IValidatorValidationError objects, one per failed field
+   * - `failureCount`: Number of fields that failed validation
+   * - `message`: Summary message (e.g., "Validation failed for 3 fields")
+   * - `failedAt`: ISO timestamp when validation failed
+   * - `duration`: Milliseconds elapsed before failure
+   * - `status`: "error"
+   *
+   * ### Supported Decorators
+   * - `@IsRequired` / `@IsNullable` / `@IsEmpty` / `@IsSometimes` - Conditional rules
+   * - `@IsEmail` / `@IsUrl` / `@IsPhoneNumber` - Format validators
+   * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
+   * - `@IsNumber` / `@IsNonNullString` - Type validators
+   * - `@HasLength[n]` - Exact length validator
+   * - Custom decorators created with `Validator.createPropertyDecorator()`
+   *
+   * ### Nullable Rule Behavior
+   * - **@IsEmpty**: Skips remaining rules if value is empty string ""
+   * - **@IsNullable**: Skips remaining rules if value is null or undefined
+   * - **@IsSometimes**: Skips remaining rules if value is undefined only
+   * - **Skip if Absent**: @IsSometimes fields can be omitted from data entirely
+   *
+   * ### Examples
+   *
+   * #### Basic Class Validation
+   * ```typescript
+   * class UserForm {
+   *   @IsRequired
+   *   @IsEmail
+   *   email: string;
+   *
+   *   @IsRequired
+   *   @MinLength([3])
+   *   @MaxLength([50])
+   *   name: string;
+   *
+   *   @IsNullable
+   *   @IsNumber
+   *   age?: number;
+   * }
+   *
+   * const result = await Validator.validateTarget(UserForm, {
+   *   email: "user@example.com",
+   *   name: "John Doe",
+   *   age: null,
+   * });
+   *
+   * if (result.success) {
+   *   console.log("Form is valid:", result.data);
+   * } else {
+   *   result.errors.forEach(error => {
+   *     console.error(`${error.propertyName}: ${error.message}`);
+   *   });
+   * }
+   * ```
+   *
+   * #### Complex Multi-Field Validation
+   * ```typescript
+   * class ProductForm {
+   *   @IsRequired
+   *   @MinLength([3])
+   *   title: string;
+   *
+   *   @IsRequired
+   *   @IsNumber
+   *   @NumberGreaterThan([0])
+   *   price: number;
+   *
+   *   @IsEmpty // Product description can be empty
+   *   @MaxLength([1000])
+   *   description?: string;
+   *
+   *   @IsSometimes // Can be omitted entirely
+   *   @IsUrl
+   *   imageUrl?: string;
+   * }
+   *
+   * const result = await Validator.validateTarget(ProductForm, {
+   *   title: "Awesome Product",
+   *   price: 29.99,
+   *   description: "",
+   *   // imageUrl omitted (valid with @IsSometimes)
+   * });
+   * ```
+   *
+   * #### Custom Error Message Building
+   * ```typescript
+   * const result = await Validator.validateTarget(UserForm, data, {
+   *   errorMessageBuilder: (translatedPropertyName, error, options) => {
+   *     // Custom format: "Field Name (validation rule): error message"
+   *     return `${translatedPropertyName} (${options.ruleName}): ${error}`;
+   *   }
+   * });
+   * ```
+   *
+   * #### Validation with Context
+   * ```typescript
+   * interface AuthContext {
+   *   userId: number;
+   *   isAdmin: boolean;
+   * }
+   *
+   * class AdminAction {
+   *   @IsRequired
+   *   action: string;
+   *
+   *   @IsRequired
+   *   targetId: number;
+   * }
+   *
+   * const result = await Validator.validateTarget<typeof AdminAction, AuthContext>(
+   *   AdminAction,
+   *   { action: "delete", targetId: 123 },
+   *   { context: { userId: 1, isAdmin: true } }
+   * );
+   * ```
+   *
+   * #### Error Handling
+   * ```typescript
+   * const result = await Validator.validateTarget(UserForm, userData);
+   *
+   * if (!result.success) {
+   *   // Access failure details
+   *   console.log(`${result.failureCount} fields failed validation`);
+   *   console.log(result.message); // "Validation failed for 2 fields"
+   *
+   *   result.errors.forEach(error => {
+   *     console.error({
+   *       field: error.propertyName,
+   *       message: error.message,
+   *       rule: error.ruleName,
+   *       value: error.value,
+   *     });
+   *   });
+   * }
+   * ```
+   *
+   * #### Type Guards
+   * ```typescript
+   * const result = await Validator.validateTarget(UserForm, data);
+   *
+   * if (result.success) {
+   *   // result.data is properly typed
+   *   const validatedUser: Partial<UserForm> = result.data;
+   * } else {
+   *   // result.errors is available
+   *   const errorCount = result.errors.length;
+   * }
+   * ```
+   *
+   * @template T - Class constructor type (extends IClassConstructor)
+   * @template Context - Optional type for validation context passed to rules
+   *
+   * @param target - Class constructor decorated with validation decorators (e.g., UserForm)
+   * @param data - Object containing property values to validate (can be partial)
+   * @param options - Optional validation options
+   * @param options.context - Optional context object passed to all validation rules
+   * @param options.errorMessageBuilder - Optional custom error message formatter function
+   *
+   * @returns Promise resolving to IValidatorValidateTargetResult<T>
+   *          - Success: object with success=true, data (validated object), validatedAt, duration
+   *          - Failure: object with success=false, errors (array), failureCount, message, failedAt, duration
+   *
+   * @throws {Never} This method never throws. All errors are returned in the result object.
+   *
+   * @remarks
+   * - Validation is performed in parallel for all fields using Promise.all()
+   * - Fields decorated with @IsSometimes can be omitted from input data
+   * - Nullable/Empty rules prevent other rules from executing for that field
+   * - Property names are translated using i18n if available
+   * - Errors include field-specific information for precise error reporting
+   *
+   * @since 1.0.0
+   * @see {@link validate} - For single-value validation
+   * @see {@link createPropertyDecorator} - To create custom validation decorators
+   * @see {@link registerRule} - To register custom validation rules
+   * @see {@link IValidatorValidateTargetResult} - Result type documentation
+   * @see {@link IValidatorValidationError} - Error details type
+   *
+   * @public
+   * @async
+   */
   static async validateTarget<
     T extends IClassConstructor = any,
     Context = unknown,

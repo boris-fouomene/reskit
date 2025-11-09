@@ -58,7 +58,8 @@ export * from "./merge";
   const exampleService = new ExampleService();
   const exampleController = new ExampleControllerClass(exampleService);
  */
-export interface IClassConstructor<T = any, D extends any[] = any[]> extends Function {
+export interface IClassConstructor<T = any, D extends any[] = any[]>
+  extends Function {
   new (...args: D): T;
 }
 
@@ -83,4 +84,94 @@ export interface IClassConstructor<T = any, D extends any[] = any[]> extends Fun
  * console.log(numberRenderer(123)); // Output: <div class="cell number">123</div>
  * ```
  */
-export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: InputType) => OutputType;
+export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (
+  value: InputType
+) => OutputType;
+
+/**
+ * ## Make Optional Utility Type
+ *
+ * A mapped type that makes specific properties of a type optional while keeping others required.
+ * This is useful when you want fine-grained control over which properties should be optional
+ * in a derived type, rather than making all properties optional (like `Partial<T>`).
+ *
+ * ### How it Works
+ * This type uses TypeScript's mapped types to:
+ * 1. Remove specified properties from the original type (`Omit<T, K>`)
+ * 2. Make those properties optional (`Partial<Pick<T, K>>`)
+ * 3. Combine them back together with an intersection type
+ *
+ * ### Template Parameters
+ * @template T - The original type to modify
+ * @template K - A union of keys from T that should be made optional (must extend `keyof T`)
+ *
+ * ### Examples
+ *
+ * #### Basic Usage
+ * ```typescript
+ * interface User {
+ *   id: number;
+ *   name: string;
+ *   email: string;
+ *   age: number;
+ *   isActive: boolean;
+ * }
+ *
+ * // Make only 'age' and 'isActive' optional
+ * type UserWithOptionalFields = IMakeOptional<User, 'age' | 'isActive'>;
+ *
+ * // Result: {
+ * //   id: number;
+ * //   name: string;
+ * //   email: string;
+ * //   age?: number;      // Now optional
+ * //   isActive?: boolean; // Now optional
+ * // }
+ * ```
+ *
+ * #### Single Property
+ * ```typescript
+ * type UserWithOptionalEmail = IMakeOptional<User, 'email'>;
+ *
+ * // Result: {
+ * //   id: number;
+ * //   name: string;
+ * //   email?: string;    // Only email is optional
+ * //   age: number;
+ * //   isActive: boolean;
+ * // }
+ * ```
+ *
+ * #### Comparison with Other Utility Types
+ * ```typescript
+ * // All properties optional
+ * type AllOptional = Partial<User>;
+ *
+ * // All properties required (opposite)
+ * type AllRequired = Required<User>;
+ *
+ * // Specific properties optional (this type)
+ * type SomeOptional = IMakeOptional<User, 'age' | 'email'>;
+ * ```
+ *
+ * ### Use Cases
+ * - API responses where some fields might be missing
+ * - Form data where certain fields are optional based on conditions
+ * - Configuration objects with optional overrides
+ * - Database models with nullable columns
+ *
+ * ### Type Safety
+ * The type ensures compile-time safety by:
+ * - Constraining `K` to only valid keys of `T`
+ * - Preserving the original property types (just making them optional)
+ * - Maintaining type relationships and inference
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link Partial} - Makes all properties optional
+ * @see {@link Required} - Makes all properties required
+ * @see {@link Pick} - Selects specific properties
+ * @see {@link Omit} - Removes specific properties
+ */
+export type IMakeOptional<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;

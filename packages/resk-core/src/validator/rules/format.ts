@@ -529,10 +529,7 @@ Validator.registerRule("Regex", _Regex);
 export const Regex = Validator.createRuleDecorator<string[]>(_Regex);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### UUID Rule
      *
@@ -581,7 +578,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    UUID: IValidatorRuleFunction<ParamType, Context>;
+    UUID: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### JSON Rule
@@ -626,7 +623,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    JSON: IValidatorRuleFunction<ParamType, Context>;
+    JSON: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### Base64 Rule
@@ -671,7 +668,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Base64: IValidatorRuleFunction<ParamType, Context>;
+    Base64: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### HexColor Rule
@@ -731,7 +728,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    HexColor: IValidatorRuleFunction<ParamType, Context>;
+    HexColor: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### CreditCard Rule
@@ -781,7 +778,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    CreditCard: IValidatorRuleFunction<ParamType, Context>;
+    CreditCard: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### IP Rule
@@ -900,7 +897,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MACAddress: IValidatorRuleFunction<ParamType, Context>;
+    MACAddress: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### Regex Rule

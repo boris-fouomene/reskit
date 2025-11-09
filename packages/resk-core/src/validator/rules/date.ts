@@ -609,10 +609,7 @@ Validator.registerRule("PastDate", _PastDate);
 export const PastDate = Validator.createPropertyDecorator(["PastDate"]);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### Date Rule
      *
@@ -661,7 +658,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Date: IValidatorRuleFunction<ParamType, Context>;
+    Date: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### DateAfter Rule
@@ -898,7 +895,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FutureDate: IValidatorRuleFunction<ParamType, Context>;
+    FutureDate: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### PastDate Rule
@@ -942,6 +939,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    PastDate: IValidatorRuleFunction<ParamType, Context>;
+    PastDate: IValidatorRuleFunction<[], Context>;
   }
 }

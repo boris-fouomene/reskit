@@ -432,10 +432,7 @@ export const MinFileSize =
   Validator.createRuleDecorator<number[]>(_MinFileSize);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### File Rule
      *
@@ -474,7 +471,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    File: IValidatorRuleFunction<ParamType, Context>;
+    File: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### FileSize Rule
@@ -604,7 +601,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Image: IValidatorRuleFunction<ParamType, Context>;
+    Image: IValidatorRuleFunction<[], Context>;
 
     /**
      * ### FileExtension Rule

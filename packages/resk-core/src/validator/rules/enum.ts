@@ -33,10 +33,7 @@ function Enum<T extends IPrimitive = IPrimitive>({
 export const IsIsEnum = Validator.createRuleDecorator<Array<IPrimitive>>(Enum);
 Validator.registerRule("Enum", Enum);
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### Enum Rule
      *
@@ -50,7 +47,7 @@ declare module "../types" {
      * @since 1.25.13
      * @public
      */
-    Enum: IValidatorRuleFunction<ParamType, Context>;
+    Enum: IValidatorRuleFunction<Array<any>, Context>;
   }
 }
 

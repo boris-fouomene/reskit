@@ -2,27 +2,29 @@ import {
   createPropertyDecorator,
   getDecoratedProperties,
 } from "@/resources/decorators";
-import { IClassConstructor, IDict } from "@/types";
+import { IClassConstructor, IDict, IMakeOptional } from "@/types";
 import {
   defaultStr,
-  extendObj,
   isEmpty,
   isNonNullString,
   isObj,
   stringify,
 } from "@utils/index";
-import { i18n } from "../i18n";
+import { I18n, i18n as defaultI18n } from "../i18n";
 import {
   IValidatorRule,
   IValidatorRuleFunction,
   IValidatorRuleName,
   IValidatorRules,
+  IValidatorRulesMap,
+  IValidatorSanitizedRuleObject,
   IValidatorSanitizedRules,
   IValidatorValidateFailure,
   IValidatorValidateOptions,
   IValidatorValidateResult,
   IValidatorValidateSuccess,
   IValidatorValidateTargetResult,
+  IValidatorValidationError,
 } from "./types";
 
 // Enhanced metadata keys with consistent naming convention
@@ -268,9 +270,9 @@ export class Validator {
    * @see {@link findRegisteredRule} - Find a specific rule
    * @public
    */
-  static getRules(): IValidatorRules {
+  static getRules(): IValidatorRulesMap {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
-    return isObj(rules) ? { ...rules } : ({} as IValidatorRules);
+    return isObj(rules) ? { ...rules } : ({} as IValidatorRulesMap);
   }
 
   /**
@@ -289,6 +291,7 @@ export class Validator {
    * `validator.separators`. This allows different languages to use appropriate
    * punctuation and formatting conventions.
    *
+   * @param customI18n - Optional custom I18n instance to use for translations
    * @example
    * ```typescript
    * // Get current separators
@@ -316,7 +319,11 @@ export class Validator {
    * @see {@link validateTarget} - Also uses these separators
    * @public
    */
-  static getErrorMessageSeparators(): { multiple: string; single: string } {
+  static getErrorMessageSeparators(customI18n?: I18n): {
+    multiple: string;
+    single: string;
+  } {
+    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
     const translatedSeparator: IDict = Object.assign(
       {},
       i18n.getNestedTranslation("validator.separators")
@@ -481,27 +488,27 @@ export class Validator {
    * @see {@link validate} - Uses this method for rule processing
    * @public
    */
-  static parseAndValidateRules(
-    inputRules?: IValidatorValidateOptions["rules"]
+  static parseAndValidateRules<Context = unknown>(
+    inputRules?: IValidatorValidateOptions<Array<any>, Context>["rules"]
   ): {
-    sanitizedRules: IValidatorSanitizedRules;
-    invalidRules: IValidatorRule[];
+    sanitizedRules: IValidatorSanitizedRules<Context>;
+    invalidRules: IValidatorRules<Context>[];
   } {
-    const parsedRules: IValidatorSanitizedRules = [];
+    const parsedRules: IValidatorSanitizedRules<Context> = [];
     const registeredRules = this.getRules();
-    const invalidRules: IValidatorRule[] = [];
+    const invalidRules: IValidatorRules<Context>[] = [];
 
     const rulesToProcess = Array.isArray(inputRules) ? inputRules : [];
 
     for (const rule of rulesToProcess) {
       if (typeof rule === "function") {
-        parsedRules.push(rule as IValidatorRuleFunction);
+        parsedRules.push(rule as IValidatorRuleFunction<Array<any>, Context>);
       } else if (isNonNullString(rule)) {
         const parsedRule = this.parseStringRule(rule, registeredRules);
         if (parsedRule) {
           parsedRules.push(parsedRule);
         } else {
-          invalidRules.push(rule);
+          invalidRules.push(rule as any);
         }
       } else if (isObj(rule) && typeof rule === "object") {
         const parsedObjectRules = this.parseObjectRules(rule, registeredRules);
@@ -563,7 +570,7 @@ export class Validator {
    */
   private static parseStringRule(
     ruleString: string,
-    registeredRules: IValidatorRules
+    registeredRules: IValidatorRulesMap
   ): any {
     let ruleName = String(ruleString).trim();
     const ruleParameters: string[] = [];
@@ -599,6 +606,7 @@ export class Validator {
    * rule objects. This method handles the conversion of key-value pair rules where the
    * key is the rule name and the value contains the parameters.
    *
+   * @template Context - Type of the validation context object
    * ### Object Format Structure
    * ```typescript
    * {
@@ -643,15 +651,15 @@ export class Validator {
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
-  private static parseObjectRules(
+  private static parseObjectRules<Context = unknown>(
     rulesObject: Record<IValidatorRuleName, any>,
-    registeredRules: IValidatorRules
+    registeredRules: IValidatorRulesMap<Context>
   ): {
     valid: any[];
-    invalid: IValidatorRule[];
+    invalid: IValidatorRules<Context>[];
   } {
-    const validRules: any[] = [];
-    const invalidRules: IValidatorRule[] = [];
+    const validRules: IValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
+    const invalidRules: IValidatorRules<Context>[] = [];
 
     for (const propertyKey in rulesObject) {
       if (Object.hasOwnProperty.call(rulesObject, propertyKey)) {
@@ -668,7 +676,7 @@ export class Validator {
             rawRuleName: String(propertyKey),
           });
         } else {
-          invalidRules.push(propertyKey as IValidatorRule);
+          invalidRules.push(propertyKey as any);
         }
       }
     }
@@ -828,7 +836,10 @@ export class Validator {
    *
    * @template Context - Optional type for the validation context object
    *
-   * @param options - Validation options (IValidatorValidateOptions)
+   * @param options - Validation options (IMakeOptional<
+    IValidatorValidateOptions<Array<any>, Context>,
+    "i18n"
+  >)
    * @param options.value - The value to validate (required)
    * @param options.rules - Array of validation rules to apply
    * @param options.context - Optional context object passed to rule functions
@@ -855,14 +866,17 @@ export class Validator {
    */
   static async validate<Context = unknown>({
     rules,
+    i18n: customI18n,
     ...extra
-  }: IValidatorValidateOptions<Array<any>, Context>): Promise<
-    IValidatorValidateResult<Context>
-  > {
+  }: IMakeOptional<
+    IValidatorValidateOptions<Array<any>, Context>,
+    "i18n"
+  >): Promise<IValidatorValidateResult<Context>> {
+    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
     const startTime = Date.now();
     const { sanitizedRules, invalidRules } =
-      Validator.parseAndValidateRules(rules);
-    const separators = Validator.getErrorMessageSeparators();
+      Validator.parseAndValidateRules<Context>(rules);
+    const separators = Validator.getErrorMessageSeparators(i18n);
     const { value, context, data } = extra;
     const successOrErrorData = {
       context,
@@ -882,6 +896,7 @@ export class Validator {
         value,
         fieldName: extra.fieldName,
         propertyName: extra.propertyName,
+        ruleParams: [],
       });
       return createFailureResult<Context>(error, successOrErrorData, startTime);
     }
@@ -941,10 +956,11 @@ export class Validator {
           }
           const rule = sanitizedRules[index];
           let ruleName = undefined;
-          let rawRuleName = undefined;
+          let rawRuleName: IValidatorRuleName | string | undefined = undefined;
           let ruleParams: any[] = [];
-          let ruleFunc: IValidatorRule<Array<any>, Context> | undefined =
-            typeof rule === "function" ? rule : undefined;
+          let ruleFunc:
+            | IValidatorRuleFunction<Array<any>, Context>
+            | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "object" && isObj(rule)) {
             ruleFunc = rule.ruleFunction;
             ruleParams = Array.isArray(rule.params) ? rule.params : [];
@@ -1039,6 +1055,7 @@ export class Validator {
               rules,
               ruleParams,
               value,
+              i18n: i18n,
             } as any);
             return handleResult(result);
           } catch (e) {
@@ -1295,16 +1312,13 @@ export class Validator {
     data: Partial<Record<keyof InstanceType<T>, any>>,
     options?: {
       context?: Context;
+      i18n?: I18n;
       errorMessageBuilder?: (
         translatedPropertyName: string,
         error: string,
-        builderOptions: {
+        builderOptions: IValidatorValidationError & {
           propertyName: string;
           translatedPropertyName: string;
-          message: string;
-          ruleName: string;
-          ruleParams: any[];
-          value: any;
           separators: {
             multiple: string;
             single: string;
@@ -1316,14 +1330,15 @@ export class Validator {
   ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
     const targetRules = Validator.getTargetRules<T>(target);
-    const messageSeparators = Validator.getErrorMessageSeparators();
-    const { context, errorMessageBuilder, ...restOptions } = extendObj(
-      {},
-      Validator.getValidateTargetOptions(target),
-      options
-    );
+    const {
+      context,
+      errorMessageBuilder,
+      i18n: customI18n,
+      ...restOptions
+    } = Object.assign({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
-
+    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
+    const messageSeparators = Validator.getErrorMessageSeparators(i18n);
     const buildErrorMessage =
       typeof errorMessageBuilder === "function"
         ? errorMessageBuilder
@@ -1690,7 +1705,7 @@ export class Validator {
           enhancedOptions.ruleParams = (
             Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
           ) as RuleParamsType;
-          return ruleFunction(enhancedOptions);
+          return ruleFunction(enhancedOptions as any);
         };
       return Validator.createPropertyDecorator<RuleParamsType>(
         enhancedValidatorFunction
@@ -2160,8 +2175,8 @@ function createValidationError(
     propertyName?: string;
     translatedPropertyName?: string;
     ruleName?: IValidatorRuleName;
-    rawRuleName?: string;
-    ruleParams?: any[];
+    rawRuleName?: IValidatorRuleName | string;
+    ruleParams: any[];
   }
 ): IValidatorValidationError {
   return {
@@ -2177,8 +2192,6 @@ function createValidationError(
     ruleParams: params.ruleParams,
   };
 }
-
-type IValidatorValidationError = IValidatorValidateFailure<{}>["error"];
 
 function createSuccessResult<Context = unknown>(
   options: {

@@ -67,10 +67,7 @@ export const IsBoolean = Validator.createPropertyDecorator(["Boolean"]);
 Validator.registerRule("Boolean", _Boolean);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### Boolean Rule
      *
@@ -116,6 +113,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Boolean: IValidatorRuleFunction<ParamType, Context>;
+    Boolean: IValidatorRuleFunction<[], Context>;
   }
 }

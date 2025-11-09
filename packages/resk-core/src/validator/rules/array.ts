@@ -400,10 +400,7 @@ Validator.registerRule("ArrayUnique", _ArrayUnique);
 export const ArrayUnique = Validator.createPropertyDecorator(["ArrayUnique"]);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### Array Rule
      *
@@ -447,7 +444,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Array: IValidatorRuleFunction<ParamType, Context>;
+    Array: IValidatorRuleFunction<Array<any>, Context>;
 
     /**
      * ### ArrayMinLength Rule
@@ -693,6 +690,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayUnique: IValidatorRuleFunction<ParamType, Context>;
+    ArrayUnique: IValidatorRuleFunction<Array<any>, Context>;
   }
 }

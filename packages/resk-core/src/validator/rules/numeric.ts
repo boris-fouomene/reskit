@@ -343,10 +343,7 @@ export const IsMultipleOf =
   Validator.createRuleDecorator<[multiple: number]>(MultipleOf);
 
 declare module "../types" {
-  export interface IValidatorRules<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  > {
+  export interface IValidatorRulesMap<Context = unknown> {
     /**
      * ### NumberBetween Rule (Numeric)
      *

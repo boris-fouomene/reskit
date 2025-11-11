@@ -3,9 +3,7 @@ import { interpolate } from "../index";
 describe("interpolate", () => {
   describe("Basic interpolation with default {key} format", () => {
     it("should interpolate a single placeholder", () => {
-      expect(interpolate("Hello, {name}!", { name: "World" })).toBe(
-        "Hello, World!"
-      );
+      expect(interpolate("Hello, {name}!", { name: "World" })).toBe("Hello, World!");
     });
 
     it("should interpolate multiple placeholders", () => {
@@ -42,9 +40,7 @@ describe("interpolate", () => {
     });
 
     it("should return original string when no params provided", () => {
-      expect(interpolate("No placeholders here.")).toBe(
-        "No placeholders here."
-      );
+      expect(interpolate("No placeholders here.")).toBe("No placeholders here.");
     });
 
     it("should handle null params", () => {
@@ -83,15 +79,11 @@ describe("interpolate", () => {
     });
 
     it("should handle object values (stringified)", () => {
-      expect(interpolate("Data: {obj}", { obj: { key: "value" } })).toBe(
-        'Data: {"key":"value"}'
-      );
+      expect(interpolate("Data: {obj}", { obj: { key: "value" } })).toBe('Data: {"key":"value"}');
     });
 
     it("should handle array values (stringified)", () => {
-      expect(interpolate("List: {arr}", { arr: [1, 2, 3] })).toBe(
-        "List: [1,2,3]"
-      );
+      expect(interpolate("List: {arr}", { arr: [1, 2, 3] })).toBe("List: [1,2,3]");
     });
   });
 
@@ -116,69 +108,37 @@ describe("interpolate", () => {
 
   describe("Special characters and unicode", () => {
     it("should handle unicode characters in values", () => {
-      expect(interpolate("Hello {name}!", { name: "世界" })).toBe(
-        "Hello 世界!"
-      );
+      expect(interpolate("Hello {name}!", { name: "世界" })).toBe("Hello 世界!");
     });
 
     it("should handle special characters in values", () => {
-      expect(
-        interpolate("Path: {path}", { path: "C:\\Program Files\\App" })
-      ).toBe("Path: C:\\Program Files\\App");
+      expect(interpolate("Path: {path}", { path: "C:\\Program Files\\App" })).toBe("Path: C:\\Program Files\\App");
     });
 
     it("should handle emojis", () => {
-      expect(interpolate("Status: {emoji}", { emoji: "✅" })).toBe(
-        "Status: ✅"
-      );
+      expect(interpolate("Status: {emoji}", { emoji: "✅" })).toBe("Status: ✅");
     });
   });
 
   describe("Custom regex patterns", () => {
     it("should support double braces {{key}} format", () => {
-      expect(
-        interpolate(
-          "Hello, {{name}}!",
-          { name: "World" },
-          { tagRegex: /\{\{([^}]+)\}\}/g }
-        )
-      ).toBe("Hello, World!");
+      expect(interpolate("Hello, {{name}}!", { name: "World" }, { tagRegex: /\{\{([^}]+)\}\}/g })).toBe("Hello, World!");
     });
 
     it("should support square brackets [key] format", () => {
-      expect(
-        interpolate(
-          "Value: [amount]",
-          { amount: 100 },
-          { tagRegex: /\[([^\]]+)\]/g }
-        )
-      ).toBe("Value: 100");
+      expect(interpolate("Value: [amount]", { amount: 100 }, { tagRegex: /\[([^\]]+)\]/g })).toBe("Value: 100");
     });
 
     it("should support custom delimiters like <key>", () => {
-      expect(
-        interpolate("Tag: <name>", { name: "test" }, { tagRegex: /<([^>]+)>/g })
-      ).toBe("Tag: test");
+      expect(interpolate("Tag: <name>", { name: "test" }, { tagRegex: /<([^>]+)>/g })).toBe("Tag: test");
     });
 
     it("should handle multiple occurrences with custom regex", () => {
-      expect(
-        interpolate(
-          "{{greeting}} {{name}}!",
-          { greeting: "Hi", name: "Alice" },
-          { tagRegex: /\{\{([^}]+)\}\}/g }
-        )
-      ).toBe("Hi Alice!");
+      expect(interpolate("{{greeting}} {{name}}!", { greeting: "Hi", name: "Alice" }, { tagRegex: /\{\{([^}]+)\}\}/g })).toBe("Hi Alice!");
     });
 
     it("should remove unmatched placeholders with custom regex", () => {
-      expect(
-        interpolate(
-          "Hello {{name}} from {{location}}!",
-          { name: "Bob" },
-          { tagRegex: /\{\{([^}]+)\}\}/g }
-        )
-      ).toBe("Hello Bob from !");
+      expect(interpolate("Hello {{name}} from {{location}}!", { name: "Bob" }, { tagRegex: /\{\{([^}]+)\}\}/g })).toBe("Hello Bob from !");
     });
   });
 
@@ -200,27 +160,19 @@ describe("interpolate", () => {
     });
 
     it("should handle malformed placeholders (missing closing brace)", () => {
-      expect(interpolate("Hello {name!", { name: "World" })).toBe(
-        "Hello {name!"
-      );
+      expect(interpolate("Hello {name!", { name: "World" })).toBe("Hello {name!");
     });
 
     it("should handle nested braces", () => {
-      expect(interpolate("Data: {user.field}", { "user.field": "value" })).toBe(
-        "Data: value"
-      );
+      expect(interpolate("Data: {user.field}", { "user.field": "value" })).toBe("Data: value");
     });
 
     it("should handle spaces in keys", () => {
-      expect(
-        interpolate("Hello { firstName }!", { " firstName ": "John" })
-      ).toBe("Hello John!");
+      expect(interpolate("Hello { firstName }!", { " firstName ": "John" })).toBe("Hello John!");
     });
 
     it("should handle regex special characters in keys", () => {
-      expect(interpolate("Match: {pattern}", { pattern: "test.*" })).toBe(
-        "Match: test.*"
-      );
+      expect(interpolate("Match: {pattern}", { pattern: "test.*" })).toBe("Match: test.*");
     });
   });
 
@@ -241,8 +193,7 @@ describe("interpolate", () => {
         "Hello {name}!",
         { name: "world" },
         {
-          valueFormatter: (value, tagName) =>
-            typeof value === "string" ? value.toUpperCase() : String(value),
+          valueFormatter: (value, tagName) => (typeof value === "string" ? value.toUpperCase() : String(value)),
         }
       );
       expect(result).toBe("Hello WORLD!");
@@ -253,8 +204,7 @@ describe("interpolate", () => {
         "Price: {amount}",
         { amount: 99.99 },
         {
-          valueFormatter: (value, tagName) =>
-            typeof value === "number" ? `$${value.toFixed(2)}` : String(value),
+          valueFormatter: (value, tagName) => (typeof value === "number" ? `$${value.toFixed(2)}` : String(value)),
         }
       );
       expect(result).toBe("Price: $99.99");
@@ -265,8 +215,7 @@ describe("interpolate", () => {
         "Value: {val}",
         { val: null },
         {
-          valueFormatter: (value, tagName) =>
-            value === null ? "N/A" : String(value),
+          valueFormatter: (value, tagName) => (value === null ? "N/A" : String(value)),
         }
       );
       expect(result).toBe("Value: N/A");
@@ -293,9 +242,7 @@ describe("interpolate", () => {
       customNumber.formatNumber = function () {
         return "1,234.56";
       };
-      expect(interpolate("Amount: {num}", { num: customNumber })).toBe(
-        "Amount: 1,234.56"
-      );
+      expect(interpolate("Amount: {num}", { num: customNumber })).toBe("Amount: 1,234.56");
     });
 
     it("should handle Date objects with toFormat method", () => {
@@ -303,9 +250,7 @@ describe("interpolate", () => {
       (customDate as any).toFormat = function () {
         return "25/12/2023";
       };
-      expect(interpolate("Date: {date}", { date: customDate })).toBe(
-        "Date: 25/12/2023"
-      );
+      expect(interpolate("Date: {date}", { date: customDate })).toBe("Date: 25/12/2023");
     });
 
     it("should handle Date objects without toFormat method", () => {
@@ -317,18 +262,12 @@ describe("interpolate", () => {
 
     it("should handle Error objects", () => {
       const error = new Error("Something went wrong");
-      expect(interpolate("Error: {err}", { err: error })).toBe(
-        "Error: Error: Something went wrong"
-      );
+      expect(interpolate("Error: {err}", { err: error })).toBe("Error: Error: Something went wrong");
     });
 
     it("should handle primitive types", () => {
-      expect(interpolate("Symbol: {sym}", { sym: Symbol("test") })).toBe(
-        "Symbol: Symbol(test)"
-      );
-      expect(interpolate("BigInt: {big}", { big: BigInt(123) })).toBe(
-        "BigInt: 123"
-      );
+      expect(interpolate("Symbol: {sym}", { sym: Symbol("test") })).toBe("Symbol: Symbol(test)");
+      expect(interpolate("BigInt: {big}", { big: BigInt(123) })).toBe("BigInt: 123");
     });
 
     it("should handle objects with custom toString methods", () => {
@@ -336,9 +275,7 @@ describe("interpolate", () => {
         value: 42,
         toString: () => "custom string representation",
       };
-      expect(interpolate("Object: {obj}", { obj: customObj })).toBe(
-        "Object: custom string representation"
-      );
+      expect(interpolate("Object: {obj}", { obj: customObj })).toBe("Object: custom string representation");
     });
 
     it("should handle functions", () => {
@@ -361,9 +298,7 @@ describe("interpolate", () => {
           active: true,
         },
       };
-      expect(interpolate("Data: {data}", { data: complex })).toBe(
-        'Data: {"users":[{"name":"Alice","age":30},{"name":"Bob","age":25}],"metadata":{"total":2,"active":true}}'
-      );
+      expect(interpolate("Data: {data}", { data: complex })).toBe('Data: {"users":[{"name":"Alice","age":30},{"name":"Bob","age":25}],"metadata":{"total":2,"active":true}}');
     });
   });
 
@@ -374,10 +309,8 @@ describe("interpolate", () => {
         { str: "hello", num: 42, obj: { key: "value" } },
         {
           valueFormatter: (value, tagName, defaultFormatter) => {
-            if (tagName === "str")
-              return defaultFormatter(value, tagName).toUpperCase();
-            if (tagName === "num")
-              return `Number: ${defaultFormatter(value, tagName)}`;
+            if (tagName === "str") return defaultFormatter(value, tagName).toUpperCase();
+            if (tagName === "num") return `Number: ${defaultFormatter(value, tagName)}`;
             return defaultFormatter(value, tagName);
           },
         }
@@ -404,9 +337,7 @@ describe("interpolate", () => {
           },
         }
       );
-      expect(result).toBe(
-        "User: Alice (ID: #123), Status: Active, Score: 95.5%"
-      );
+      expect(result).toBe("User: Alice (ID: #123), Status: Active, Score: 95.5%");
     });
 
     it("should handle custom formatter with complex logic", () => {
@@ -420,7 +351,7 @@ describe("interpolate", () => {
         {
           valueFormatter: (value, tagName, defaultFormatter) => {
             if (tagName === "date" && value instanceof Date) {
-              return value.toLocaleDateString();
+              return value.toSQLDateFormat();
             }
             if (tagName === "title") {
               return `"${value}"`;
@@ -429,9 +360,7 @@ describe("interpolate", () => {
           },
         }
       );
-      expect(result).toBe(
-        'Report: "Sales Report" - Generated on 12/25/2023 by Admin'
-      );
+      expect(result).toBe('Report: "Sales Report" - Generated on 2023-12-25 by Admin');
     });
   });
 
@@ -445,30 +374,24 @@ describe("interpolate", () => {
     });
 
     it("should handle templates with newlines and special characters", () => {
-      const template =
-        "Dear {name},\n\nYour order #{orderId} for {product}\nTotal: ${total}\n\nThank you!";
+      const template = "Dear {name},\n\nYour order #{orderId} for {product}\nTotal: ${total}\n\nThank you!";
       const result = interpolate(template, {
         name: "John Doe",
         orderId: "12345",
         product: "Widget Pro",
         total: "99.99",
       });
-      expect(result).toBe(
-        "Dear John Doe,\n\nYour order #12345 for Widget Pro\nTotal: $99.99\n\nThank you!"
-      );
+      expect(result).toBe("Dear John Doe,\n\nYour order #12345 for Widget Pro\nTotal: $99.99\n\nThank you!");
     });
 
     it("should handle templates with HTML-like content", () => {
-      const template =
-        '<div class="user"><h1>{name}</h1><p>ID: {id}</p><span class="{status}">{status}</span></div>';
+      const template = '<div class="user"><h1>{name}</h1><p>ID: {id}</p><span class="{status}">{status}</span></div>';
       const result = interpolate(template, {
         name: "Alice",
         id: 123,
         status: "active",
       });
-      expect(result).toBe(
-        '<div class="user"><h1>Alice</h1><p>ID: 123</p><span class="active">active</span></div>'
-      );
+      expect(result).toBe('<div class="user"><h1>Alice</h1><p>ID: 123</p><span class="active">active</span></div>');
     });
 
     it("should handle templates with JSON-like structures", () => {
@@ -501,9 +424,7 @@ describe("interpolate", () => {
 
     it("should handle very long values", () => {
       const longValue = "a".repeat(10000);
-      expect(interpolate("Content: {data}", { data: longValue })).toBe(
-        `Content: ${longValue}`
-      );
+      expect(interpolate("Content: {data}", { data: longValue })).toBe(`Content: ${longValue}`);
     });
 
     it("should handle circular references gracefully", () => {
@@ -518,82 +439,45 @@ describe("interpolate", () => {
     });
 
     it("should handle keys with only spaces", () => {
-      expect(interpolate("Spaces: {   }", { "   ": "value" })).toBe(
-        "Spaces: value"
-      );
+      expect(interpolate("Spaces: {   }", { "   ": "value" })).toBe("Spaces: value");
     });
   });
 
   describe("Advanced regex patterns", () => {
     it("should support mustache-style templates {{key}}", () => {
-      expect(
-        interpolate(
-          "Hello {{name}}!",
-          { name: "World" },
-          { tagRegex: /\{\{([^}]+)\}\}/g }
-        )
-      ).toBe("Hello World!");
+      expect(interpolate("Hello {{name}}!", { name: "World" }, { tagRegex: /\{\{([^}]+)\}\}/g })).toBe("Hello World!");
     });
 
     it("should support ERB-style templates <%= key %>", () => {
-      expect(
-        interpolate(
-          "Hello <%= name %>!",
-          { name: "World" },
-          { tagRegex: /<%= ([^%>]+) %>/g }
-        )
-      ).toBe("Hello World!");
+      expect(interpolate("Hello <%= name %>!", { name: "World" }, { tagRegex: /<%= ([^%>]+) %>/g })).toBe("Hello World!");
     });
 
     it("should support custom delimiters with special characters", () => {
-      expect(
-        interpolate(
-          "Value: [[amount]]",
-          { amount: 100 },
-          { tagRegex: /\[\[([^\]]+)\]\]/g }
-        )
-      ).toBe("Value: 100");
+      expect(interpolate("Value: [[amount]]", { amount: 100 }, { tagRegex: /\[\[([^\]]+)\]\]/g })).toBe("Value: 100");
     });
 
     it("should support single character delimiters", () => {
-      expect(
-        interpolate(
-          "Var: $name$",
-          { name: "test" },
-          { tagRegex: /\$([^$]+)\$/g }
-        )
-      ).toBe("Var: test");
+      expect(interpolate("Var: $name$", { name: "test" }, { tagRegex: /\$([^$]+)\$/g })).toBe("Var: test");
     });
 
     it("should handle regex with case-insensitive flag", () => {
       // Case-insensitive matching requires the 'i' flag in the regex
       // The default regex does NOT have the 'i' flag, so {NAME} won't match 'name'
       // This test verifies that custom regex with 'i' flag works
-      expect(
-        interpolate(
-          "Hello {name}!",
-          { name: "World" },
-          { tagRegex: /\{([^}]+)\}/gi }
-        )
-      ).toBe("Hello World!");
+      expect(interpolate("Hello {name}!", { name: "World" }, { tagRegex: /\{([^}]+)\}/gi })).toBe("Hello World!");
     });
 
     it("should handle regex with multiline flag", () => {
       const template = "Line 1: {name}\nLine 2: {name}";
-      expect(
-        interpolate(template, { name: "test" }, { tagRegex: /\{([^}]+)\}/gm })
-      ).toBe("Line 1: test\nLine 2: test");
+      expect(interpolate(template, { name: "test" }, { tagRegex: /\{([^}]+)\}/gm })).toBe("Line 1: test\nLine 2: test");
     });
   });
 
   describe("Internationalization and localization scenarios", () => {
     it("should handle i18n-style templates with pluralization", () => {
-      const template =
-        "You have {count} {count, plural, one{message} other{messages}}";
+      const template = "You have {count} {count, plural, one{message} other{messages}}";
       // Note: This is a simplified example - real i18n would need more complex parsing
-      expect(interpolate("You have {count} messages", { count: 5 })).toBe(
-        "You have 5 messages"
-      );
+      expect(interpolate("You have {count} messages", { count: 5 })).toBe("You have 5 messages");
     });
 
     it("should handle currency formatting", () => {
@@ -632,25 +516,13 @@ describe("interpolate", () => {
   describe("Error handling and robustness", () => {
     it("should handle malformed regex patterns gracefully", () => {
       // Invalid regex should fall back to default behavior
-      expect(
-        interpolate(
-          "Hello {name}!",
-          { name: "World" },
-          { tagRegex: /\{([^}]+)\}/g }
-        )
-      ).toBe("Hello World!");
+      expect(interpolate("Hello {name}!", { name: "World" }, { tagRegex: /\{([^}]+)\}/g })).toBe("Hello World!");
     });
 
     it("should handle regex patterns that don't capture groups", () => {
       // Regex without capturing group (no parentheses) should not match anything
       // because the function expects a capture group to extract the key
-      expect(
-        interpolate(
-          "Hello {name}!",
-          { name: "World" },
-          { tagRegex: /\{[^}]+\}/g }
-        )
-      ).toBe("Hello {name}!");
+      expect(interpolate("Hello {name}!", { name: "World" }, { tagRegex: /\{[^}]+\}/g })).toBe("Hello {name}!");
     });
 
     it("should handle custom formatter that throws errors", () => {
@@ -669,9 +541,7 @@ describe("interpolate", () => {
 
     it("should handle deeply nested object access", () => {
       const nested = { a: { b: { c: { d: "deep value" } } } };
-      expect(interpolate("Value: {a.b.c.d}", { "a.b.c.d": "deep value" })).toBe(
-        "Value: deep value"
-      );
+      expect(interpolate("Value: {a.b.c.d}", { "a.b.c.d": "deep value" })).toBe("Value: deep value");
     });
 
     it("should handle prototype pollution attempts", () => {
@@ -687,9 +557,7 @@ describe("interpolate", () => {
         ["key2", "value2"],
       ]);
       const set = new Set([1, 2, 3]);
-      expect(interpolate("Map: {map}, Set: {set}", { map, set })).toBe(
-        "Map: [object Map], Set: [object Set]"
-      );
+      expect(interpolate("Map: {map}, Set: {set}", { map, set })).toBe("Map: [object Map], Set: [object Set]");
     });
 
     it("should handle custom class instances", () => {
@@ -700,23 +568,17 @@ describe("interpolate", () => {
         }
       }
       const instance = new CustomClass("test");
-      expect(interpolate("Instance: {obj}", { obj: instance })).toBe(
-        "Instance: Custom(test)"
-      );
+      expect(interpolate("Instance: {obj}", { obj: instance })).toBe("Instance: Custom(test)");
     });
 
     it("should handle Promise objects", () => {
       const promise = Promise.resolve("resolved");
-      expect(interpolate("Promise: {promise}", { promise })).toBe(
-        "Promise: [object Promise]"
-      );
+      expect(interpolate("Promise: {promise}", { promise })).toBe("Promise: [object Promise]");
     });
 
     it("should handle Buffer objects", () => {
       const buffer = Buffer.from("hello");
-      expect(interpolate("Buffer: {buf}", { buf: buffer })).toBe(
-        "Buffer: hello"
-      );
+      expect(interpolate("Buffer: {buf}", { buf: buffer })).toBe("Buffer: hello");
     });
   });
 
@@ -766,9 +628,7 @@ describe("interpolate", () => {
 
     it("should handle Int32Array", () => {
       const int32 = new Int32Array([100, 200, 300]);
-      expect(interpolate("Data: {data}", { data: int32 })).toBe(
-        "Data: 100,200,300"
-      );
+      expect(interpolate("Data: {data}", { data: int32 })).toBe("Data: 100,200,300");
     });
 
     it("should handle Float64Array", () => {
@@ -779,23 +639,17 @@ describe("interpolate", () => {
 
     it("should handle WeakMap objects", () => {
       const weakMap = new WeakMap();
-      expect(interpolate("Data: {data}", { data: weakMap })).toBe(
-        "Data: [object WeakMap]"
-      );
+      expect(interpolate("Data: {data}", { data: weakMap })).toBe("Data: [object WeakMap]");
     });
 
     it("should handle WeakSet objects", () => {
       const weakSet = new WeakSet();
-      expect(interpolate("Data: {data}", { data: weakSet })).toBe(
-        "Data: [object WeakSet]"
-      );
+      expect(interpolate("Data: {data}", { data: weakSet })).toBe("Data: [object WeakSet]");
     });
 
     it("should handle RegExp objects", () => {
       const regex = /test/gi;
-      expect(interpolate("Pattern: {pattern}", { pattern: regex })).toBe(
-        "Pattern: /test/gi"
-      );
+      expect(interpolate("Pattern: {pattern}", { pattern: regex })).toBe("Pattern: /test/gi");
     });
   });
 
@@ -848,16 +702,12 @@ describe("interpolate", () => {
   describe("Arrays with various content types", () => {
     it("should handle arrays with mixed types", () => {
       const mixed = [1, "string", true, null, undefined, { key: "value" }];
-      expect(interpolate("Data: {data}", { data: mixed })).toBe(
-        'Data: [1,"string",true,null,null,{"key":"value"}]'
-      );
+      expect(interpolate("Data: {data}", { data: mixed })).toBe('Data: [1,"string",true,null,null,{"key":"value"}]');
     });
 
     it("should handle nested arrays", () => {
       const nested = [1, [2, 3], [4, [5, 6]]];
-      expect(interpolate("Data: {data}", { data: nested })).toBe(
-        "Data: [1,[2,3],[4,[5,6]]]"
-      );
+      expect(interpolate("Data: {data}", { data: nested })).toBe("Data: [1,[2,3],[4,[5,6]]]");
     });
 
     it("should handle empty array", () => {
@@ -866,18 +716,14 @@ describe("interpolate", () => {
 
     it("should handle array-like objects", () => {
       const arrayLike = { 0: "a", 1: "b", 2: "c", length: 3 };
-      expect(interpolate("Data: {data}", { data: arrayLike })).toBe(
-        'Data: {"0":"a","1":"b","2":"c","length":3}'
-      );
+      expect(interpolate("Data: {data}", { data: arrayLike })).toBe('Data: {"0":"a","1":"b","2":"c","length":3}');
     });
   });
 
   describe("Object serialization edge cases", () => {
     it("should handle objects with numeric keys", () => {
       const obj = { 1: "one", 2: "two", 3: "three" };
-      expect(interpolate("Data: {data}", { data: obj })).toBe(
-        'Data: {"1":"one","2":"two","3":"three"}'
-      );
+      expect(interpolate("Data: {data}", { data: obj })).toBe('Data: {"1":"one","2":"two","3":"three"}');
     });
 
     it("should handle objects with special string keys", () => {
@@ -982,23 +828,17 @@ describe("interpolate", () => {
   describe("Error and exception types", () => {
     it("should handle different Error types", () => {
       const typeError = new TypeError("Type error occurred");
-      expect(interpolate("Error: {e}", { e: typeError })).toBe(
-        "Error: Error: Type error occurred"
-      );
+      expect(interpolate("Error: {e}", { e: typeError })).toBe("Error: Error: Type error occurred");
     });
 
     it("should handle ReferenceError", () => {
       const refError = new ReferenceError("Reference not found");
-      expect(interpolate("Error: {e}", { e: refError })).toMatch(
-        /Error.*Reference/
-      );
+      expect(interpolate("Error: {e}", { e: refError })).toMatch(/Error.*Reference/);
     });
 
     it("should handle SyntaxError", () => {
       const syntaxError = new SyntaxError("Invalid syntax");
-      expect(interpolate("Error: {e}", { e: syntaxError })).toMatch(
-        /Error.*syntax/i
-      );
+      expect(interpolate("Error: {e}", { e: syntaxError })).toMatch(/Error.*syntax/i);
     });
 
     it("should handle Error with empty message", () => {
@@ -1021,9 +861,7 @@ describe("interpolate", () => {
 
     it("should handle value formatter that returns same as input", () => {
       const formatter = (val: any) => String(val);
-      expect(
-        interpolate("Val: {x}", { x: 42 }, { valueFormatter: formatter })
-      ).toBe("Val: 42");
+      expect(interpolate("Val: {x}", { x: 42 }, { valueFormatter: formatter })).toBe("Val: 42");
     });
 
     it("should handle value formatter with complex transformations", () => {
@@ -1042,9 +880,7 @@ describe("interpolate", () => {
     });
 
     it("should preserve spacing in output", () => {
-      expect(interpolate("  {a}   {b}  ", { a: "x", b: "y" })).toBe(
-        "  x   y  "
-      );
+      expect(interpolate("  {a}   {b}  ", { a: "x", b: "y" })).toBe("  x   y  ");
     });
 
     it("should handle consecutive placeholders", () => {
@@ -1091,9 +927,7 @@ describe("interpolate", () => {
           },
         }
       );
-      expect(result).toMatch(
-        /[Mm]ontag|[Dd]ienstag|[Mm]ittwoch|[Dd]onnerstag|[Ff]reitag|[Ss]amstag|[Ss]onntag|[Dd]ezember/
-      );
+      expect(result).toMatch(/[Mm]ontag|[Dd]ienstag|[Mm]ittwoch|[Dd]onnerstag|[Ff]reitag|[Ss]amstag|[Ss]onntag|[Dd]ezember/);
     });
 
     it("should handle template with mixed placeholders and static numbers", () => {

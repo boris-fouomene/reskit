@@ -1,4 +1,3 @@
-import { i18n } from "../../i18n";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -7,6 +6,7 @@ function NumberBetween({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<[number, number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -96,6 +96,7 @@ function DecimalPlaces({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<
   [minDecimalPlaces: number, maxDecimalPlaces?: number]
@@ -200,6 +201,7 @@ function _Integer({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -253,6 +255,7 @@ function MultipleOf({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<[number]>): IValidatorResult {
   return new Promise((resolve, reject) => {

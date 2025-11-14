@@ -7,7 +7,6 @@ import {
   isValidUrl,
 } from "@utils/index";
 import { isNumber } from "@utils/isNumber";
-import { i18n } from "../../i18n";
 import { InputFormatter } from "../../inputFormatter";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
@@ -45,7 +44,7 @@ export * from "./string";
 function compareNumer(
   compare: (value: any, toCompare: any) => boolean,
   translateKey: string,
-  { value, ruleParams, ...rest }: IValidatorValidateOptions
+  { value, ruleParams, i18n, ...rest }: IValidatorValidateOptions
 ): IValidatorResult {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const rParams = ruleParams ? ruleParams : [];
@@ -302,7 +301,7 @@ export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<
 >(numberIsDifferentFromTo);
 
 Validator.registerRule("Required", function Required(options) {
-  const value = options?.value;
+  const { value, i18n } = options;
   // Check if value is truly empty (null, undefined, or empty string)
   // Empty arrays, empty objects, 0, false, NaN are NOT considered empty
   const isValueEmpty =
@@ -312,7 +311,11 @@ Validator.registerRule("Required", function Required(options) {
   return !isValueEmpty || i18n.t("validator.required");
 });
 
-function numberHasLength({ value, ruleParams }: IValidatorValidateOptions) {
+function numberHasLength({
+  value,
+  ruleParams,
+  i18n,
+}: IValidatorValidateOptions) {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   value = defaultStr(value);
   const minLength = isNumber(ruleParams[0])
@@ -383,7 +386,7 @@ export const HasLength =
   );
 
 Validator.registerRule("Email", function Email(options) {
-  const value = options?.value;
+  const { value, i18n } = options;
   if (!value || typeof value !== "string") {
     return true;
   }
@@ -391,14 +394,14 @@ Validator.registerRule("Email", function Email(options) {
 });
 
 Validator.registerRule("Url", function Url(options) {
-  const value = options?.value;
+  const { value, i18n } = options;
   return !value || typeof value !== "string"
     ? true
     : isValidUrl(value) || i18n.t("validator.url", options);
 });
 
 function minLength(options: IValidatorValidateOptions) {
-  let { value, ruleParams } = options;
+  let { value, ruleParams, i18n } = options;
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const mLength = parseFloat(ruleParams[0]) || 0;
   const message = i18n.t("validator.minLength", {
@@ -445,7 +448,7 @@ export const HasMinLength =
   Validator.createRuleDecorator<[minLength: string]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
-  let { value, ruleParams } = options;
+  let { value, ruleParams, i18n } = options;
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
   const mLength = parseFloat(ruleParams[0]) || 0;
   const message = i18n.t("validator.maxLength", {
@@ -493,7 +496,7 @@ export const HasMaxLength =
   Validator.createRuleDecorator<[maxLength: number]>(maxLength);
 
 Validator.registerRule("FileName", function FileName(options) {
-  const { value } = options;
+  const { value, i18n } = options;
   const message = i18n.t("validator.fileName", options);
   if (!isNonNullString(value)) return message;
   const rg1 = /^[^\\/:*?"<>|]+$/; // forbidden characters \ / : * ? " < > |
@@ -505,17 +508,17 @@ Validator.registerRule("FileName", function FileName(options) {
 });
 
 Validator.registerRule("Number", function Number(options) {
-  const { value } = options;
+  const { value, i18n } = options;
   return typeof value === "number" || i18n.t("validator.isNumber", options);
 });
 
 Validator.registerRule("NonNullString", function NonNullString(options) {
-  const { value } = options;
+  const { value, i18n } = options;
   return isNonNullString(value) || i18n.t("validator.isNonNullString", options);
 });
 
 function phoneNumber(options: IValidatorValidateOptions) {
-  const { value, phoneCountryCode } = options;
+  const { value, phoneCountryCode, i18n } = options;
   return (
     InputFormatter.isValidPhoneNumber(value, phoneCountryCode) ||
     i18n.t("validator.phoneNumber", options)
@@ -539,7 +542,7 @@ Validator.registerRule("PhoneNumber", phoneNumber);
 export const IsPhoneNumber = Validator.createPropertyDecorator(["PhoneNumber"]);
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
-  const { value, phoneCountryCode } = options;
+  const { value, phoneCountryCode, i18n } = options;
   return (
     isValidEmail(value) ||
     InputFormatter.isValidPhoneNumber(value, phoneCountryCode) ||

@@ -1,4 +1,3 @@
-import { i18n } from "../../i18n";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -6,6 +5,7 @@ function _UUID({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -61,6 +61,7 @@ function _JSON({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -115,6 +116,7 @@ function _Base64({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -170,6 +172,7 @@ function _HexColor({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -226,6 +229,7 @@ function _CreditCard({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -311,6 +315,7 @@ function _IP({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -396,6 +401,7 @@ function _MACAddress({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -453,6 +459,7 @@ function _Regex({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<[rule: RegExp]>): IValidatorResult {
   return new Promise((resolve, reject) => {

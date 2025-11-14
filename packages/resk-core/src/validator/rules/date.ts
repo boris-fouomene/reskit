@@ -1,4 +1,3 @@
-import { i18n } from "../../i18n";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -6,6 +5,7 @@ function _Date({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -63,8 +63,9 @@ function _DateAfter({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<string[] | Date[]>): IValidatorResult {
+}: IValidatorValidateOptions<[string | Date]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -92,7 +93,7 @@ function _DateAfter({
       return reject(message);
     }
 
-    if (!ruleParams || ruleParams.length === 0) {
+    if (!ruleParams) {
       const message = i18n.t("validator.invalidRuleParams", {
         rule: "DateAfter",
         field: translatedPropertyName || fieldName,
@@ -153,17 +154,17 @@ Validator.registerRule("DateAfter", _DateAfter);
  * @since 1.22.0
  * @public
  */
-export const DateAfter = Validator.createRuleDecorator<string[] | Date[]>(
-  _DateAfter
-);
+export const DateAfter =
+  Validator.createRuleDecorator<[date: string | Date]>(_DateAfter);
 
 function _DateBefore({
   value,
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<string[] | Date[]>): IValidatorResult {
+}: IValidatorValidateOptions<[string | Date]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -191,7 +192,7 @@ function _DateBefore({
       return reject(message);
     }
 
-    if (!ruleParams || ruleParams.length === 0) {
+    if (!ruleParams) {
       const message = i18n.t("validator.invalidRuleParams", {
         rule: "DateBefore",
         field: translatedPropertyName || fieldName,
@@ -252,17 +253,19 @@ Validator.registerRule("DateBefore", _DateBefore);
  * @since 1.22.0
  * @public
  */
-export const DateBefore = Validator.createRuleDecorator<string[] | Date[]>(
-  _DateBefore
-);
+export const DateBefore =
+  Validator.createRuleDecorator<[date: string | Date]>(_DateBefore);
 
 function _DateBetween({
   value,
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<(string | Date)[]>): IValidatorResult {
+}: IValidatorValidateOptions<
+  [string | Date, string | Date]
+>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -359,15 +362,18 @@ Validator.registerRule("DateBetween", _DateBetween);
  * @public
  */
 export const DateBetween =
-  Validator.createRuleDecorator<(string | Date)[]>(_DateBetween);
+  Validator.createRuleDecorator<
+    [minDate: string | Date, maxDate: string | Date]
+  >(_DateBetween);
 
 function _DateEquals({
   value,
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<string[] | Date[]>): IValidatorResult {
+}: IValidatorValidateOptions<[string | Date]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -395,7 +401,7 @@ function _DateEquals({
       return reject(message);
     }
 
-    if (!ruleParams || ruleParams.length === 0) {
+    if (!ruleParams) {
       const message = i18n.t("validator.invalidRuleParams", {
         rule: "DateEquals",
         field: translatedPropertyName || fieldName,
@@ -468,16 +474,16 @@ Validator.registerRule("DateEquals", _DateEquals);
  * @since 1.22.0
  * @public
  */
-export const DateEquals = Validator.createRuleDecorator<string[] | Date[]>(
-  _DateEquals
-);
+export const DateEquals =
+  Validator.createRuleDecorator<[string | Date]>(_DateEquals);
 
 function _FutureDate({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+}: IValidatorValidateOptions<[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -538,14 +544,15 @@ Validator.registerRule("FutureDate", _FutureDate);
  * @since 1.22.0
  * @public
  */
-export const FutureDate = Validator.createPropertyDecorator(["FutureDate"]);
+export const FutureDate = Validator.createPropertyDecorator<[]>(["FutureDate"]);
 
 function _PastDate({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+}: IValidatorValidateOptions<[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (
       !value ||
@@ -606,7 +613,7 @@ Validator.registerRule("PastDate", _PastDate);
  * @since 1.22.0
  * @public
  */
-export const PastDate = Validator.createPropertyDecorator(["PastDate"]);
+export const PastDate = Validator.createPropertyDecorator<[]>(["PastDate"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -706,7 +713,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateAfter: IValidatorRuleFunction<string[] | Date[], Context>;
+    DateAfter: IValidatorRuleFunction<[date: string | Date], Context>;
 
     /**
      * ### DateBefore Rule
@@ -754,7 +761,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateBefore: IValidatorRuleFunction<string[] | Date[], Context>;
+    DateBefore: IValidatorRuleFunction<[date: string | Date], Context>;
 
     /**
      * ### DateBetween Rule
@@ -803,7 +810,10 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateBetween: IValidatorRuleFunction<(string | Date)[], Context>;
+    DateBetween: IValidatorRuleFunction<
+      [minDate: string | Date, maxDate: string | Date],
+      Context
+    >;
 
     /**
      * ### DateEquals Rule
@@ -851,7 +861,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateEquals: IValidatorRuleFunction<string[] | Date[], Context>;
+    DateEquals: IValidatorRuleFunction<[date: string | Date], Context>;
 
     /**
      * ### FutureDate Rule

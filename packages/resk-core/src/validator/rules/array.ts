@@ -1,4 +1,3 @@
-import { i18n } from "../../i18n";
 import { IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -6,6 +5,7 @@ function _Array({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): boolean | string {
   if (Array.isArray(value)) {
@@ -49,6 +49,7 @@ function _ArrayMinLength({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
@@ -118,6 +119,7 @@ function _ArrayMaxLength({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
@@ -187,6 +189,7 @@ function _ArrayLength({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
@@ -256,6 +259,7 @@ function _ArrayContains({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<any[]>): boolean | string {
   if (!Array.isArray(value)) {
@@ -333,6 +337,7 @@ function _ArrayUnique({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): boolean | string {
   if (!Array.isArray(value)) {
@@ -492,7 +497,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayMinLength: IValidatorRuleFunction<number[], Context>;
+    ArrayMinLength: IValidatorRuleFunction<[minLength: number], Context>;
 
     /**
      * ### ArrayMaxLength Rule
@@ -540,7 +545,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayMaxLength: IValidatorRuleFunction<number[], Context>;
+    ArrayMaxLength: IValidatorRuleFunction<[maxLength: number], Context>;
 
     /**
      * ### ArrayLength Rule
@@ -593,7 +598,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayLength: IValidatorRuleFunction<number[], Context>;
+    ArrayLength: IValidatorRuleFunction<[length: number], Context>;
 
     /**
      * ### ArrayContains Rule

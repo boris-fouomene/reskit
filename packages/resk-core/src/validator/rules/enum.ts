@@ -1,4 +1,3 @@
-import { i18n } from "@/i18n";
 import { IPrimitive } from "@/types";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
@@ -8,6 +7,7 @@ function Enum<T extends IPrimitive = IPrimitive>({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<Array<T>>): IValidatorResult {
   if (!ruleParams || !ruleParams.length) {

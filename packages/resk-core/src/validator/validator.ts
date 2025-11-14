@@ -275,6 +275,27 @@ export class Validator {
     return isObj(rules) ? { ...rules } : ({} as IValidatorRulesMap);
   }
 
+  private static getI18n(options?: { i18n?: I18n }): I18n {
+    const { i18n } = Object.assign({}, options);
+    if (i18n instanceof I18n) {
+      return i18n;
+    }
+    if (
+      i18n &&
+      typeof (i18n as any)?.getLocale === "function" &&
+      typeof (i18n as any)?.translate === "function" &&
+      typeof (i18n as any)?.translateTarget === "function"
+    ) {
+      console.log(
+        "returning i18n found ",
+        (i18n as any).getLocale(),
+        " is locale getted"
+      );
+      return i18n as I18n;
+    }
+    return defaultI18n;
+  }
+
   /**
    * ## Get Error Message Separators
    *
@@ -323,7 +344,7 @@ export class Validator {
     multiple: string;
     single: string;
   } {
-    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
+    const i18n = this.getI18n({ i18n: customI18n });
     const translatedSeparator: IDict = Object.assign(
       {},
       i18n.getNestedTranslation("validator.separators")
@@ -866,13 +887,12 @@ export class Validator {
    */
   static async validate<Context = unknown>({
     rules,
-    i18n: customI18n,
     ...extra
   }: IMakeOptional<
     IValidatorValidateOptions<Array<any>, Context>,
     "i18n"
   >): Promise<IValidatorValidateResult<Context>> {
-    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
+    const i18n = this.getI18n(extra);
     const startTime = Date.now();
     const { sanitizedRules, invalidRules } =
       Validator.parseAndValidateRules<Context>(rules);
@@ -1055,7 +1075,7 @@ export class Validator {
               rules,
               ruleParams,
               value,
-              i18n: i18n,
+              i18n,
             } as any);
             return handleResult(result);
           } catch (e) {
@@ -1317,8 +1337,9 @@ export class Validator {
         translatedPropertyName: string,
         error: string,
         builderOptions: IValidatorValidationError & {
-          propertyName: string;
+          propertyName: keyof InstanceType<T> | string;
           translatedPropertyName: string;
+          i18n: I18n;
           separators: {
             multiple: string;
             single: string;
@@ -1330,14 +1351,13 @@ export class Validator {
   ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
     const targetRules = Validator.getTargetRules<T>(target);
-    const {
-      context,
-      errorMessageBuilder,
-      i18n: customI18n,
-      ...restOptions
-    } = Object.assign({}, Validator.getValidateTargetOptions(target), options);
+    const { context, errorMessageBuilder, ...restOptions } = Object.assign(
+      {},
+      Validator.getValidateTargetOptions(target),
+      options
+    );
     data = Object.assign({}, data);
-    const i18n = customI18n instanceof I18n ? customI18n : defaultI18n;
+    const i18n = this.getI18n(options);
     const messageSeparators = Validator.getErrorMessageSeparators(i18n);
     const buildErrorMessage =
       typeof errorMessageBuilder === "function"
@@ -1350,7 +1370,6 @@ export class Validator {
     let validatedFieldCount = 0;
 
     const translatedPropertyNames = i18n.translateTarget(target, { data });
-
     for (const propertyKey in targetRules) {
       const rules = targetRules[propertyKey];
       // Skip validation for Sometimes fields that are not present in data
@@ -1367,16 +1386,15 @@ export class Validator {
         // Skip validation for Nullable fields with null/undefined value
         continue;
       }
-      const translatedPropertyName: string = isNonNullString(
-        (translatedPropertyNames as any)[propertyKey]
-      )
-        ? (translatedPropertyNames as any)[propertyKey]
-        : propertyKey;
-
+      const translatedPropertyName: string = defaultStr(
+        (translatedPropertyNames as any)[propertyKey],
+        propertyKey
+      );
       validationPromises.push(
         Validator.validate<Context>({
           context,
           ...restOptions,
+          i18n,
           value,
           data,
           translatedPropertyName,
@@ -1397,6 +1415,7 @@ export class Validator {
                 data,
                 propertyName: propertyKey,
                 translatedPropertyName: translatedPropertyName,
+                i18n,
               }
             );
             validationErrors.push({

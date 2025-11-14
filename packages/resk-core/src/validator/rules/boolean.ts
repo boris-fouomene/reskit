@@ -1,4 +1,3 @@
-import { i18n } from "@/i18n";
 import { defaultStr } from "@/utils";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
@@ -7,6 +6,7 @@ function _Boolean({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {

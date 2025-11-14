@@ -20,6 +20,7 @@ describe("Array Validation Rules", () => {
       it("should validate arrays", async () => {
         const result = await Validator.getRules().Array({
           value: [1, 2, 3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -27,6 +28,7 @@ describe("Array Validation Rules", () => {
       it("should validate empty arrays", async () => {
         const result = await Validator.getRules().Array({
           value: [],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -34,6 +36,7 @@ describe("Array Validation Rules", () => {
       it("should reject non-arrays", async () => {
         const result = await Validator.getRules().Array({
           value: "not an array",
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -41,6 +44,7 @@ describe("Array Validation Rules", () => {
       it("should reject null", async () => {
         const result = await Validator.getRules().Array({
           value: null,
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -48,6 +52,7 @@ describe("Array Validation Rules", () => {
       it("should reject undefined", async () => {
         const result = await Validator.getRules().Array({
           value: undefined,
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -104,6 +109,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMinLength({
           value: [1, 2, 3],
           ruleParams: [2],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -112,6 +118,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMinLength({
           value: [1, 2],
           ruleParams: [2],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -120,6 +127,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMinLength({
           value: [1],
           ruleParams: [2],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -128,6 +136,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMinLength({
           value: "not an array",
           ruleParams: [1],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -136,6 +145,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMinLength({
           value: [1, 2, 3],
           ruleParams: [-1],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -192,6 +202,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMaxLength({
           value: [1, 2],
           ruleParams: [3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -200,6 +211,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMaxLength({
           value: [1, 2, 3],
           ruleParams: [3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -208,6 +220,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMaxLength({
           value: [1, 2, 3, 4],
           ruleParams: [3],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -216,6 +229,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayMaxLength({
           value: "not an array",
           ruleParams: [3],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -267,6 +281,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayLength({
           value: [1, 2, 3],
           ruleParams: [3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -275,6 +290,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayLength({
           value: [1, 2],
           ruleParams: [3],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -283,6 +299,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayLength({
           value: "not an array",
           ruleParams: [3],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -334,6 +351,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayContains({
           value: [1, 2, 3, 4],
           ruleParams: [2, 3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -342,6 +360,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayContains({
           value: [{ id: 1 }, { id: 2 }, { id: 3 }],
           ruleParams: [{ id: 2 }],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -350,6 +369,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayContains({
           value: [1, 2, 3],
           ruleParams: [4],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -358,6 +378,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayContains({
           value: "not an array",
           ruleParams: [1],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -366,6 +387,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.getRules().ArrayContains({
           value: [1, 2, 3],
           ruleParams: [],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -416,6 +438,7 @@ describe("Array Validation Rules", () => {
       it("should validate arrays with unique primitive values", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: [1, 2, 3],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -423,6 +446,7 @@ describe("Array Validation Rules", () => {
       it("should validate arrays with unique string values", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: ["a", "b", "c"],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -430,6 +454,7 @@ describe("Array Validation Rules", () => {
       it("should validate arrays with unique objects", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          i18n,
         });
         expect(result).toBe(true);
       });
@@ -437,6 +462,7 @@ describe("Array Validation Rules", () => {
       it("should reject arrays with duplicate primitives", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: [1, 2, 2, 3],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -444,6 +470,7 @@ describe("Array Validation Rules", () => {
       it("should reject arrays with duplicate objects", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: [{ id: 1 }, { id: 1 }, { id: 2 }],
+          i18n,
         });
         expect(result).not.toBe(true);
       });
@@ -451,6 +478,7 @@ describe("Array Validation Rules", () => {
       it("should reject non-arrays", async () => {
         const result = await Validator.getRules().ArrayUnique({
           value: "not an array",
+          i18n,
         });
         expect(result).not.toBe(true);
       });

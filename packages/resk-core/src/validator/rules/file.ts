@@ -1,4 +1,3 @@
-import { i18n } from "../../i18n";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -27,6 +26,7 @@ function _File({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -72,8 +72,9 @@ function _FileSize({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<number[]>): IValidatorResult {
+}: IValidatorValidateOptions<[size: number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.fileSize", {
@@ -137,13 +138,15 @@ Validator.registerRule("FileSize", _FileSize);
  * @since 1.22.0
  * @public
  */
-export const FileSize = Validator.createRuleDecorator<number[]>(_FileSize);
+export const FileSize =
+  Validator.createRuleDecorator<[size: number]>(_FileSize);
 
 function _FileType({
   value,
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -221,6 +224,7 @@ function _Image({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -286,6 +290,7 @@ function _FileExtension({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -363,8 +368,9 @@ function _MinFileSize({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
-}: IValidatorValidateOptions<number[]>): IValidatorResult {
+}: IValidatorValidateOptions<[minSize: number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.minFileSize", {
@@ -429,7 +435,7 @@ Validator.registerRule("MinFileSize", _MinFileSize);
  * @public
  */
 export const MinFileSize =
-  Validator.createRuleDecorator<number[]>(_MinFileSize);
+  Validator.createRuleDecorator<[minSize: number]>(_MinFileSize);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -514,7 +520,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FileSize: IValidatorRuleFunction<number[], Context>;
+    FileSize: IValidatorRuleFunction<[size: number], Context>;
 
     /**
      * ### FileType Rule
@@ -687,6 +693,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MinFileSize: IValidatorRuleFunction<number[], Context>;
+    MinFileSize: IValidatorRuleFunction<[minSize: number], Context>;
   }
 }

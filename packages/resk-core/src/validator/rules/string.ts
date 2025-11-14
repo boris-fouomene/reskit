@@ -1,5 +1,4 @@
 import { isNonNullString } from "@utils/isNonNullString";
-import { i18n } from "../../i18n";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
@@ -8,6 +7,7 @@ function _EndsWith({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -82,6 +82,7 @@ function _StartsWith({
   ruleParams,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -127,6 +128,7 @@ function _String({
   value,
   fieldName,
   translatedPropertyName,
+  i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {

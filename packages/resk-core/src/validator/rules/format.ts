@@ -454,7 +454,7 @@ function _Regex({
   fieldName,
   translatedPropertyName,
   ...rest
-}: IValidatorValidateOptions<string[]>): IValidatorResult {
+}: IValidatorValidateOptions<[rule: RegExp]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.regex", {
@@ -466,9 +466,9 @@ function _Regex({
       return reject(message);
     }
 
-    if (!ruleParams || ruleParams.length === 0 || !ruleParams[0]) {
+    if (!ruleParams || !ruleParams[0]) {
       const message = i18n.t("validator.invalidRuleParams", {
-        rule: "Regex",
+        rule: "Matches",
         field: translatedPropertyName || fieldName,
         ruleParams,
         ...rest,
@@ -491,7 +491,7 @@ function _Regex({
       }
     } catch (error) {
       const message = i18n.t("validator.invalidRuleParams", {
-        rule: "Regex",
+        rule: "Matches",
         field: translatedPropertyName || fieldName,
         ruleParams,
         ...rest,
@@ -500,10 +500,10 @@ function _Regex({
     }
   });
 }
-Validator.registerRule("Regex", _Regex);
+Validator.registerRule("Matches", _Regex);
 
 /**
- * ### Regex Rule
+ * ### Matches Rule
  *
  * Validates that the field under validation matches the specified regular expression.
  *
@@ -514,7 +514,7 @@ Validator.registerRule("Regex", _Regex);
  * ```typescript
  * // Class validation
  * class CustomFormat {
- *   @Regex(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
+ *   @Matches(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
  *   customCode: string;
  * }
  * ```
@@ -526,7 +526,7 @@ Validator.registerRule("Regex", _Regex);
  * @since 1.22.0
  * @public
  */
-export const Regex = Validator.createRuleDecorator<string[]>(_Regex);
+export const Matches = Validator.createRuleDecorator<[rule: RegExp]>(_Regex);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -900,7 +900,7 @@ declare module "../types" {
     MACAddress: IValidatorRuleFunction<[], Context>;
 
     /**
-     * ### Regex Rule
+     * ### Matches Rule
      *
      * Validates that the field under validation matches the specified regular expression.
      *
@@ -912,33 +912,33 @@ declare module "../types" {
      * // Valid examples
      * await Validator.validate({
      *   value: 'ABC1234',
-     *   rules: ['Regex[^[A-Z]{3}\\d{4}$]']
+     *   rules: ['Matches[^[A-Z]{3}\\d{4}$]']
      * }); // ✓ Valid (3 letters + 4 digits)
      *
      * await Validator.validate({
      *   value: 'user@example.com',
-     *   rules: ['Regex[^\\S+@\\S+\\.\\S+$]']
+     *   rules: ['Matches[^\\S+@\\S+\\.\\S+$]']
      * }); // ✓ Valid email pattern
      *
      * // Invalid examples
      * await Validator.validate({
      *   value: 'abc123',
-     *   rules: ['Regex[^[A-Z]{3}\\d{4}$]']
+     *   rules: ['Matches[^[A-Z]{3}\\d{4}$]']
      * }); // ✗ Invalid (lowercase letters)
      *
      * await Validator.validate({
      *   value: 'invalid-pattern(',
-     *   rules: ['Regex[(]'] // Invalid regex
+     *   rules: ['Matches[(]'] // Invalid regex
      * }); // ✗ Invalid
      *
      * await Validator.validate({
      *   value: 123,
-     *   rules: ['Regex[\\d+]']
+     *   rules: ['Matches[\\d+]']
      * }); // ✗ Invalid (not a string)
      *
      * // Class validation
      * class CustomFormat {
-     *   @Regex(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
+     *   @Matches(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
      *   customCode: string;
      * }
      * ```
@@ -950,6 +950,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Regex: IValidatorRuleFunction<string[], Context>;
+    Matches: IValidatorRuleFunction<string[], Context>;
   }
 }

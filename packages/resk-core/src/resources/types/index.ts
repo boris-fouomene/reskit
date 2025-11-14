@@ -5,7 +5,11 @@ import { IMongoQuery, IResourceQueryOrderBy } from "./filters";
 
 export * from "./filters";
 
-export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> extends Partial<IResourceActionTupleObject<IResourceName>>, Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
+export interface IFieldBase<
+  FieldType extends IFieldType = IFieldType,
+  ValueType = any,
+> extends Partial<IResourceActionTupleObject<IResourceName>>,
+    Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
   /**
    * The type of the field.
    *
@@ -189,9 +193,14 @@ export interface IFieldActionsMap {
   filter: string;
 }
 
-export type IField<T extends IFieldType = IFieldType, ValueType = any> = IFieldMap[T] extends IFieldBase
+export type IField<
+  T extends IFieldType = IFieldType,
+  ValueType = any,
+> = IFieldMap[T] extends IFieldBase
   ? IFieldMap[T] & {
-      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<IFieldMap[keyof IFieldMap]>;
+      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<
+        IFieldMap[keyof IFieldMap]
+      >;
     }
   : never;
 
@@ -534,7 +543,8 @@ type ValidateResource<T> = T extends IResource ? T : never;
  * // TypeScript knows userResource has the users resource structure
  * ```
  */
-export type GetResource<ResourceName extends IResourceName> = ValidatedResourceRegistry[ResourceName];
+export type GetResource<ResourceName extends IResourceName> =
+  ValidatedResourceRegistry[ResourceName];
 
 export type IResourceName = keyof ValidatedResourceRegistry;
 
@@ -644,7 +654,9 @@ export type IResourceName = keyof ValidatedResourceRegistry;
  * });
  * ```
  */
-export type IResourceActionName<ResourceName extends IResourceName = IResourceName> = IResourceGetActionNames<GetResource<ResourceName>>;
+export type IResourceActionName<
+  ResourceName extends IResourceName = IResourceName,
+> = IResourceGetActionNames<GetResource<ResourceName>>;
 
 /**
  * @interface IResourceActionTuple
@@ -670,7 +682,9 @@ export type IResourceActionName<ResourceName extends IResourceName = IResourceNa
  * @see {@link IResourceActionTupleArray} for the `IResourceActionTupleArray` type.
  * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
  */
-export type IResourceActionTuple<ResourceName extends IResourceName> = IResourceActionTupleArray<ResourceName> | IResourceActionTupleObject<ResourceName>;
+export type IResourceActionTuple<ResourceName extends IResourceName> =
+  | IResourceActionTupleArray<ResourceName>
+  | IResourceActionTupleObject<ResourceName>;
 
 /**
  * @interface IResourceActionTupleArray
@@ -721,7 +735,9 @@ export type IResourceActionTupleArray<ResourceName extends IResourceName> = [
  *
  * @interface IResourceActionTupleObject
  */
-export interface IResourceActionTupleObject<ResourceName extends IResourceName> {
+export interface IResourceActionTupleObject<
+  ResourceName extends IResourceName,
+> {
   /**
    * The name of the resource.
    *
@@ -790,7 +806,10 @@ export interface IResourceAction {
   title?: string;
 }
 
-type IResourceActionsRecord<TActions> = TActions extends Record<string, IResourceAction> ? TActions & Partial<IResourceDefaultActions> : never;
+type IResourceActionsRecord<TActions> =
+  TActions extends Record<string, IResourceAction>
+    ? TActions & Partial<IResourceDefaultActions>
+    : never;
 
 /**
  * Type representing the actions record for a specific resource.
@@ -922,7 +941,10 @@ type IResourceActionsRecord<TActions> = TActions extends Record<string, IResourc
  * // permManager.hasPermission("users", "invalid"); // ✗ TypeScript error
  * ```
  */
-export type IResourceActions<ResourceName extends IResourceName> = IResources[ResourceName] extends { actions: Record<string, IResourceAction> } ? IResourceActionsRecord<IResources[ResourceName]["actions"]> : never;
+export type IResourceActions<ResourceName extends IResourceName> =
+  IResources[ResourceName] extends { actions: Record<string, IResourceAction> }
+    ? IResourceActionsRecord<IResources[ResourceName]["actions"]>
+    : never;
 
 /**
  * Utility type to extract action names from a resource actions record.
@@ -941,9 +963,12 @@ export type IResourceActions<ResourceName extends IResourceName> = IResources[Re
  * // Result: "read" | "create" | "custom"
  * ```
  */
-export type IResourceActionNames<T extends Record<string, IResourceAction>> = keyof T & string;
+export type IResourceActionNames<T extends Record<string, IResourceAction>> =
+  keyof T & string;
 
-type IResourceGetActionNames<TResource extends { actions?: Record<string, IResourceAction> }> = keyof IResourceActionsRecord<TResource["actions"]> & string;
+type IResourceGetActionNames<
+  TResource extends { actions?: Record<string, IResourceAction> },
+> = keyof IResourceActionsRecord<TResource["actions"]> & string;
 
 export interface IResourceDefaultActions {
   /**
@@ -1022,7 +1047,15 @@ export interface IResourceDefaultActions {
   all: IResourceAction;
 }
 
-export interface IResource<Name extends IResourceName = IResourceName, DataType = unknown, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, Actions extends Record<string, IResourceAction> = Record<string, IResourceAction>> {
+export interface IResource<
+  Name extends IResourceName = IResourceName,
+  DataType = unknown,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+  Actions extends Record<string, IResourceAction> = Record<
+    string,
+    IResourceAction
+  >,
+> {
   /**
    * The internal name of the resource.
    *
@@ -1332,9 +1365,13 @@ export type IResourcePrimaryKey = string | number | object;
  * for managing resources, facilitating CRUD operations and ensuring a consistent
  * approach to data handling in applications.
  */
-export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceDataService<
+  DataType = unknown,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+> {
   /***
    * Creates a new resource record.
+   * @template T - The type of the resource data being created.
    * @param record The data for the new resource to be created.
    * @returns A promise that resolves to an `DataType`,
    * indicating the success or failure of the operation.
@@ -1343,9 +1380,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.create({ name: "New ResourceMeta" });
    *     ```
    */
-  create(record: Partial<DataType>): Promise<DataType>;
+  create<T extends DataType>(record: T): Promise<DataType>;
   /***
    * Updates an existing resource record.
+   * @template T - The type of the resource data being updated.
    * @param primaryKey The primary key of the resource to update.
    * @param updatedData An object containing the updated data for the resource.
    * @returns A promise that resolves to an `DataType`,
@@ -1355,7 +1393,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.update("resourceId", { name: "Updated ResourceMeta" });
    *     ```
    */
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
+  update<T extends Partial<DataType>>(
+    primaryKey: PrimaryKeyType,
+    updatedData: T
+  ): Promise<DataType>;
   /***
    * Deletes a resource record by its primary key.
    * @param primaryKey The primary key of the resource to delete.
@@ -1381,7 +1422,9 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.findOne({ firstName: 1 });
    *     ```
    */
-  findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
+  findOne(
+    options: PrimaryKeyType | IResourceQueryOptions<DataType>
+  ): Promise<DataType | null>;
   /***
    * Retrieves a single resource record by its primary key or throws an error if not found.
    * @param primaryKey The primary key or query options of the resource to retrieve.
@@ -1392,7 +1435,9 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.findOneOrFail("resourceId");
    *     ```
    */
-  findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
+  findOneOrFail(
+    options: PrimaryKeyType | IResourceQueryOptions<DataType>
+  ): Promise<DataType>;
   /***
    * Retrieves multiple resource records based on query options.
    * @param options Optional query options to filter the results.
@@ -1415,7 +1460,9 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
    *     ```
    */
-  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<[DataType[], number]>;
+  findAndCount(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<[DataType[], number]>;
 
   /***
    * Retrieves multiple resource records and paginates the results.
@@ -1426,10 +1473,13 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   ```typescript
    *   const result = await dataProvider.findAndPaginate({ limit: 10, skip: 0 });
    */
-  findAndPaginate(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
+  findAndPaginate(
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<IResourcePaginatedResult<DataType>>;
 
   /***
    * Creates multiple resource records.
+   * @template T - The type of the resource data being created.
    * @param data An array of data for the new resources to be created.
    * @returns A promise that resolves to an `DataType[]`,
    * indicating the success or failure of the operation.
@@ -1438,9 +1488,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.createMany([{ name: "ResourceMeta 1" }, { name: "ResourceMeta 2" }]);
    *     ```
    */
-  createMany(data: Partial<DataType>[]): Promise<DataType[]>;
+  createMany<T extends DataType>(data: T[]): Promise<DataType[]>;
   /***
    * Updates multiple resource records.
+   * @template T - The type of the resource data being updated.
    * @param criteria An object containing the filter criteria for the resources.
    * @param data An object containing the updated data for the resources.
    * @returns A promise that resolves to an `DataType[]`,
@@ -1450,7 +1501,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.updateMany({ status: "active" });
    *     ```
    */
-  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
+  updateMany<T extends Partial<DataType>>(
+    criteria: IResourceManyCriteria<DataType, PrimaryKeyType>,
+    data: T
+  ): Promise<number>;
   /**
    *
    * @param criteria The criteria to filter which resources to delete.
@@ -1461,7 +1515,9 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
    *     ```
    */
-  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
+  deleteMany(
+    criteria: IResourceManyCriteria<DataType, PrimaryKeyType>
+  ): Promise<number>;
   /***
    * Counts the total number of resource records based on query options.
    * @param options Optional query options to filter the count.
@@ -1629,7 +1685,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
    * - Performance may vary based on field cardinality and data size
    * - Consider indexing the field for better performance on large datasets
    */
-  distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType>): Promise<any[]>;
+  distinct?(
+    field: keyof DataType,
+    options?: IResourceQueryOptions<DataType>
+  ): Promise<any[]>;
 
   /**
    * // Supports MongoDB-style aggregation pipelines
@@ -1725,7 +1784,10 @@ export interface IResourceDataService<DataType = unknown, PrimaryKeyType extends
  *   "user456"
  * ];
  */
-export type IResourceManyCriteria<DataType = unknown, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> = PrimaryKeyType[] | IMongoQuery<DataType>;
+export type IResourceManyCriteria<
+  DataType = unknown,
+  PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey,
+> = PrimaryKeyType[] | IMongoQuery<DataType>;
 
 /**
  * Interface representing options for fetching resources.
@@ -2155,7 +2217,9 @@ export interface IResourcePaginationMetaData {
  * userMiddleware.execute("findOne", 123);
  * ```
  */
-export type IResourceDefaultEvent<ResourceName extends IResourceName> = IResourceActionName<ResourceName> | keyof IResourceDataService;
+export type IResourceDefaultEvent<ResourceName extends IResourceName> =
+  | IResourceActionName<ResourceName>
+  | keyof IResourceDataService;
 
 /**
  * Represents contextual information about a resource for operations like translations, logging, and error handling.

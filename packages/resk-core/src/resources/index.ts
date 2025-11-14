@@ -434,10 +434,14 @@ export abstract class Resource<
   ) {}
   /***
    * creates a new record in the resource.
+   * This method allows you to create a new record in the resource.
+   * It first authorizes the action, then calls the `beforeCreate` hook, performs the creation,
+   * and finally calls the `afterCreate` hook before triggering the "create" event.
+   * @template T - The type of the data being created.
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  async create(record: Partial<DataType>) {
+  async create<T extends DataType>(record: T): Promise<DataType> {
     return this.authorizeAction("create").then(() => {
       return this.beforeCreate(record).then(() => {
         return this.getDataService()
@@ -453,11 +457,18 @@ export abstract class Resource<
   }
   /**
    * updates a record in the resource.
+   * This method allows you to update an existing record in the resource.
+   * It first authorizes the action, then calls the `beforeUpdate` hook, performs the update,
+   * and finally calls the `afterUpdate` hook before triggering the "update" event.
+   * @template T - The type of the data being updated.
    * @param key {PrimaryKeyType} The primary key of the resource to update.
    * @param dataToUpdate
    * @returns
    */
-  async update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
+  async update<T extends Partial<DataType>>(
+    primaryKey: PrimaryKeyType,
+    dataToUpdate: T
+  ) {
     return this.authorizeAction("update").then(async () => {
       return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
         return this.getDataService()
@@ -480,6 +491,11 @@ export abstract class Resource<
   }
   /***
    * deletes a record from the resource.
+   * This method allows you to delete an existing record from the resource.
+   * It first authorizes the action, then calls the `beforeDelete` hook, performs the deletion,
+   * and finally calls the `afterDelete` hook before triggering the "delete" event.
+   *
+   * @template PrimaryKeyType - The type of the primary key of the resource.
    * @param primaryKey {PrimaryKeyType} The primary key of the resource to delete.
    * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
@@ -500,6 +516,9 @@ export abstract class Resource<
 
   /**
    * Fetches a list of records from the resource and returns the total count.
+   * This method allows you to retrieve a list of records from the resource,
+   * along with the total count of records that match the query options.
+   * It first authorizes the action, then calls the `findAndCount` method on the data service,
    * @param options - Optional query options to filter, sort, and paginate the results.
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
@@ -513,6 +532,15 @@ export abstract class Resource<
         });
     });
   }
+  /**
+   * Fetches a paginated list of records from the resource.
+   * This method allows you to retrieve a paginated list of records from the resource,
+   * along with the total count of records that match the query options.
+   * It first authorizes the action, then calls the `findAndPaginate` method on the data service,
+   * and finally triggers the "findAndPaginate" event.
+   * @param options - Optional query options to filter, sort, and paginate the results.
+   * @returns A promise that resolves to an object containing the paginated list of records and the total count.
+   */
   async findAndPaginate(
     options?: IResourceQueryOptions<DataType> | undefined
   ): Promise<IResourcePaginatedResult<DataType>> {
@@ -526,10 +554,14 @@ export abstract class Resource<
   }
   /**
    * Creates multiple records in the resource.
+   * This method allows you to create multiple records in the resource in a single operation.
+   * It first authorizes the action, then calls the `beforeCreateMany` hook, performs the creation,
+   * and finally calls the `afterCreateMany` hook before triggering the "createMany" event.
+   * @template T - The type of the data being created.
    * @param data - An array of partial data objects to create.
    * @returns A promise that resolves to the result of the create operation.
    */
-  async createMany(data: Partial<DataType>[]) {
+  async createMany<T extends DataType>(data: T[]) {
     return this.authorizeAction("create").then(() => {
       return this.beforeCreateMany(data).then(() => {
         return this.getDataService()
@@ -545,13 +577,17 @@ export abstract class Resource<
   }
   /**
    * Updates multiple records in the resource.
+   * This method allows you to update multiple records in the resource in a single operation.
+   * It first authorizes the action, then calls the `beforeUpdateMany` hook, performs the update,
+   * and finally calls the `afterUpdateMany` hook before triggering the "updateMany" event.
+   * @template T - The type of the data being updated.
    * @param criteria - The query options to filter the records to be updated.
    * @param data - An array of partial data objects to update.
    * @returns A promise that resolves to the result of the update operation.
    */
-  async updateMany(
+  async updateMany<T extends Partial<DataType>>(
     criteria: IResourceManyCriteria<DataType, PrimaryKeyType>,
-    data: Partial<DataType>
+    data: T
   ) {
     return this.authorizeAction("update").then(() => {
       return this.beforeUpdateMany(criteria, data).then(() => {
@@ -575,6 +611,9 @@ export abstract class Resource<
   }
   /**
    * Deletes multiple records from the resource based on the provided criteria.
+   * This method allows you to delete multiple records in the resource in a single operation.
+   * It first authorizes the action, then calls the `beforeDeleteMany` hook, performs the deletion,
+   * and finally calls the `afterDeleteMany` hook before triggering the "deleteMany" event.
    * @param criteria - The query options to filter the records to be deleted.
    * @returns A promise that resolves to the result of the delete operation.
    */
@@ -594,6 +633,11 @@ export abstract class Resource<
   }
   /**
    * Counts the number of records in the resource.
+   * This method allows you to count the total number of records in the resource.
+   * It first authorizes the action, then calls the `count` method on the data service,
+   * and finally triggers the "read" event with the count result.
+   *
+   * @template DataType - The type of the data being counted.
    * @param options - Optional query options to filter the results.
    * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
@@ -609,6 +653,9 @@ export abstract class Resource<
   }
   /***
    * checks if the resource has the record
+   * This method allows you to check if a record exists in the resource.
+   * It first authorizes the action, then calls the `exists` method on the data service,
+   * and finally triggers the "exists" event with the result.
    * @param {PrimaryKeyType} primaryKey - The primary key of the record to check.
    * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */

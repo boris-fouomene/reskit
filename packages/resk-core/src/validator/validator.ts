@@ -717,7 +717,7 @@ export class Validator {
    * - **Multiple Rules**: Supports validation with multiple rules applied sequentially
    * - **Error Handling**: Never throws errors; returns a result object with success/failure status
    * - **Type Safe**: Full TypeScript support with generic typing for context
-   * - **Nullable Handling**: Supports Empty, Nullable, and Sometimes rules for conditional validation
+   * - **Nullable Handling**: Supports Empty, Nullable, and Optional rules for conditional validation
    * - **Performance**: Tracks validation duration and timestamps
    *
    * ### Return Type: IValidatorValidateResult
@@ -751,9 +751,9 @@ export class Validator {
    * Special handling for conditional validation rules:
    * - **Empty**: Skips validation if value is empty string ""
    * - **Nullable**: Skips validation if value is null or undefined
-   * - **Sometimes**: Skips validation if value is undefined only
+   * - **Optional**: Skips validation if value is undefined only
    *
-   * Priority order: Empty > Nullable > Sometimes
+   * Priority order: Empty > Nullable > Optional
    *
    * ### Examples
    *
@@ -830,10 +830,10 @@ export class Validator {
    * });
    * // result2.success === true (skips Email check)
    *
-   * // Undefined is valid with Sometimes rule
+   * // Undefined is valid with Optional rule
    * const result3 = await Validator.validate({
    *   value: undefined,
-   *   rules: ["Sometimes", "MinLength[5]"],
+   *   rules: ["Optional", "MinLength[5]"],
    * });
    * // result3.success === true (skips MinLength check)
    * ```
@@ -932,7 +932,7 @@ export class Validator {
       const nullableConditions = {
         Empty: (value: any) => value === "",
         Nullable: (value: any) => value === null || value === undefined,
-        Sometimes: (value: any) => value === undefined,
+        Optional: (value: any) => value === undefined,
       };
       for (const rule of sanitizedRules) {
         if (typeof rule === "function") continue;
@@ -1151,7 +1151,7 @@ export class Validator {
    * - `status`: "error"
    *
    * ### Supported Decorators
-   * - `@IsRequired` / `@IsNullable` / `@IsEmpty` / `@IsSometimes` - Conditional rules
+   * - `@IsRequired` / `@IsNullable` / `@IsEmpty` / `@IsOptional` - Conditional rules
    * - `@IsEmail` / `@IsUrl` / `@IsPhoneNumber` - Format validators
    * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
    * - `@IsNumber` / `@IsNonNullString` - Type validators
@@ -1161,8 +1161,8 @@ export class Validator {
    * ### Nullable Rule Behavior
    * - **@IsEmpty**: Skips remaining rules if value is empty string ""
    * - **@IsNullable**: Skips remaining rules if value is null or undefined
-   * - **@IsSometimes**: Skips remaining rules if value is undefined only
-   * - **Skip if Absent**: @IsSometimes fields can be omitted from data entirely
+   * - **@IsOptional**: Skips remaining rules if value is undefined only
+   * - **Skip if Absent**: @IsOptional fields can be omitted from data entirely
    *
    * ### Examples
    *
@@ -1214,7 +1214,7 @@ export class Validator {
    *   @MaxLength([1000])
    *   description?: string;
    *
-   *   @IsSometimes // Can be omitted entirely
+   *   @IsOptional // Can be omitted entirely
    *   @IsUrl
    *   imageUrl?: string;
    * }
@@ -1223,7 +1223,7 @@ export class Validator {
    *   title: "Awesome Product",
    *   price: 29.99,
    *   description: "",
-   *   // imageUrl omitted (valid with @IsSometimes)
+   *   // imageUrl omitted (valid with @IsOptional)
    * });
    * ```
    *
@@ -1309,7 +1309,7 @@ export class Validator {
    *
    * @remarks
    * - Validation is performed in parallel for all fields using Promise.all()
-   * - Fields decorated with @IsSometimes can be omitted from input data
+   * - Fields decorated with @IsOptional can be omitted from input data
    * - Nullable/Empty rules prevent other rules from executing for that field
    * - Property names are translated using i18n if available
    * - Errors include field-specific information for precise error reporting
@@ -1372,8 +1372,8 @@ export class Validator {
     const translatedPropertyNames = i18n.translateTarget(target, { data });
     for (const propertyKey in targetRules) {
       const rules = targetRules[propertyKey];
-      // Skip validation for Sometimes fields that are not present in data
-      if (rules.includes("Sometimes") && !(propertyKey in data)) {
+      // Skip validation for Optional fields that are not present in data
+      if (rules.includes("Optional") && !(propertyKey in data)) {
         continue;
       }
       const value = data[propertyKey];

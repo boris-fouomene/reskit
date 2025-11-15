@@ -1,7 +1,7 @@
 import { IObservableCallback } from "../../observable";
 import { II18nTranslation } from "../../types/i18n";
 import "../../utils";
-import { I18n, Translate } from "../index";
+import { I18n, Translate, i18n as defaultI18n } from "../index";
 
 describe("I18n", () => {
   let i18n: I18n;
@@ -70,6 +70,11 @@ describe("I18n", () => {
     expect(typeof instance?.getLocale).toBe("function");
     expect(typeof instance?.translate).toBe("function");
     expect(typeof instance?.translateTarget).toBe("function");
+
+    // verify the default exported instance is recognized as I18n
+    expect(defaultI18n instanceof I18n).toBe(true);
+    // and its prototype is the I18n prototype
+    expect(Object.getPrototypeOf(defaultI18n)).toBe(I18n.prototype);
     // also should be true for I18n.getInstance()
     // Should recognize duck-typed objects as well
     const fakeI18n = {

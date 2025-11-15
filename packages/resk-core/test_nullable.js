@@ -79,42 +79,40 @@ async function testNullableValidation() {
     );
   }
 
-  // Test 7: Sometimes rule with undefined should succeed
+  // Test 7: Optional rule with undefined should succeed
   try {
     const result7 = await Validator.validate({
       value: undefined,
-      rules: ["Sometimes", "Required"],
+      rules: ["Optional", "Required"],
     });
-    console.log(
-      "✓ Test 7 passed: undefined value with Sometimes rule succeeds"
-    );
+    console.log("✓ Test 7 passed: undefined value with Optional rule succeeds");
   } catch (error) {
     console.log("✗ Test 7 failed:", error.message);
   }
 
-  // Test 8: Sometimes rule with null should fail
+  // Test 8: Optional rule with null should fail
   try {
     await Validator.validate({
       value: null,
-      rules: ["Sometimes", "Required"],
+      rules: ["Optional", "Required"],
     });
     console.log("✗ Test 8 failed: should have failed validation");
   } catch (error) {
     console.log(
-      "✓ Test 8 passed: null value with Sometimes rule fails as expected"
+      "✓ Test 8 passed: null value with Optional rule fails as expected"
     );
   }
 
-  // Test 9: Sometimes rule with empty string should fail
+  // Test 9: Optional rule with empty string should fail
   try {
     await Validator.validate({
       value: "",
-      rules: ["Sometimes", "Required"],
+      rules: ["Optional", "Required"],
     });
     console.log("✗ Test 9 failed: should have failed validation");
   } catch (error) {
     console.log(
-      "✓ Test 9 passed: empty string with Sometimes rule fails as expected"
+      "✓ Test 9 passed: empty string with Optional rule fails as expected"
     );
   }
 

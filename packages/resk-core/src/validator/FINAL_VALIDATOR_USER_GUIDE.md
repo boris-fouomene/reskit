@@ -501,7 +501,7 @@ class ProfileForm {
   @IsRequired
   name: string;
 
-  @IsSometimes // Skip if undefined
+  @IsOptional // Skip if undefined
   @IsEmail
   email?: string;
 
@@ -579,11 +579,11 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Nullable/Optional Rules
 
-| Rule      | Decorator      | Description          | Example        |
-| --------- | -------------- | -------------------- | -------------- |
-| Nullable  | `@IsNullable`  | Allow null/undefined | `@IsNullable`  |
-| Empty     | `@IsEmpty`     | Allow empty string   | `@IsEmpty`     |
-| Sometimes | `@IsSometimes` | Allow undefined      | `@IsSometimes` |
+| Rule     | Decorator     | Description          | Example       |
+| -------- | ------------- | -------------------- | ------------- |
+| Nullable | `@IsNullable` | Allow null/undefined | `@IsNullable` |
+| Empty    | `@IsEmpty`    | Allow empty string   | `@IsEmpty`    |
+| Optional | `@IsOptional` | Allow undefined      | `@IsOptional` |
 
 ### Contact Rules
 
@@ -696,7 +696,7 @@ class ComprehensiveForm {
   @IsPhoneNumber
   phone?: string;
 
-  @IsSometimes
+  @IsOptional
   @IsUrl
   profileUrl?: string;
 
@@ -1985,7 +1985,7 @@ All rules are registered with the Validator and can be used by name:
 'Enum[value1,value2]', 'Equals[value]'
 
 // Nullable rules
-'Nullable', 'Empty', 'Sometimes'
+'Nullable', 'Empty', 'Optional'
 
 // Contact rules
 'PhoneNumber', 'EmailOrPhoneNumber'
@@ -2042,14 +2042,14 @@ await Validator.validate({
 
 **Q: How do I handle optional fields?**
 
-A: Use `@IsSometimes`, `@IsNullable`, or `@IsEmpty`:
+A: Use `@IsOptional`, `@IsNullable`, or `@IsEmpty`:
 
 ```typescript
 class Form {
   @IsRequired
   email: string;
 
-  @IsSometimes // Skip if undefined
+  @IsOptional // Skip if undefined
   @IsUrl
   website?: string;
 

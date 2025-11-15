@@ -482,7 +482,7 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that marks a field as sometimes validated (validation skipped if undefined).
    */
-  Sometimes: IValidatorRuleFunction<[], Context>;
+  Optional: IValidatorRuleFunction<[], Context>;
 }
 
 /**

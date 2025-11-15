@@ -232,7 +232,7 @@ Validator.registerRule("Custom", ({ value }) => {
 ### 8. Optional Fields
 
 ```typescript
-@IsSometimes
+@IsOptional
 @IsUrl
 website?: string;
 ```

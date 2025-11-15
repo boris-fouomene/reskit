@@ -545,10 +545,10 @@ numbersOptional?: string;
 // Validates if value is provided
 ```
 
-#### Sometimes
+#### Optional
 
 ```typescript
-@IsSometimes
+@IsOptional
 @IsUrl
 website?: string;
 
@@ -846,7 +846,7 @@ code: string;
 @IsFileName             // Must be valid filename
 @IsNullable             // Allow null/undefined
 @IsEmpty                // Allow empty string
-@IsSometimes            // Allow undefined
+@IsOptional            // Allow undefined
 @IsArray                // Must be an array
 @IsDate                 // Must be valid date
 @IsFile                 // Must be valid file
@@ -903,7 +903,7 @@ class User {
   @IsMaxLength([100]) // Max 100 chars
   email: string;
 
-  @IsSometimes // Optional
+  @IsOptional // Optional
   @IsUrl // If provided, must be URL
   website?: string;
 }
@@ -1102,7 +1102,7 @@ class OptionalField {
   @IsRequired
   email: string;
 
-  @IsSometimes // Validate only if present
+  @IsOptional // Validate only if present
   @IsUrl
   website?: string;
 
@@ -1325,14 +1325,14 @@ class LoginForm extends BaseUserForm {
 
 ### Q: How do I handle optional fields?
 
-**A:** Use `@IsSometimes`, `@IsNullable`, or `@IsEmpty`:
+**A:** Use `@IsOptional`, `@IsNullable`, or `@IsEmpty`:
 
 ```typescript
 class Form {
   @IsRequired // Required
   email: string;
 
-  @IsSometimes // Skip if undefined
+  @IsOptional // Skip if undefined
   @IsUrl
   website?: string;
 

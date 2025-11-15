@@ -369,7 +369,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     session.set("i18n.locale", locale);
   }
   static getLocaleFromSession() {
-    return session.get("i18n.locale") as string;
+    const locale = session.get("i18n.locale");
+    if (isNonNullString(locale)) {
+      return locale;
+    }
+    return "";
   }
   /**
    * Checks if the provided translation key can be pluralized for the given locale.
@@ -764,7 +768,6 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     return new Promise((resolve, reject) => {
       this._isLoading = true;
       this.trigger("namespaces-before-load", locale);
-      console.log("setting i18n locale to ", locale);
       return this.loadNamespaces(locale)
         .then((translations) => {
           if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
@@ -963,5 +966,18 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
 }
 
 const i18n = I18n.getInstance();
+
+// Ensure the default exported instance passes `instanceof I18n` checks.
+// When code is built and consumed across module boundaries, constructor
+// identity can be inconsistent — to make the exported `i18n` recognized by
+// `instanceof I18n` reliably in the same runtime, set its prototype to
+// the class prototype. This preserves the current exported logic.
+try {
+  Object.setPrototypeOf(i18n, I18n.prototype);
+} catch (e) {
+  // Setting the prototype may fail on frozen objects in some environments.
+  // If it does, fallback to relying on Symbol.hasInstance which is already
+  // implemented on the class for cross-realm compatibility.
+}
 
 export { i18n };

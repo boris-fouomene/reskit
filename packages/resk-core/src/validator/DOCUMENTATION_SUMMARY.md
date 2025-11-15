@@ -227,7 +227,7 @@ INDEX.md
 ✅ Boolean rules (IsBoolean)  
 ✅ Enum rules (Enum, Equals)  
 ✅ Contact rules (PhoneNumber, EmailOrPhoneNumber)  
-✅ Nullable rules (Nullable, Empty, Sometimes)
+✅ Nullable rules (Nullable, Empty, Optional)
 
 ### Advanced Features
 
@@ -418,7 +418,7 @@ INDEX.md → RECIPES.md (find matching scenario) →
 
 ### Edge Cases
 
-- Optional fields (Sometimes, Nullable, Empty)
+- Optional fields (Optional, Nullable, Empty)
 - Interdependent fields (password confirmation)
 - Business rules (discount codes, business hours)
 - Data transformation before validation

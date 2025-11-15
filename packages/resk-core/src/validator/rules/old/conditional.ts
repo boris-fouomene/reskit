@@ -1,5 +1,5 @@
-import { IValidatorValidateOptions, IValidatorResult } from "../../types";
 import { i18n } from "../../../i18n";
+import { IValidatorResult, IValidatorValidateOptions } from "../../types";
 
 /**
  * ## Conditional Validation Rules
@@ -181,7 +181,10 @@ export function Exclude({}: IValidatorValidateOptions): IValidatorResult {
  * @see {@link https://laravel.com/docs/11.x/validation#rule-exclude-if | Laravel exclude_if Rule}
  * @public
  */
-export function ExcludeIf({ ruleParams, context }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function ExcludeIf({
+  ruleParams,
+  context,
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve) => {
     // exclude_if rule doesn't validate the value itself
     // It's a meta-rule that affects conditional data inclusion
@@ -233,7 +236,10 @@ export function ExcludeIf({ ruleParams, context }: IValidatorValidateOptions<str
  * @see {@link https://laravel.com/docs/11.x/validation#rule-exclude-unless | Laravel exclude_unless Rule}
  * @public
  */
-export function ExcludeUnless({ ruleParams, context }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function ExcludeUnless({
+  ruleParams,
+  context,
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve) => {
     // exclude_unless rule doesn't validate the value itself
     // It's a meta-rule that affects conditional data inclusion
@@ -289,7 +295,9 @@ export function ExcludeUnless({ ruleParams, context }: IValidatorValidateOptions
  * @see {@link https://laravel.com/docs/11.x/validation#rule-nullable | Laravel nullable Rule}
  * @public
  */
-export function Nullable({ value }: IValidatorValidateOptions): IValidatorResult {
+export function Nullable({
+  value,
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve) => {
     if (value === null || value === undefined) {
       // Value is null/undefined, which is explicitly allowed
@@ -351,7 +359,12 @@ export function Nullable({ value }: IValidatorValidateOptions): IValidatorResult
  * @see {@link https://laravel.com/docs/11.x/validation#rule-present | Laravel present Rule}
  * @public
  */
-export function Present({ context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions): IValidatorResult {
+export function Present({
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     // Check if field exists in the data
     const fieldExists = (context as any)?.fieldExists ?? true;
@@ -421,7 +434,12 @@ export function Present({ context, fieldName, translatedPropertyName, ...rest }:
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited | Laravel prohibited Rule}
  * @public
  */
-export function Prohibited({ value, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions): IValidatorResult {
+export function Prohibited({
+  value,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     let isEmpty = false;
 
@@ -502,7 +520,14 @@ export function Prohibited({ value, fieldName, translatedPropertyName, ...rest }
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited-if | Laravel prohibited_if Rule}
  * @public
  */
-export function ProhibitedIf({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function ProhibitedIf({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -605,7 +630,14 @@ export function ProhibitedIf({ value, ruleParams, context, fieldName, translated
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited-unless | Laravel prohibited_unless Rule}
  * @public
  */
-export function ProhibitedUnless({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function ProhibitedUnless({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -711,7 +743,14 @@ export function ProhibitedUnless({ value, ruleParams, context, fieldName, transl
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-unless | Laravel required_unless Rule}
  * @public
  */
-export function RequiredUnless({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function RequiredUnless({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -812,7 +851,14 @@ export function RequiredUnless({ value, ruleParams, context, fieldName, translat
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-with | Laravel required_with Rule}
  * @public
  */
-export function RequiredWith({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function RequiredWith({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -828,7 +874,12 @@ export function RequiredWith({ value, ruleParams, context, fieldName, translated
     // Check if any of the specified fields are present and not empty
     const anyFieldPresent = ruleParams.some((fieldName) => {
       const fieldValue = data[fieldName];
-      return fieldValue !== null && fieldValue !== undefined && (typeof fieldValue !== "string" || fieldValue.trim() !== "") && (!Array.isArray(fieldValue) || fieldValue.length > 0);
+      return (
+        fieldValue !== null &&
+        fieldValue !== undefined &&
+        (typeof fieldValue !== "string" || fieldValue.trim() !== "") &&
+        (!Array.isArray(fieldValue) || fieldValue.length > 0)
+      );
     });
 
     if (anyFieldPresent) {
@@ -915,7 +966,14 @@ export function RequiredWith({ value, ruleParams, context, fieldName, translated
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-with-all | Laravel required_with_all Rule}
  * @public
  */
-export function RequiredWithAll({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function RequiredWithAll({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -931,7 +989,12 @@ export function RequiredWithAll({ value, ruleParams, context, fieldName, transla
     // Check if ALL specified fields are present and not empty
     const allFieldsPresent = ruleParams.every((fieldName) => {
       const fieldValue = data[fieldName];
-      return fieldValue !== null && fieldValue !== undefined && (typeof fieldValue !== "string" || fieldValue.trim() !== "") && (!Array.isArray(fieldValue) || fieldValue.length > 0);
+      return (
+        fieldValue !== null &&
+        fieldValue !== undefined &&
+        (typeof fieldValue !== "string" || fieldValue.trim() !== "") &&
+        (!Array.isArray(fieldValue) || fieldValue.length > 0)
+      );
     });
 
     if (allFieldsPresent) {
@@ -1014,7 +1077,14 @@ export function RequiredWithAll({ value, ruleParams, context, fieldName, transla
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-without | Laravel required_without Rule}
  * @public
  */
-export function RequiredWithout({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function RequiredWithout({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1030,7 +1100,12 @@ export function RequiredWithout({ value, ruleParams, context, fieldName, transla
     // Check if any of the specified fields are missing or empty
     const anyFieldMissing = ruleParams.some((fieldName) => {
       const fieldValue = data[fieldName];
-      return fieldValue === null || fieldValue === undefined || (typeof fieldValue === "string" && fieldValue.trim() === "") || (Array.isArray(fieldValue) && fieldValue.length === 0);
+      return (
+        fieldValue === null ||
+        fieldValue === undefined ||
+        (typeof fieldValue === "string" && fieldValue.trim() === "") ||
+        (Array.isArray(fieldValue) && fieldValue.length === 0)
+      );
     });
 
     if (anyFieldMissing) {
@@ -1117,7 +1192,14 @@ export function RequiredWithout({ value, ruleParams, context, fieldName, transla
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-without-all | Laravel required_without_all Rule}
  * @public
  */
-export function RequiredWithoutAll({ value, ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function RequiredWithoutAll({
+  value,
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1133,7 +1215,12 @@ export function RequiredWithoutAll({ value, ruleParams, context, fieldName, tran
     // Check if ALL specified fields are missing or empty
     const allFieldsMissing = ruleParams.every((fieldName) => {
       const fieldValue = data[fieldName];
-      return fieldValue === null || fieldValue === undefined || (typeof fieldValue === "string" && fieldValue.trim() === "") || (Array.isArray(fieldValue) && fieldValue.length === 0);
+      return (
+        fieldValue === null ||
+        fieldValue === undefined ||
+        (typeof fieldValue === "string" && fieldValue.trim() === "") ||
+        (Array.isArray(fieldValue) && fieldValue.length === 0)
+      );
     });
 
     if (allFieldsMissing) {
@@ -1162,7 +1249,7 @@ export function RequiredWithoutAll({ value, ruleParams, context, fieldName, tran
 }
 
 /**
- * ### Sometimes Rule
+ * ### Optional Rule
  *
  * In some situations, you may wish to run validation checks against a field
  * only if that field is present in the input array. This is exactly what the
@@ -1188,11 +1275,11 @@ export function RequiredWithoutAll({ value, ruleParams, context, fieldName, tran
  *   @Required
  *   name: string;
  *
- *   @Sometimes
+ *   @Optional
  *   @Email
  *   email?: string; // Only validate if present
  *
- *   @Sometimes
+ *   @Optional
  *   @Integer
  *   @Min([18])
  *   age?: number; // Only validate if present
@@ -1207,7 +1294,9 @@ export function RequiredWithoutAll({ value, ruleParams, context, fieldName, tran
  * @see {@link https://laravel.com/docs/11.x/validation#rule-sometimes | Laravel sometimes Rule}
  * @public
  */
-export function Sometimes({ context }: IValidatorValidateOptions): IValidatorResult {
+export function Optional({
+  context,
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve) => {
     // Check if field exists in the data
     const fieldExists = (context as any)?.fieldExists ?? true;
@@ -1267,7 +1356,13 @@ export function Sometimes({ context }: IValidatorValidateOptions): IValidatorRes
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-if | Laravel missing_if Rule}
  * @public
  */
-export function MissingIf({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingIf({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1332,7 +1427,13 @@ export function MissingIf({ ruleParams, context, fieldName, translatedPropertyNa
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-unless | Laravel missing_unless Rule}
  * @public
  */
-export function MissingUnless({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingUnless({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1396,7 +1497,13 @@ export function MissingUnless({ ruleParams, context, fieldName, translatedProper
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-with | Laravel missing_with Rule}
  * @public
  */
-export function MissingWith({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingWith({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1460,7 +1567,13 @@ export function MissingWith({ ruleParams, context, fieldName, translatedProperty
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-with-all | Laravel missing_with_all Rule}
  * @public
  */
-export function MissingWithAll({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingWithAll({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1523,7 +1636,13 @@ export function MissingWithAll({ ruleParams, context, fieldName, translatedPrope
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-without | Laravel missing_without Rule}
  * @public
  */
-export function MissingWithout({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingWithout({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -1586,7 +1705,13 @@ export function MissingWithout({ ruleParams, context, fieldName, translatedPrope
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-without-all | Laravel missing_without_all Rule}
  * @public
  */
-export function MissingWithoutAll({ ruleParams, context, fieldName, translatedPropertyName, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+export function MissingWithoutAll({
+  ruleParams,
+  context,
+  fieldName,
+  translatedPropertyName,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length === 0) {
       const message = i18n.t("validator.invalidRuleParams", {

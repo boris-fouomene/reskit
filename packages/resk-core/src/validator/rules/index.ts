@@ -630,13 +630,13 @@ Validator.registerRule("Nullable", function Nullable() {
  */
 export const IsNullable = Validator.createPropertyDecorator(["Nullable"]);
 
-Validator.registerRule("Sometimes", function Sometimes() {
+Validator.registerRule("Optional", function Optional() {
   // This rule always passes - its presence indicates that undefined values should skip validation
   return true;
 });
 
 /**
- * ### Sometimes Decorator
+ * ### Optional Decorator
  *
  * Marks a field as sometimes validated, meaning validation will be skipped if the value is undefined.
  * If the field is not present in the data object, validation is also skipped.
@@ -649,7 +649,7 @@ Validator.registerRule("Sometimes", function Sometimes() {
  *   @IsEmail
  *   email: string;
  *
- *   @IsSometimes
+ *   @IsOptional
  *   @IsUrl  // Only validated if website is present in data and not undefined
  *   website?: string;
  * }
@@ -659,7 +659,7 @@ Validator.registerRule("Sometimes", function Sometimes() {
  * @since 1.23.0
  * @public
  */
-export const IsSometimes = Validator.createPropertyDecorator(["Sometimes"]);
+export const IsOptional = Validator.createPropertyDecorator(["Optional"]);
 
 /**
  * Ensures that all validation rules are registered.

@@ -220,9 +220,9 @@ describe("Validator", () => {
       expect(result.value).toBe("");
     });
 
-    it("should return success for Sometimes with undefined value", async () => {
+    it("should return success for Optional with undefined value", async () => {
       const result = await Validator.validate({
-        rules: ["Sometimes"],
+        rules: ["Optional"],
         value: undefined,
       });
 

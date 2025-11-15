@@ -439,10 +439,10 @@ count: number;
 // Rejects: 0, -1
 ```
 
-#### NumberGreaterThanOrEquals
+#### NumberGreaterThanOrEqual
 
 ```typescript
-@IsNumberGreaterThanOrEquals([18])
+@IsNumberGreaterThanOrEqual([18])
 age: number;
 
 // Accepts: 18, 25, 100
@@ -459,20 +459,20 @@ percentage: number;
 // Rejects: 100, 101
 ```
 
-#### NumberLessThanOrEquals
+#### NumberLessThanOrEqual
 
 ```typescript
-@IsNumberLessThanOrEqualTo([100])
+@IsNumberLessThanOrEqual([100])
 percentage: number;
 
 // Accepts: 0, 50, 100
 // Rejects: 101, 102
 ```
 
-#### NumberEquals
+#### NumberEqual
 
 ```typescript
-@ IsNumberEqualTo([42])
+@ IsNumberEqual([42])
 value: number;
 
 // Only accepts: 42
@@ -647,7 +647,7 @@ birthDate: string;
 #### DateAfter
 
 ```typescript
-@DateAfter(['2023-01-01'])
+@IsDateAfter(['2023-01-01'])
 eventDate: string;
 
 // Date must be after January 1, 2023
@@ -656,7 +656,7 @@ eventDate: string;
 #### DateBefore
 
 ```typescript
-@DateBefore(['2023-12-31'])
+@IsDateBefore(['2023-12-31'])
 deadline: string;
 
 // Date must be before December 31, 2023
@@ -665,16 +665,16 @@ deadline: string;
 #### DateBetween
 
 ```typescript
-@DateBetween(['2023-01-01', '2023-12-31'])
+@IsDateBetween(['2023-01-01', '2023-12-31'])
 vacationDate: string;
 
 // Date must be between Jan 1 and Dec 31, 2023
 ```
 
-#### DateEquals
+#### SameDate
 
 ```typescript
-@DateEquals(['2023-06-15'])
+@IsSameDate(['2023-06-15'])
 meetingDate: string;
 
 // Date must equal June 15, 2023
@@ -683,7 +683,7 @@ meetingDate: string;
 #### FutureDate
 
 ```typescript
-@FutureDate
+@IsFutureDate
 appointmentDate: string;
 
 // Date must be in the future
@@ -692,7 +692,7 @@ appointmentDate: string;
 #### PastDate
 
 ```typescript
-@PastDate
+@IsPastDate
 birthDate: string;
 
 // Date must be in the past
@@ -709,10 +709,10 @@ document: File;
 // Value must be a valid file object
 ```
 
-#### FileSize
+#### MaxFileSize
 
 ```typescript
-@FileSize([1024000])
+@MaxFileSize([1024000])
 image: File;
 
 // File size must be exactly 1MB
@@ -721,7 +721,7 @@ image: File;
 #### FileType
 
 ```typescript
-@FileType(['image/jpeg'])
+@IsFileType(['image/jpeg'])
 photo: File;
 
 // File must be JPEG image
@@ -739,7 +739,7 @@ picture: File;
 #### FileExtension
 
 ```typescript
-@FileExtension(['.pdf'])
+@IsFileExtension(['.pdf'])
 document: File;
 
 // File must have .pdf extension
@@ -859,8 +859,8 @@ code: string;
 @IsIP                   // Must be valid IP address
 @IsMACAddress           // Must be valid MAC address
 @ArrayUnique            // Array elements must be unique
-@FutureDate             // Date must be in future
-@PastDate               // Date must be in past
+@IsFutureDate             // Date must be in future
+@IsPastDate               // Date must be in past
 ```
 
 ### Rule Decorators (With Parameters)
@@ -870,10 +870,10 @@ code: string;
 @IsMaxLength([50])
 @ Length([3, 10])
 @IsNumberGreaterThan([0])
-@IsNumberGreaterThanOrEquals([18])
+@IsNumberGreaterThanOrEqual([18])
 @IsNumberLessThan([100])
-@IsNumberLessThanOrEqualTo([100])
-@ IsNumberEqualTo([42])
+@IsNumberLessThanOrEqual([100])
+@ IsNumberEqual([42])
 @IsNumberNotEqual([0])
 @StartsWith(['Mr.', 'Mrs.'])
 @EndsWith(['.jpg', '.png'])
@@ -883,13 +883,13 @@ code: string;
 @ArrayMaxLength([10])
 @ArrayLength([5])
 @ArrayContains(['item'])
-@DateAfter(['2023-01-01'])
-@DateBefore(['2023-12-31'])
-@DateBetween(['2023-01-01', '2023-12-31'])
-@DateEquals(['2023-06-15'])
-@FileSize([1024000])
-@FileType(['image/jpeg'])
-@FileExtension(['.jpg'])
+@IsDateAfter(['2023-01-01'])
+@IsDateBefore(['2023-12-31'])
+@IsDateBetween(['2023-01-01', '2023-12-31'])
+@IsSameDate(['2023-06-15'])
+@MaxFileSize([1024000])
+@IsFileType(['image/jpeg'])
+@IsFileExtension(['.jpg'])
 @MinFileSize([100])
 @Regex(['^[A-Z]+$'])
 ```

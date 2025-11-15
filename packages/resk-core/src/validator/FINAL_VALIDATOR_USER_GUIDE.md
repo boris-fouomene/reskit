@@ -554,15 +554,15 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Numeric Rules
 
-| Rule                      | Decorator                           | Description      | Example                              |
-| ------------------------- | ----------------------------------- | ---------------- | ------------------------------------ |
-| Number                    | `@IsNumber`                         | Must be a number | `@IsNumber`                          |
-| NumberGreaterThan         | `@IsNumberGreaterThan([n])`         | Greater than n   | `@IsNumberGreaterThan([0])`          |
-| NumberGreaterThanOrEquals | `@IsNumberGreaterThanOrEquals([n])` | ≥ n              | `@IsNumberGreaterThanOrEquals([18])` |
-| NumberLessThan            | `@IsNumberLessThan([n])`            | Less than n      | `@IsNumberLessThan([100])`           |
-| NumberLessThanOrEquals    | `@IsNumberLessThanOrEqualTo([n])`   | ≤ n              | `@IsNumberLessThanOrEqualTo([100])`  |
-| NumberEquals              | `@ IsNumberEqualTo([n])`            | Exactly n        | `@ IsNumberEqualTo([42])`            |
-| NumberNotEqual            | `@IsNumberNotEqual([n])`            | Not equal to n   | `@IsNumberNotEqual([0])`             |
+| Rule                     | Decorator                          | Description      | Example                             |
+| ------------------------ | ---------------------------------- | ---------------- | ----------------------------------- |
+| Number                   | `@IsNumber`                        | Must be a number | `@IsNumber`                         |
+| NumberGreaterThan        | `@IsNumberGreaterThan([n])`        | Greater than n   | `@IsNumberGreaterThan([0])`         |
+| NumberGreaterThanOrEqual | `@IsNumberGreaterThanOrEqual([n])` | ≥ n              | `@IsNumberGreaterThanOrEqual([18])` |
+| NumberLessThan           | `@IsNumberLessThan([n])`           | Less than n      | `@IsNumberLessThan([100])`          |
+| NumberLessThanOrEqual    | `@IsNumberLessThanOrEqual([n])`    | ≤ n              | `@IsNumberLessThanOrEqual([100])`   |
+| NumberEqual              | `@ IsNumberEqual([n])`             | Exactly n        | `@ IsNumberEqual([42])`             |
+| NumberNotEqual           | `@IsNumberNotEqual([n])`           | Not equal to n   | `@IsNumberNotEqual([0])`            |
 
 ### Boolean Rules
 
@@ -605,26 +605,26 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Date Rules
 
-| Rule        | Decorator                       | Description                | Example                                     |
-| ----------- | ------------------------------- | -------------------------- | ------------------------------------------- |
-| Date        | `@IsDate`                       | Value must be valid date   | `@IsDate`                                   |
-| DateAfter   | `@DateAfter(['date'])`          | Date after specified date  | `@DateAfter(['2023-01-01'])`                |
-| DateBefore  | `@DateBefore(['date'])`         | Date before specified date | `@DateBefore(['2023-12-31'])`               |
-| DateBetween | `@DateBetween(['start','end'])` | Date between range         | `@DateBetween(['2023-01-01','2023-12-31'])` |
-| DateEquals  | `@DateEquals(['date'])`         | Date equals specified date | `@DateEquals(['2023-06-15'])`               |
-| FutureDate  | `@FutureDate`                   | Date in future             | `@FutureDate`                               |
-| PastDate    | `@PastDate`                     | Date in past               | `@PastDate`                                 |
+| Rule        | Decorator                         | Description                | Example                                       |
+| ----------- | --------------------------------- | -------------------------- | --------------------------------------------- |
+| Date        | `@IsDate`                         | Value must be valid date   | `@IsDate`                                     |
+| DateAfter   | `@IsDateAfter(['date'])`          | Date after specified date  | `@IsDateAfter(['2023-01-01'])`                |
+| DateBefore  | `@IsDateBefore(['date'])`         | Date before specified date | `@IsDateBefore(['2023-12-31'])`               |
+| DateBetween | `@IsDateBetween(['start','end'])` | Date between range         | `@IsDateBetween(['2023-01-01','2023-12-31'])` |
+| SameDate    | `@IsSameDate(['date'])`           | Date equals specified date | `@IsSameDate(['2023-06-15'])`                 |
+| FutureDate  | `@IsFutureDate`                   | Date in future             | `@IsFutureDate`                               |
+| PastDate    | `@IsPastDate`                     | Date in past               | `@IsPastDate`                                 |
 
 ### File Rules
 
-| Rule          | Decorator                  | Description               | Example                     |
-| ------------- | -------------------------- | ------------------------- | --------------------------- |
-| File          | `@IsFile`                  | Value must be file object | `@IsFile`                   |
-| FileSize      | `@FileSize([bytes])`       | File exact size           | `@FileSize([1024000])`      |
-| FileType      | `@FileType(['mime'])`      | File MIME type            | `@FileType(['image/jpeg'])` |
-| Image         | `@IsImage`                 | File must be image        | `@IsImage`                  |
-| FileExtension | `@FileExtension(['.ext'])` | File extension            | `@FileExtension(['.pdf'])`  |
-| MinFileSize   | `@MinFileSize([bytes])`    | File minimum size         | `@MinFileSize([100])`       |
+| Rule          | Decorator                    | Description               | Example                       |
+| ------------- | ---------------------------- | ------------------------- | ----------------------------- |
+| File          | `@IsFile`                    | Value must be file object | `@IsFile`                     |
+| MaxFileSize   | `@MaxFileSize([bytes])`      | File exact size           | `@MaxFileSize([1024000])`     |
+| FileType      | `@IsFileType(['mime'])`      | File MIME type            | `@IsFileType(['image/jpeg'])` |
+| Image         | `@IsImage`                   | File must be image        | `@IsImage`                    |
+| FileExtension | `@IsFileExtension(['.ext'])` | File extension            | `@IsFileExtension(['.pdf'])`  |
+| MinFileSize   | `@MinFileSize([bytes])`      | File minimum size         | `@MinFileSize([100])`         |
 
 ### Format Rules
 
@@ -671,8 +671,8 @@ class ComprehensiveForm {
   // Numeric rules
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([18])
-  @IsNumberLessThanOrEqualTo([120])
+  @IsNumberGreaterThanOrEqual([18])
+  @IsNumberLessThanOrEqual([120])
   age: number;
 
   @IsRequired
@@ -714,13 +714,13 @@ class ComprehensiveForm {
   // Date rules
   @IsRequired
   @IsDate
-  @FutureDate
+  @IsFutureDate
   eventDate: string;
 
   // File rules
   @IsRequired
   @IsFile
-  @FileSize([2097152]) // 2MB max
+  @MaxFileSize([2097152]) // 2MB max
   @IsImage
   profilePicture: File;
 
@@ -1035,7 +1035,7 @@ class ProductForm {
 
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([0])
+  @IsNumberGreaterThanOrEqual([0])
   stock: number;
 
   @IsRequired
@@ -1169,13 +1169,13 @@ async function validationMiddleware(
 class PaginationParams {
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([1])
+  @IsNumberGreaterThanOrEqual([1])
   page: number;
 
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([1])
-  @IsNumberLessThanOrEqualTo([100])
+  @IsNumberGreaterThanOrEqual([1])
+  @IsNumberLessThanOrEqual([100])
   limit: number;
 
   @IsNullable
@@ -1975,8 +1975,8 @@ All rules are registered with the Validator and can be used by name:
 'Url', 'NonNullString', 'FileName', 'StartsWith[value1,value2]', 'EndsWith[value1,value2]'
 
 // Numeric rules
-'Number', 'NumberGreaterThan[n]', 'NumberGreaterThanOrEquals[n]',
-'NumberLessThan[n]', 'NumberLessThanOrEquals[n]', 'NumberEquals[n]', 'NumberNotEqual[n]'
+'Number', 'NumberGreaterThan[n]', 'NumberGreaterThanOrEqual[n]',
+'NumberLessThan[n]', 'NumberLessThanOrEqual[n]', 'NumberEqual[n]', 'NumberNotEqual[n]'
 
 // Boolean rules
 'Boolean'

@@ -310,7 +310,7 @@ Validator.registerRule("CreditCard", _CreditCard);
  */
 export const IsCreditCard = Validator.createPropertyDecorator(["CreditCard"]);
 
-function _IP({
+function _IsIP({
   value,
   ruleParams,
   fieldName,
@@ -363,7 +363,7 @@ function _IP({
     }
   });
 }
-Validator.registerRule("IP", _IP);
+Validator.registerRule("IP", _IsIP);
 
 /**
  * ### IP Rule
@@ -377,13 +377,13 @@ Validator.registerRule("IP", _IP);
  * ```typescript
  * // Class validation
  * class Server {
- *   @IP(['4']) // IPv4 only
+ *   @IsIP(['4']) // IPv4 only
  *   ipv4Address: string;
  *
- *   @IP(['6']) // IPv6 only
+ *   @IsIP(['6']) // IPv6 only
  *   ipv6Address: string;
  *
- *   @IP() // IPv4 or IPv6
+ *   @IsIP() // IPv4 or IPv6
  *   ipAddress: string;
  * }
  * ```
@@ -395,7 +395,7 @@ Validator.registerRule("IP", _IP);
  * @since 1.22.0
  * @public
  */
-export const IP = Validator.createRuleDecorator<string[]>(_IP);
+export const IsIP = Validator.createRuleDecorator<string[]>(_IsIP);
 
 function _MACAddress({
   value,
@@ -831,13 +831,13 @@ declare module "../types" {
      *
      * // Class validation
      * class Server {
-     *   @IP(['4']) // IPv4 only
+     *   @IsIP(['4']) // IPv4 only
      *   ipv4Address: string;
      *
-     *   @IP(['6']) // IPv6 only
+     *   @IsIP(['6']) // IPv6 only
      *   ipv6Address: string;
      *
-     *   @IP() // IPv4 or IPv6
+     *   @IsIP() // IPv4 or IPv6
      *   ipAddress: string;
      * }
      * ```

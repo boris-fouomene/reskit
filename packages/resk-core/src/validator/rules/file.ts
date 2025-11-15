@@ -11,6 +11,11 @@ interface FileLike {
 }
 
 function isFileLike(value: any): value is FileLike {
+  try {
+    if (typeof File !== "undefined" && File && value instanceof File) {
+      return true;
+    }
+  } catch {}
   return (
     value &&
     typeof value === "object" &&
@@ -22,7 +27,7 @@ function isFileLike(value: any): value is FileLike {
   );
 }
 
-function _File({
+function _IsFile({
   value,
   fieldName,
   translatedPropertyName,
@@ -42,7 +47,7 @@ function _File({
     }
   });
 }
-Validator.registerRule("File", _File);
+Validator.registerRule("File", _IsFile);
 
 /**
  * ### File Rule
@@ -67,7 +72,7 @@ Validator.registerRule("File", _File);
  */
 export const IsFile = Validator.createPropertyDecorator(["File"]);
 
-function _FileSize({
+function _MaxFileSize({
   value,
   ruleParams,
   fieldName,
@@ -89,7 +94,7 @@ function _FileSize({
     const maxSize = ruleParams?.[0];
     if (typeof maxSize !== "number" || maxSize < 0) {
       const message = i18n.t("validator.invalidRuleParams", {
-        rule: "FileSize",
+        rule: "MaxFileSize",
         field: translatedPropertyName || fieldName,
         ruleParams,
         ...rest,
@@ -112,10 +117,10 @@ function _FileSize({
     }
   });
 }
-Validator.registerRule("FileSize", _FileSize);
+Validator.registerRule("MaxFileSize", _MaxFileSize);
 
 /**
- * ### FileSize Rule
+ * ### MaxFileSize Rule
  *
  * Validates that the file size does not exceed the specified maximum size in bytes.
  *
@@ -126,7 +131,7 @@ Validator.registerRule("FileSize", _FileSize);
  * ```typescript
  * // Class validation - 5MB max
  * class UploadForm {
- *   @FileSize(5242880) // 5MB in bytes
+ *   @MaxFileSize(5242880) // 5MB in bytes
  *   document: File;
  * }
  * ```
@@ -138,10 +143,10 @@ Validator.registerRule("FileSize", _FileSize);
  * @since 1.22.0
  * @public
  */
-export const FileSize =
-  Validator.createRuleDecorator<[size: number]>(_FileSize);
+export const MaxFileSize =
+  Validator.createRuleDecorator<[size: number]>(_MaxFileSize);
 
-function _FileType({
+function _IsFileType({
   value,
   ruleParams,
   fieldName,
@@ -192,7 +197,7 @@ function _FileType({
     }
   });
 }
-Validator.registerRule("FileType", _FileType);
+Validator.registerRule("FileType", _IsFileType);
 
 /**
  * ### FileType Rule
@@ -206,7 +211,7 @@ Validator.registerRule("FileType", _FileType);
  * ```typescript
  * // Class validation
  * class ImageUpload {
- *   @FileType(['image/jpeg', 'image/png', 'image/gif'])
+ *   @IsFileType(['image/jpeg', 'image/png', 'image/gif'])
  *   image: File;
  * }
  * ```
@@ -218,7 +223,7 @@ Validator.registerRule("FileType", _FileType);
  * @since 1.22.0
  * @public
  */
-export const FileType = Validator.createRuleDecorator<string[]>(_FileType);
+export const IsFileType = Validator.createRuleDecorator<string[]>(_IsFileType);
 
 function _Image({
   value,
@@ -272,7 +277,7 @@ Validator.registerRule("Image", _Image);
  * ```typescript
  * // Class validation
  * class ProfilePicture {
- *   @Image
+ *   @IsImage
  *   avatar: File;
  * }
  * ```
@@ -283,9 +288,9 @@ Validator.registerRule("Image", _Image);
  * @since 1.22.0
  * @public
  */
-export const Image = Validator.createPropertyDecorator(["Image"]);
+export const IsImage = Validator.createPropertyDecorator(["Image"]);
 
-function _FileExtension({
+function _IsFileExtension({
   value,
   ruleParams,
   fieldName,
@@ -334,7 +339,7 @@ function _FileExtension({
     }
   });
 }
-Validator.registerRule("FileExtension", _FileExtension);
+Validator.registerRule("FileExtension", _IsFileExtension);
 
 /**
  * ### FileExtension Rule
@@ -348,7 +353,7 @@ Validator.registerRule("FileExtension", _FileExtension);
  * ```typescript
  * // Class validation
  * class DocumentUpload {
- *   @FileExtension(['pdf', 'doc', 'docx'])
+ *   @IsFileExtension(['pdf', 'doc', 'docx'])
  *   document: File;
  * }
  * ```
@@ -360,8 +365,8 @@ Validator.registerRule("FileExtension", _FileExtension);
  * @since 1.22.0
  * @public
  */
-export const FileExtension =
-  Validator.createRuleDecorator<string[]>(_FileExtension);
+export const IsFileExtension =
+  Validator.createRuleDecorator<string[]>(_IsFileExtension);
 
 function _MinFileSize({
   value,
@@ -480,7 +485,7 @@ declare module "../types" {
     File: IValidatorRuleFunction<[], Context>;
 
     /**
-     * ### FileSize Rule
+     * ### MaxFileSize Rule
      *
      * Validates that the file size does not exceed the specified maximum size in bytes.
      *
@@ -492,23 +497,23 @@ declare module "../types" {
      * // Valid examples
      * await Validator.validate({
      *   value: { name: 'small.txt', size: 1024, type: 'text/plain' },
-     *   rules: ['FileSize[2048]']
+     *   rules: ['MaxFileSize[2048]']
      * }); // ✓ Valid (file <= 2KB)
      *
      * // Invalid examples
      * await Validator.validate({
      *   value: { name: 'large.txt', size: 5242880, type: 'text/plain' },
-     *   rules: ['FileSize[2048]']
+     *   rules: ['MaxFileSize[2048]']
      * }); // ✗ Invalid (file > 2KB)
      *
      * await Validator.validate({
      *   value: 'not a file',
-     *   rules: ['FileSize[2048]']
+     *   rules: ['MaxFileSize[2048]']
      * }); // ✗ Invalid
      *
      * // Class validation - 5MB max
      * class UploadForm {
-     *   @FileSize(5242880) // 5MB in bytes
+     *   @MaxFileSize(5242880) // 5MB in bytes
      *   document: File;
      * }
      * ```
@@ -520,7 +525,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FileSize: IValidatorRuleFunction<[size: number], Context>;
+    MaxFileSize: IValidatorRuleFunction<[size: number], Context>;
 
     /**
      * ### FileType Rule
@@ -551,7 +556,7 @@ declare module "../types" {
      *
      * // Class validation
      * class ImageUpload {
-     *   @FileType(['image/jpeg', 'image/png', 'image/gif'])
+     *   @IsFileType(['image/jpeg', 'image/png', 'image/gif'])
      *   image: File;
      * }
      * ```
@@ -596,7 +601,7 @@ declare module "../types" {
      *
      * // Class validation
      * class ProfilePicture {
-     *   @Image
+     *   @IsImage
      *   avatar: File;
      * }
      * ```
@@ -638,7 +643,7 @@ declare module "../types" {
      *
      * // Class validation
      * class DocumentUpload {
-     *   @FileExtension(['pdf', 'doc', 'docx'])
+     *   @IsFileExtension(['pdf', 'doc', 'docx'])
      *   document: File;
      * }
      * ```

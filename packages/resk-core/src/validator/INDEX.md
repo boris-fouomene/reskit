@@ -193,7 +193,7 @@ password: string;
 ### 4. Numeric Ranges
 
 ```typescript
-@IsNumberGreaterThanOrEquals([18])
+@IsNumberGreaterThanOrEqual([18])
 age: number;
 ```
 

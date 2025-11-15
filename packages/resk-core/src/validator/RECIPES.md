@@ -188,7 +188,7 @@ class ProductForm {
 
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([0])
+  @IsNumberGreaterThanOrEqual([0])
   stock: number;
 
   @IsRequired
@@ -454,13 +454,13 @@ async function validationMiddleware(
 class PaginationParams {
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([1])
+  @IsNumberGreaterThanOrEqual([1])
   page: number;
 
   @IsRequired
   @IsNumber
-  @IsNumberGreaterThanOrEquals([1])
-  @IsNumberLessThanOrEqualTo([100])
+  @IsNumberGreaterThanOrEqual([1])
+  @IsNumberLessThanOrEqual([100])
   limit: number;
 
   @IsNullable
@@ -525,7 +525,7 @@ class Step2Form {
   lastName: string;
 
   @IsRequired
-  @IsNumberGreaterThanOrEquals([18])
+  @IsNumberGreaterThanOrEqual([18])
   age: number;
 }
 

@@ -86,21 +86,21 @@ function numberLessThanOrEquals(options: IValidatorValidateOptions<[number]>) {
   );
 }
 
-Validator.registerRule("NumberLessThanOrEquals", numberLessThanOrEquals);
+Validator.registerRule("NumberLessThanOrEqual", numberLessThanOrEquals);
 /**
- * @decorator IsNumberLessThanOrEqualTo
+ * @decorator IsNumberLessThanOrEqual
  *
  * Validator rule that checks if a number is less than or equal to a specified value.
  *
  * ### Example Usage:
  * ```typescript
  *  class MyClass {
- *      @IsNumberLessThanOrEqualTo([5])
+ *      @IsNumberLessThanOrEqual([5])
  *      myNumber: number;
  *  }
  * ```
  */
-export const IsNumberLessThanOrEqualTo = Validator.createRuleDecorator<
+export const IsNumberLessThanOrEqual = Validator.createRuleDecorator<
   [param: number]
 >(numberLessThanOrEquals);
 
@@ -156,10 +156,10 @@ function numberGreaterThanOrEquals(
     options
   );
 }
-Validator.registerRule("NumberGreaterThanOrEquals", numberGreaterThanOrEquals);
+Validator.registerRule("NumberGreaterThanOrEqual", numberGreaterThanOrEquals);
 
 /**
- * @decorator IsNumberGreaterThanOrEquals
+ * @decorator IsNumberGreaterThanOrEqual
  *
  * Validator rule that checks if a given number is greater than or equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -176,7 +176,7 @@ Validator.registerRule("NumberGreaterThanOrEquals", numberGreaterThanOrEquals);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @IsNumberGreaterThanOrEquals([5])
+ *     @IsNumberGreaterThanOrEqual([5])
  *     myNumber: number;
  * }
  * ```
@@ -185,7 +185,7 @@ Validator.registerRule("NumberGreaterThanOrEquals", numberGreaterThanOrEquals);
  * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberGreaterThanOrEquals = Validator.createRuleDecorator<
+export const IsNumberGreaterThanOrEqual = Validator.createRuleDecorator<
   [param: number]
 >(numberGreaterThanOrEquals);
 
@@ -239,10 +239,10 @@ function numberEqualsTo(options: IValidatorValidateOptions<[number]>) {
     options
   );
 }
-Validator.registerRule("NumberEquals", numberEqualsTo);
+Validator.registerRule("NumberEqual", numberEqualsTo);
 
 /**
- * @decorator  IsNumberEqualTo
+ * @decorator  IsNumberEqual
  *
  * Validator rule that checks if a given number is equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -259,7 +259,7 @@ Validator.registerRule("NumberEquals", numberEqualsTo);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ IsNumberEqualTo([10])
+ *     @ IsNumberEqual([10])
  *     myNumber: number;
  * }
  * ```
@@ -268,7 +268,7 @@ Validator.registerRule("NumberEquals", numberEqualsTo);
  * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberEqualTo =
+export const IsNumberEqual =
   Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
 
 function numberIsDifferentFromTo(options: IValidatorValidateOptions<[number]>) {

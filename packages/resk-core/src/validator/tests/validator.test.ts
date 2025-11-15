@@ -315,14 +315,14 @@ describe("Validator", () => {
       expect(result.error?.ruleName).toBe("NumberLessThan");
     });
 
-    it("should return failure for NumberEquals when value doesn't match", async () => {
+    it("should return failure for NumberEqual when value doesn't match", async () => {
       const result = await Validator.validate({
-        rules: ["NumberEquals[10]"],
+        rules: ["NumberEqual[10]"],
         value: 5,
       });
 
       expect(result.success).toBe(false);
-      expect(result.error?.ruleName).toBe("NumberEquals");
+      expect(result.error?.ruleName).toBe("NumberEqual");
     });
 
     it("should stop at first failing rule in multiple rules", async () => {
@@ -556,14 +556,14 @@ describe("Validator", () => {
   });
 
   describe("validate - Number Rules", () => {
-    it("should validate NumberGreaterThanOrEquals", async () => {
+    it("should validate NumberGreaterThanOrEqual", async () => {
       const pass = await Validator.validate({
-        rules: ["NumberGreaterThanOrEquals[10]"],
+        rules: ["NumberGreaterThanOrEqual[10]"],
         value: 10,
       });
 
       const fail = await Validator.validate({
-        rules: ["NumberGreaterThanOrEquals[10]"],
+        rules: ["NumberGreaterThanOrEqual[10]"],
         value: 9,
       });
 
@@ -571,14 +571,14 @@ describe("Validator", () => {
       expect(fail.success).toBe(false);
     });
 
-    it("should validate NumberLessThanOrEquals", async () => {
+    it("should validate NumberLessThanOrEqual", async () => {
       const pass = await Validator.validate({
-        rules: ["NumberLessThanOrEquals[10]"],
+        rules: ["NumberLessThanOrEqual[10]"],
         value: 10,
       });
 
       const fail = await Validator.validate({
-        rules: ["NumberLessThanOrEquals[10]"],
+        rules: ["NumberLessThanOrEqual[10]"],
         value: 11,
       });
 

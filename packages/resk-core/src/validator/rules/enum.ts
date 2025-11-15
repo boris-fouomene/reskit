@@ -2,7 +2,7 @@ import { IPrimitive } from "@/types";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
-function Enum<T extends IPrimitive = IPrimitive>({
+function _IsEnum<T extends IPrimitive = IPrimitive>({
   value,
   ruleParams,
   fieldName,
@@ -30,8 +30,8 @@ function Enum<T extends IPrimitive = IPrimitive>({
   }
   return true;
 }
-export const IsIsEnum = Validator.createRuleDecorator<Array<IPrimitive>>(Enum);
-Validator.registerRule("Enum", Enum);
+export const IsEnum = Validator.createRuleDecorator<Array<IPrimitive>>(_IsEnum);
+Validator.registerRule("Enum", _IsEnum);
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
     /**

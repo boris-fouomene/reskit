@@ -124,27 +124,27 @@ describe("Validator.validate() - Either Pattern Tests", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should pass NumberEquals when values match", async () => {
+    it("should pass NumberEqual when values match", async () => {
       const result = await Validator.validate({
-        rules: ["NumberEquals[42]"],
+        rules: ["NumberEqual[42]"],
         value: 42,
       });
 
       expect(result.success).toBe(true);
     });
 
-    it("should pass NumberGreaterThanOrEquals at boundary", async () => {
+    it("should pass NumberGreaterThanOrEqual at boundary", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThanOrEquals[10]"],
+        rules: ["NumberGreaterThanOrEqual[10]"],
         value: 10,
       });
 
       expect(result.success).toBe(true);
     });
 
-    it("should pass NumberLessThanOrEquals at boundary", async () => {
+    it("should pass NumberLessThanOrEqual at boundary", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThanOrEquals[10]"],
+        rules: ["NumberLessThanOrEqual[10]"],
         value: 10,
       });
 
@@ -283,15 +283,15 @@ describe("Validator.validate() - Either Pattern Tests", () => {
       }
     });
 
-    it("should fail NumberEquals when values don't match", async () => {
+    it("should fail NumberEqual when values don't match", async () => {
       const result = await Validator.validate({
-        rules: ["NumberEquals[42]"],
+        rules: ["NumberEqual[42]"],
         value: 10,
       });
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error?.ruleName).toBe("NumberEquals");
+        expect(result.error?.ruleName).toBe("NumberEqual");
       }
     });
 
@@ -331,18 +331,18 @@ describe("Validator.validate() - Either Pattern Tests", () => {
       }
     });
 
-    it("should fail NumberGreaterThanOrEquals at boundary minus one", async () => {
+    it("should fail NumberGreaterThanOrEqual at boundary minus one", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThanOrEquals[10]"],
+        rules: ["NumberGreaterThanOrEqual[10]"],
         value: 9,
       });
 
       expect(result.success).toBe(false);
     });
 
-    it("should fail NumberLessThanOrEquals at boundary plus one", async () => {
+    it("should fail NumberLessThanOrEqual at boundary plus one", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThanOrEquals[10]"],
+        rules: ["NumberLessThanOrEqual[10]"],
         value: 11,
       });
 

@@ -384,7 +384,7 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a number is less than or equals a specified value.
    */
-  NumberLessThanOrEquals: IValidatorRuleFunction<[number], Context>;
+  NumberLessThanOrEqual: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is less than a specified value.
@@ -394,7 +394,7 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a number is greater than or equals a specified value.
    */
-  NumberGreaterThanOrEquals: IValidatorRuleFunction<[number], Context>;
+  NumberGreaterThanOrEqual: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is greater than a specified value.
@@ -404,7 +404,7 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a number is equal to a specified value.
    */
-  NumberEquals: IValidatorRuleFunction<[number], Context>;
+  NumberEqual: IValidatorRuleFunction<[number], Context>;
 
   /**
    * Validator rule that checks if a number is different from a specified value.

@@ -106,7 +106,7 @@ import {
   IsDate,
   FutureDate,
   IsFile,
-  FileSize,
+  MaxFileSize,
   IsUUID,
 } from "resk-core";
 
@@ -125,7 +125,7 @@ const dateResult = await Validator.validate({
 // File validation (with file object)
 const fileResult = await Validator.validate({
   value: fileObject,
-  rules: ["File", "FileSize[1024000]"], // Max 1MB
+  rules: ["File", "MaxFileSize[1024000]"], // Max 1MB
 });
 
 // Format validation
@@ -142,11 +142,11 @@ class ProductForm {
   tags: string[];
 
   @IsDate
-  @FutureDate
+  @IsFutureDate
   releaseDate: string;
 
   @IsFile
-  @FileSize([2097152]) // 2MB max
+  @MaxFileSize([2097152]) // 2MB max
   image: File;
 
   @IsUUID
@@ -402,15 +402,15 @@ class UserProfile {
 
 ### Numeric Rules
 
-| Rule                          | Parameters | Description            | Example                              |
-| ----------------------------- | ---------- | ---------------------- | ------------------------------------ |
-| **Number**                    | None       | Value must be a number | `@IsNumber`                          |
-| **NumberGreaterThan**         | `[number]` | Value > N              | `@IsNumberGreaterThan([0])`          |
-| **NumberGreaterThanOrEquals** | `[number]` | Value >= N             | `@IsNumberGreaterThanOrEquals([18])` |
-| **NumberLessThan**            | `[number]` | Value < N              | `@IsNumberLessThan([100])`           |
-| **NumberLessThanOrEquals**    | `[number]` | Value <= N             | `@IsNumberLessThanOrEqualTo([100])`  |
-| **NumberEquals**              | `[number]` | Value === N            | `@ IsNumberEqualTo([42])`            |
-| **NumberIsDifferentFrom**     | `[number]` | Value !== N            | `@IsNumberNotEqual([0])`             |
+| Rule                         | Parameters | Description            | Example                             |
+| ---------------------------- | ---------- | ---------------------- | ----------------------------------- |
+| **Number**                   | None       | Value must be a number | `@IsNumber`                         |
+| **NumberGreaterThan**        | `[number]` | Value > N              | `@IsNumberGreaterThan([0])`         |
+| **NumberGreaterThanOrEqual** | `[number]` | Value >= N             | `@IsNumberGreaterThanOrEqual([18])` |
+| **NumberLessThan**           | `[number]` | Value < N              | `@IsNumberLessThan([100])`          |
+| **NumberLessThanOrEqual**    | `[number]` | Value <= N             | `@IsNumberLessThanOrEqual([100])`   |
+| **NumberEqual**              | `[number]` | Value === N            | `@ IsNumberEqual([42])`             |
+| **NumberIsDifferentFrom**    | `[number]` | Value !== N            | `@IsNumberNotEqual([0])`            |
 
 ### Boolean Rules
 
@@ -453,26 +453,26 @@ class UserProfile {
 
 ### Date Rules
 
-| Rule            | Parameters     | Description                              | Example                                      |
-| --------------- | -------------- | ---------------------------------------- | -------------------------------------------- |
-| **Date**        | None           | Value must be a valid date               | `@IsDate`                                    |
-| **DateAfter**   | `[date]`       | Date must be after the specified date    | `@DateAfter(['2023-01-01'])`                 |
-| **DateBefore**  | `[date]`       | Date must be before the specified date   | `@DateBefore(['2023-12-31'])`                |
-| **DateBetween** | `[start, end]` | Date must be between start and end dates | `@DateBetween(['2023-01-01', '2023-12-31'])` |
-| **DateEquals**  | `[date]`       | Date must equal the specified date       | `@DateEquals(['2023-06-15'])`                |
-| **FutureDate**  | None           | Date must be in the future               | `@FutureDate`                                |
-| **PastDate**    | None           | Date must be in the past                 | `@PastDate`                                  |
+| Rule            | Parameters     | Description                              | Example                                        |
+| --------------- | -------------- | ---------------------------------------- | ---------------------------------------------- |
+| **Date**        | None           | Value must be a valid date               | `@IsDate`                                      |
+| **DateAfter**   | `[date]`       | Date must be after the specified date    | `@IsDateAfter(['2023-01-01'])`                 |
+| **DateBefore**  | `[date]`       | Date must be before the specified date   | `@IsDateBefore(['2023-12-31'])`                |
+| **DateBetween** | `[start, end]` | Date must be between start and end dates | `@IsDateBetween(['2023-01-01', '2023-12-31'])` |
+| **SameDate**    | `[date]`       | Date must equal the specified date       | `@IsSameDate(['2023-06-15'])`                  |
+| **FutureDate**  | None           | Date must be in the future               | `@IsFutureDate`                                |
+| **PastDate**    | None           | Date must be in the past                 | `@IsPastDate`                                  |
 
 ### File Rules
 
-| Rule              | Parameters    | Description                            | Example                     |
-| ----------------- | ------------- | -------------------------------------- | --------------------------- |
-| **File**          | None          | Value must be a valid file object      | `@IsFile`                   |
-| **FileSize**      | `[bytes]`     | File size must be exactly N bytes      | `@FileSize([1024])`         |
-| **FileType**      | `[mimeType]`  | File must have the specified MIME type | `@FileType(['image/jpeg'])` |
-| **Image**         | None          | File must be a valid image             | `@IsImage`                  |
-| **FileExtension** | `[extension]` | File must have the specified extension | `@FileExtension(['.jpg'])`  |
-| **MinFileSize**   | `[bytes]`     | File size must be at least N bytes     | `@MinFileSize([100])`       |
+| Rule              | Parameters    | Description                            | Example                       |
+| ----------------- | ------------- | -------------------------------------- | ----------------------------- |
+| **File**          | None          | Value must be a valid file object      | `@IsFile`                     |
+| **MaxFileSize**   | `[bytes]`     | File size must be exactly N bytes      | `@MaxFileSize([1024])`        |
+| **FileType**      | `[mimeType]`  | File must have the specified MIME type | `@IsFileType(['image/jpeg'])` |
+| **Image**         | None          | File must be a valid image             | `@IsImage`                    |
+| **FileExtension** | `[extension]` | File must have the specified extension | `@IsFileExtension(['.jpg'])`  |
+| **MinFileSize**   | `[bytes]`     | File size must be at least N bytes     | `@MinFileSize([100])`         |
 
 ### Format Rules
 
@@ -879,7 +879,7 @@ import {
   IsEmail,
   IsMinLength,
   IsMaxLength,
-  IsNumberGreaterThanOrEquals,
+  IsNumberGreaterThanOrEqual,
 } from "resk-core";
 
 class RegistrationForm {
@@ -899,7 +899,7 @@ class RegistrationForm {
   username: string;
 
   @IsRequired
-  @IsNumberGreaterThanOrEquals([18])
+  @IsNumberGreaterThanOrEqual([18])
   age: number;
 
   @IsNullable

@@ -142,7 +142,7 @@ Validator.registerRule("DateAfter", _DateAfter);
  * ```typescript
  * // Class validation
  * class Event {
- *   @DateAfter(new Date('2024-01-01'))
+ *   @IsDateAfter(new Date('2024-01-01'))
  *   eventDate: Date;
  * }
  * ```
@@ -154,7 +154,7 @@ Validator.registerRule("DateAfter", _DateAfter);
  * @since 1.22.0
  * @public
  */
-export const DateAfter =
+export const IsDateAfter =
   Validator.createRuleDecorator<[date: string | Date]>(_DateAfter);
 
 function _DateBefore({
@@ -241,7 +241,7 @@ Validator.registerRule("DateBefore", _DateBefore);
  * ```typescript
  * // Class validation
  * class Deadline {
- *   @DateBefore(new Date('2024-12-31'))
+ *   @IsDateBefore(new Date('2024-12-31'))
  *   submissionDate: Date;
  * }
  * ```
@@ -253,7 +253,7 @@ Validator.registerRule("DateBefore", _DateBefore);
  * @since 1.22.0
  * @public
  */
-export const DateBefore =
+export const IsDateBefore =
   Validator.createRuleDecorator<[date: string | Date]>(_DateBefore);
 
 function _DateBetween({
@@ -349,7 +349,7 @@ Validator.registerRule("DateBetween", _DateBetween);
  * ```typescript
  * // Class validation
  * class Vacation {
- *   @DateBetween(new Date('2024-01-01'), new Date('2024-12-31'))
+ *   @IsDateBetween(new Date('2024-01-01'), new Date('2024-12-31'))
  *   vacationDate: Date;
  * }
  * ```
@@ -361,12 +361,12 @@ Validator.registerRule("DateBetween", _DateBetween);
  * @since 1.22.0
  * @public
  */
-export const DateBetween =
+export const IsDateBetween =
   Validator.createRuleDecorator<
     [minDate: string | Date, maxDate: string | Date]
   >(_DateBetween);
 
-function _DateEquals({
+function _IsSameDate({
   value,
   ruleParams,
   fieldName,
@@ -403,7 +403,7 @@ function _DateEquals({
 
     if (!ruleParams) {
       const message = i18n.t("validator.invalidRuleParams", {
-        rule: "DateEquals",
+        rule: "SameDate",
         field: translatedPropertyName || fieldName,
         ruleParams,
         ...rest,
@@ -415,7 +415,7 @@ function _DateEquals({
       ruleParams[0] instanceof Date ? ruleParams[0] : new Date(ruleParams[0]);
     if (isNaN(compareDate.getTime())) {
       const message = i18n.t("validator.invalidRuleParams", {
-        rule: "DateEquals",
+        rule: "SameDate",
         field: translatedPropertyName || fieldName,
         ruleParams,
         ...rest,
@@ -448,10 +448,10 @@ function _DateEquals({
     }
   });
 }
-Validator.registerRule("DateEquals", _DateEquals);
+Validator.registerRule("SameDate", _IsSameDate);
 
 /**
- * ### DateEquals Rule
+ * ### SameDate Rule
  *
  * Validates that the date equals the specified date (compares date part only, ignores time).
  *
@@ -462,7 +462,7 @@ Validator.registerRule("DateEquals", _DateEquals);
  * ```typescript
  * // Class validation
  * class Birthday {
- *   @DateEquals(new Date('1990-01-01'))
+ *   @IsSameDate(new Date('1990-01-01'))
  *   birthDate: Date;
  * }
  * ```
@@ -474,10 +474,10 @@ Validator.registerRule("DateEquals", _DateEquals);
  * @since 1.22.0
  * @public
  */
-export const DateEquals =
-  Validator.createRuleDecorator<[string | Date]>(_DateEquals);
+export const IsSameDate =
+  Validator.createRuleDecorator<[string | Date]>(_IsSameDate);
 
-function _FutureDate({
+function _IsFutureDate({
   value,
   fieldName,
   translatedPropertyName,
@@ -522,10 +522,10 @@ function _FutureDate({
     }
   });
 }
-Validator.registerRule("FutureDate", _FutureDate);
+Validator.registerRule("FutureDate", _IsFutureDate);
 
 /**
- * ### FutureDate Rule
+ * ### IsFutureDate Rule
  *
  * Validates that the date is in the future.
  *
@@ -533,7 +533,7 @@ Validator.registerRule("FutureDate", _FutureDate);
  * ```typescript
  * // Class validation
  * class Appointment {
- *   @FutureDate
+ *   @IsFutureDate
  *   appointmentDate: Date;
  * }
  * ```
@@ -544,9 +544,11 @@ Validator.registerRule("FutureDate", _FutureDate);
  * @since 1.22.0
  * @public
  */
-export const FutureDate = Validator.createPropertyDecorator<[]>(["FutureDate"]);
+export const IsFutureDate = Validator.createPropertyDecorator<[]>([
+  "FutureDate",
+]);
 
-function _PastDate({
+function _IsPassDate({
   value,
   fieldName,
   translatedPropertyName,
@@ -591,7 +593,7 @@ function _PastDate({
     }
   });
 }
-Validator.registerRule("PastDate", _PastDate);
+Validator.registerRule("PastDate", _IsPassDate);
 
 /**
  * ### PastDate Rule
@@ -602,7 +604,7 @@ Validator.registerRule("PastDate", _PastDate);
  * ```typescript
  * // Class validation
  * class HistoricalEvent {
- *   @PastDate
+ *   @IsPastDate
  *   eventDate: Date;
  * }
  * ```
@@ -613,7 +615,7 @@ Validator.registerRule("PastDate", _PastDate);
  * @since 1.22.0
  * @public
  */
-export const PastDate = Validator.createPropertyDecorator<[]>(["PastDate"]);
+export const IsPastDate = Validator.createPropertyDecorator<[]>(["PastDate"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -654,7 +656,7 @@ declare module "../types" {
      * // Class validation
      * class Event {
      *   @Required
-     *   @Date
+     *   @IsDate
      *   eventDate: Date;
      * }
      * ```
@@ -701,7 +703,7 @@ declare module "../types" {
      *
      * // Class validation
      * class Event {
-     *   @DateAfter(new Date('2024-01-01'))
+     *   @IsDateAfter(new Date('2024-01-01'))
      *   eventDate: Date;
      * }
      * ```
@@ -749,7 +751,7 @@ declare module "../types" {
      *
      * // Class validation
      * class Deadline {
-     *   @DateBefore(new Date('2024-12-31'))
+     *   @IsDateBefore(new Date('2024-12-31'))
      *   submissionDate: Date;
      * }
      * ```
@@ -798,7 +800,7 @@ declare module "../types" {
      *
      * // Class validation
      * class Vacation {
-     *   @DateBetween(new Date('2024-01-01'), new Date('2024-12-31'))
+     *   @IsDateBetween(new Date('2024-01-01'), new Date('2024-12-31'))
      *   vacationDate: Date;
      * }
      * ```
@@ -816,7 +818,7 @@ declare module "../types" {
     >;
 
     /**
-     * ### DateEquals Rule
+     * ### SameDate Rule
      *
      * Validates that the date equals the specified date (compares date part only, ignores time).
      *
@@ -828,28 +830,28 @@ declare module "../types" {
      * // Valid examples
      * await Validator.validate({
      *   value: new Date('2024-01-01T10:30:00'),
-     *   rules: ['DateEquals[2024-01-01]']
+     *   rules: ['SameDate[2024-01-01]']
      * }); // ✓ Valid (time ignored)
      *
      * await Validator.validate({
      *   value: '2024-01-01',
-     *   rules: ['DateEquals[2024-01-01]']
+     *   rules: ['SameDate[2024-01-01]']
      * }); // ✓ Valid
      *
      * // Invalid examples
      * await Validator.validate({
      *   value: new Date('2024-01-02'),
-     *   rules: ['DateEquals[2024-01-01]']
+     *   rules: ['SameDate[2024-01-01]']
      * }); // ✗ Invalid
      *
      * await Validator.validate({
      *   value: '2024-01-01T10:30:00',
-     *   rules: ['DateEquals[2024-01-02]']
+     *   rules: ['SameDate[2024-01-02]']
      * }); // ✗ Invalid
      *
      * // Class validation
      * class Birthday {
-     *   @DateEquals(new Date('1990-01-01'))
+     *   @IsSameDate(new Date('1990-01-01'))
      *   birthDate: Date;
      * }
      * ```
@@ -861,7 +863,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateEquals: IValidatorRuleFunction<[date: string | Date], Context>;
+    SameDate: IValidatorRuleFunction<[date: string | Date], Context>;
 
     /**
      * ### FutureDate Rule
@@ -894,7 +896,7 @@ declare module "../types" {
      *
      * // Class validation
      * class Appointment {
-     *   @FutureDate
+     *   @IsFutureDate
      *   appointmentDate: Date;
      * }
      * ```
@@ -938,7 +940,7 @@ declare module "../types" {
      *
      * // Class validation
      * class HistoricalEvent {
-     *   @PastDate
+     *   @IsPastDate
      *   eventDate: Date;
      * }
      * ```

@@ -24,7 +24,7 @@ describe("Validator Rules", () => {
 
   describe("numberLessThanOrEquals 5, and 10", () => {
     it("should validate if the number 5 is less than  or equal to the specified value 10", async () => {
-      const result = await Validator.getRules().NumberLessThanOrEquals({
+      const result = await Validator.getRules().NumberLessThanOrEqual({
         value: 5,
         ruleParams: [10],
         i18n,
@@ -44,9 +44,9 @@ describe("Validator Rules", () => {
     });
   });
 
-  describe("NumberGreaterThanOrEquals", () => {
+  describe("NumberGreaterThanOrEqual", () => {
     it("should validate if the number is greater than or equal to the specified value", async () => {
-      const result = await Validator.getRules().NumberGreaterThanOrEquals({
+      const result = await Validator.getRules().NumberGreaterThanOrEqual({
         value: 10,
         ruleParams: [5],
         i18n,
@@ -68,7 +68,7 @@ describe("Validator Rules", () => {
 
   describe("numberEquals", () => {
     it("should validate if the number is equal to the specified value", async () => {
-      const result = await Validator.getRules().NumberEquals({
+      const result = await Validator.getRules().NumberEqual({
         value: 10,
         ruleParams: [10],
         i18n,

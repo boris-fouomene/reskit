@@ -137,28 +137,16 @@ export class JsonHelper {
         // Not a JSON string: return original input
         return jsonStr;
       }
-    } else {
-      // If the value is an object, recursively parse each property
-      if (jsonStr && typeof jsonStr === "object") {
-        for (const i in jsonStr) {
-          const json = jsonStr[i];
-          if (JsonHelper.isJSON(json)) {
-            jsonStr[i] = JsonHelper.parse(json, reviver);
-          }
-        }
-      }
-      return jsonStr;
     }
-
-    // After parsing string into a value, if it's an object, recurse inside
+    // If the value is an object, recursively parse each property
     if (jsonStr && typeof jsonStr === "object") {
       for (const i in jsonStr) {
-        jsonStr[i] = JsonHelper.parse(jsonStr[i], reviver);
+        const json = jsonStr[i];
+        if (JsonHelper.isJSON(json)) {
+          jsonStr[i] = JsonHelper.parse(json, reviver);
+        }
       }
     }
-    /**
-     * Return the parsed object.
-     */
     return jsonStr;
   }
 }

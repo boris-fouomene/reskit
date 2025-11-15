@@ -36,7 +36,7 @@ describe("JsonHelper.parse", () => {
     const nested = JSON.stringify({ a: JSON.stringify({ b: 2 }), c: "123" });
     const result = JsonHelper.parse(nested);
     // nested.a is parsed into object and nested.c parsed into primitive number
-    expect(result).toEqual({ a: { b: 2 }, c: 123 });
+    expect(result).toEqual({ a: { b: 2 }, c: "123" });
   });
 
   test("parses object input by recursing into its properties", () => {

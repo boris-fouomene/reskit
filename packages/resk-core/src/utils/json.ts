@@ -141,7 +141,10 @@ export class JsonHelper {
       // If the value is an object, recursively parse each property
       if (jsonStr && typeof jsonStr === "object") {
         for (const i in jsonStr) {
-          jsonStr[i] = JsonHelper.parse(jsonStr[i], reviver);
+          const json = jsonStr[i];
+          if (JsonHelper.isJSON(json)) {
+            jsonStr[i] = JsonHelper.parse(json, reviver);
+          }
         }
       }
       return jsonStr;

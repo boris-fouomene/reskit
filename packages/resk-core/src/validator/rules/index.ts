@@ -445,7 +445,7 @@ Validator.registerRule("MinLength", minLength);
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
 export const MinLength =
-  Validator.createRuleDecorator<[minLength: string]>(minLength);
+  Validator.createRuleDecorator<[minLength: number]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
   let { value, ruleParams, i18n } = options;

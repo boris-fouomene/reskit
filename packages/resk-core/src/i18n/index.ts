@@ -349,7 +349,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @returns The singleton I18n instance.
    */
   static getInstance(options?: I18nOptions): I18n {
-    if (!I18n.instance) {
+    if (!I18n.instance || !(I18n.instance instanceof I18n)) {
       const locale = I18n.getLocaleFromSession();
       I18n.instance = this.createInstance(
         {},
@@ -764,6 +764,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     return new Promise((resolve, reject) => {
       this._isLoading = true;
       this.trigger("namespaces-before-load", locale);
+      console.log("setting i18n locale to ", locale);
       return this.loadNamespaces(locale)
         .then((translations) => {
           if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {

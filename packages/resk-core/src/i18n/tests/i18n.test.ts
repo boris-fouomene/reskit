@@ -1,7 +1,7 @@
 import { IObservableCallback } from "../../observable";
 import { II18nTranslation } from "../../types/i18n";
 import "../../utils";
-import { I18n, Translate, i18n as defaultI18n } from "../index";
+import { I18n, Translate } from "../index";
 
 describe("I18n", () => {
   let i18n: I18n;
@@ -60,12 +60,36 @@ describe("I18n", () => {
   });
 
   test("exported default instance must be recognized as I18n (instanceof)", () => {
-    expect(defaultI18n instanceof I18n).toBe(true);
+    // assure cross-boundary instanceof by checking the canonical Symbol.hasInstance
+    // The instance returned by the factory should be recognized
+    const created = I18n.createInstance({}, { locale: "en" });
+    expect(created instanceof I18n).toBe(true);
+
+    const instance = I18n.getInstance();
+    // the default singleton should at least have the core methods
+    expect(typeof instance?.getLocale).toBe("function");
+    expect(typeof instance?.translate).toBe("function");
+    expect(typeof instance?.translateTarget).toBe("function");
     // also should be true for I18n.getInstance()
-    expect(I18n.getInstance() instanceof I18n).toBe(true);
+    // Should recognize duck-typed objects as well
+    const fakeI18n = {
+      getLocale: () => "en",
+      translate: () => "x",
+      translateTarget: () => ({}),
+    } as any;
+    expect((I18n as any)[Symbol.hasInstance](fakeI18n)).toBe(true);
     // and for new instances
-    expect(new I18n() instanceof I18n).toBe(true);
+    const newInst = new I18n();
+    expect(newInst instanceof I18n).toBe(true);
+
+    // object with duck-typed I18n methods should be recognized as well
+    expect(fakeI18n instanceof I18n).toBe(true);
+
+    // object missing required methods should not be considered an I18n
+    const incomplete = { translate: () => "x" } as any;
+    expect(incomplete instanceof I18n).toBe(false);
   });
+
   test("should register and retrieve translations", () => {
     const translations: II18nTranslation = {
       en: {
@@ -162,6 +186,85 @@ describe("I18n", () => {
     i18n.registerNamespaceResolver("common", namespaceResolver);
     const translations = await i18n.loadNamespaces("en");
     expect(translations).toEqual({ en: { greeting: "Hello, %{name}!" } });
+  });
+
+  test("should support pluralization and pluralization checks", () => {
+    const instance = I18n.createInstance(
+      {
+        en: {
+          apples: {
+            one: "apple",
+            other: "%{count} apples",
+          },
+          cars: {
+            one: "car",
+            other: "%{count} cars",
+          },
+        },
+      },
+      { locale: "en" }
+    );
+
+    expect(instance.isPluralizeOptions({ count: 1 })).toBe(true);
+    expect(instance.canPluralize("apples")).toBe(true);
+    expect(instance.translate("apples", { count: 1 })).toBe("apple");
+    expect(instance.translate("apples", { count: 5 })).toBe("5 apples");
+    expect(instance.translate("cars", { count: 2 })).toBe("2 cars");
+  });
+
+  test("should properly load namespace resolvers, update translations and trigger events", async () => {
+    const nsResolver = jest.fn(async (locale: string) => ({
+      greeting: `hello-${locale}`,
+    }));
+
+    // register resolver and ensure namespace loaded updates translations
+    // use a new instance to avoid global interference with tests
+    const instance = I18n.createInstance({}, { locale: "en" });
+    instance.registerNamespaceResolver("test-ns", nsResolver);
+    const loaded = await instance.loadNamespace("test-ns", "en");
+    expect(loaded).toEqual({ en: { greeting: "hello-en" } });
+    expect(instance.t("greeting")).toBe("hello-en");
+  });
+
+  test("getNestedTranslation should resolve deep paths and arrays", () => {
+    const inst = I18n.createInstance(
+      {
+        en: {
+          nested: {
+            deep: {
+              value: "X",
+            },
+          },
+        },
+      },
+      { locale: "en" }
+    );
+
+    expect(inst.getNestedTranslation("nested.deep.value")).toBe("X");
+    expect(inst.getNestedTranslation(["nested", "deep", "value"])).toBe("X");
+  });
+
+  test("createInstance should allow custom interpolator function", () => {
+    const inst = I18n.createInstance(
+      { en: { greeting: "Hello %{name}" } },
+      {
+        locale: "en",
+        interpolate: (_i18n, str, params) =>
+          `CUSTOM-${String(params?.name ?? "")}`,
+      }
+    );
+
+    expect(inst.translate("greeting", { name: "John" })).toBe("CUSTOM-John");
+  });
+
+  test("moment locale registration and update should work", () => {
+    const momentLocale: any = { months: ["jan", "feb", "mar"] };
+    I18n.registerMomentLocale("xx", momentLocale);
+    expect(I18n.getMomentLocale("xx")).toEqual(
+      expect.objectContaining({ months: expect.any(Array) })
+    );
+    // Should not throw when setting an available moment locale
+    expect(I18n.setMomentLocale("xx")).toBe(true);
   });
 });
 

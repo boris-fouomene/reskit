@@ -611,7 +611,6 @@ export interface IValidatorRulesMap<Context = unknown> {
  *
  * @public
  * @since 1.0.0
- * @see {@link Validator.validate} - Method that accepts these options
  * @see {@link IValidatorRule} - Rule interface
  * @see {@link BaseData} - Base properties (value, data, context)
  */

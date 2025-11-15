@@ -1,17 +1,30 @@
-import "reflect-metadata";
-import { isNonNullString } from "@utils/isNonNullString";
-import { I18nEvent, II18nTranslation } from "../types/i18n";
-import { extendObj, isObj } from "@utils/object";
-import { IObservable, IObservableCallback, observableFactory } from "@/observable";
-import { Dict, I18n as I18nJs, I18nOptions, Scope, TranslateOptions } from "i18n-js";
-import { defaultStr } from "@utils/defaultStr";
-import { stringify } from "@utils/stringify";
+import {
+  IObservable,
+  IObservableCallback,
+  observableFactory,
+} from "@/observable";
+import {
+  createPropertyDecorator,
+  getDecoratedProperties,
+} from "@/resources/decorators";
 import { Session as session } from "@session/index";
-import { IDict } from "../types/index";
-import moment, { LocaleSpecification } from "moment";
-import { createPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
-import { isPrimitive } from "@utils/isPrimitive";
+import { defaultStr } from "@utils/defaultStr";
+import { isNonNullString } from "@utils/isNonNullString";
 import { isNullable } from "@utils/isNullable";
+import { isPrimitive } from "@utils/isPrimitive";
+import { extendObj, isObj } from "@utils/object";
+import { stringify } from "@utils/stringify";
+import {
+  Dict,
+  I18n as I18nJs,
+  I18nOptions,
+  Scope,
+  TranslateOptions,
+} from "i18n-js";
+import moment, { LocaleSpecification } from "moment";
+import "reflect-metadata";
+import { I18nEvent, II18nTranslation } from "../types/i18n";
+import { IDict } from "../types/index";
 /**
  * A key to store metadata for translations.
  */
@@ -65,6 +78,28 @@ export function Translate(key: string): PropertyDecorator & MethodDecorator {
  */
 export class I18n extends I18nJs implements IObservable<I18nEvent> {
   /**
+   * Custom instanceof check. When consumers import `I18n` from built packages or
+   * across module boundaries, class identity can differ. Using Symbol.hasInstance
+   * allows `instanceof I18n` to succeed if the object has the required i18n API
+   * shape (duck typing). This preserves `instanceof` checks externally while
+   * keeping the current exported API intact.
+   */
+  static [Symbol.hasInstance](obj: any) {
+    if (!obj || typeof obj !== "object") return false;
+    // If it's an actual instance of the native i18n-js class, consider true
+    try {
+      if (obj instanceof (I18nJs as any)) return true;
+    } catch (e) {
+      // ignore cross-realm issues
+    }
+    // Fallback to duck-typing verification: check for i18n-like methods used in the codebase
+    return (
+      typeof obj.getLocale === "function" &&
+      typeof obj.translate === "function" &&
+      typeof obj.translateTarget === "function"
+    );
+  }
+  /**
    * Translates the given scope with the provided options.
    * If the scope is a string and the options include pluralization, the method will pluralize the translation.
    * Otherwise, it will call the parent `translate` method.
@@ -107,7 +142,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param options The translation options.
    * @returns The translated keys.
    */
-  translateTarget<T extends { new (...args: any[]): {} } = any>(target: T, options?: TranslateOptions): Record<keyof T, string> {
+  translateTarget<T extends { new (...args: any[]): {} } = any>(
+    target: T,
+    options?: TranslateOptions
+  ): Record<keyof T, string> {
     const translationKeys = I18n.getTargetTanslationKeys(target);
     for (let i in translationKeys) {
       if (isNonNullString(translationKeys[i])) {
@@ -193,7 +231,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    *
    * @since 1.20.3
    */
-  translateObject<T extends Record<string, string> = any>(object: T, options?: TranslateOptions): T {
+  translateObject<T extends Record<string, string> = any>(
+    object: T,
+    options?: TranslateOptions
+  ): T {
     if (!isObj(object)) return {} as T;
     const translatedKeys: T = {} as T;
     for (const key in object) {
@@ -209,7 +250,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param target the target class
    * @returns the translation keys for the target class
    */
-  static getTargetTanslationKeys<T extends { new (...args: any[]): {} } = any>(target: T): Record<keyof T, string> {
+  static getTargetTanslationKeys<T extends { new (...args: any[]): {} } = any>(
+    target: T
+  ): Record<keyof T, string> {
     return getDecoratedProperties(target, TRANSLATION_KEY);
   }
   private _isLoading: boolean = false;
@@ -220,7 +263,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
   /**
    * Namespace resolvers for loading translations.
    */
-  private namespaceResolvers: Record<string, (locale: string) => Promise<II18nTranslation>> = {};
+  private namespaceResolvers: Record<
+    string,
+    (locale: string) => Promise<II18nTranslation>
+  > = {};
   /**
    * Singleton instance of the I18n class.
    */
@@ -230,7 +276,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * Creates an instance of the I18n class.
    * @param options Optional configuration options for the I18n instance.
    */
-  constructor(translations: II18nTranslation = {}, options: Partial<I18nOptions> = {}) {
+  constructor(
+    translations: II18nTranslation = {},
+    options: Partial<I18nOptions> = {}
+  ) {
     super(translations, options);
     this.loadNamespaces();
   }
@@ -302,7 +351,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
   static getInstance(options?: I18nOptions): I18n {
     if (!I18n.instance) {
       const locale = I18n.getLocaleFromSession();
-      I18n.instance = this.createInstance({}, Object.assign({}, locale ? { locale } : {}, options));
+      I18n.instance = this.createInstance(
+        {},
+        Object.assign({}, locale ? { locale } : {}, options)
+      );
     }
     return I18n.instance;
   }
@@ -384,9 +436,16 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * // Resolve translation for the "farewell" key.
    * i18n.getNestedTranslation("en", "farewell");
    */
-  getNestedTranslation(scope: Scope, locale?: string): string | IDict | undefined {
+  getNestedTranslation(
+    scope: Scope,
+    locale?: string
+  ): string | IDict | undefined {
     locale = defaultStr(locale, this.getLocale());
-    const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
+    const scopeArray = isNonNullString(scope)
+      ? scope.trim().split(".")
+      : Array.isArray(scope)
+        ? scope
+        : [];
     if (!scopeArray.length) return undefined;
     let result: any = this.getTranslations(locale);
     const canLog = scope === "dates.defaultDateFormat";
@@ -420,7 +479,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         })
     * @param translations The language translations.
     */
-  static RegisterTranslations(translations: II18nTranslation): II18nTranslation {
+  static RegisterTranslations(
+    translations: II18nTranslation
+  ): II18nTranslation {
     return I18n.getInstance().registerTranslations(translations);
   }
 
@@ -429,10 +490,26 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param options Optional configuration options for the I18n instance.
    * @returns A new I18n instance.
    */
-  static createInstance(translations: II18nTranslation = {}, options: Partial<I18nOptions> & { interpolate?: (i18n: I18nJs, str: string, params: Record<string, any>) => string } = {}): I18n {
-    const { interpolate: i18nInterpolate, ...restOptions } = Object.assign({}, options);
+  static createInstance(
+    translations: II18nTranslation = {},
+    options: Partial<I18nOptions> & {
+      interpolate?: (
+        i18n: I18nJs,
+        str: string,
+        params: Record<string, any>
+      ) => string;
+    } = {}
+  ): I18n {
+    const { interpolate: i18nInterpolate, ...restOptions } = Object.assign(
+      {},
+      options
+    );
     const i18n = new I18n(translations, restOptions);
-    i18n.interpolate = (i18n: I18nJs, str: string, params: Record<string, any>) => {
+    i18n.interpolate = (
+      i18n: I18nJs,
+      str: string,
+      params: Record<string, any>
+    ) => {
       const flattenParams = I18n.flattenObject(params);
       const formattedValue = this.defaultInterpolator(i18n, str, flattenParams);
       if (isNonNullString(formattedValue) && formattedValue !== str) {
@@ -478,9 +555,20 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @see https://momentjs.com/docs/#/i18n/ for more information on moment locales
    * @returns
    */
-  static registerMomentLocale(locale: string, momentLocale: LocaleSpecification): Record<string, LocaleSpecification> {
-    if (isNonNullString(locale) && isObj(momentLocale) && Array.isArray(momentLocale.months)) {
-      this.momentLocales[locale] = extendObj({}, this.momentLocales[locale], momentLocale);
+  static registerMomentLocale(
+    locale: string,
+    momentLocale: LocaleSpecification
+  ): Record<string, LocaleSpecification> {
+    if (
+      isNonNullString(locale) &&
+      isObj(momentLocale) &&
+      Array.isArray(momentLocale.months)
+    ) {
+      this.momentLocales[locale] = extendObj(
+        {},
+        this.momentLocales[locale],
+        momentLocale
+      );
     }
     return this.momentLocales;
   }
@@ -512,7 +600,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param translations The translations to register.
    * @returns The updated translations.
    */
-  public registerTranslations(translations: II18nTranslation): II18nTranslation {
+  public registerTranslations(
+    translations: II18nTranslation
+  ): II18nTranslation {
     this.store(translations);
     return this.getTranslations();
   }
@@ -523,7 +613,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    */
   store(translations: Dict): void {
     super.store(translations);
-    this.trigger("translations-changed", this.getLocale(), this.getTranslations());
+    this.trigger(
+      "translations-changed",
+      this.getLocale(),
+      this.getTranslations()
+    );
   }
   /**
    * Automatically resolves translations using reflect Metadata.
@@ -556,7 +650,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
           try {
             (target as any)[key] = this.translate(metadataKey);
           } catch (error) {
-            console.error(error, " resolving translation for key : ", metadataKey);
+            console.error(
+              error,
+              " resolving translation for key : ",
+              metadataKey
+            );
           }
         }
       }
@@ -572,9 +670,18 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param options - The options for the missing placeholder string.
    * @returns The missing placeholder string.
    */
-  getMissingPlaceholderString(placeholder: string, message?: string, options?: II18nTranslation) {
+  getMissingPlaceholderString(
+    placeholder: string,
+    message?: string,
+    options?: II18nTranslation
+  ) {
     if (typeof this.missingPlaceholder == "function") {
-      return this.missingPlaceholder(this, placeholder, defaultStr(message), Object.assign({}, options));
+      return this.missingPlaceholder(
+        this,
+        placeholder,
+        defaultStr(message),
+        Object.assign({}, options)
+      );
     }
     return placeholder;
   }
@@ -613,8 +720,13 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    */
   getLocales(): string[] {
     const translations = Object.keys(this.getTranslations());
-    const suportedLocales = Array.isArray(this._locales) ? this._locales : ["en"];
-    const r = [...translations, ...suportedLocales.filter((locale) => !translations.includes(locale))];
+    const suportedLocales = Array.isArray(this._locales)
+      ? this._locales
+      : ["en"];
+    const r = [
+      ...translations,
+      ...suportedLocales.filter((locale) => !translations.includes(locale)),
+    ];
     if (!r.includes("en")) {
       r.push("en");
     }
@@ -642,7 +754,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
 
   private _namespacesLoaded: Record<string, any> = {};
   setLocale(locale: string, forceUpdate: boolean = false): Promise<string> {
-    if (super.locale === locale && forceUpdate !== true && this._namespacesLoaded[locale]) {
+    if (
+      super.locale === locale &&
+      forceUpdate !== true &&
+      this._namespacesLoaded[locale]
+    ) {
       return Promise.resolve(this.getLocale());
     }
     return new Promise((resolve, reject) => {
@@ -675,9 +791,16 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    *   return await response.json();
    * });
    */
-  registerNamespaceResolver(namespace: string, resolver: (locale: string) => Promise<II18nTranslation>): void {
+  registerNamespaceResolver(
+    namespace: string,
+    resolver: (locale: string) => Promise<II18nTranslation>
+  ): void {
     if (!isNonNullString(namespace) || typeof resolver !== "function") {
-      console.warn("Invalid arguments for registerNamespaceResolver.", namespace, resolver);
+      console.warn(
+        "Invalid arguments for registerNamespaceResolver.",
+        namespace,
+        resolver
+      );
       return;
     }
     this.namespaceResolvers[namespace] = resolver;
@@ -694,17 +817,28 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    *   return await response.json();
    * });
    */
-  static RegisterNamespaceResolver(namespace: string, resolver: (locale: string) => Promise<any>): void {
+  static RegisterNamespaceResolver(
+    namespace: string,
+    resolver: (locale: string) => Promise<any>
+  ): void {
     return I18n.getInstance().registerNamespaceResolver(namespace, resolver);
   }
 
-  loadNamespace(namespace: string, locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
+  loadNamespace(
+    namespace: string,
+    locale?: string,
+    updateTranslations: boolean = true
+  ): Promise<II18nTranslation> {
     if (!isNonNullString(namespace) || !this.namespaceResolvers[namespace]) {
-      return Promise.reject(new Error(`Invalid namespace or resolver for namespace "${namespace}".`));
+      return Promise.reject(
+        new Error(`Invalid namespace or resolver for namespace "${namespace}".`)
+      );
     }
     locale = defaultStr(locale, this.getLocale());
     if (!isNonNullString(locale)) {
-      return Promise.reject(new Error(`Locale is not set. Cannot load namespace "${namespace}".`));
+      return Promise.reject(
+        new Error(`Locale is not set. Cannot load namespace "${namespace}".`)
+      );
     }
     return this.namespaceResolvers[namespace](locale).then((translations) => {
       const dict: II18nTranslation = {};
@@ -719,18 +853,32 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     });
   }
 
-  static LoadNamespace(namespace: string, locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
-    return I18n.getInstance().loadNamespace(namespace, locale, updateTranslations);
+  static LoadNamespace(
+    namespace: string,
+    locale?: string,
+    updateTranslations: boolean = true
+  ): Promise<II18nTranslation> {
+    return I18n.getInstance().loadNamespace(
+      namespace,
+      locale,
+      updateTranslations
+    );
   }
 
-  loadNamespaces(locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
+  loadNamespaces(
+    locale?: string,
+    updateTranslations: boolean = true
+  ): Promise<II18nTranslation> {
     const namespaces = [];
     const translations: II18nTranslation = {};
     locale = defaultStr(locale, this.getLocale());
     this._isLoading = true;
     //const errors : any[] = [];
     for (const namespace in this.namespaceResolvers) {
-      if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
+      if (
+        this.namespaceResolvers.hasOwnProperty(namespace) &&
+        typeof this.namespaceResolvers[namespace] === "function"
+      ) {
         namespaces.push(
           new Promise((resolve, reject) => {
             this.namespaceResolvers[namespace](locale as string)
@@ -766,7 +914,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param updateTranslations optional boolean to update the translations
    * @returns {Promise<II18nTranslation>} A promise that resolves to the combined translations for the current local
    */
-  static LoadNamespaces(locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
+  static LoadNamespaces(
+    locale?: string,
+    updateTranslations: boolean = true
+  ): Promise<II18nTranslation> {
     return I18n.getInstance().loadNamespaces(locale, updateTranslations);
   }
   static flattenObject(obj: any): TranslateOptions {
@@ -787,7 +938,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @param params Optional object containing replacement values for placeholders in the `value`.
    * @returns The interpolated string.
    */
-  private static defaultInterpolator(i18n: I18nJs, value: string, params?: Record<string, any>) {
+  private static defaultInterpolator(
+    i18n: I18nJs,
+    value: string,
+    params?: Record<string, any>
+  ) {
     if (isNullable(value)) return "";
     if (!isPrimitive(value)) {
       return stringify(value, { escapeString: false });
@@ -797,7 +952,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     if (!params) return value;
     if (!isObj(params) || !params) return value;
     return value.replace(/%{(.*?)}/g, (_, key) => {
-      return isNullable(params[key]) ? "" : isPrimitive(params[key]) ? String(params[key]) : stringify(params[key], { escapeString: false });
+      return isNullable(params[key])
+        ? ""
+        : isPrimitive(params[key])
+          ? String(params[key])
+          : stringify(params[key], { escapeString: false });
     });
   }
 }

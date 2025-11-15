@@ -1,7 +1,7 @@
-import { I18n, Translate } from "../index";
-import "../../utils";
-import { II18nTranslation } from "../../types/i18n";
 import { IObservableCallback } from "../../observable";
+import { II18nTranslation } from "../../types/i18n";
+import "../../utils";
+import { I18n, Translate, i18n as defaultI18n } from "../index";
 
 describe("I18n", () => {
   let i18n: I18n;
@@ -13,28 +13,58 @@ describe("I18n", () => {
         resources: {},
         validator: {
           length: "This field must be exactly %{length} characters long",
-          lengthRange: "This field must be between %{minLength} and %{maxLength} characters long",
-          numberLessThanOrEquals: "This field must be less than or equal to %{ruleParams[0]}",
+          lengthRange:
+            "This field must be between %{minLength} and %{maxLength} characters long",
+          numberLessThanOrEquals:
+            "This field must be less than or equal to %{ruleParams[0]}",
           numberLessThan: "This field must be less than %{ruleParams[0]}",
-          numberGreaterThanOrEquals: "This field must be greater than or equal to %{ruleParams[0]}",
+          numberGreaterThanOrEquals:
+            "This field must be greater than or equal to %{ruleParams[0]}",
           numberGreaterThan: "This field must be greater than %{ruleParams[0]}",
           noteEquals: "This field must be different from %{ruleParams[0]}",
-          numberIsDifferentFrom: "This field must be different from %{ruleParams[0]}",
+          numberIsDifferentFrom:
+            "This field must be different from %{ruleParams[0]}",
           numberEquals: "This field must be equal to %{ruleParams[0]}",
         },
       },
     });
   });
   test("sould return correct translation from validator length rules", () => {
-    expect(i18n.t("validator.length", { length: 10 })).toBe("This field must be exactly 10 characters long");
-    expect(i18n.t("validator.lengthRange", { minLength: 5, maxLength: 10 })).toBe("This field must be between 5 and 10 characters long");
-    expect(i18n.t("validator.numberLessThanOrEquals", { ruleParams: [10] })).toBe("This field must be less than or equal to 10");
-    expect(i18n.t("validator.numberLessThan", { ruleParams: [10] })).toBe("This field must be less than 10");
-    expect(i18n.t("validator.numberGreaterThanOrEquals", { ruleParams: [10] })).toBe("This field must be greater than or equal to 10");
-    expect(i18n.t("validator.numberGreaterThan", { ruleParams: [10] })).toBe("This field must be greater than 10");
-    expect(i18n.t("validator.noteEquals", { ruleParams: ["test"] })).toBe("This field must be different from test");
-    expect(i18n.t("validator.numberIsDifferentFrom", { ruleParams: [10] })).toBe("This field must be different from 10");
-    expect(i18n.t("validator.numberEquals", { ruleParams: [10] })).toBe("This field must be equal to 10");
+    expect(i18n.t("validator.length", { length: 10 })).toBe(
+      "This field must be exactly 10 characters long"
+    );
+    expect(
+      i18n.t("validator.lengthRange", { minLength: 5, maxLength: 10 })
+    ).toBe("This field must be between 5 and 10 characters long");
+    expect(
+      i18n.t("validator.numberLessThanOrEquals", { ruleParams: [10] })
+    ).toBe("This field must be less than or equal to 10");
+    expect(i18n.t("validator.numberLessThan", { ruleParams: [10] })).toBe(
+      "This field must be less than 10"
+    );
+    expect(
+      i18n.t("validator.numberGreaterThanOrEquals", { ruleParams: [10] })
+    ).toBe("This field must be greater than or equal to 10");
+    expect(i18n.t("validator.numberGreaterThan", { ruleParams: [10] })).toBe(
+      "This field must be greater than 10"
+    );
+    expect(i18n.t("validator.noteEquals", { ruleParams: ["test"] })).toBe(
+      "This field must be different from test"
+    );
+    expect(
+      i18n.t("validator.numberIsDifferentFrom", { ruleParams: [10] })
+    ).toBe("This field must be different from 10");
+    expect(i18n.t("validator.numberEquals", { ruleParams: [10] })).toBe(
+      "This field must be equal to 10"
+    );
+  });
+
+  test("exported default instance must be recognized as I18n (instanceof)", () => {
+    expect(defaultI18n instanceof I18n).toBe(true);
+    // also should be true for I18n.getInstance()
+    expect(I18n.getInstance() instanceof I18n).toBe(true);
+    // and for new instances
+    expect(new I18n() instanceof I18n).toBe(true);
   });
   test("should register and retrieve translations", () => {
     const translations: II18nTranslation = {
@@ -71,7 +101,9 @@ describe("I18n", () => {
   });
 
   test("should handle invalid namespace", async () => {
-    await expect(i18n.loadNamespace("invalid")).rejects.toThrow('Invalid namespace or resolver for namespace "invalid".');
+    await expect(i18n.loadNamespace("invalid")).rejects.toThrow(
+      'Invalid namespace or resolver for namespace "invalid".'
+    );
   });
 
   class MyComponent {

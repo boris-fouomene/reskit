@@ -362,12 +362,12 @@ if (!result.success) {
 class UserProfile {
   @IsRequired
   @IsEmail
-  @HasMaxLength([255])
+  @MaxLength([255])
   email: string;
 
   @IsRequired
   @IsMinLength([3])
-  @HasMaxLength([50])
+  @MaxLength([50])
   username: string;
 
   @IsRequired
@@ -393,7 +393,7 @@ class UserProfile {
 | **Email**           | None                      | Must be a valid email address                      | `@IsEmail`                    |
 | **MinLength**       | `[number]`                | Minimum character length                           | `@IsMinLength([8])`           |
 | **MaxLength**       | `[number]`                | Maximum character length                           | `@IsMaxLength([50])`          |
-| **Length**          | `[min, max]` or `[exact]` | Exact or range length                              | `@HasLength([3, 10])`         |
+| **Length**          | `[min, max]` or `[exact]` | Exact or range length                              | `@ Length([3, 10])`           |
 | **Url**             | None                      | Must be a valid URL                                | `@IsUrl`                      |
 | **NonNullString**   | None                      | Must be a non-empty string                         | `@IsNonNullString`            |
 | **FileName**        | None                      | Valid filename (no forbidden chars)                | `@IsFileName`                 |
@@ -408,8 +408,8 @@ class UserProfile {
 | **NumberGreaterThan**         | `[number]` | Value > N              | `@IsNumberGreaterThan([0])`          |
 | **NumberGreaterThanOrEquals** | `[number]` | Value >= N             | `@IsNumberGreaterThanOrEquals([18])` |
 | **NumberLessThan**            | `[number]` | Value < N              | `@IsNumberLessThan([100])`           |
-| **NumberLessThanOrEquals**    | `[number]` | Value <= N             | `@IsNumberLessThanOrEquals([100])`   |
-| **NumberEquals**              | `[number]` | Value === N            | `@IsNumberEquals([42])`              |
+| **NumberLessThanOrEquals**    | `[number]` | Value <= N             | `@IsNumberLessThanOrEqualTo([100])`  |
+| **NumberEquals**              | `[number]` | Value === N            | `@ IsNumberEqualTo([42])`            |
 | **NumberIsDifferentFrom**     | `[number]` | Value !== N            | `@IsNumberNotEqual([0])`             |
 
 ### Boolean Rules
@@ -435,10 +435,10 @@ class UserProfile {
 
 ### Contact Rules
 
-| Rule                   | Parameters | Description                            | Example                 |
-| ---------------------- | ---------- | -------------------------------------- | ----------------------- |
-| **PhoneNumber**        | None       | Valid phone number (uses country code) | `@IsPhoneNumber`        |
-| **EmailOrPhoneNumber** | None       | Valid email OR phone number            | `@IsEmailOrPhoneNumber` |
+| Rule                   | Parameters | Description                            | Example           |
+| ---------------------- | ---------- | -------------------------------------- | ----------------- |
+| **PhoneNumber**        | None       | Valid phone number (uses country code) | `@IsPhoneNumber`  |
+| **EmailOrPhoneNumber** | None       | Valid email OR phone number            | `@IsEmailOrPhone` |
 
 ### Array Rules
 

@@ -88,19 +88,19 @@ function numberLessThanOrEquals(options: IValidatorValidateOptions<[number]>) {
 
 Validator.registerRule("NumberLessThanOrEquals", numberLessThanOrEquals);
 /**
- * @decorator IsNumberLessThanOrEquals
+ * @decorator IsNumberLessThanOrEqualTo
  *
  * Validator rule that checks if a number is less than or equal to a specified value.
  *
  * ### Example Usage:
  * ```typescript
  *  class MyClass {
- *      @IsNumberLessThanOrEquals([5])
+ *      @IsNumberLessThanOrEqualTo([5])
  *      myNumber: number;
  *  }
  * ```
  */
-export const IsNumberLessThanOrEquals = Validator.createRuleDecorator<
+export const IsNumberLessThanOrEqualTo = Validator.createRuleDecorator<
   [param: number]
 >(numberLessThanOrEquals);
 
@@ -242,7 +242,7 @@ function numberEqualsTo(options: IValidatorValidateOptions<[number]>) {
 Validator.registerRule("NumberEquals", numberEqualsTo);
 
 /**
- * @decorator IsNumberEquals
+ * @decorator  IsNumberEqualTo
  *
  * Validator rule that checks if a given number is equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -259,7 +259,7 @@ Validator.registerRule("NumberEquals", numberEqualsTo);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @IsNumberEquals([10])
+ *     @ IsNumberEqualTo([10])
  *     myNumber: number;
  * }
  * ```
@@ -268,7 +268,7 @@ Validator.registerRule("NumberEquals", numberEqualsTo);
  * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const IsNumberEquals =
+export const IsNumberEqualTo =
   Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
 
 function numberIsDifferentFromTo(options: IValidatorValidateOptions<[number]>) {
@@ -283,7 +283,7 @@ function numberIsDifferentFromTo(options: IValidatorValidateOptions<[number]>) {
 Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
 
 /**
- * @decorator IsNumberIsDifferentFrom
+ * @decorator IsNumberDifferentFrom
  *
  * Validator rule that checks if a given number is not equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -291,12 +291,12 @@ Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @IsNumberIsDifferentFrom([10])
+ *     @IsNumberDifferentFrom([10])
  *     myNumber: number;
  * }
  * ```
  */
-export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<
+export const IsNumberDifferentFrom = Validator.createRuleDecorator<
   [param: number]
 >(numberIsDifferentFromTo);
 
@@ -345,7 +345,7 @@ function numberHasLength({
 Validator.registerRule("Length", numberHasLength);
 
 /**
- * @decorator HasLength
+ * @decorator  Length
  *
  * Validator rule that validates the length of a string. This rule checks if the length of the input string
  * falls within a specified range or matches a specific length.
@@ -365,12 +365,12 @@ Validator.registerRule("Length", numberHasLength);
  * ```typescript
  *
  * class MyClass {
- *     @HasLength([3, 10]) //"This field must be between 3 and 10 characters long"
+ *     @ Length([3, 10]) //"This field must be between 3 and 10 characters long"
  *     myString: string;
  * }
  *
  * class MyClass {
- *     @HasLength([4]) //"This field must be exactly 4 characters long"
+ *     @ Length([4]) //"This field must be exactly 4 characters long"
  *     myString: string;
  * }
  * ```
@@ -380,7 +380,7 @@ Validator.registerRule("Length", numberHasLength);
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const HasLength =
+export const Length =
   Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(
     numberHasLength
   );
@@ -417,7 +417,7 @@ function minLength(options: IValidatorValidateOptions) {
 Validator.registerRule("MinLength", minLength);
 
 /**
- * @decorator HasMinLength
+ * @decorator  MinLength
  *
  * Validator rule that checks if a given string meets a minimum length requirement.
  * This rule ensures that the input string has at least the specified number of characters.
@@ -434,7 +434,7 @@ Validator.registerRule("MinLength", minLength);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @HasMinLength([3]) //"This field must have a minimum of 3 characters"
+ *     @ MinLength([3]) //"This field must have a minimum of 3 characters"
  *     myString: string;
  * }
  * ```
@@ -444,7 +444,7 @@ Validator.registerRule("MinLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const HasMinLength =
+export const MinLength =
   Validator.createRuleDecorator<[minLength: string]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
@@ -464,7 +464,7 @@ function maxLength(options: IValidatorValidateOptions) {
 Validator.registerRule("MaxLength", maxLength);
 
 /**
- * @decorator HasMaxLength
+ * @decorator  MaxLength
  * 
  * Validator rule that checks if a given string does not exceed a maximum length.
  * This rule ensures that the input string has at most the specified number of characters.
@@ -480,9 +480,9 @@ Validator.registerRule("MaxLength", maxLength);
  * 
  * ### Example Usage:
  * ```typescript
-    import { HasMaxLength } from '@resk/core';
+    import {  MaxLength } from '@resk/core';
     class MyClass {
-        @HasMaxLength([10])
+        @ MaxLength([10])
         myProperty: string;
     }
  * ```
@@ -492,7 +492,7 @@ Validator.registerRule("MaxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const HasMaxLength =
+export const MaxLength =
   Validator.createRuleDecorator<[maxLength: number]>(maxLength);
 
 Validator.registerRule("FileName", function FileName(options) {
@@ -559,12 +559,12 @@ Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
  * @example
  * ```typescript
  * class User {
- *   @IsEmailOrPhoneNumber
+ *   @IsEmailOrPhone
  *   emailOrPhoneNumber : string;
  * }
  * ```
  */
-export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator([
+export const IsEmailOrPhone = Validator.createPropertyDecorator([
   "EmailOrPhoneNumber",
 ]);
 

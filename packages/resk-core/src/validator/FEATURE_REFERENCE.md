@@ -360,10 +360,10 @@ bio: string;
 #### Length (Exact or Range)
 
 ```typescript
-@HasLength([5])        // Exactly 5
+@ Length([5])        // Exactly 5
 name: string;
 
-@HasLength([3, 10])    // Between 3-10
+@ Length([3, 10])    // Between 3-10
 code: string;
 ```
 
@@ -462,7 +462,7 @@ percentage: number;
 #### NumberLessThanOrEquals
 
 ```typescript
-@IsNumberLessThanOrEquals([100])
+@IsNumberLessThanOrEqualTo([100])
 percentage: number;
 
 // Accepts: 0, 50, 100
@@ -472,7 +472,7 @@ percentage: number;
 #### NumberEquals
 
 ```typescript
-@IsNumberEquals([42])
+@ IsNumberEqualTo([42])
 value: number;
 
 // Only accepts: 42
@@ -571,7 +571,7 @@ phone: string;
 #### EmailOrPhoneNumber
 
 ```typescript
-@IsEmailOrPhoneNumber
+@IsEmailOrPhone
 contact: string;
 
 // Accepts valid email OR valid phone number
@@ -839,7 +839,7 @@ code: string;
 @IsEmail                 // Must be valid email
 @IsUrl                   // Must be valid URL
 @IsPhoneNumber          // Must be valid phone
-@IsEmailOrPhoneNumber   // Must be email or phone
+@IsEmailOrPhone   // Must be email or phone
 @IsNumber               // Must be a number
 @IsNonNullString        // Must be non-empty string
 @IsBoolean              // Must be boolean
@@ -868,12 +868,12 @@ code: string;
 ```typescript
 @IsMinLength([5])
 @IsMaxLength([50])
-@HasLength([3, 10])
+@ Length([3, 10])
 @IsNumberGreaterThan([0])
 @IsNumberGreaterThanOrEquals([18])
 @IsNumberLessThan([100])
-@IsNumberLessThanOrEquals([100])
-@IsNumberEquals([42])
+@IsNumberLessThanOrEqualTo([100])
+@ IsNumberEqualTo([42])
 @IsNumberNotEqual([0])
 @StartsWith(['Mr.', 'Mrs.'])
 @EndsWith(['.jpg', '.png'])

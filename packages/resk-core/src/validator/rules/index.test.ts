@@ -2,18 +2,18 @@ import { i18n, Translate } from "../../i18n";
 import "../../translations";
 
 import {
-  HasLength,
   IsEmail,
   IsEmpty,
   IsNonNullString,
   IsNullable,
   IsNumber,
+  IsNumberDifferentFrom,
   IsNumberGreaterThan,
-  IsNumberIsDifferentFrom,
   IsNumberLessThan,
   IsOptional,
   IsRequired,
   IsUrl,
+  Length,
   Validator,
 } from "../index";
 
@@ -227,7 +227,7 @@ describe("Validator Rules", () => {
       }
       @IsNumber
       @Translate("validator.tests.entity.id")
-      @IsNumberIsDifferentFrom([10])
+      @IsNumberDifferentFrom([10])
       id?: number;
 
       @IsRequired
@@ -252,8 +252,8 @@ describe("Validator Rules", () => {
 
       @Translate("validator.tests.entity.aString")
       @IsRequired
-      @HasLength([10])
-      @HasLength([5, 20])
+      @Length([10])
+      @Length([5, 20])
       aString?: string;
     }
 

@@ -1155,7 +1155,7 @@ export class Validator {
    * - `@IsEmail` / `@IsUrl` / `@IsPhoneNumber` - Format validators
    * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
    * - `@IsNumber` / `@IsNonNullString` - Type validators
-   * - `@HasLength[n]` - Exact length validator
+   * - `@ Length[n]` - Exact length validator
    * - Custom decorators created with `Validator.createPropertyDecorator()`
    *
    * ### Nullable Rule Behavior

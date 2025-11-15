@@ -460,7 +460,7 @@ class PaginationParams {
   @IsRequired
   @IsNumber
   @IsNumberGreaterThanOrEquals([1])
-  @IsNumberLessThanOrEquals([100])
+  @IsNumberLessThanOrEqualTo([100])
   limit: number;
 
   @IsNullable

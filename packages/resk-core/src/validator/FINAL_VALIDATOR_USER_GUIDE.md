@@ -539,18 +539,18 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### String Rules
 
-| Rule            | Decorator                                     | Description              | Example                                |
-| --------------- | --------------------------------------------- | ------------------------ | -------------------------------------- |
-| Required        | `@IsRequired`                                 | Value must exist         | `@IsRequired`                          |
-| Email           | `@IsEmail`                                    | Must be valid email      | `@IsEmail`                             |
-| MinLength       | `@IsMinLength([n])`                           | Minimum length           | `@IsMinLength([8])`                    |
-| MaxLength       | `@IsMaxLength([n])`                           | Maximum length           | `@IsMaxLength([100])`                  |
-| Length          | `@HasLength([n])` or `@HasLength([min, max])` | Exact or range length    | `@HasLength([5, 20])`                  |
-| Url             | `@IsUrl`                                      | Must be valid URL        | `@IsUrl`                               |
-| NonNullString   | `@IsNonNullString`                            | Must be non-empty string | `@IsNonNullString`                     |
-| FileName        | `@IsFileName`                                 | Valid filename           | `@IsFileName`                          |
-| StartsWithOneOf | `@StartsWith(['Mr.', 'Mrs.'])`                | Starts with one of       | `@StartsWith(['http://', 'https://'])` |
-| EndsWithOneOf   | `@EndsWith(['.jpg', '.png'])`                 | Ends with one of         | `@EndsWith(['.jpg', '.png', '.gif'])`  |
+| Rule            | Decorator                                 | Description              | Example                                |
+| --------------- | ----------------------------------------- | ------------------------ | -------------------------------------- |
+| Required        | `@IsRequired`                             | Value must exist         | `@IsRequired`                          |
+| Email           | `@IsEmail`                                | Must be valid email      | `@IsEmail`                             |
+| MinLength       | `@IsMinLength([n])`                       | Minimum length           | `@IsMinLength([8])`                    |
+| MaxLength       | `@IsMaxLength([n])`                       | Maximum length           | `@IsMaxLength([100])`                  |
+| Length          | `@ Length([n])` or `@ Length([min, max])` | Exact or range length    | `@ Length([5, 20])`                    |
+| Url             | `@IsUrl`                                  | Must be valid URL        | `@IsUrl`                               |
+| NonNullString   | `@IsNonNullString`                        | Must be non-empty string | `@IsNonNullString`                     |
+| FileName        | `@IsFileName`                             | Valid filename           | `@IsFileName`                          |
+| StartsWithOneOf | `@StartsWith(['Mr.', 'Mrs.'])`            | Starts with one of       | `@StartsWith(['http://', 'https://'])` |
+| EndsWithOneOf   | `@EndsWith(['.jpg', '.png'])`             | Ends with one of         | `@EndsWith(['.jpg', '.png', '.gif'])`  |
 
 ### Numeric Rules
 
@@ -560,8 +560,8 @@ The Validator includes 75+ built-in rules organized by category.
 | NumberGreaterThan         | `@IsNumberGreaterThan([n])`         | Greater than n   | `@IsNumberGreaterThan([0])`          |
 | NumberGreaterThanOrEquals | `@IsNumberGreaterThanOrEquals([n])` | ≥ n              | `@IsNumberGreaterThanOrEquals([18])` |
 | NumberLessThan            | `@IsNumberLessThan([n])`            | Less than n      | `@IsNumberLessThan([100])`           |
-| NumberLessThanOrEquals    | `@IsNumberLessThanOrEquals([n])`    | ≤ n              | `@IsNumberLessThanOrEquals([100])`   |
-| NumberEquals              | `@IsNumberEquals([n])`              | Exactly n        | `@IsNumberEquals([42])`              |
+| NumberLessThanOrEquals    | `@IsNumberLessThanOrEqualTo([n])`   | ≤ n              | `@IsNumberLessThanOrEqualTo([100])`  |
+| NumberEquals              | `@ IsNumberEqualTo([n])`            | Exactly n        | `@ IsNumberEqualTo([42])`            |
 | NumberNotEqual            | `@IsNumberNotEqual([n])`            | Not equal to n   | `@IsNumberNotEqual([0])`             |
 
 ### Boolean Rules
@@ -587,10 +587,10 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Contact Rules
 
-| Rule               | Decorator               | Description        | Example                 |
-| ------------------ | ----------------------- | ------------------ | ----------------------- |
-| PhoneNumber        | `@IsPhoneNumber`        | Valid phone number | `@IsPhoneNumber`        |
-| EmailOrPhoneNumber | `@IsEmailOrPhoneNumber` | Email or phone     | `@IsEmailOrPhoneNumber` |
+| Rule               | Decorator         | Description        | Example           |
+| ------------------ | ----------------- | ------------------ | ----------------- |
+| PhoneNumber        | `@IsPhoneNumber`  | Valid phone number | `@IsPhoneNumber`  |
+| EmailOrPhoneNumber | `@IsEmailOrPhone` | Email or phone     | `@IsEmailOrPhone` |
 
 ### Array Rules
 
@@ -672,7 +672,7 @@ class ComprehensiveForm {
   @IsRequired
   @IsNumber
   @IsNumberGreaterThanOrEquals([18])
-  @IsNumberLessThanOrEquals([120])
+  @IsNumberLessThanOrEqualTo([120])
   age: number;
 
   @IsRequired
@@ -1175,7 +1175,7 @@ class PaginationParams {
   @IsRequired
   @IsNumber
   @IsNumberGreaterThanOrEquals([1])
-  @IsNumberLessThanOrEquals([100])
+  @IsNumberLessThanOrEqualTo([100])
   limit: number;
 
   @IsNullable

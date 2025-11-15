@@ -127,37 +127,31 @@ export class JsonHelper {
     /**
      * If the string is not a valid JSON string, return it as is.
      */
-    if (!JsonHelper.isJSON(jsonStr)) {
-      /**
-       * If the value is an object, recursively parse each property.
-       */
-      if (jsonStr && typeof jsonStr == "object") {
-        for (var i in jsonStr) {
+    // If the input is a string, try to parse any valid JSON value (objects, arrays, or primitives)
+    if (typeof jsonStr === "string") {
+      try {
+        // Attempt to parse any JSON (including primitives)
+        const parsed = JSON.parse(jsonStr, reviver);
+        jsonStr = parsed;
+      } catch (e) {
+        // Not a JSON string: return original input
+        return jsonStr;
+      }
+    } else {
+      // If the value is an object, recursively parse each property
+      if (jsonStr && typeof jsonStr === "object") {
+        for (const i in jsonStr) {
           jsonStr[i] = JsonHelper.parse(jsonStr[i], reviver);
         }
       }
       return jsonStr;
     }
 
-    /**
-     * Try to parse the JSON string.
-     */
-    try {
-      jsonStr = JSON.parse(jsonStr, reviver);
-
-      /**
-       * If the parsed value is an object, recursively parse each property.
-       */
-      if (jsonStr && typeof jsonStr == "object") {
-        for (var i in jsonStr) {
-          jsonStr[i] = JsonHelper.parse(jsonStr[i], reviver);
-        }
+    // After parsing string into a value, if it's an object, recurse inside
+    if (jsonStr && typeof jsonStr === "object") {
+      for (const i in jsonStr) {
+        jsonStr[i] = JsonHelper.parse(jsonStr[i], reviver);
       }
-    } catch (e) {
-      /**
-       * If parsing fails, return the original string.
-       */
-      return jsonStr;
     }
     /**
      * Return the parsed object.

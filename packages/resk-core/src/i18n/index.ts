@@ -85,6 +85,16 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * keeping the current exported API intact.
    */
   static [Symbol.hasInstance](obj: any) {
+    return this.isI18nInstance(obj);
+  }
+  /**
+   * Type guard to check if an object is an instance of I18n.
+   * Uses duck typing to verify the object has the required i18n methods,
+   * allowing for cross-realm compatibility when instanceof checks fail.
+   * @param obj The object to check.
+   * @returns True if the object is an I18n instance, false otherwise.
+   */
+  static isI18nInstance(obj: any): obj is I18n {
     if (!obj || typeof obj !== "object") return false;
     // If it's an actual instance of the native i18n-js class, consider true
     try {
@@ -349,7 +359,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
    * @returns The singleton I18n instance.
    */
   static getInstance(options?: I18nOptions): I18n {
-    if (!I18n.instance || !(I18n.instance instanceof I18n)) {
+    if (!this.isI18nInstance(I18n.instance)) {
       const locale = I18n.getLocaleFromSession();
       I18n.instance = this.createInstance(
         {},

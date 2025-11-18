@@ -319,7 +319,9 @@ export class DateHelper {
      */
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-
+  private static getI18n(i18n?: I18n) {
+    return I18n.isI18nInstance(i18n) ? i18n : I18n.getInstance();
+  }
   /**
    * Get the default datetime format, according to the Moment.js library.
    * it firstly tries to retrieve the default date time format from the translations (key: dates.defaultDateTimeFormat), and if it fails, it returns the default value.
@@ -327,9 +329,9 @@ export class DateHelper {
    * @description The format used to represent dates and times by default, as defined by the Moment.js library.
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
-  static get DEFAULT_DATE_TIME_FORMAT(): IDateFormat {
+  static getDefaultDateTimeFormat(i18n?: I18n): IDateFormat {
     return defaultStr(
-      I18n.getInstance().getNestedTranslation("dates.defaultDateTimeFormat"),
+      this.getI18n(i18n).getNestedTranslation("dates.defaultDateTimeFormat"),
       "YYYY-MM-DD HH:mm"
     ) as unknown as IDateFormat;
   }
@@ -339,9 +341,9 @@ export class DateHelper {
    *
    * @description The format used to represent dates by default.
    */
-  static get DEFAULT_DATE_FORMAT(): IDateFormat {
+  static getDefaultDateFormat(i18n?: I18n): IDateFormat {
     return defaultStr(
-      I18n.getInstance().getNestedTranslation("dates.defaultDateFormat"),
+      this.getI18n(i18n).getNestedTranslation("dates.defaultDateFormat"),
       "YYYY-MM-DD"
     ) as unknown as IDateFormat;
   }
@@ -427,9 +429,9 @@ export class DateHelper {
    * @description The format used to represent times by default, as defined by the Moment.js library.
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
-  static get DEFAULT_TIME_FORMAT(): IDateFormat {
+  static getDefaultTimeFormat(i18n?: I18n): IDateFormat {
     return defaultStr(
-      I18n.getInstance().getNestedTranslation("dates.defaultTimeFormat"),
+      this.getI18n(i18n).getNestedTranslation("dates.defaultTimeFormat"),
       "HH:mm"
     ) as unknown as IDateFormat;
   }
@@ -870,7 +872,7 @@ export class DateHelper {
         return parsedDate.format(
           defaultStr(
             format,
-            DateHelper.DEFAULT_DATE_TIME_FORMAT
+            DateHelper.getDefaultDateTimeFormat()
           ) as unknown as IDateFormat
         );
       }

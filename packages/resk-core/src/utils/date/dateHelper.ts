@@ -1,11 +1,11 @@
-import moment from "moment";
+import { I18n } from "@/i18n";
 import { IDateFormat } from "@/types";
+import { defaultStr } from "@utils/defaultStr";
 import { isEmpty } from "@utils/isEmpty";
 import { isNonNullString } from "@utils/isNonNullString";
-import { defaultStr } from "@utils/defaultStr";
-import { i18n } from "@/i18n";
-import { isDateObj } from "./isDateObj";
 import { isNumber } from "@utils/isNumber";
+import moment from "moment";
+import { isDateObj } from "./isDateObj";
 /**
  * Result object returned by the date parser
  */
@@ -153,7 +153,10 @@ export class DateHelper {
    * 5. Time formats
    * 6. Relative formats
    */
-  static parseString(dateString: string, preferredFormats?: string[] | string): IDateHelperResult {
+  static parseString(
+    dateString: string,
+    preferredFormats?: string[] | string
+  ): IDateHelperResult {
     if (isNonNullString(dateString) && isNonNullString(preferredFormats)) {
       try {
         const date = moment(dateString, preferredFormats, true);
@@ -195,7 +198,10 @@ export class DateHelper {
         date: null,
         matchedFormat: null,
         isValid: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred while parsing date",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unknown error occurred while parsing date",
       };
     }
   }
@@ -260,7 +266,13 @@ export class DateHelper {
         return parsedDate.toDate();
       }
     } catch (error) {
-      console.error(error, " parsing date with moment : ", date, " format is : ", format);
+      console.error(
+        error,
+        " parsing date with moment : ",
+        date,
+        " format is : ",
+        format
+      );
     }
     return null;
   }
@@ -316,7 +328,10 @@ export class DateHelper {
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
   static get DEFAULT_DATE_TIME_FORMAT(): IDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "YYYY-MM-DD HH:mm") as unknown as IDateFormat;
+    return defaultStr(
+      I18n.getInstance().getNestedTranslation("dates.defaultDateTimeFormat"),
+      "YYYY-MM-DD HH:mm"
+    ) as unknown as IDateFormat;
   }
   /**
    * Get the default date format.
@@ -325,7 +340,10 @@ export class DateHelper {
    * @description The format used to represent dates by default.
    */
   static get DEFAULT_DATE_FORMAT(): IDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "YYYY-MM-DD") as unknown as IDateFormat;
+    return defaultStr(
+      I18n.getInstance().getNestedTranslation("dates.defaultDateFormat"),
+      "YYYY-MM-DD"
+    ) as unknown as IDateFormat;
   }
   /**
    * Converts a date to SQL date format.
@@ -410,7 +428,10 @@ export class DateHelper {
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
   static get DEFAULT_TIME_FORMAT(): IDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm") as unknown as IDateFormat;
+    return defaultStr(
+      I18n.getInstance().getNestedTranslation("dates.defaultTimeFormat"),
+      "HH:mm"
+    ) as unknown as IDateFormat;
   }
 
   /**
@@ -445,7 +466,11 @@ export class DateHelper {
     /**
      * If the input is a number that can be converted to a string, it's not a valid date.
      */
-    if ((sDate as any)?.toString && (sDate as any)?.toString() == parseInt(sDate).toString()) return false;
+    if (
+      (sDate as any)?.toString &&
+      (sDate as any)?.toString() == parseInt(sDate).toString()
+    )
+      return false;
 
     /**
      * Try to create a new Date object from the input.
@@ -494,7 +519,11 @@ export class DateHelper {
    * console.log(DateHelper.addToDate(1)); // Output: Date object with 1 day added to the current date
    * ```
    */
-  private static addToDate(days: number, date?: Date, setFunction?: string): Date {
+  private static addToDate(
+    days: number,
+    date?: Date,
+    setFunction?: string
+  ): Date {
     if (!isNumber(days)) days = 0;
     if (isEmpty(date)) {
       date = new Date();
@@ -505,7 +534,11 @@ export class DateHelper {
     if (!DateHelper.isValidDate(date)) {
       date = isNonNullString(date) ? new Date(date) : new Date();
     }
-    if (isNonNullString(setFunction) && typeof (date as any)["set" + setFunction] === "function" && typeof (date as any)["get" + setFunction] === "function") {
+    if (
+      isNonNullString(setFunction) &&
+      typeof (date as any)["set" + setFunction] === "function" &&
+      typeof (date as any)["get" + setFunction] === "function"
+    ) {
       const set = "set" + setFunction;
       const get = "get" + setFunction;
       date = new Date((date as any)[set]((date as any)[get]() + days));
@@ -650,27 +683,39 @@ export class DateHelper {
    * console.log(getCurrentMonthDaysRange(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
    * ```
    */
-  static getCurrentMonthDaysRange = (date?: any): { first: Date; last: Date } => {
+  static getCurrentMonthDaysRange = (
+    date?: any
+  ): { first: Date; last: Date } => {
     /**
      * If no date is provided, use the current date.
      *
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const currentDate = DateHelper.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const currentDate = DateHelper.isValidDate(date)
+      ? new Date(date)
+      : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Calculate the first day of the month.
      *
      * The first day of the month is always the 1st day of the month, so we can simply set the day to 1.
      */
-    const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const first = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
 
     /**
      * Calculate the last day of the month.
      *
      * The last day of the month is the same as the current date, since we're calculating the limits of the current month.
      */
-    const last = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const last = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
 
     return { first, last };
   };
@@ -687,13 +732,17 @@ export class DateHelper {
    * console.log(getPreviousWeekDaysRange(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
    * ```
    */
-  static getPreviousWeekDaysRange = (date?: any): { first: Date; last: Date } => {
+  static getPreviousWeekDaysRange = (
+    date?: any
+  ): { first: Date; last: Date } => {
     /**
      * If no date is provided, use the current date.
      *
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const cDate = DateHelper.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const cDate = DateHelper.isValidDate(date)
+      ? new Date(date)
+      : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Calculate the date one week ago.
@@ -758,7 +807,9 @@ export class DateHelper {
      *
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const currentDate = DateHelper.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const currentDate = DateHelper.isValidDate(date)
+      ? new Date(date)
+      : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Get the day of the week (0 = Sunday, 1 = Monday, etc.).
@@ -816,7 +867,12 @@ export class DateHelper {
     try {
       const parsedDate = moment(date);
       if (parsedDate.isValid()) {
-        return parsedDate.format(defaultStr(format, DateHelper.DEFAULT_DATE_TIME_FORMAT) as unknown as IDateFormat);
+        return parsedDate.format(
+          defaultStr(
+            format,
+            DateHelper.DEFAULT_DATE_TIME_FORMAT
+          ) as unknown as IDateFormat
+        );
       }
     } catch (error) {}
     return defaultStr(DateHelper.isValidDate(date) ? date?.toString() : "");
@@ -900,7 +956,10 @@ export class DateHelper {
 const parseDString = (dateString: string, format: string) => {
   const parsed = moment(dateString, format, true);
   try {
-    if ((parsed.isValid() && parsed.format(format) === dateString) || moment.utc(parsed, true).format(format) === dateString) {
+    if (
+      (parsed.isValid() && parsed.format(format) === dateString) ||
+      moment.utc(parsed, true).format(format) === dateString
+    ) {
       return {
         date: parsed.toDate(),
         matchedFormat: format,

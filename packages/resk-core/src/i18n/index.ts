@@ -770,8 +770,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
       this.trigger("namespaces-before-load", locale);
       return this.loadNamespaces(locale)
         .then((translations) => {
-          if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
-            I18n.setLocaleToSession(locale);
+          if (this.isDefaultInstance()) {
+            I18n.instance = this;
+            if (this.isLocaleSupported(locale)) {
+              I18n.setLocaleToSession(locale);
+            }
           }
           super.locale = locale;
           I18n.setMomentLocale(locale);

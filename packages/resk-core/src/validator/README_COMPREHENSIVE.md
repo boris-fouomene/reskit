@@ -628,7 +628,7 @@ const divisibleByRule = ({ value, ruleParams }: IValidatorValidateOptions<[numbe
 Validator.registerRule("DivisibleBy", divisibleByRule);
 
 // Create parameterized decorator
-const IsDivisibleBy = Validator.createRuleDecorator<[number]>(divisibleByRule);
+const IsDivisibleBy = Validator.buildRuleDecorator<[number]>(divisibleByRule);
 
 // Use in class
 class NumberModel {
@@ -908,7 +908,7 @@ Validator.registerRule("StockAvailable", async ({ value, context }) => {
   return value > minStock || `Stock must be greater than ${minStock}`;
 });
 
-const IsStockAvailable = Validator.createRuleDecorator(["StockAvailable"]);
+const IsStockAvailable = Validator.buildRuleDecorator(["StockAvailable"]);
 
 class Product {
   @IsRequired
@@ -1121,7 +1121,7 @@ async function handleFormSubmit(formData: FormData) {
 | `validate(options)`                     | Validate a single value                   | `Promise<IValidatorValidateResult>`       |
 | `validateTarget(Class, data, options?)` | Validate a class instance with decorators | `Promise<IValidatorValidateTargetResult>` |
 | `registerRule(name, fn)`                | Register a custom validation rule         | `void`                                    |
-| `createRuleDecorator(fn)`               | Create a parameterized decorator          | `PropertyDecorator`                       |
+| `buildRuleDecorator(fn)`                | Create a parameterized decorator          | `PropertyDecorator`                       |
 | `createPropertyDecorator(ruleNames)`    | Create a simple decorator                 | `PropertyDecorator`                       |
 | `isSuccess(result)`                     | Type guard for success                    | `boolean`                                 |
 | `isFailure(result)`                     | Type guard for failure                    | `boolean`                                 |

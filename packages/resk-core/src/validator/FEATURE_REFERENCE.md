@@ -1134,7 +1134,7 @@ const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>
 Validator.registerRule("MinValue", minValueRule);
 
 // Create parameterized decorator
-const IsMinValue = Validator.createRuleDecorator<[number]>(minValueRule);
+const IsMinValue = Validator.buildRuleDecorator<[number]>(minValueRule);
 
 // Use it
 class PriceForm {

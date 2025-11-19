@@ -106,7 +106,7 @@ Validator.registerRule("MinLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const MinLength = Validator.createRuleDecorator<[minLength: number]>(minLength);
+export const MinLength = Validator.buildRuleDecorator<[minLength: number]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
   let { value, ruleParams, i18n } = options;
@@ -149,7 +149,7 @@ Validator.registerRule("MaxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const MaxLength = Validator.createRuleDecorator<[maxLength: number]>(maxLength);
+export const MaxLength = Validator.buildRuleDecorator<[maxLength: number]>(maxLength);
 
 Validator.registerRule("NonNullString", function NonNullString(options) {
   const { value, i18n } = options;
@@ -192,7 +192,7 @@ Validator.registerRule("NonNullString", function NonNullString(options) {
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const Length = Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(stringLength);
+export const Length = Validator.buildRuleDecorator<[minOrLength: number, maxLength?: number]>(stringLength);
 
 function _EndsWith({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -258,7 +258,7 @@ Validator.registerRule("EndsWithOneOf", _EndsWith);
  * @since 1.22.0
  * @public
  */
-export const EndsWithOneOf = Validator.createRuleDecorator<string[]>(_EndsWith);
+export const EndsWithOneOf = Validator.buildRuleDecorator<string[]>(_EndsWith);
 
 function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {

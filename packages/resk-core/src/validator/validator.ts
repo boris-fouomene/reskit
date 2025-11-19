@@ -1494,7 +1494,7 @@ export class Validator {
    * };
    *
    * // Create a decorator factory
-   * const AgeRange = Validator.createRuleDecorator(validateAge);
+   * const AgeRange = Validator.buildRuleDecorator(validateAge);
    *
    * // Use the decorator
    * class Person {
@@ -1532,7 +1532,7 @@ export class Validator {
    *          `Requires ${requiredPermission} permission`;
    * };
    *
-   * const RequiresPermission = Validator.createRuleDecorator(validatePermission);
+   * const RequiresPermission = Validator.buildRuleDecorator(validatePermission);
    *
    * class AdminAction {
    *   @RequiresPermission(['admin'])
@@ -1551,7 +1551,7 @@ export class Validator {
    *   return !exists || 'Email is already registered';
    * };
    *
-   * const IsUniqueEmail = Validator.createRuleDecorator(validateUniqueEmail);
+   * const IsUniqueEmail = Validator.buildRuleDecorator(validateUniqueEmail);
    *
    * class Registration {
    *   @IsRequired
@@ -1573,7 +1573,7 @@ export class Validator {
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
    */
-  static createRuleDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+  static buildRuleDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters: RuleParamsType) {
       const enhancedValidatorFunction: IValidatorRuleFunction<RuleParamsType, Context> = function (validationOptions) {
         const enhancedOptions: IValidatorValidateOptions<RuleParamsType> = Object.assign({}, validationOptions);
@@ -1581,6 +1581,32 @@ export class Validator {
         return ruleFunction(enhancedOptions as any);
       };
       return Validator.createPropertyDecorator<RuleParamsType, Context>(enhancedValidatorFunction);
+    };
+  }
+  /**
+   * ## Build Optional-Parameter Rule Decorator
+   *
+   * Same as {@link buildRuleDecorator}, but the factory parameter is **optional**.
+   * Call it with `undefined`, `[]`, or no argument at all and the underlying rule
+   * will receive an empty parameter array, letting you write:
+   *
+   * ```ts
+   * @IsRequired        // no params
+   * @MinLength([5])    // with params
+   * @PhoneNumber()          // optional-params version
+   * @IsPhoneNumber(["US"]) // with params
+   * ```
+   *
+   * @param ruleFunction  The validation rule to wrap
+   * @returns A decorator factory that can be invoked **with or without** parameters
+   *
+   * @since 1.34.1
+   * @see {@link buildRuleDecorator}
+   * @public
+   */
+  static buildRuleDecoratorOptional<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+    return function (ruleParameters?: RuleParamsType) {
+      return Validator.buildRuleDecorator<RuleParamsType, Context>(ruleFunction)(ruleParameters as RuleParamsType);
     };
   }
 
@@ -1631,7 +1657,7 @@ export class Validator {
    * @returns Property decorator function that can be applied to class properties
    *
    * @since 1.0.0
-   * @see {@link createRuleDecorator} - Higher-level decorator creation
+   * @see {@link buildRuleDecorator} - Higher-level decorator creation
    * @internal
    */
   static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(rule: IValidatorRule<RuleParamsType, Context> | IValidatorRule<RuleParamsType, Context>[]): PropertyDecorator {

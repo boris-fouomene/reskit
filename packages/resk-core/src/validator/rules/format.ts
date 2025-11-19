@@ -119,7 +119,7 @@ Validator.registerRule("PhoneNumber", phoneNumber);
  * }
  * ```
  */
-export const IsPhoneNumber = Validator.createRuleDecorator<[countryCode?: ICountryCode]>(phoneNumber);
+export const IsPhoneNumber = Validator.buildRuleDecoratorOptional<[countryCode?: ICountryCode]>(phoneNumber);
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode, i18n } = options;
@@ -540,7 +540,7 @@ Validator.registerRule("IP", _IsIP);
  * @since 1.22.0
  * @public
  */
-export const IsIP = Validator.createRuleDecorator<string[]>(_IsIP);
+export const IsIP = Validator.buildRuleDecorator<string[]>(_IsIP);
 
 function _MACAddress({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
@@ -656,7 +656,7 @@ Validator.registerRule("Matches", _Matches);
  * @since 1.22.0
  * @public
  */
-export const Matches = Validator.createRuleDecorator<[rule: RegExp, errorMessage?: string]>(_Matches);
+export const Matches = Validator.buildRuleDecorator<[rule: RegExp, errorMessage?: string]>(_Matches);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {

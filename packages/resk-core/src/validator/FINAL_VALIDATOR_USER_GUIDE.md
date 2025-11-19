@@ -777,7 +777,7 @@ const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>
 Validator.registerRule("MinValue", minValueRule);
 
 // Create decorator
-const IsMinValue = Validator.createRuleDecorator<[number]>(minValueRule);
+const IsMinValue = Validator.buildRuleDecorator<[number]>(minValueRule);
 
 // Use it
 class Product {
@@ -804,7 +804,7 @@ class User {
 #### Parameterized Decorator
 
 ```typescript
-const IsMinValue = Validator.createRuleDecorator<[number]>("MinValue");
+const IsMinValue = Validator.buildRuleDecorator<[number]>("MinValue");
 
 class Product {
   @IsMinValue([9.99])
@@ -1809,7 +1809,7 @@ registerRule(name: string, rule: IValidatorRule): void
 createPropertyDecorator(rules: string[]): PropertyDecorator
 
 // Create parameterized decorator
-createRuleDecorator<P extends any[]>(
+buildRuleDecorator<P extends any[]>(
   ruleName: string | IValidatorRule
 ): (...params: P) => PropertyDecorator
 ```
@@ -2051,7 +2051,7 @@ const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>
 
 Validator.registerRule("MinValue", minValueRule);
 
-const IsMinValue = Validator.createRuleDecorator<[number]>(minValueRule);
+const IsMinValue = Validator.buildRuleDecorator<[number]>(minValueRule);
 
 class Product {
   @IsMinValue([9.99])

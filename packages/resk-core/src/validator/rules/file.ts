@@ -16,24 +16,10 @@ function isFileLike(value: any): value is FileLike {
       return true;
     }
   } catch {}
-  return (
-    value &&
-    typeof value === "object" &&
-    (typeof value.size === "number" ||
-      typeof value.type === "string" ||
-      typeof value.name === "string" ||
-      typeof value.mimetype === "string" ||
-      typeof value.originalname === "string")
-  );
+  return value && typeof value === "object" && (typeof value.size === "number" || typeof value.type === "string" || typeof value.name === "string" || typeof value.mimetype === "string" || typeof value.originalname === "string");
 }
 
-function _IsFile({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _IsFile({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (isFileLike(value)) {
       resolve(true);
@@ -72,14 +58,7 @@ Validator.registerRule("File", _IsFile);
  */
 export const IsFile = Validator.createPropertyDecorator(["File"]);
 
-function _MaxFileSize({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<[size: number]>): IValidatorResult {
+function _MaxFileSize({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[size: number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.fileSize", {
@@ -143,17 +122,9 @@ Validator.registerRule("MaxFileSize", _MaxFileSize);
  * @since 1.22.0
  * @public
  */
-export const MaxFileSize =
-  Validator.createRuleDecorator<[size: number]>(_MaxFileSize);
+export const MaxFileSize = Validator.buildRuleDecorator<[size: number]>(_MaxFileSize);
 
-function _IsFileType({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _IsFileType({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.fileType", {
@@ -179,11 +150,7 @@ function _IsFileType({
     const allowedTypes = ruleParams.map((type) => type.toLowerCase());
     const actualType = fileType.toLowerCase();
 
-    if (
-      allowedTypes.some(
-        (type) => actualType === type || actualType.startsWith(type + "/")
-      )
-    ) {
+    if (allowedTypes.some((type) => actualType === type || actualType.startsWith(type + "/"))) {
       resolve(true);
     } else {
       const message = i18n.t("validator.fileType", {
@@ -223,15 +190,9 @@ Validator.registerRule("FileType", _IsFileType);
  * @since 1.22.0
  * @public
  */
-export const IsFileType = Validator.createRuleDecorator<string[]>(_IsFileType);
+export const IsFileType = Validator.buildRuleDecorator<string[]>(_IsFileType);
 
-function _Image({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _Image({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.image", {
@@ -243,15 +204,7 @@ function _Image({
     }
 
     const fileType = value.type || value.mimetype || "";
-    const imageTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/svg+xml",
-      "image/bmp",
-    ];
+    const imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/svg+xml", "image/bmp"];
 
     if (imageTypes.some((type) => fileType.toLowerCase() === type)) {
       resolve(true);
@@ -290,14 +243,7 @@ Validator.registerRule("Image", _Image);
  */
 export const IsImage = Validator.createPropertyDecorator(["Image"]);
 
-function _IsFileExtension({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _IsFileExtension({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.fileExtension", {
@@ -321,9 +267,7 @@ function _IsFileExtension({
 
     const fileName = value.name || value.originalname || "";
     const extension = fileName.split(".").pop()?.toLowerCase() || "";
-    const allowedExtensions = ruleParams.map((ext) =>
-      ext.toLowerCase().replace(/^\./, "")
-    );
+    const allowedExtensions = ruleParams.map((ext) => ext.toLowerCase().replace(/^\./, ""));
 
     if (allowedExtensions.includes(extension)) {
       resolve(true);
@@ -365,17 +309,9 @@ Validator.registerRule("FileExtension", _IsFileExtension);
  * @since 1.22.0
  * @public
  */
-export const IsFileExtension =
-  Validator.createRuleDecorator<string[]>(_IsFileExtension);
+export const IsFileExtension = Validator.buildRuleDecorator<string[]>(_IsFileExtension);
 
-function _MinFileSize({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<[minSize: number]>): IValidatorResult {
+function _MinFileSize({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[minSize: number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!isFileLike(value)) {
       const message = i18n.t("validator.minFileSize", {
@@ -439,8 +375,7 @@ Validator.registerRule("MinFileSize", _MinFileSize);
  * @since 1.22.0
  * @public
  */
-export const MinFileSize =
-  Validator.createRuleDecorator<[minSize: number]>(_MinFileSize);
+export const MinFileSize = Validator.buildRuleDecorator<[minSize: number]>(_MinFileSize);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {

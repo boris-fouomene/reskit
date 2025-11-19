@@ -99,7 +99,16 @@ if (result.success) {
 ### Advanced Validation Examples
 
 ```typescript
-import { Validator, IsArray, ArrayMinLength, IsDate, FutureDate, IsFile, MaxFileSize, IsUUID } from "resk-core";
+import {
+  Validator,
+  IsArray,
+  ArrayMinLength,
+  IsDate,
+  FutureDate,
+  IsFile,
+  MaxFileSize,
+  IsUUID,
+} from "resk-core";
 
 // Array validation
 const arrayResult = await Validator.validate({
@@ -519,13 +528,17 @@ class AdminForm {
   email: string;
 }
 
-const result = await Validator.validateTarget<AdminForm, UserContext>(AdminForm, data, {
-  context: {
-    userId: 123,
-    userRole: "admin",
-    locale: "en",
-  },
-});
+const result = await Validator.validateTarget<AdminForm, UserContext>(
+  AdminForm,
+  data,
+  {
+    context: {
+      userId: 123,
+      userRole: "admin",
+      locale: "en",
+    },
+  }
+);
 ```
 
 ### 3. Custom Error Messages
@@ -606,7 +619,7 @@ const isEvenNumber = ({ value }: IValidatorValidateOptions) => {
 };
 
 // Create decorator
-const IsEven = Validator.createPropertyDecorator(["IsEven"]);
+const IsEven = Validator.buildPropertyDecorator(["IsEven"]);
 
 // Use in class
 class NumberModel {
@@ -619,7 +632,10 @@ class NumberModel {
 
 ```typescript
 // Rule function with parameters
-const divisibleByRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
+const divisibleByRule = ({
+  value,
+  ruleParams,
+}: IValidatorValidateOptions<[number]>) => {
   const [divisor] = ruleParams;
   return value % divisor === 0 || `Value must be divisible by ${divisor}`;
 };
@@ -649,7 +665,7 @@ const uniqueUsernameRule = async ({ value }: IValidatorValidateOptions) => {
 Validator.registerRule("UniqueUsername", uniqueUsernameRule);
 
 // Create decorator
-const IsUniqueUsername = Validator.createPropertyDecorator(["UniqueUsername"]);
+const IsUniqueUsername = Validator.buildPropertyDecorator(["UniqueUsername"]);
 
 // Use it
 class UserForm {
@@ -667,7 +683,10 @@ interface ValidationContext {
   maxAge: number;
 }
 
-const ageInRangeRule = ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
+const ageInRangeRule = ({
+  value,
+  context,
+}: IValidatorValidateOptions<any, ValidationContext>) => {
   if (typeof value !== "number") return false;
 
   const { minAge, maxAge } = context;
@@ -854,7 +873,14 @@ class RegistrationForm {
 ### Example 1: User Registration Form
 
 ```typescript
-import { Validator, IsRequired, IsEmail, IsMinLength, IsMaxLength, IsNumberGreaterThanOrEqual } from "resk-core";
+import {
+  Validator,
+  IsRequired,
+  IsEmail,
+  IsMinLength,
+  IsMaxLength,
+  IsNumberGreaterThanOrEqual,
+} from "resk-core";
 
 class RegistrationForm {
   @IsRequired
@@ -952,12 +978,17 @@ interface AdminContext {
   organizationId: number;
 }
 
-Validator.registerRule("AllowedAction", ({ value, context }: IValidatorValidateOptions<any, AdminContext>) => {
-  const { userPermissions } = context;
-  return userPermissions.includes(value) || `Permission '${value}' not granted`;
-});
+Validator.registerRule(
+  "AllowedAction",
+  ({ value, context }: IValidatorValidateOptions<any, AdminContext>) => {
+    const { userPermissions } = context;
+    return (
+      userPermissions.includes(value) || `Permission '${value}' not granted`
+    );
+  }
+);
 
-const IsAllowedAction = Validator.createPropertyDecorator(["AllowedAction"]);
+const IsAllowedAction = Validator.buildPropertyDecorator(["AllowedAction"]);
 
 class AdminAction {
   @IsRequired
@@ -970,8 +1001,15 @@ class AdminAction {
   resourceId: number;
 }
 
-async function performAdminAction(actionData: unknown, adminContext: AdminContext) {
-  const result = await Validator.validateTarget<AdminAction, AdminContext>(AdminAction, actionData, { context: adminContext });
+async function performAdminAction(
+  actionData: unknown,
+  adminContext: AdminContext
+) {
+  const result = await Validator.validateTarget<AdminAction, AdminContext>(
+    AdminAction,
+    actionData,
+    { context: adminContext }
+  );
 
   if (result.success) {
     console.log(`Admin action '${result.data.action}' authorized`);
@@ -1048,7 +1086,10 @@ async function registerUsername(username: string) {
       // Sync custom rule - check format
       ({ value }) => {
         const validFormat = /^[a-zA-Z0-9_-]+$/.test(value);
-        return validFormat || "Only letters, numbers, dashes, and underscores allowed";
+        return (
+          validFormat ||
+          "Only letters, numbers, dashes, and underscores allowed"
+        );
       },
     ],
     propertyName: "username",
@@ -1122,7 +1163,7 @@ async function handleFormSubmit(formData: FormData) {
 | `validateTarget(Class, data, options?)` | Validate a class instance with decorators | `Promise<IValidatorValidateTargetResult>` |
 | `registerRule(name, fn)`                | Register a custom validation rule         | `void`                                    |
 | `buildRuleDecorator(fn)`                | Create a parameterized decorator          | `PropertyDecorator`                       |
-| `createPropertyDecorator(ruleNames)`    | Create a simple decorator                 | `PropertyDecorator`                       |
+| `buildPropertyDecorator(ruleNames)`     | Create a simple decorator                 | `PropertyDecorator`                       |
 | `isSuccess(result)`                     | Type guard for success                    | `boolean`                                 |
 | `isFailure(result)`                     | Type guard for failure                    | `boolean`                                 |
 

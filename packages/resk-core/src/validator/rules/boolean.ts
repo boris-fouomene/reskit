@@ -63,7 +63,7 @@ function _Boolean({
  * @since 1.22.0
  * @public
  */
-export const IsBoolean = Validator.createPropertyDecorator(["Boolean"]);
+export const IsBoolean = Validator.buildPropertyDecorator(["Boolean"]);
 Validator.registerRule("Boolean", _Boolean);
 
 declare module "../types" {

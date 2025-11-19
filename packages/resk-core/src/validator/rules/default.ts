@@ -4,7 +4,10 @@ Validator.registerRule("Required", function Required(options) {
   const { value, i18n } = options;
   // Check if value is truly empty (null, undefined, or empty string)
   // Empty arrays, empty objects, 0, false, NaN are NOT considered empty
-  const isValueEmpty = value === null || value === undefined || (typeof value === "string" && value === "");
+  const isValueEmpty =
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value === "");
   return !isValueEmpty || i18n.t("validator.required");
 });
 
@@ -42,7 +45,7 @@ Validator.registerRule("Required", function Required(options) {
  * @see {@link IsOptional} - For optional fields
  * @public
  */
-export const IsRequired = Validator.createPropertyDecorator(["Required"]);
+export const IsRequired = Validator.buildPropertyDecorator(["Required"]);
 
 // Nullable validation rules - allow skipping validation under specific conditions
 
@@ -74,7 +77,7 @@ Validator.registerRule("Empty", function Empty() {
  * @since 1.23.0
  * @public
  */
-export const IsEmpty = Validator.createPropertyDecorator(["Empty"]);
+export const IsEmpty = Validator.buildPropertyDecorator(["Empty"]);
 
 Validator.registerRule("Nullable", function Nullable() {
   // This rule always passes - its presence indicates that null/undefined values should skip validation
@@ -104,7 +107,7 @@ Validator.registerRule("Nullable", function Nullable() {
  * @since 1.23.0
  * @public
  */
-export const IsNullable = Validator.createPropertyDecorator(["Nullable"]);
+export const IsNullable = Validator.buildPropertyDecorator(["Nullable"]);
 
 Validator.registerRule("Optional", function Optional() {
   // This rule always passes - its presence indicates that undefined values should skip validation
@@ -135,4 +138,4 @@ Validator.registerRule("Optional", function Optional() {
  * @since 1.23.0
  * @public
  */
-export const IsOptional = Validator.createPropertyDecorator(["Optional"]);
+export const IsOptional = Validator.buildPropertyDecorator(["Optional"]);

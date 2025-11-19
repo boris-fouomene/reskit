@@ -1,4 +1,4 @@
-import { createPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
+import { buildPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
 import { IClassConstructor, IDict, IMakeOptional } from "@/types";
 import { defaultStr, isEmpty, isNonNullString, isObj, stringify } from "@utils/index";
 import { I18n, i18n as defaultI18n } from "../i18n";
@@ -1050,7 +1050,7 @@ export class Validator {
    * - `@MinLength[n]` / `@MaxLength[n]` - Length validators
    * - `@IsNumber` / `@IsNonNullString` - Type validators
    * - `@ Length[n]` - Exact length validator
-   * - Custom decorators created with `Validator.createPropertyDecorator()`
+   * - Custom decorators created with `Validator.buildPropertyDecorator()`
    *
    * ### Nullable Rule Behavior
    * - **@IsEmpty**: Skips remaining rules if value is empty string ""
@@ -1210,7 +1210,7 @@ export class Validator {
    *
    * @since 1.0.0
    * @see {@link validate} - For single-value validation
-   * @see {@link createPropertyDecorator} - To create custom validation decorators
+   * @see {@link buildPropertyDecorator} - To create custom validation decorators
    * @see {@link registerRule} - To register custom validation rules
    * @see {@link IValidatorValidateTargetResult} - Result type documentation
    * @see {@link IValidatorValidationError} - Error details type
@@ -1409,7 +1409,7 @@ export class Validator {
    *
    * @since 1.0.0
    * @see {@link validateTarget} - Uses this method to get validation rules
-   * @see {@link createPropertyDecorator} - How rules are attached to properties
+   * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
    */
   static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
@@ -1569,7 +1569,7 @@ export class Validator {
    * @returns Decorator factory function that accepts parameters and returns a property decorator
    *
    * @since 1.22.0
-   * @see {@link createPropertyDecorator} - Lower-level decorator creation
+   * @see {@link buildPropertyDecorator} - Lower-level decorator creation
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
    */
@@ -1580,7 +1580,7 @@ export class Validator {
         enhancedOptions.ruleParams = (Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]) as RuleParamsType;
         return ruleFunction(enhancedOptions as any);
       };
-      return Validator.createPropertyDecorator<RuleParamsType, Context>(enhancedValidatorFunction);
+      return Validator.buildPropertyDecorator<RuleParamsType, Context>(enhancedValidatorFunction);
     };
   }
   /**
@@ -1629,12 +1629,12 @@ export class Validator {
    * @example
    * ```typescript
    * // Create a simple validation decorator
-   * const IsPositive = Validator.createPropertyDecorator(
+   * const IsPositive = Validator.buildPropertyDecorator(
    *   ({ value }) => value > 0 || 'Must be positive'
    * );
    *
    * // Create a decorator with multiple rules
-   * const IsValidEmail = Validator.createPropertyDecorator([
+   * const IsValidEmail = Validator.buildPropertyDecorator([
    *   'required',
    *   'email'
    * ]);
@@ -1660,8 +1660,8 @@ export class Validator {
    * @see {@link buildRuleDecorator} - Higher-level decorator creation
    * @internal
    */
-  static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(rule: IValidatorRule<RuleParamsType, Context> | IValidatorRule<RuleParamsType, Context>[]): PropertyDecorator {
-    return createPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(VALIDATOR_TARGET_RULES_METADATA_KEY, (oldRules) => {
+  static buildPropertyDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(rule: IValidatorRule<RuleParamsType, Context> | IValidatorRule<RuleParamsType, Context>[]): PropertyDecorator {
+    return buildPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(VALIDATOR_TARGET_RULES_METADATA_KEY, (oldRules) => {
       return [...(Array.isArray(oldRules) ? oldRules : []), ...(Array.isArray(rule) ? rule : [rule])];
     });
   }

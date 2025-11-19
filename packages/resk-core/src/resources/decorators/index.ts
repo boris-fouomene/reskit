@@ -1,7 +1,7 @@
-import "reflect-metadata";
-import { defaultStr } from "../../utils/defaultStr";
-import { IClassConstructor, ITypeRegistryRenderer } from "../../types";
 import { extendObj } from "@utils/object";
+import "reflect-metadata";
+import { IClassConstructor, ITypeRegistryRenderer } from "../../types";
+import { defaultStr } from "../../utils/defaultStr";
 
 /**
  * Creates a property decorator that stores metadata without making the property readonly
@@ -11,7 +11,10 @@ import { extendObj } from "@utils/object";
    @param metadata - The metadata to store, or a function that returns the metadata
  * @returns PropertyDecorator
  */
-export function createPropertyDecorator<MetadataType = any, PropertyKeyType extends string | symbol | number = any>(
+export function buildPropertyDecorator<
+  MetadataType = any,
+  PropertyKeyType extends string | symbol | number = any,
+>(
   metadataKey: any,
   /**
       Retrieves the metadata for a property
@@ -22,14 +25,32 @@ export function createPropertyDecorator<MetadataType = any, PropertyKeyType exte
       @returns {MetadataType} The metadata for the property
       
   */
-  metadata: ((existingMetaData: MetadataType, allExistingMetadata: Record<PropertyKeyType, MetadataType>, target: Object, propertyKey: any) => MetadataType) | MetadataType
+  metadata:
+    | ((
+        existingMetaData: MetadataType,
+        allExistingMetadata: Record<PropertyKeyType, MetadataType>,
+        target: Object,
+        propertyKey: any
+      ) => MetadataType)
+    | MetadataType
 ): PropertyDecorator {
   return (target: Object, propertyKey: any) => {
     const constructor = target?.constructor;
-    const allExistingMetadata: Record<PropertyKeyType, MetadataType> = Object.assign({}, Reflect.getMetadata(metadataKey, constructor));
-    const existingMetaData: MetadataType | undefined = allExistingMetadata[propertyKey as keyof typeof allExistingMetadata];
-    const newMetatdata: MetadataType = typeof metadata === "function" ? (metadata as any)(existingMetaData, allExistingMetadata, target, propertyKey) : metadata;
-    allExistingMetadata[propertyKey as keyof typeof allExistingMetadata] = newMetatdata;
+    const allExistingMetadata: Record<PropertyKeyType, MetadataType> =
+      Object.assign({}, Reflect.getMetadata(metadataKey, constructor));
+    const existingMetaData: MetadataType | undefined =
+      allExistingMetadata[propertyKey as keyof typeof allExistingMetadata];
+    const newMetatdata: MetadataType =
+      typeof metadata === "function"
+        ? (metadata as any)(
+            existingMetaData,
+            allExistingMetadata,
+            target,
+            propertyKey
+          )
+        : metadata;
+    allExistingMetadata[propertyKey as keyof typeof allExistingMetadata] =
+      newMetatdata;
     // Update the metadata on the class
     Reflect.defineMetadata(metadataKey, allExistingMetadata, constructor);
     // Store additional metadata for this specific property if needed
@@ -45,8 +66,18 @@ export function createPropertyDecorator<MetadataType = any, PropertyKeyType exte
  * @param metadataKey The metadata key.
  * @returns Record of property names and their metadata
  */
-export function getDecoratedProperties<MetaDataType = any, PropertyKeyType extends string | symbol | number = any>(target: IClassConstructor, metadataKey: any): Record<PropertyKeyType, MetaDataType> {
-  return extendObj({}, Reflect.getMetadata(metadataKey, target), Reflect.getMetadata(metadataKey, target.prototype));
+export function getDecoratedProperties<
+  MetaDataType = any,
+  PropertyKeyType extends string | symbol | number = any,
+>(
+  target: IClassConstructor,
+  metadataKey: any
+): Record<PropertyKeyType, MetaDataType> {
+  return extendObj(
+    {},
+    Reflect.getMetadata(metadataKey, target),
+    Reflect.getMetadata(metadataKey, target.prototype)
+  );
 }
 
 /**
@@ -57,7 +88,11 @@ export function getDecoratedProperties<MetaDataType = any, PropertyKeyType exten
  *@param propertyKey - The name of the propertyfor which metadata is being retrieved.
  * @returns {MetaDataType} The metadata value for the property.
  */
-export function getDecoratedProperty<MetaDataType = any>(target: IClassConstructor, metadataKey: any, propertyKey: any): MetaDataType {
+export function getDecoratedProperty<MetaDataType = any>(
+  target: IClassConstructor,
+  metadataKey: any,
+  propertyKey: any
+): MetaDataType {
   return getDecoratedProperties(target, metadataKey)[propertyKey];
 }
 
@@ -136,10 +171,24 @@ export class TypeRegistry {
    * });
    * ```
    */
-  static register<InputType = any, OutputType = any>(type: string, componentType: string, renderer: ITypeRegistryRenderer<InputType, OutputType>): void {
-    if (!type || typeof type !== "string" || !componentType || typeof componentType !== "string") return;
+  static register<InputType = any, OutputType = any>(
+    type: string,
+    componentType: string,
+    renderer: ITypeRegistryRenderer<InputType, OutputType>
+  ): void {
+    if (
+      !type ||
+      typeof type !== "string" ||
+      !componentType ||
+      typeof componentType !== "string"
+    )
+      return;
     // Use Reflect Metadata to set the renderer for the specific value and component type
-    Reflect.defineMetadata(this.getMetadataKey(type, componentType), renderer, TypeRegistry);
+    Reflect.defineMetadata(
+      this.getMetadataKey(type, componentType),
+      renderer,
+      TypeRegistry
+    );
   }
 
   /**
@@ -164,9 +213,15 @@ export class TypeRegistry {
    * }
    * ```
    */
-  static getRenderer<InputType = any, OutputType = any>(type: string, componentType: string): ITypeRegistryRenderer<InputType, OutputType> | undefined {
+  static getRenderer<InputType = any, OutputType = any>(
+    type: string,
+    componentType: string
+  ): ITypeRegistryRenderer<InputType, OutputType> | undefined {
     // Use Reflect Metadata to get the renderer for the specific value and component type
-    return Reflect.getMetadata(this.getMetadataKey(type, componentType), TypeRegistry);
+    return Reflect.getMetadata(
+      this.getMetadataKey(type, componentType),
+      TypeRegistry
+    );
   }
 
   /**
@@ -200,8 +255,16 @@ export class TypeRegistry {
    @param fallbackValue - The value to be rendered if no renderer is found.
  * @returns {OutputType}.The rendered content
  */
-  static render<InputType = any, OutputType = any>(type: string, value: InputType, componentType: string, fallbackValue?: OutputType): OutputType {
-    const renderer = TypeRegistry.getRenderer<InputType, OutputType>(type, componentType);
+  static render<InputType = any, OutputType = any>(
+    type: string,
+    value: InputType,
+    componentType: string,
+    fallbackValue?: OutputType
+  ): OutputType {
+    const renderer = TypeRegistry.getRenderer<InputType, OutputType>(
+      type,
+      componentType
+    );
     if (renderer) {
       return renderer(value) as OutputType;
     }
@@ -245,9 +308,13 @@ export class TypeRegistry {
  * console.log(renderer(123)); // Output: <div class="cell number">123</div>
  * ```
  */
-export function createTypeRegistryDecorator<InputType = any, OutputType = any>(componentType: string) {
+export function createTypeRegistryDecorator<InputType = any, OutputType = any>(
+  componentType: string
+) {
   return (type: string) => {
-    return function (target: ITypeRegistryRenderer<InputType, OutputType>): void {
+    return function (
+      target: ITypeRegistryRenderer<InputType, OutputType>
+    ): void {
       // Register the rendering function with the TypeRegistry
       TypeRegistry.register(type, componentType, target);
     };
@@ -374,9 +441,16 @@ export class ComponentRegistry {
    * ComponentRegistry.register<number, string>("numberRenderer", (input: number) => `The number is ${input}`);
    * ```
    */
-  static register<InputType = any, OutputType = any>(componentName: string, renderer: ITypeRegistryRenderer<InputType, OutputType>): void {
+  static register<InputType = any, OutputType = any>(
+    componentName: string,
+    renderer: ITypeRegistryRenderer<InputType, OutputType>
+  ): void {
     if (!componentName || typeof componentName !== "string") return;
-    Reflect.defineMetadata(this.getMetadataKey(componentName), renderer, ComponentRegistry);
+    Reflect.defineMetadata(
+      this.getMetadataKey(componentName),
+      renderer,
+      ComponentRegistry
+    );
   }
 
   /**
@@ -395,8 +469,13 @@ export class ComponentRegistry {
    * }
    * ```
    */
-  static getRenderer<InputType = any, OutputType = any>(componentName: string): ITypeRegistryRenderer<InputType, OutputType> | undefined {
-    return Reflect.getMetadata(this.getMetadataKey(componentName), ComponentRegistry);
+  static getRenderer<InputType = any, OutputType = any>(
+    componentName: string
+  ): ITypeRegistryRenderer<InputType, OutputType> | undefined {
+    return Reflect.getMetadata(
+      this.getMetadataKey(componentName),
+      ComponentRegistry
+    );
   }
 
   /**
@@ -432,7 +511,11 @@ export class ComponentRegistry {
    * console.log(output); // Outputs: "The number is 42" or "No renderer available" if the renderer isn't registered
    * ```
    */
-  static render<InputType = any, OutputType = any>(value: InputType, componentName: string, fallbackValue?: OutputType): OutputType {
+  static render<InputType = any, OutputType = any>(
+    value: InputType,
+    componentName: string,
+    fallbackValue?: OutputType
+  ): OutputType {
     const renderer = this.getRenderer<InputType, OutputType>(componentName);
     if (renderer) {
       return renderer(value) as OutputType;
@@ -489,7 +572,10 @@ export class ComponentRegistry {
  * @param componentName - The name of the component to register the renderer for.
  * @returns A decorator function that registers the target function as a renderer in the `ComponentRegistry`.
  */
-export function createComponentRegistryDecorator<InputType = any, OutputType = any>(componentName: string) {
+export function createComponentRegistryDecorator<
+  InputType = any,
+  OutputType = any,
+>(componentName: string) {
   return function (target: ITypeRegistryRenderer<InputType, OutputType>): void {
     // Register the rendering function with the ComponentRegistry
     ComponentRegistry.register(componentName, target);

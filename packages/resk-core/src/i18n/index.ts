@@ -4,7 +4,7 @@ import {
   observableFactory,
 } from "@/observable";
 import {
-  createPropertyDecorator,
+  buildPropertyDecorator,
   getDecoratedProperties,
 } from "@/resources/decorators";
 import { Session as session } from "@session/index";
@@ -52,7 +52,7 @@ const TRANSLATION_KEY = Symbol("TRANSLATION_KEY");
 * ```
 */
 export function Translate(key: string): PropertyDecorator & MethodDecorator {
-  return createPropertyDecorator<string>(TRANSLATION_KEY, key);
+  return buildPropertyDecorator<string>(TRANSLATION_KEY, key);
 }
 
 /**

@@ -1,7 +1,13 @@
 import { IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
-function _Array({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): boolean | string {
+function _Array({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions): boolean | string {
   if (Array.isArray(value)) {
     return true;
   } else {
@@ -36,9 +42,16 @@ Validator.registerRule("Array", _Array);
  * @since 1.22.0
  * @public
  */
-export const IsArray = Validator.createPropertyDecorator(["Array"]);
+export const IsArray = Validator.buildPropertyDecorator(["Array"]);
 
-function _ArrayMinLength({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<number[]>): boolean | string {
+function _ArrayMinLength({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
     const message = i18n.t("validator.array", {
       field: translatedPropertyName || fieldName,
@@ -98,9 +111,17 @@ Validator.registerRule("ArrayMinLength", _ArrayMinLength);
  * @since 1.22.0
  * @public
  */
-export const ArrayMinLength = Validator.buildRuleDecorator<[number]>(_ArrayMinLength);
+export const ArrayMinLength =
+  Validator.buildRuleDecorator<[number]>(_ArrayMinLength);
 
-function _ArrayMaxLength({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<number[]>): boolean | string {
+function _ArrayMaxLength({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
     const message = i18n.t("validator.array", {
       field: translatedPropertyName || fieldName,
@@ -160,9 +181,17 @@ Validator.registerRule("ArrayMaxLength", _ArrayMaxLength);
  * @since 1.22.0
  * @public
  */
-export const ArrayMaxLength = Validator.buildRuleDecorator<[number]>(_ArrayMaxLength);
+export const ArrayMaxLength =
+  Validator.buildRuleDecorator<[number]>(_ArrayMaxLength);
 
-function _ArrayLength({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<number[]>): boolean | string {
+function _ArrayLength({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<number[]>): boolean | string {
   if (!Array.isArray(value)) {
     const message = i18n.t("validator.array", {
       field: translatedPropertyName || fieldName,
@@ -224,7 +253,14 @@ Validator.registerRule("ArrayLength", _ArrayLength);
  */
 export const ArrayLength = Validator.buildRuleDecorator<[number]>(_ArrayLength);
 
-function _ArrayContains({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<any[]>): boolean | string {
+function _ArrayContains({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<any[]>): boolean | string {
   if (!Array.isArray(value)) {
     const message = i18n.t("validator.arrayContains", {
       field: translatedPropertyName || fieldName,
@@ -293,9 +329,16 @@ Validator.registerRule("ArrayContains", _ArrayContains);
  * @since 1.22.0
  * @public
  */
-export const ArrayContains = Validator.buildRuleDecorator<any[]>(_ArrayContains);
+export const ArrayContains =
+  Validator.buildRuleDecorator<any[]>(_ArrayContains);
 
-function _ArrayUnique({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): boolean | string {
+function _ArrayUnique({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions): boolean | string {
   if (!Array.isArray(value)) {
     const message = i18n.t("validator.arrayUnique", {
       field: translatedPropertyName || fieldName,
@@ -358,7 +401,7 @@ Validator.registerRule("ArrayUnique", _ArrayUnique);
  * @since 1.22.0
  * @public
  */
-export const ArrayUnique = Validator.createPropertyDecorator(["ArrayUnique"]);
+export const ArrayUnique = Validator.buildPropertyDecorator(["ArrayUnique"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {

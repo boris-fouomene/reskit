@@ -59,7 +59,7 @@ Validator.registerRule("UniqueEmail", async ({ value }) => {
   return !exists || "Email already registered";
 });
 
-const IsUniqueEmail = Validator.createPropertyDecorator(["UniqueEmail"]);
+const IsUniqueEmail = Validator.buildPropertyDecorator(["UniqueEmail"]);
 
 class RegistrationForm {
   @IsRequired
@@ -121,21 +121,24 @@ async function registerUser(formData: unknown) {
 ### Password Reset Validation
 
 ```typescript
-Validator.registerRule("StrongPassword", ({ value }: IValidatorValidateOptions) => {
-  const hasUpperCase = /[A-Z]/.test(value);
-  const hasLowerCase = /[a-z]/.test(value);
-  const hasNumbers = /[0-9]/.test(value);
-  const hasSpecialChar = /[!@#$%^&*]/.test(value);
+Validator.registerRule(
+  "StrongPassword",
+  ({ value }: IValidatorValidateOptions) => {
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasLowerCase = /[a-z]/.test(value);
+    const hasNumbers = /[0-9]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*]/.test(value);
 
-  if (!hasUpperCase) return "Must contain uppercase letter";
-  if (!hasLowerCase) return "Must contain lowercase letter";
-  if (!hasNumbers) return "Must contain number";
-  if (!hasSpecialChar) return "Must contain special character (!@#$%^&*)";
+    if (!hasUpperCase) return "Must contain uppercase letter";
+    if (!hasLowerCase) return "Must contain lowercase letter";
+    if (!hasNumbers) return "Must contain number";
+    if (!hasSpecialChar) return "Must contain special character (!@#$%^&*)";
 
-  return true;
-});
+    return true;
+  }
+);
 
-const IsStrongPassword = Validator.createPropertyDecorator(["StrongPassword"]);
+const IsStrongPassword = Validator.buildPropertyDecorator(["StrongPassword"]);
 
 class PasswordResetForm {
   @IsRequired
@@ -243,9 +246,13 @@ class CartItem {
 }
 
 async function validateCartItems(items: unknown[]) {
-  const results = await Promise.all(items.map((item, index) => Validator.validateTarget(CartItem, item)));
+  const results = await Promise.all(
+    items.map((item, index) => Validator.validateTarget(CartItem, item))
+  );
 
-  const failures = results.map((r, i) => ({ index: i, result: r })).filter((x) => !x.result.success);
+  const failures = results
+    .map((r, i) => ({ index: i, result: r }))
+    .filter((x) => !x.result.success);
 
   if (failures.length > 0) {
     return {
@@ -273,7 +280,7 @@ Validator.registerRule("ValidSlug", ({ value }) => {
   return slugRegex.test(value) || "Slug must be lowercase with hyphens only";
 });
 
-const IsValidSlug = Validator.createPropertyDecorator(["ValidSlug"]);
+const IsValidSlug = Validator.buildPropertyDecorator(["ValidSlug"]);
 
 class BlogPost {
   @IsRequired
@@ -398,8 +405,16 @@ interface ValidationContext {
   userRole?: string;
 }
 
-async function validateRequest<T>(data: unknown, ValidationClass: new () => T, context?: ValidationContext) {
-  const result = await Validator.validateTarget<T, ValidationContext>(ValidationClass, data, { context });
+async function validateRequest<T>(
+  data: unknown,
+  ValidationClass: new () => T,
+  context?: ValidationContext
+) {
+  const result = await Validator.validateTarget<T, ValidationContext>(
+    ValidationClass,
+    data,
+    { context }
+  );
 
   return {
     isValid: result.success,
@@ -410,7 +425,11 @@ async function validateRequest<T>(data: unknown, ValidationClass: new () => T, c
 }
 
 // Express/Fastify middleware example
-async function validationMiddleware(req: Request, res: Response, next: NextFunction) {
+async function validationMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const validation = await validateRequest(req.body, UserForm, {
     userId: req.user?.id,
     userRole: req.user?.role,
@@ -548,7 +567,7 @@ Validator.registerRule("MatchesField", ({ value, context }) => {
   return value === targetValue || `Must match ${targetField}`;
 });
 
-const MatchesField = Validator.createPropertyDecorator(["MatchesField"]);
+const MatchesField = Validator.buildPropertyDecorator(["MatchesField"]);
 
 interface PasswordContext {
   targetField: string;
@@ -565,7 +584,10 @@ class ChangePasswordForm {
   confirmPassword: string; // Will use MatchesField rule
 }
 
-async function validatePasswordChange(formData: unknown, currentPassword: string) {
+async function validatePasswordChange(
+  formData: unknown,
+  currentPassword: string
+) {
   const validated = formData as any;
 
   // First validate structure
@@ -576,7 +598,8 @@ async function validatePasswordChange(formData: unknown, currentPassword: string
   }
 
   // Then validate cross-field
-  const passwordsMatch = result.data.newPassword === result.data.confirmPassword;
+  const passwordsMatch =
+    result.data.newPassword === result.data.confirmPassword;
   if (!passwordsMatch) {
     return {
       success: false,
@@ -605,7 +628,9 @@ Validator.registerRule("ValidDiscountCode", async ({ value, context }) => {
   return true;
 });
 
-const IsValidDiscountCode = Validator.createPropertyDecorator(["ValidDiscountCode"]);
+const IsValidDiscountCode = Validator.buildPropertyDecorator([
+  "ValidDiscountCode",
+]);
 
 class CheckoutForm {
   @IsRequired
@@ -663,7 +688,7 @@ Validator.registerRule("BusinessHours", ({ value }) => {
   return true;
 });
 
-const IsBusinessHours = Validator.createPropertyDecorator(["BusinessHours"]);
+const IsBusinessHours = Validator.buildPropertyDecorator(["BusinessHours"]);
 
 class ServiceRequest {
   @IsRequired
@@ -704,7 +729,9 @@ class CSVRecord {
 }
 
 async function validateCSVImport(records: unknown[]) {
-  const results = await Promise.all(records.map((record, index) => Validator.validateTarget(CSVRecord, record)));
+  const results = await Promise.all(
+    records.map((record, index) => Validator.validateTarget(CSVRecord, record))
+  );
 
   const summary = {
     total: records.length,

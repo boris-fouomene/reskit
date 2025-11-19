@@ -1,10 +1,10 @@
+import { defaultStr } from "@utils/defaultStr";
+import { isEmpty } from "@utils/isEmpty";
 import { isNonNullString } from "@utils/isNonNullString";
+import { isNumber } from "@utils/isNumber";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
-import { defaultStr } from "@utils/defaultStr";
 import { toNumber } from "./utils";
-import { isNumber } from "@utils/isNumber";
-import { isEmpty } from "@utils/isEmpty";
 
 /**
  * ### IsNonNullString Decorator
@@ -46,7 +46,9 @@ import { isEmpty } from "@utils/isEmpty";
  * @see {@link IsRequired} - Less strict alternative
  * @public
  */
-export const IsNonNullString = Validator.createPropertyDecorator(["NonNullString"]);
+export const IsNonNullString = Validator.buildPropertyDecorator([
+  "NonNullString",
+]);
 
 function stringLength({ value, ruleParams, i18n }: IValidatorValidateOptions) {
   ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
@@ -54,7 +56,10 @@ function stringLength({ value, ruleParams, i18n }: IValidatorValidateOptions) {
   const minLength = toNumber(ruleParams[0]);
   const maxLength = toNumber(ruleParams[1]);
   const i18nParams = { value, minLength, maxLength, length: minLength };
-  const message = isNumber(minLength) && isNumber(maxLength) ? i18n.t("validator.lengthRange", i18nParams) : i18n.t("validator.length", i18nParams);
+  const message =
+    isNumber(minLength) && isNumber(maxLength)
+      ? i18n.t("validator.lengthRange", i18nParams)
+      : i18n.t("validator.length", i18nParams);
   if (isNumber(minLength) && isNumber(maxLength)) {
     return (value.length >= minLength && value.length <= maxLength) || message;
   }
@@ -74,7 +79,11 @@ function minLength(options: IValidatorValidateOptions) {
     ...options,
     minLength: mLength,
   });
-  return isEmpty(value) || (value && typeof value === "string" && String(value).length >= mLength) || message;
+  return (
+    isEmpty(value) ||
+    (value && typeof value === "string" && String(value).length >= mLength) ||
+    message
+  );
 }
 Validator.registerRule("MinLength", minLength);
 
@@ -106,7 +115,8 @@ Validator.registerRule("MinLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const MinLength = Validator.buildRuleDecorator<[minLength: number]>(minLength);
+export const MinLength =
+  Validator.buildRuleDecorator<[minLength: number]>(minLength);
 
 function maxLength(options: IValidatorValidateOptions) {
   let { value, ruleParams, i18n } = options;
@@ -116,7 +126,11 @@ function maxLength(options: IValidatorValidateOptions) {
     ...options,
     maxLength: mLength,
   });
-  return isEmpty(value) || (value && typeof value === "string" && String(value).length <= mLength) || message;
+  return (
+    isEmpty(value) ||
+    (value && typeof value === "string" && String(value).length <= mLength) ||
+    message
+  );
 }
 Validator.registerRule("MaxLength", maxLength);
 
@@ -149,7 +163,8 @@ Validator.registerRule("MaxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const MaxLength = Validator.buildRuleDecorator<[maxLength: number]>(maxLength);
+export const MaxLength =
+  Validator.buildRuleDecorator<[maxLength: number]>(maxLength);
 
 Validator.registerRule("NonNullString", function NonNullString(options) {
   const { value, i18n } = options;
@@ -192,9 +207,19 @@ Validator.registerRule("NonNullString", function NonNullString(options) {
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const Length = Validator.buildRuleDecorator<[minOrLength: number, maxLength?: number]>(stringLength);
+export const Length =
+  Validator.buildRuleDecorator<[minOrLength: number, maxLength?: number]>(
+    stringLength
+  );
 
-function _EndsWith({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _EndsWith({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.endsWithOneOf", {
@@ -215,7 +240,9 @@ function _EndsWith({ value, ruleParams, fieldName, translatedPropertyName, i18n,
       });
       return reject(message);
     }
-    const endsWithAny = ruleParams.some((ending) => isNonNullString(ending) && value.endsWith(ending));
+    const endsWithAny = ruleParams.some(
+      (ending) => isNonNullString(ending) && value.endsWith(ending)
+    );
     if (endsWithAny) {
       resolve(true);
     } else {
@@ -260,7 +287,14 @@ Validator.registerRule("EndsWithOneOf", _EndsWith);
  */
 export const EndsWithOneOf = Validator.buildRuleDecorator<string[]>(_EndsWith);
 
-function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _StartsWith({
+  value,
+  ruleParams,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.startsWithOneOf", {
@@ -282,7 +316,9 @@ function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, i18
       return reject(message);
     }
 
-    const startsWithAny = ruleParams.some((prefix) => isNonNullString(value) && value.startsWith(prefix));
+    const startsWithAny = ruleParams.some(
+      (prefix) => isNonNullString(value) && value.startsWith(prefix)
+    );
 
     if (startsWithAny) {
       resolve(true);
@@ -298,7 +334,13 @@ function _StartsWith({ value, ruleParams, fieldName, translatedPropertyName, i18
   });
 }
 
-function _String({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
+function _String({
+  value,
+  fieldName,
+  translatedPropertyName,
+  i18n,
+  ...rest
+}: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value === "string") {
       resolve(true);
@@ -339,7 +381,7 @@ Validator.registerRule("String", _String);
  * @since 1.22.0
  * @public
  */
-export const IsString = Validator.createPropertyDecorator(["String"]);
+export const IsString = Validator.buildPropertyDecorator(["String"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {

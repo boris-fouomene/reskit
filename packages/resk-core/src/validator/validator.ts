@@ -1,8 +1,31 @@
-import { buildPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
+import {
+  buildPropertyDecorator,
+  getDecoratedProperties,
+} from "@/resources/decorators";
 import { IClassConstructor, IDict, IMakeOptional } from "@/types";
-import { defaultStr, isEmpty, isNonNullString, isObj, stringify } from "@utils/index";
+import {
+  defaultStr,
+  isEmpty,
+  isNonNullString,
+  isObj,
+  stringify,
+} from "@utils/index";
 import { I18n, i18n as defaultI18n } from "../i18n";
-import { IValidatorRule, IValidatorRuleFunction, IValidatorRuleName, IValidatorRules, IValidatorRulesMap, IValidatorSanitizedRuleObject, IValidatorSanitizedRules, IValidatorValidateFailure, IValidatorValidateOptions, IValidatorValidateResult, IValidatorValidateSuccess, IValidatorValidateTargetResult, IValidatorValidationError } from "./types";
+import {
+  IValidatorRule,
+  IValidatorRuleFunction,
+  IValidatorRuleName,
+  IValidatorRules,
+  IValidatorRulesMap,
+  IValidatorSanitizedRuleObject,
+  IValidatorSanitizedRules,
+  IValidatorValidateFailure,
+  IValidatorValidateOptions,
+  IValidatorValidateResult,
+  IValidatorValidateSuccess,
+  IValidatorValidateTargetResult,
+  IValidatorValidationError,
+} from "./types";
 
 // Enhanced metadata keys with consistent naming convention
 const VALIDATOR_TARGET_RULES_METADATA_KEY = Symbol("validatorTargetRules");
@@ -190,7 +213,13 @@ export class Validator {
    * @see {@link getRules} - Get all registered rules
    * @public
    */
-  static registerRule<ParamType extends Array<any> = Array<any>, Context = unknown>(ruleName: IValidatorRuleName, ruleHandler: IValidatorRuleFunction<ParamType, Context>): void {
+  static registerRule<
+    ParamType extends Array<any> = Array<any>,
+    Context = unknown,
+  >(
+    ruleName: IValidatorRuleName,
+    ruleHandler: IValidatorRuleFunction<ParamType, Context>
+  ): void {
     if (!isNonNullString(ruleName)) {
       throw new Error("Rule name must be a non-empty string");
     }
@@ -201,7 +230,11 @@ export class Validator {
 
     const existingRules = Validator.getRules();
     const updatedRules = { ...existingRules, [ruleName]: ruleHandler };
-    Reflect.defineMetadata(Validator.RULES_METADATA_KEY, updatedRules, Validator);
+    Reflect.defineMetadata(
+      Validator.RULES_METADATA_KEY,
+      updatedRules,
+      Validator
+    );
   }
 
   /**
@@ -247,8 +280,17 @@ export class Validator {
     if (i18n instanceof I18n) {
       return i18n;
     }
-    if (i18n && typeof (i18n as any)?.getLocale === "function" && typeof (i18n as any)?.translate === "function" && typeof (i18n as any)?.translateTarget === "function") {
-      console.log("returning i18n found ", (i18n as any).getLocale(), " is locale getted");
+    if (
+      i18n &&
+      typeof (i18n as any)?.getLocale === "function" &&
+      typeof (i18n as any)?.translate === "function" &&
+      typeof (i18n as any)?.translateTarget === "function"
+    ) {
+      console.log(
+        "returning i18n found ",
+        (i18n as any).getLocale(),
+        " is locale getted"
+      );
       return i18n as I18n;
     }
     return defaultI18n;
@@ -303,7 +345,10 @@ export class Validator {
     single: string;
   } {
     const i18n = this.getI18n({ i18n: customI18n });
-    const translatedSeparator: IDict = Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict;
+    const translatedSeparator: IDict = Object.assign(
+      {},
+      i18n.getNestedTranslation("validator.separators")
+    ) as IDict;
     return {
       multiple: defaultStr(translatedSeparator.multiple, ", "),
       single: defaultStr(translatedSeparator.single, ", "),
@@ -374,10 +419,17 @@ export class Validator {
    * @see {@link getRules} - Get all rules
    * @public
    */
-  static findRegisteredRule<ParamType extends Array<any> = Array<any>, Context = unknown>(ruleName: IValidatorRuleName): IValidatorRuleFunction<ParamType, Context> | undefined {
+  static findRegisteredRule<
+    ParamType extends Array<any> = Array<any>,
+    Context = unknown,
+  >(
+    ruleName: IValidatorRuleName
+  ): IValidatorRuleFunction<ParamType, Context> | undefined {
     if (!isNonNullString(ruleName)) return undefined;
     const rules = Validator.getRules();
-    return rules[ruleName] as IValidatorRuleFunction<ParamType, Context> | undefined;
+    return rules[ruleName] as
+      | IValidatorRuleFunction<ParamType, Context>
+      | undefined;
   }
 
   /**
@@ -537,7 +589,10 @@ export class Validator {
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
-  private static parseStringRule(ruleString: string, registeredRules: IValidatorRulesMap): any {
+  private static parseStringRule(
+    ruleString: string,
+    registeredRules: IValidatorRulesMap
+  ): any {
     let ruleName = String(ruleString).trim();
     const ruleParameters: string[] = [];
 
@@ -630,7 +685,9 @@ export class Validator {
     for (const propertyKey in rulesObject) {
       if (Object.hasOwnProperty.call(rulesObject, propertyKey)) {
         const ruleParameters = rulesObject[propertyKey as IValidatorRuleName];
-        const ruleFunction = registeredRules[propertyKey as IValidatorRuleName] as IValidatorRuleFunction;
+        const ruleFunction = registeredRules[
+          propertyKey as IValidatorRuleName
+        ] as IValidatorRuleFunction;
 
         if (typeof ruleFunction === "function") {
           validRules.push({
@@ -828,10 +885,17 @@ export class Validator {
    * @public
    * @async
    */
-  static async validate<Context = unknown>({ rules, ...extra }: IMakeOptional<IValidatorValidateOptions<Array<any>, Context>, "i18n">): Promise<IValidatorValidateResult<Context>> {
+  static async validate<Context = unknown>({
+    rules,
+    ...extra
+  }: IMakeOptional<
+    IValidatorValidateOptions<Array<any>, Context>,
+    "i18n"
+  >): Promise<IValidatorValidateResult<Context>> {
     const i18n = this.getI18n(extra);
     const startTime = Date.now();
-    const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules<Context>(rules);
+    const { sanitizedRules, invalidRules } =
+      Validator.parseAndValidateRules<Context>(rules);
     const separators = Validator.getErrorMessageSeparators(i18n);
     const { value, context, data } = extra;
     const successOrErrorData = {
@@ -874,7 +938,12 @@ export class Validator {
         if (typeof rule === "function") continue;
         if (typeof rule === "object" && rule.ruleName) {
           const ruleName = rule.ruleName;
-          if (ruleName in nullableConditions && nullableConditions[ruleName as keyof typeof nullableConditions](value)) {
+          if (
+            ruleName in nullableConditions &&
+            nullableConditions[ruleName as keyof typeof nullableConditions](
+              value
+            )
+          ) {
             skipValidation = true;
             break;
           }
@@ -886,7 +955,10 @@ export class Validator {
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
-    extra.fieldName = extra.propertyName = defaultStr(extra.fieldName, extra.propertyName);
+    extra.fieldName = extra.propertyName = defaultStr(
+      extra.fieldName,
+      extra.propertyName
+    );
     const i18nRulesOptions = {
       ...extra,
       value,
@@ -906,7 +978,9 @@ export class Validator {
           let ruleName = undefined;
           let rawRuleName: IValidatorRuleName | string | undefined = undefined;
           let ruleParams: any[] = [];
-          let ruleFunc: IValidatorRuleFunction<Array<any>, Context> | undefined = typeof rule === "function" ? rule : undefined;
+          let ruleFunc:
+            | IValidatorRuleFunction<Array<any>, Context>
+            | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "object" && isObj(rule)) {
             ruleFunc = rule.ruleFunction;
             ruleParams = Array.isArray(rule.params) ? rule.params : [];
@@ -923,18 +997,28 @@ export class Validator {
           };
 
           const handleResult = (result: any) => {
-            result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
+            result =
+              typeof result === "string"
+                ? isNonNullString(result)
+                  ? result
+                  : i18n.t("validator.invalidMessage", i18nRuleOptions)
+                : result;
             if (result === false) {
-              const error = createValidationError(i18n.t("validator.invalidMessage", i18nRuleOptions), {
-                value,
-                ruleName,
-                rawRuleName,
-                ruleParams,
-                fieldName: extra.fieldName,
-                propertyName: extra.propertyName,
-                translatedPropertyName: extra.translatedPropertyName,
-              });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
+              const error = createValidationError(
+                i18n.t("validator.invalidMessage", i18nRuleOptions),
+                {
+                  value,
+                  ruleName,
+                  rawRuleName,
+                  ruleParams,
+                  fieldName: extra.fieldName,
+                  propertyName: extra.propertyName,
+                  translatedPropertyName: extra.translatedPropertyName,
+                }
+              );
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             } else if (isNonNullString(result)) {
               const error = createValidationError(result, {
                 value,
@@ -945,7 +1029,9 @@ export class Validator {
                 propertyName: extra.propertyName,
                 translatedPropertyName: extra.translatedPropertyName,
               });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             } else if ((result as any) instanceof Error) {
               const error = createValidationError(stringify(result), {
                 value,
@@ -956,22 +1042,29 @@ export class Validator {
                 propertyName: extra.propertyName,
                 translatedPropertyName: extra.translatedPropertyName,
               });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
+              return resolve(
+                createFailureResult(error, successOrErrorData, startTime)
+              );
             }
             return next();
           };
 
           if (typeof ruleFunc !== "function") {
-            const error = createValidationError(i18n.t("validator.invalidRule", i18nRuleOptions), {
-              value,
-              ruleName,
-              rawRuleName,
-              ruleParams,
-              fieldName: extra.fieldName,
-              propertyName: extra.propertyName,
-              translatedPropertyName: extra.translatedPropertyName,
-            });
-            return resolve(createFailureResult(error, successOrErrorData, startTime));
+            const error = createValidationError(
+              i18n.t("validator.invalidRule", i18nRuleOptions),
+              {
+                value,
+                ruleName,
+                rawRuleName,
+                ruleParams,
+                fieldName: extra.fieldName,
+                propertyName: extra.propertyName,
+                translatedPropertyName: extra.translatedPropertyName,
+              }
+            );
+            return resolve(
+              createFailureResult(error, successOrErrorData, startTime)
+            );
           }
 
           try {
@@ -986,19 +1079,32 @@ export class Validator {
             } as any);
             return handleResult(result);
           } catch (e) {
-            return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
+            return handleResult(
+              typeof e === "string"
+                ? e
+                : (e as any)?.message || e?.toString() || stringify(e)
+            );
           }
         };
         return next();
       }, 0);
     });
   }
-  static isSuccess<Context = unknown>(result: IValidatorValidateResult<Context>): result is IValidatorValidateSuccess<Context> {
+  static isSuccess<Context = unknown>(
+    result: IValidatorValidateResult<Context>
+  ): result is IValidatorValidateSuccess<Context> {
     return isObj(result) && result.success === true;
   }
 
-  static isFailure<Context = unknown>(result: any): result is IValidatorValidateFailure<Context> {
-    return isObj(result) && result.success === false && isObj(result.error) && result.error.name == "ValidatorValidationError";
+  static isFailure<Context = unknown>(
+    result: any
+  ): result is IValidatorValidateFailure<Context> {
+    return (
+      isObj(result) &&
+      result.success === false &&
+      isObj(result.error) &&
+      result.error.name == "ValidatorValidationError"
+    );
   }
 
   /**
@@ -1218,7 +1324,10 @@ export class Validator {
    * @public
    * @async
    */
-  static async validateTarget<T extends IClassConstructor = any, Context = unknown>(
+  static async validateTarget<
+    T extends IClassConstructor = any,
+    Context = unknown,
+  >(
     target: T,
     data: Partial<Record<keyof InstanceType<T>, any>>,
     options?: {
@@ -1242,11 +1351,19 @@ export class Validator {
   ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
     const targetRules = Validator.getTargetRules<T>(target);
-    const { context, errorMessageBuilder, ...restOptions } = Object.assign({}, Validator.getValidateTargetOptions(target), options);
+    const { context, errorMessageBuilder, ...restOptions } = Object.assign(
+      {},
+      Validator.getValidateTargetOptions(target),
+      options
+    );
     data = Object.assign({}, data);
     const i18n = this.getI18n(options);
     const messageSeparators = Validator.getErrorMessageSeparators(i18n);
-    const buildErrorMessage = typeof errorMessageBuilder === "function" ? errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
+    const buildErrorMessage =
+      typeof errorMessageBuilder === "function"
+        ? errorMessageBuilder
+        : (translatedPropertyName: string, error: string) =>
+            `[${String(translatedPropertyName)}] : ${error}`;
 
     const validationErrors: IValidatorValidationError[] = [];
     const validationPromises: Promise<IValidatorValidateResult<Context>>[] = [];
@@ -1260,11 +1377,19 @@ export class Validator {
         continue;
       }
       const value = data[propertyKey];
-      if ((value === "" || value === undefined || value === null) && ((rules.includes("Nullable") && (value === null || value === undefined)) || (rules.includes("Empty") && value === ""))) {
+      if (
+        (value === "" || value === undefined || value === null) &&
+        ((rules.includes("Nullable") &&
+          (value === null || value === undefined)) ||
+          (rules.includes("Empty") && value === ""))
+      ) {
         // Skip validation for Nullable fields with null/undefined value
         continue;
       }
-      const translatedPropertyName: string = defaultStr((translatedPropertyNames as any)[propertyKey], propertyKey);
+      const translatedPropertyName: string = defaultStr(
+        (translatedPropertyNames as any)[propertyKey],
+        propertyKey
+      );
       validationPromises.push(
         Validator.validate<Context>({
           context,
@@ -1281,14 +1406,18 @@ export class Validator {
             validatedFieldCount++;
           } else {
             const errorMessage = stringify(validationResult.error?.message);
-            const formattedMessage = buildErrorMessage(translatedPropertyName, errorMessage, {
-              ...Object.assign({}, validationResult.error),
-              separators: messageSeparators,
-              data,
-              propertyName: propertyKey,
-              translatedPropertyName: translatedPropertyName,
-              i18n,
-            });
+            const formattedMessage = buildErrorMessage(
+              translatedPropertyName,
+              errorMessage,
+              {
+                ...Object.assign({}, validationResult.error),
+                separators: messageSeparators,
+                data,
+                propertyName: propertyKey,
+                translatedPropertyName: translatedPropertyName,
+                i18n,
+              }
+            );
             validationErrors.push({
               name: "ValidatorValidationError",
               status: "error" as const,
@@ -1325,7 +1454,9 @@ export class Validator {
           const message = i18n.translate("validator.failedForNFields", {
             count: validationErrors.length,
           });
-          resolve(createTargetFailureResult(message, validationErrors, startTime));
+          resolve(
+            createTargetFailureResult(message, validationErrors, startTime)
+          );
         }
       });
     });
@@ -1412,8 +1543,13 @@ export class Validator {
    * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
    */
-  static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
-    return getDecoratedProperties(target, VALIDATOR_TARGET_RULES_METADATA_KEY) as Record<keyof InstanceType<T>, IValidatorRule[]>;
+  static getTargetRules<T extends IClassConstructor = any>(
+    target: T
+  ): Record<keyof InstanceType<T>, IValidatorRule[]> {
+    return getDecoratedProperties(
+      target,
+      VALIDATOR_TARGET_RULES_METADATA_KEY
+    ) as Record<keyof InstanceType<T>, IValidatorRule[]>;
   }
 
   /**
@@ -1462,12 +1598,17 @@ export class Validator {
    * @see {@link ValidationTargetOptions} - Decorator to set these options
    * @public
    */
-  public static getValidateTargetOptions<T extends IClassConstructor>(target: T): Parameters<typeof Validator.validateTarget>[2] {
-    return Object.assign({}, Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {});
+  public static getValidateTargetOptions<T extends IClassConstructor>(
+    target: T
+  ): Parameters<typeof Validator.validateTarget>[2] {
+    return Object.assign(
+      {},
+      Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {}
+    );
   }
 
   /**
-   * ## Create Rule Decorator Factory
+   * ## Build Rule Decorator Factory
    *
    * Creates a decorator factory that can be used to apply validation rules to class
    * properties. This method provides a way to create reusable decorators from
@@ -1573,14 +1714,25 @@ export class Validator {
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
    */
-  static buildRuleDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+  static buildRuleDecorator<
+    RuleParamsType extends Array<any> = Array<any>,
+    Context = unknown,
+  >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters: RuleParamsType) {
-      const enhancedValidatorFunction: IValidatorRuleFunction<RuleParamsType, Context> = function (validationOptions) {
-        const enhancedOptions: IValidatorValidateOptions<RuleParamsType> = Object.assign({}, validationOptions);
-        enhancedOptions.ruleParams = (Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]) as RuleParamsType;
+      const enhancedValidatorFunction: IValidatorRuleFunction<
+        RuleParamsType,
+        Context
+      > = function (validationOptions) {
+        const enhancedOptions: IValidatorValidateOptions<RuleParamsType> =
+          Object.assign({}, validationOptions);
+        enhancedOptions.ruleParams = (
+          Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
+        ) as RuleParamsType;
         return ruleFunction(enhancedOptions as any);
       };
-      return Validator.buildPropertyDecorator<RuleParamsType, Context>(enhancedValidatorFunction);
+      return Validator.buildPropertyDecorator<RuleParamsType, Context>(
+        enhancedValidatorFunction
+      );
     };
   }
   /**
@@ -1604,14 +1756,19 @@ export class Validator {
    * @see {@link buildRuleDecorator}
    * @public
    */
-  static buildRuleDecoratorOptional<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+  static buildRuleDecoratorOptional<
+    RuleParamsType extends Array<any> = Array<any>,
+    Context = unknown,
+  >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters?: RuleParamsType) {
-      return Validator.buildRuleDecorator<RuleParamsType, Context>(ruleFunction)(ruleParameters as RuleParamsType);
+      return Validator.buildRuleDecorator<RuleParamsType, Context>(
+        ruleFunction
+      )(ruleParameters as RuleParamsType);
     };
   }
 
   /**
-   * ## Create Property Decorator
+   * ## Build Property Decorator
    *
    * Low-level method for creating property decorators that attach validation rules
    * to class properties. This method handles the metadata storage and provides
@@ -1660,10 +1817,23 @@ export class Validator {
    * @see {@link buildRuleDecorator} - Higher-level decorator creation
    * @internal
    */
-  static buildPropertyDecorator<RuleParamsType extends Array<any> = Array<any>, Context = unknown>(rule: IValidatorRule<RuleParamsType, Context> | IValidatorRule<RuleParamsType, Context>[]): PropertyDecorator {
-    return buildPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(VALIDATOR_TARGET_RULES_METADATA_KEY, (oldRules) => {
-      return [...(Array.isArray(oldRules) ? oldRules : []), ...(Array.isArray(rule) ? rule : [rule])];
-    });
+  static buildPropertyDecorator<
+    RuleParamsType extends Array<any> = Array<any>,
+    Context = unknown,
+  >(
+    rule:
+      | IValidatorRule<RuleParamsType, Context>
+      | IValidatorRule<RuleParamsType, Context>[]
+  ): PropertyDecorator {
+    return buildPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(
+      VALIDATOR_TARGET_RULES_METADATA_KEY,
+      (oldRules) => {
+        return [
+          ...(Array.isArray(oldRules) ? oldRules : []),
+          ...(Array.isArray(rule) ? rule : [rule]),
+        ];
+      }
+    );
   }
 }
 
@@ -1804,9 +1974,15 @@ export class Validator {
  * @decorator
  * @public
  */
-export function ValidationTargetOptions(validationOptions: Parameters<typeof Validator.validateTarget>[2]): ClassDecorator {
+export function ValidationTargetOptions(
+  validationOptions: Parameters<typeof Validator.validateTarget>[2]
+): ClassDecorator {
   return function (targetClass: Function) {
-    Reflect.defineMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, validationOptions, targetClass);
+    Reflect.defineMetadata(
+      VALIDATOR_TARGET_OPTIONS_METADATA_KEY,
+      validationOptions,
+      targetClass
+    );
   };
 }
 

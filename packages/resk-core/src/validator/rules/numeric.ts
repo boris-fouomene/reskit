@@ -1,14 +1,315 @@
+import { defaultStr } from "@utils/defaultStr";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
+import { isNumber } from "@utils/isNumber";
 
-function NumberBetween({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<[number, number]>): IValidatorResult {
+/**
+ * @function compareNumer
+ *
+ * Compares a numeric value against a specified value using a comparison function.
+ * This function returns a promise that resolves if the comparison is valid and rejects with an error message if it is not.
+ *
+ * ### Parameters:
+ * - **compare**: `(value: any, toCompare: any) => boolean` - A comparison function that defines the comparison logic.
+ * - **message**: `string` - The error message to return if the validation fails.
+ * - **options**: `IValidatorValidateOptions` - An object containing the value to validate and any rule parameters.
+ *
+ * ### Return Value:
+ * - `IValidatorResult`: A promise that resolves to `true` if the comparison is valid, or rejects with an error message if it is not.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * compareNumer((value, toCompare) => value < toCompare, "Value must be less than", { value: 5, ruleParams: [10] })
+ *     .then(result => console.log(result)) // Output: true
+ *     .catch(error => console.error(error)); // Output: "Value must be less than 10"
+ * ```
+ */
+function compareNumer(compare: (value: any, toCompare: any) => boolean, translateKey: string, { value, ruleParams, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
+  ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
+  const rParams = ruleParams ? ruleParams : [];
+  translateKey = defaultStr(translateKey);
+  const message = i18n.t(translateKey, { ...rest, value, ruleParams });
+  const nVal = Number(value);
+  value = typeof value === "number" ? value : isNumber(nVal) ? nVal : NaN;
+  const toCompareN = rParams[0] ? Number(rParams[0]) : NaN;
+  const toCompare = typeof rParams[0] === "number" ? rParams[0] : isNumber(toCompareN) ? toCompareN : NaN;
+  return new Promise((resolve, reject) => {
+    if (isNaN(value) || rParams[0] === undefined) {
+      return resolve(message);
+    }
+    if (isNaN(toCompare)) {
+      return reject(message);
+    }
+    if (compare(value, toCompare)) {
+      return resolve(true);
+    }
+    reject(message);
+  });
+}
+
+function numberLessThanOrEquals(options: IValidatorValidateOptions<[number]>) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value <= toCompare;
+    },
+    "validator.numberLessThanOrEquals",
+    options
+  );
+}
+
+Validator.registerRule("NumberLessThanOrEqual", numberLessThanOrEquals);
+/**
+ * @decorator IsNumberLessThanOrEqual
+ *
+ * Validator rule that checks if a number is less than or equal to a specified value.
+ *
+ * ### Example Usage:
+ * ```typescript
+ *  class MyClass {
+ *      @IsNumberLessThanOrEqual([5])
+ *      myNumber: number;
+ *  }
+ * ```
+ */
+export const IsNumberLessThanOrEqual = Validator.createRuleDecorator<[param: number]>(numberLessThanOrEquals);
+
+function numberLessThan(options: IValidatorValidateOptions) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value < toCompare;
+    },
+    "validator.numberLessThan",
+    options
+  );
+}
+Validator.registerRule("NumberLessThan", numberLessThan);
+
+/**
+ * @decorator IsNumberLessThan
+ *
+ * Validator rule that checks if a given number is less than a specified value.
+ * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
+ *
+ * ### Parameters:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
+ *   - `value`: The number to validate.
+ *   - `ruleParams`: An array where the first element is the value to compare against.
+ *
+ * ### Return Value:
+ * - `IValidatorResult`: Resolves to `true` if the value is less than the specified comparison value,
+ *   otherwise rejects with an error message indicating the validation failure.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * class MyClass {
+ *     @IsNumberLessThan([10])
+ *     myNumber: number;
+ * }
+ * ```
+ *
+ * ### Notes:
+ * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
+ * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+ */
+export const IsNumberLessThan = Validator.createRuleDecorator<[param: number]>(numberLessThan);
+
+function numberGreaterThanOrEquals(options: IValidatorValidateOptions<[number]>) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value >= toCompare;
+    },
+    "validator.numberGreaterThanOrEquals",
+    options
+  );
+}
+Validator.registerRule("NumberGreaterThanOrEqual", numberGreaterThanOrEquals);
+
+/**
+ * @decorator IsNumberGreaterThanOrEqual
+ *
+ * Validator rule that checks if a given number is greater than or equal to a specified value.
+ * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
+ *
+ * ### Parameters:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
+ *   - `value`: The number to validate.
+ *   - `ruleParams`: An array where the first element is the value to compare against.
+ *
+ * ### Return Value:
+ * - `IValidatorResult`: Resolves to `true` if the value is greater than or equal to the specified comparison value,
+ *   otherwise rejects with an error message indicating the validation failure.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * class MyClass {
+ *     @IsNumberGreaterThanOrEqual([5])
+ *     myNumber: number;
+ * }
+ * ```
+ *
+ * ### Notes:
+ * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
+ * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+ */
+export const IsNumberGreaterThanOrEqual = Validator.createRuleDecorator<[param: number]>(numberGreaterThanOrEquals);
+
+function numberGreaterThan(options: IValidatorValidateOptions) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value > toCompare;
+    },
+    "validator.numberGreaterThan",
+    options
+  );
+}
+Validator.registerRule("NumberGreaterThan", numberGreaterThan);
+
+/**
+ * @decorator IsNumberGreaterThan
+ *
+ * Validator rule that checks if a given number is greater than a specified value.
+ * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
+ *
+ * ### Parameters:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
+ *   - `value`: The number to validate.
+ *   - `ruleParams`: An array where the first element is the value to compare against.
+ *
+ * ### Return Value:
+ * - `IValidatorResult`: Resolves to `true` if the value is greater than the specified comparison value,
+ *   otherwise rejects with an error message indicating the validation failure.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * class MyClass {
+ *     @IsNumberGreaterThan([10])
+ *     myNumber: number;
+ * }
+ * ```
+ *
+ * ### Notes:
+ * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
+ * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+ */
+export const IsNumberGreaterThan = Validator.createRuleDecorator<[param: number]>(numberGreaterThan);
+
+function numberEqualsTo(options: IValidatorValidateOptions<[number]>) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value === toCompare;
+    },
+    "validator.numberEquals",
+    options
+  );
+}
+Validator.registerRule("NumberEqual", numberEqualsTo);
+
+/**
+ * @decorator  IsNumberEqual
+ *
+ * Validator rule that checks if a given number is equal to a specified value.
+ * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
+ *
+ * ### Parameters:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
+ *   - `value`: The number to validate.
+ *   - `ruleParams`: An array where the first element is the value to compare against.
+ *
+ * ### Return Value:
+ * - `IValidatorResult`: Resolves to `true` if the value is equal to the specified comparison value,
+ *   otherwise rejects with an error message indicating the validation failure.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * class MyClass {
+ *     @ IsNumberEqual([10])
+ *     myNumber: number;
+ * }
+ * ```
+ *
+ * ### Notes:
+ * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
+ * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+ */
+export const IsNumberEqual = Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
+
+function numberIsDifferentFromTo(options: IValidatorValidateOptions<[number]>) {
+  return compareNumer(
+    (value, toCompare) => {
+      return value !== toCompare;
+    },
+    "validator.numberIsDifferentFrom",
+    options
+  );
+}
+Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
+
+/**
+ * @decorator IsNumberDifferentFrom
+ *
+ * Validator rule that checks if a given number is not equal to a specified value.
+ * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * class MyClass {
+ *     @IsNumberDifferentFrom([10])
+ *     myNumber: number;
+ * }
+ * ```
+ */
+export const IsNumberDifferentFrom = Validator.createRuleDecorator<[param: number]>(numberIsDifferentFromTo);
+
+/**
+ * ## Pre-Built Validation Decorators
+ *
+ * Collection of commonly used validation decorators that provide immediate
+ * validation capabilities for standard data types and formats. These decorators
+ * are built on top of registered validation rules and provide a convenient
+ * way to apply common validations.
+ */
+
+/**
+ * ### IsNumber Decorator
+ *
+ * Validates that a property value is a valid number. This decorator checks
+ * for numeric values and rejects non-numeric inputs.
+ *
+ * @example
+ * ```typescript
+ * class Product {
+ *   @IsNumber
+ *   price: number;
+ *
+ *   @IsNumber
+ *   quantity: number;
+ *
+ *   @IsRequired
+ *   @IsNumber
+ *   weight: number;
+ * }
+ *
+ * // Valid data
+ * const product = { price: 19.99, quantity: 5, weight: 2.5 };
+ *
+ * // Invalid data
+ * const invalid = { price: "not-a-number", quantity: 5, weight: 2.5 };
+ * // Will fail validation with error: "Price must be a number"
+ * ```
+ *
+ * @decorator
+ * @since 1.0.0
+ * @see {@link IsRequired} - Often used together
+ * @public
+ */
+export const IsNumber = Validator.createPropertyDecorator(["Number"]);
+
+Validator.registerRule("Number", function Number(options) {
+  const { value, i18n } = options;
+  return typeof value === "number" || i18n.t("validator.isNumber", options);
+});
+
+function NumberBetween({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[number, number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || ruleParams.length < 2) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -87,20 +388,10 @@ function NumberBetween({
  * @since 1.22.0
  * @public
  */
-export const IsNumberBetween =
-  Validator.createRuleDecorator<[min: number, max: number]>(NumberBetween);
+export const IsNumberBetween = Validator.createRuleDecorator<[min: number, max: number]>(NumberBetween);
 Validator.registerRule("NumberBetween", NumberBetween);
 
-function DecimalPlaces({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<
-  [minDecimalPlaces: number, maxDecimalPlaces?: number]
->): IValidatorResult {
+function DecimalPlaces({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[minDecimalPlaces: number, maxDecimalPlaces?: number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || !ruleParams.length) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -127,8 +418,7 @@ function DecimalPlaces({
     // Get decimal places from the number
     const valueStr = String(value);
     const decimalIndex = valueStr.indexOf(".");
-    const actualDecimalPlaces =
-      decimalIndex === -1 ? 0 : valueStr.length - decimalIndex - 1;
+    const actualDecimalPlaces = decimalIndex === -1 ? 0 : valueStr.length - decimalIndex - 1;
 
     let isValid = false;
 
@@ -140,8 +430,7 @@ function DecimalPlaces({
       // Range of decimal places
       const minPlaces = Number(ruleParams[0]);
       const maxPlaces = Number(ruleParams[1]);
-      isValid =
-        actualDecimalPlaces >= minPlaces && actualDecimalPlaces <= maxPlaces;
+      isValid = actualDecimalPlaces >= minPlaces && actualDecimalPlaces <= maxPlaces;
     }
     if (isValid) {
       resolve(true);
@@ -192,18 +481,9 @@ Validator.registerRule("DecimalPlaces", DecimalPlaces);
  * @since 1.22.0
  * @public
  */
-export const HasDecimalPlaces =
-  Validator.createRuleDecorator<
-    [minDecimalPlaces: number, maxDecimalPlaces?: number]
-  >(DecimalPlaces);
+export const HasDecimalPlaces = Validator.createRuleDecorator<[minDecimalPlaces: number, maxDecimalPlaces?: number]>(DecimalPlaces);
 
-function _Integer({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _Integer({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     const numericValue = Number(value);
     if (isNaN(numericValue) || !Number.isInteger(numericValue)) {
@@ -250,14 +530,7 @@ function _Integer({
 export const IsInteger = Validator.createPropertyDecorator(["Integer"]);
 Validator.registerRule("Integer", _Integer);
 
-function MultipleOf({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<[number]>): IValidatorResult {
+function MultipleOf({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || !ruleParams.length) {
       const message = i18n.t("validator.invalidRuleParams", {
@@ -281,10 +554,7 @@ function MultipleOf({
     }
 
     const multiple = Number(ruleParams[0]);
-    if (
-      isNaN(multiple) ||
-      (multiple === 0 && String(ruleParams[0]).trim() !== "0")
-    ) {
+    if (isNaN(multiple) || (multiple === 0 && String(ruleParams[0]).trim() !== "0")) {
       const message = i18n.t("validator.invalidRuleParams", {
         rule: "MultipleOf",
         ruleParams,
@@ -342,8 +612,7 @@ function MultipleOf({
  * @since 1.22.0
  * @public
  */
-export const IsMultipleOf =
-  Validator.createRuleDecorator<[multiple: number]>(MultipleOf);
+export const IsMultipleOf = Validator.createRuleDecorator<[multiple: number]>(MultipleOf);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -441,10 +710,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DecimalPlaces: IValidatorRuleFunction<
-      [minDecimalPlaces: number, maxDecimalPlaces?: number],
-      Context
-    >;
+    DecimalPlaces: IValidatorRuleFunction<[minDecimalPlaces: number, maxDecimalPlaces?: number], Context>;
 
     /**
      * ### Integer Rule

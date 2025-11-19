@@ -1,13 +1,194 @@
+import { defaultStr } from "@utils/defaultStr";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
+import { isValidEmail } from "@utils/isValidEmail";
+import { isValidUrl } from "@utils/uri";
+import { InputFormatter } from "@/inputFormatter";
+import { isNonNullString } from "@utils/isNonNullString";
+import { ICountryCode } from "@countries/types";
 
-function _UUID({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+/**
+ * ### IsEmail Decorator
+ *
+ * Validates that a property value is a properly formatted email address.
+ * Uses comprehensive email validation that checks for valid email format
+ * according to RFC standards.
+ *
+ * @example
+ * ```typescript
+ * class Contact {
+ *   @IsRequired
+ *   @IsEmail
+ *   primaryEmail: string;
+ *
+ *   @IsEmail  // Optional email
+ *   secondaryEmail?: string;
+ * }
+ *
+ * // Valid data
+ * const contact = {
+ *   primaryEmail: "user@example.com",
+ *   secondaryEmail: "backup@company.org"
+ * };
+ *
+ * // Invalid data
+ * const invalid = {
+ *   primaryEmail: "not-an-email",
+ *   secondaryEmail: "user@"
+ * };
+ * // Will fail validation with errors about invalid email format
+ * ```
+ *
+ * @decorator
+ * @since 1.0.0
+ * @see {@link IsRequired} - Often used together
+ * @public
+ */
+export const IsEmail = Validator.createPropertyDecorator(["Email"]);
+
+Validator.registerRule("Email", function Email(options) {
+  const { value, i18n } = options;
+  if (!value || typeof value !== "string") {
+    return true;
+  }
+  return isValidEmail(value) || i18n.t("validator.email", options);
+});
+
+/**
+ * ### IsUrl Decorator
+ *
+ * Validates that a property value is a properly formatted URL. Checks for
+ * valid URL structure including protocol, domain, and optional path components.
+ *
+ * @example
+ * ```typescript
+ * class Website {
+ *   @IsRequired
+ *   @IsUrl
+ *   homepage: string;
+ *
+ *   @IsUrl
+ *   blogUrl?: string;
+ *
+ *   @IsUrl
+ *   apiEndpoint: string;
+ * }
+ *
+ * // Valid data
+ * const website = {
+ *   homepage: "https://example.com",
+ *   blogUrl: "https://blog.example.com/posts",
+ *   apiEndpoint: "https://api.example.com/v1"
+ * };
+ *
+ * // Invalid data
+ * const invalid = {
+ *   homepage: "not-a-url",
+ *   apiEndpoint: "ftp://invalid-protocol"
+ * };
+ * ```
+ *
+ * @decorator
+ * @since 1.0.0
+ * @public
+ */
+export const IsUrl = Validator.createPropertyDecorator(["Url"]);
+
+Validator.registerRule("Url", function Url(options) {
+  const { value, i18n } = options;
+  return !value || typeof value !== "string" ? true : isValidUrl(value) || i18n.t("validator.url", options);
+});
+
+function phoneNumber(options: IValidatorValidateOptions<[countryCode?: ICountryCode]>) {
+  const { value, phoneCountryCode, i18n, ruleParams } = options;
+  return InputFormatter.isValidPhoneNumber(value, phoneCountryCode ? ruleParams?.[0] : undefined) || i18n.t("validator.phoneNumber", options);
+}
+Validator.registerRule("PhoneNumber", phoneNumber);
+
+/**
+ * A validator decorator to check if a phone number is valid.
+ *
+ * @param phoneNumber The phone number to validate.
+ * @param ruleParams.countryCode The optional country code to validate the phone number against.
+ * @returns A validator decorator that checks if the phone number is valid.
+ * @example
+ * ```typescript
+ * class User {
+ *   @IsPhoneNumber()
+ *   phoneNumber: string;
+ * }
+ * ```
+ */
+export const IsPhoneNumber = Validator.createRuleDecorator<[countryCode?: ICountryCode]>(phoneNumber);
+
+function emailOrPhoneNumber(options: IValidatorValidateOptions) {
+  const { value, phoneCountryCode, i18n } = options;
+  return isValidEmail(value) || InputFormatter.isValidPhoneNumber(value, phoneCountryCode) || i18n.t("validator.emailOrPhoneNumber", options);
+}
+Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
+
+/**
+ * A validator decorator to check if value is a valid email or phone number.
+ *
+ * @param value The email or phone number to validate.
+ * @returns A validator decorator that checks if the email or phone number is valid.
+ * @example
+ * ```typescript
+ * class User {
+ *   @IsEmailOrPhone
+ *   emailOrPhoneNumber : string;
+ * }
+ * ```
+ */
+export const IsEmailOrPhone = Validator.createPropertyDecorator(["EmailOrPhoneNumber"]);
+
+/**
+ * ### IsFileName Decorator
+ *
+ * Validates that a property value is a valid filename. Checks for proper
+ * filename format and excludes invalid characters that are not allowed
+ * in file systems.
+ *
+ * @example
+ * ```typescript
+ * class FileUpload {
+ *   @IsRequired
+ *   @IsFileName
+ *   filename: string;
+ *
+ *   @IsFileName
+ *   thumbnailName?: string;
+ * }
+ *
+ * // Valid data
+ * const upload = {
+ *   filename: "document.pdf",
+ *   thumbnailName: "thumb_001.jpg"
+ * };
+ *
+ * // Invalid data
+ * const invalid = {
+ *   filename: "file<with>invalid:chars.txt"
+ * };
+ * ```
+ *
+ * @decorator
+ * @since 1.0.0
+ * @public
+ */
+export const IsFileName = Validator.createPropertyDecorator(["FileName"]);
+
+Validator.registerRule("FileName", function FileName(options) {
+  const { value, i18n } = options;
+  const message = i18n.t("validator.fileName", options);
+  if (!isNonNullString(value)) return message;
+  const rg1 = /^[^\\/:*?"<>|]+$/; // forbidden characters \ / : * ? " < > |
+  const rg2 = /^\./; // cannot start with dot (.)
+  const rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(\.|$)/i; // forbidden file names
+  return (rg1.test(String(value)) && !rg2.test(value) && !rg3.test(value)) || message;
+});
+
+function _UUID({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.uuid", {
@@ -18,8 +199,7 @@ function _UUID({
       return reject(message);
     }
 
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (uuidRegex.test(value)) {
       resolve(true);
     } else {
@@ -57,13 +237,7 @@ Validator.registerRule("UUID", _UUID);
  */
 export const IsUUID = Validator.createPropertyDecorator(["UUID"]);
 
-function _JSON({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _JSON({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.json", {
@@ -112,13 +286,7 @@ Validator.registerRule("JSON", _JSON);
  */
 export const IsJSON = Validator.createPropertyDecorator(["JSON"]);
 
-function _Base64({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _Base64({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.base64", {
@@ -129,8 +297,7 @@ function _Base64({
       return reject(message);
     }
 
-    const base64Regex =
-      /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+    const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
     if (base64Regex.test(value)) {
       resolve(true);
     } else {
@@ -168,13 +335,7 @@ Validator.registerRule("Base64", _Base64);
  */
 export const IsBase64 = Validator.createPropertyDecorator(["Base64"]);
 
-function _HexColor({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _HexColor({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.hexColor", {
@@ -186,8 +347,7 @@ function _HexColor({
     }
 
     // Supports #RGB, #RRGGBB, #RRGGBBAA formats
-    const hexColorRegex =
-      /^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/;
+    const hexColorRegex = /^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/;
     if (hexColorRegex.test(value)) {
       resolve(true);
     } else {
@@ -225,13 +385,7 @@ Validator.registerRule("HexColor", _HexColor);
  */
 export const IsHexColor = Validator.createPropertyDecorator(["HexColor"]);
 
-function _CreditCard({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _CreditCard({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.creditCard", {
@@ -310,14 +464,7 @@ Validator.registerRule("CreditCard", _CreditCard);
  */
 export const IsCreditCard = Validator.createPropertyDecorator(["CreditCard"]);
 
-function _IsIP({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<string[]>): IValidatorResult {
+function _IsIP({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<string[]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.ip", {
@@ -334,16 +481,14 @@ function _IsIP({
 
     switch (version) {
       case "4":
-        ipRegex =
-          /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         break;
       case "6":
         ipRegex =
           /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
         break;
       default: // 4/6
-        const ipv4Regex =
-          /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         const ipv6Regex =
           /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
         ipRegex = new RegExp(`(?:${ipv4Regex.source})|(?:${ipv6Regex.source})`);
@@ -397,13 +542,7 @@ Validator.registerRule("IP", _IsIP);
  */
 export const IsIP = Validator.createRuleDecorator<string[]>(_IsIP);
 
-function _MACAddress({
-  value,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions): IValidatorResult {
+function _MACAddress({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (typeof value !== "string") {
       const message = i18n.t("validator.macAddress", {
@@ -415,8 +554,7 @@ function _MACAddress({
     }
 
     // Supports formats: XX:XX:XX:XX:XX:XX, XX-XX-XX-XX-XX-XX, XXXXXXXXXXXX
-    const macRegex =
-      /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9A-Fa-f]{12})$/;
+    const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9A-Fa-f]{12})$/;
     if (macRegex.test(value)) {
       resolve(true);
     } else {
@@ -454,60 +592,43 @@ Validator.registerRule("MACAddress", _MACAddress);
  */
 export const IsMACAddress = Validator.createPropertyDecorator(["MACAddress"]);
 
-function _Regex({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<[rule: RegExp]>): IValidatorResult {
-  return new Promise((resolve, reject) => {
-    if (typeof value !== "string") {
-      const message = i18n.t("validator.regex", {
-        field: translatedPropertyName || fieldName,
-        value,
-        pattern: ruleParams?.[0] || "",
-        ...rest,
-      });
-      return reject(message);
-    }
+function _Matches({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[rule: RegExp, errorMessage?: string]>): IValidatorResult {
+  if (typeof value !== "string") {
+    const message = i18n.t("validator.regex", {
+      field: translatedPropertyName || fieldName,
+      value,
+      pattern: ruleParams?.[0] || "",
+      ...rest,
+    });
+    return message;
+  }
 
-    if (!ruleParams || !ruleParams[0]) {
-      const message = i18n.t("validator.invalidRuleParams", {
-        rule: "Matches",
-        field: translatedPropertyName || fieldName,
-        ruleParams,
-        ...rest,
-      });
-      return reject(message);
-    }
-
-    try {
-      const regex = new RegExp(ruleParams[0]);
-      if (regex.test(value)) {
-        resolve(true);
-      } else {
-        const message = i18n.t("validator.regex", {
-          field: translatedPropertyName || fieldName,
-          value,
-          pattern: ruleParams[0],
-          ...rest,
-        });
-        reject(message);
-      }
-    } catch (error) {
-      const message = i18n.t("validator.invalidRuleParams", {
-        rule: "Matches",
-        field: translatedPropertyName || fieldName,
-        ruleParams,
-        ...rest,
-      });
-      reject(message);
-    }
-  });
+  if (!ruleParams || !ruleParams[0]) {
+    const message = i18n.t("validator.invalidRuleParams", {
+      rule: "Matches",
+      field: translatedPropertyName || fieldName,
+      ruleParams,
+      ...rest,
+    });
+    return message;
+  }
+  const messageParams = defaultStr(ruleParams[1]).trim();
+  const translatedMessage = defaultStr(messageParams ? i18n.resolveTranslations(messageParams) : "").trim();
+  const message =
+    translatedMessage ??
+    i18n.t("validator.regex", {
+      field: translatedPropertyName || fieldName,
+      value,
+      pattern: ruleParams[0],
+      ...rest,
+    });
+  try {
+    const regex = new RegExp(ruleParams[0]);
+    return regex.test(value) ? true : message;
+  } catch (error) {}
+  return message;
 }
-Validator.registerRule("Matches", _Regex);
+Validator.registerRule("Matches", _Matches);
 
 /**
  * ### Matches Rule
@@ -521,19 +642,21 @@ Validator.registerRule("Matches", _Regex);
  * ```typescript
  * // Class validation
  * class CustomFormat {
- *   @Matches(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
+ *   @Matches(['^[A-Z]{2}\\d{4}$','Invalid custom code format']) // Two letters followed by 4 digits
  *   customCode: string;
  * }
  * ```
  *
  * @param options - Validation options with rule parameters
  * @param options.ruleParams - Array containing regex pattern
+ * @param options.ruleParams[0] - Regex pattern
+ * @param options.ruleParams[1] - Optional error message or error message translation key
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
  * @since 1.22.0
  * @public
  */
-export const Matches = Validator.createRuleDecorator<[rule: RegExp]>(_Regex);
+export const Matches = Validator.createRuleDecorator<[rule: RegExp, errorMessage?: string]>(_Matches);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -945,7 +1068,7 @@ declare module "../types" {
      *
      * // Class validation
      * class CustomFormat {
-     *   @Matches(['^[A-Z]{2}\\d{4}$']) // Two letters followed by 4 digits
+     *   @Matches(['^[A-Z]{2}\\d{4}$','Invalid custom code format']) // Two letters followed by 4 digits
      *   customCode: string;
      * }
      * ```

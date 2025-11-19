@@ -99,16 +99,7 @@ if (result.success) {
 ### Advanced Validation Examples
 
 ```typescript
-import {
-  Validator,
-  IsArray,
-  ArrayMinLength,
-  IsDate,
-  FutureDate,
-  IsFile,
-  MaxFileSize,
-  IsUUID,
-} from "resk-core";
+import { Validator, IsArray, ArrayMinLength, IsDate, FutureDate, IsFile, MaxFileSize, IsUUID } from "resk-core";
 
 // Array validation
 const arrayResult = await Validator.validate({
@@ -435,10 +426,10 @@ class UserProfile {
 
 ### Contact Rules
 
-| Rule                   | Parameters | Description                            | Example           |
-| ---------------------- | ---------- | -------------------------------------- | ----------------- |
-| **PhoneNumber**        | None       | Valid phone number (uses country code) | `@IsPhoneNumber`  |
-| **EmailOrPhoneNumber** | None       | Valid email OR phone number            | `@IsEmailOrPhone` |
+| Rule                   | Parameters | Description                            | Example            |
+| ---------------------- | ---------- | -------------------------------------- | ------------------ |
+| **PhoneNumber**        | None       | Valid phone number (uses country code) | `@IsPhoneNumber()` |
+| **EmailOrPhoneNumber** | None       | Valid email OR phone number            | `@IsEmailOrPhone`  |
 
 ### Array Rules
 
@@ -528,17 +519,13 @@ class AdminForm {
   email: string;
 }
 
-const result = await Validator.validateTarget<AdminForm, UserContext>(
-  AdminForm,
-  data,
-  {
-    context: {
-      userId: 123,
-      userRole: "admin",
-      locale: "en",
-    },
-  }
-);
+const result = await Validator.validateTarget<AdminForm, UserContext>(AdminForm, data, {
+  context: {
+    userId: 123,
+    userRole: "admin",
+    locale: "en",
+  },
+});
 ```
 
 ### 3. Custom Error Messages
@@ -632,10 +619,7 @@ class NumberModel {
 
 ```typescript
 // Rule function with parameters
-const divisibleByRule = ({
-  value,
-  ruleParams,
-}: IValidatorValidateOptions<[number]>) => {
+const divisibleByRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
   const [divisor] = ruleParams;
   return value % divisor === 0 || `Value must be divisible by ${divisor}`;
 };
@@ -683,10 +667,7 @@ interface ValidationContext {
   maxAge: number;
 }
 
-const ageInRangeRule = ({
-  value,
-  context,
-}: IValidatorValidateOptions<any, ValidationContext>) => {
+const ageInRangeRule = ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
   if (typeof value !== "number") return false;
 
   const { minAge, maxAge } = context;
@@ -873,14 +854,7 @@ class RegistrationForm {
 ### Example 1: User Registration Form
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-  IsMaxLength,
-  IsNumberGreaterThanOrEqual,
-} from "resk-core";
+import { Validator, IsRequired, IsEmail, IsMinLength, IsMaxLength, IsNumberGreaterThanOrEqual } from "resk-core";
 
 class RegistrationForm {
   @IsRequired
@@ -978,15 +952,10 @@ interface AdminContext {
   organizationId: number;
 }
 
-Validator.registerRule(
-  "AllowedAction",
-  ({ value, context }: IValidatorValidateOptions<any, AdminContext>) => {
-    const { userPermissions } = context;
-    return (
-      userPermissions.includes(value) || `Permission '${value}' not granted`
-    );
-  }
-);
+Validator.registerRule("AllowedAction", ({ value, context }: IValidatorValidateOptions<any, AdminContext>) => {
+  const { userPermissions } = context;
+  return userPermissions.includes(value) || `Permission '${value}' not granted`;
+});
 
 const IsAllowedAction = Validator.createPropertyDecorator(["AllowedAction"]);
 
@@ -1001,15 +970,8 @@ class AdminAction {
   resourceId: number;
 }
 
-async function performAdminAction(
-  actionData: unknown,
-  adminContext: AdminContext
-) {
-  const result = await Validator.validateTarget<AdminAction, AdminContext>(
-    AdminAction,
-    actionData,
-    { context: adminContext }
-  );
+async function performAdminAction(actionData: unknown, adminContext: AdminContext) {
+  const result = await Validator.validateTarget<AdminAction, AdminContext>(AdminAction, actionData, { context: adminContext });
 
   if (result.success) {
     console.log(`Admin action '${result.data.action}' authorized`);
@@ -1086,10 +1048,7 @@ async function registerUsername(username: string) {
       // Sync custom rule - check format
       ({ value }) => {
         const validFormat = /^[a-zA-Z0-9_-]+$/.test(value);
-        return (
-          validFormat ||
-          "Only letters, numbers, dashes, and underscores allowed"
-        );
+        return validFormat || "Only letters, numbers, dashes, and underscores allowed";
       },
     ],
     propertyName: "username",
@@ -1115,7 +1074,7 @@ class ContactForm {
   message: string;
 
   @IsRequired
-  @IsPhoneNumber
+  @IsPhoneNumber()
   phone: string;
 
   @IsNullable

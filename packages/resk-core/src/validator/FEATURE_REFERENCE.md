@@ -262,18 +262,14 @@ const result = await Validator.validateTarget(UserForm, {
 ### With Options
 
 ```typescript
-const result = await Validator.validateTarget<UserForm, MyContext>(
-  UserForm,
-  data,
-  {
-    // Options object
-    context: {
-      /* validation context */
-    },
-    errorMessageBuilder: (fieldName, error) => `❌ ${fieldName}: ${error}`,
-    locale: "fr", // Language for error messages
-  }
-);
+const result = await Validator.validateTarget<UserForm, MyContext>(UserForm, data, {
+  // Options object
+  context: {
+    /* validation context */
+  },
+  errorMessageBuilder: (fieldName, error) => `❌ ${fieldName}: ${error}`,
+  locale: "fr", // Language for error messages
+});
 ```
 
 ### Result Handling
@@ -561,7 +557,7 @@ website?: string;
 #### PhoneNumber
 
 ```typescript
-@IsPhoneNumber
+@IsPhoneNumber()
 phone: string;
 
 // Validates phone number format
@@ -838,7 +834,7 @@ code: string;
 @IsRequired              // Value must exist
 @IsEmail                 // Must be valid email
 @IsUrl                   // Must be valid URL
-@IsPhoneNumber          // Must be valid phone
+@IsPhoneNumber()          // Must be valid phone
 @IsEmailOrPhone   // Must be email or phone
 @IsNumber               // Must be a number
 @IsNonNullString        // Must be non-empty string
@@ -1028,18 +1024,11 @@ try {
 ### Pattern 8: Map Results
 
 ```typescript
-const results = await Promise.all([
-  Validator.validate({ value: email, rules: ["Email"] }),
-  Validator.validate({ value: username, rules: ["Required"] }),
-]);
+const results = await Promise.all([Validator.validate({ value: email, rules: ["Email"] }), Validator.validate({ value: username, rules: ["Required"] })]);
 
-const successValues = results
-  .filter((r) => r.success)
-  .map((r) => r.success && r.value);
+const successValues = results.filter((r) => r.success).map((r) => r.success && r.value);
 
-const errors = results
-  .filter((r) => !r.success)
-  .map((r) => !r.success && r.message);
+const errors = results.filter((r) => !r.success).map((r) => !r.success && r.message);
 ```
 
 ---
@@ -1061,13 +1050,10 @@ interface ValidationContext {
 **Register Custom Rule:**
 
 ```typescript
-Validator.registerRule(
-  "HasPermission",
-  ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
-    const { permissions } = context;
-    return permissions.includes(value) || `Permission '${value}' not granted`;
-  }
-);
+Validator.registerRule("HasPermission", ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
+  const { permissions } = context;
+  return permissions.includes(value) || `Permission '${value}' not granted`;
+});
 
 const HasPermission = Validator.createPropertyDecorator(["HasPermission"]);
 ```
@@ -1120,13 +1106,10 @@ class OptionalField {
 
 ```typescript
 // Async database check
-Validator.registerRule(
-  "UniqueEmail",
-  async ({ value }: IValidatorValidateOptions) => {
-    const exists = await User.findOne({ email: value });
-    return !exists || "Email already registered";
-  }
-);
+Validator.registerRule("UniqueEmail", async ({ value }: IValidatorValidateOptions) => {
+  const exists = await User.findOne({ email: value });
+  return !exists || "Email already registered";
+});
 
 const IsUniqueEmail = Validator.createPropertyDecorator(["UniqueEmail"]);
 
@@ -1143,10 +1126,7 @@ class RegistrationForm {
 
 ```typescript
 // Rule with parameters
-const minValueRule = ({
-  value,
-  ruleParams,
-}: IValidatorValidateOptions<[number]>) => {
+const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
   const [minValue] = ruleParams;
   return value >= minValue || `Must be at least ${minValue}`;
 };

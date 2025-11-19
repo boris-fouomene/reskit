@@ -92,12 +92,7 @@ if (result.success) {
 ### 2. Class-Based Validation
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-} from "@resk/core/validator";
+import { Validator, IsRequired, IsEmail, IsMinLength } from "@resk/core/validator";
 
 class UserForm {
   @IsRequired
@@ -146,13 +141,7 @@ const result = await Validator.validate({
 ### 4. Complete Registration Form
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-  IsMaxLength,
-} from "@resk/core/validator";
+import { Validator, IsRequired, IsEmail, IsMinLength, IsMaxLength } from "@resk/core/validator";
 
 class RegistrationForm {
   @IsRequired
@@ -437,12 +426,7 @@ Use property decorators to validate entire classes/forms.
 ### Basic Class Validation
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-} from "@resk/core/validator";
+import { Validator, IsRequired, IsEmail, IsMinLength } from "@resk/core/validator";
 
 class UserForm {
   @IsRequired
@@ -463,15 +447,11 @@ const result = await Validator.validateTarget(UserForm, {
 ### With Options
 
 ```typescript
-const result = await Validator.validateTarget<UserForm, MyContext>(
-  UserForm,
-  data,
-  {
-    context: { userId: 1 },
-    errorMessageBuilder: (fieldName, error) => `❌ ${fieldName}: ${error}`,
-    locale: "fr",
-  }
-);
+const result = await Validator.validateTarget<UserForm, MyContext>(UserForm, data, {
+  context: { userId: 1 },
+  errorMessageBuilder: (fieldName, error) => `❌ ${fieldName}: ${error}`,
+  locale: "fr",
+});
 ```
 
 ### Decorator Stacking
@@ -587,10 +567,10 @@ The Validator includes 75+ built-in rules organized by category.
 
 ### Contact Rules
 
-| Rule               | Decorator         | Description        | Example           |
-| ------------------ | ----------------- | ------------------ | ----------------- |
-| PhoneNumber        | `@IsPhoneNumber`  | Valid phone number | `@IsPhoneNumber`  |
-| EmailOrPhoneNumber | `@IsEmailOrPhone` | Email or phone     | `@IsEmailOrPhone` |
+| Rule               | Decorator          | Description        | Example            |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| PhoneNumber        | `@IsPhoneNumber()` | Valid phone number | `@IsPhoneNumber()` |
+| EmailOrPhoneNumber | `@IsEmailOrPhone`  | Email or phone     | `@IsEmailOrPhone`  |
 
 ### Array Rules
 
@@ -693,7 +673,7 @@ class ComprehensiveForm {
 
   // Nullable/Optional
   @IsNullable
-  @IsPhoneNumber
+  @IsPhoneNumber()
   phone?: string;
 
   @IsOptional
@@ -789,10 +769,7 @@ const result = await Validator.validate({
 #### Parameterized Custom Rule
 
 ```typescript
-const minValueRule = ({
-  value,
-  ruleParams,
-}: IValidatorValidateOptions<[number]>) => {
+const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
   const [minValue] = ruleParams;
   return value >= minValue || `Must be at least ${minValue}`;
 };
@@ -847,13 +824,10 @@ interface ValidationContext {
 }
 
 // Register context-aware rule
-Validator.registerRule(
-  "HasPermission",
-  ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
-    const { permissions } = context;
-    return permissions.includes(value) || `Permission '${value}' not granted`;
-  }
-);
+Validator.registerRule("HasPermission", ({ value, context }: IValidatorValidateOptions<any, ValidationContext>) => {
+  const { permissions } = context;
+  return permissions.includes(value) || `Permission '${value}' not granted`;
+});
 
 const HasPermission = Validator.createPropertyDecorator(["HasPermission"]);
 
@@ -915,13 +889,7 @@ if (result.success) {
 #### Login Form
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-  IsMaxLength,
-} from "@resk/core/validator";
+import { Validator, IsRequired, IsEmail, IsMinLength, IsMaxLength } from "@resk/core/validator";
 
 class LoginForm {
   @IsRequired
@@ -1088,13 +1056,9 @@ class CartItem {
 }
 
 async function validateCartItems(items: unknown[]) {
-  const results = await Promise.all(
-    items.map((item) => Validator.validateTarget(CartItem, item))
-  );
+  const results = await Promise.all(items.map((item) => Validator.validateTarget(CartItem, item)));
 
-  const failures = results
-    .map((r, i) => ({ index: i, result: r }))
-    .filter((x) => !x.result.success);
+  const failures = results.map((r, i) => ({ index: i, result: r })).filter((x) => !x.result.success);
 
   if (failures.length > 0) {
     return {
@@ -1120,16 +1084,8 @@ interface ValidationContext {
   userRole?: string;
 }
 
-async function validateRequest<T>(
-  data: unknown,
-  ValidationClass: new () => T,
-  context?: ValidationContext
-) {
-  const result = await Validator.validateTarget<T, ValidationContext>(
-    ValidationClass,
-    data,
-    { context }
-  );
+async function validateRequest<T>(data: unknown, ValidationClass: new () => T, context?: ValidationContext) {
+  const result = await Validator.validateTarget<T, ValidationContext>(ValidationClass, data, { context });
 
   return {
     isValid: result.success,
@@ -1140,11 +1096,7 @@ async function validateRequest<T>(
 }
 
 // Express middleware
-async function validationMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+async function validationMiddleware(req: Request, res: Response, next: NextFunction) {
   const validation = await validateRequest(req.body, UserForm, {
     userId: req.user?.id,
     userRole: req.user?.role,
@@ -1309,9 +1261,7 @@ class CSVRecord {
 }
 
 async function validateCSVImport(records: unknown[]) {
-  const results = await Promise.all(
-    records.map((record) => Validator.validateTarget(CSVRecord, record))
-  );
+  const results = await Promise.all(records.map((record) => Validator.validateTarget(CSVRecord, record)));
 
   const summary = {
     total: records.length,
@@ -1417,18 +1367,11 @@ if (!result.success) {
 ### Pattern 5: Multiple Validation Results
 
 ```typescript
-const results = await Promise.all([
-  Validator.validate({ value: email, rules: ["Email"] }),
-  Validator.validate({ value: username, rules: ["Required"] }),
-]);
+const results = await Promise.all([Validator.validate({ value: email, rules: ["Email"] }), Validator.validate({ value: username, rules: ["Required"] })]);
 
-const successValues = results
-  .filter((r) => r.success)
-  .map((r) => r.success && r.value);
+const successValues = results.filter((r) => r.success).map((r) => r.success && r.value);
 
-const errors = results
-  .filter((r) => !r.success)
-  .map((r) => !r.success && r.message);
+const errors = results.filter((r) => !r.success).map((r) => !r.success && r.message);
 ```
 
 ### Pattern 6: Async Error Handling
@@ -1749,11 +1692,7 @@ async function createUser(userData) {
 
 ```typescript
 // ✅ Good: Full type safety
-const result = await Validator.validateTarget<UserForm, UserContext>(
-  UserForm,
-  data,
-  { context: { userId: 123, role: "admin" } }
-);
+const result = await Validator.validateTarget<UserForm, UserContext>(UserForm, data, { context: { userId: 123, role: "admin" } });
 
 if (result.success) {
   // result.data is fully typed as UserForm
@@ -1894,9 +1833,7 @@ interface IValidatorValidateOptions<T = any, C = any> {
 #### Validation Results
 
 ```typescript
-type IValidatorValidateResult<T, C> =
-  | IValidatorValidateSuccess<T, C>
-  | IValidatorValidateFailure<C>;
+type IValidatorValidateResult<T, C> = IValidatorValidateSuccess<T, C> | IValidatorValidateFailure<C>;
 
 interface IValidatorValidateSuccess<T, C> {
   success: true;
@@ -1923,9 +1860,7 @@ interface IValidatorValidateFailure<C> {
 #### Class Validation Results
 
 ```typescript
-type IValidatorValidateTargetResult<T, C> =
-  | IValidatorValidateTargetSuccess<T, C>
-  | IValidatorValidateTargetFailure<C>;
+type IValidatorValidateTargetResult<T, C> = IValidatorValidateTargetSuccess<T, C> | IValidatorValidateTargetFailure<C>;
 
 interface IValidatorValidateTargetSuccess<T, C> {
   success: true;
@@ -2109,10 +2044,7 @@ class MyClass {
 A: Use rule parameters:
 
 ```typescript
-const minValueRule = ({
-  value,
-  ruleParams,
-}: IValidatorValidateOptions<[number]>) => {
+const minValueRule = ({ value, ruleParams }: IValidatorValidateOptions<[number]>) => {
   const [minValue] = ruleParams;
   return value >= minValue || `Must be at least ${minValue}`;
 };
@@ -2266,12 +2198,7 @@ The Validator module provides a comprehensive, type-safe validation solution wit
 ### Quick Reference
 
 ```typescript
-import {
-  Validator,
-  IsRequired,
-  IsEmail,
-  IsMinLength,
-} from "@resk/core/validator";
+import { Validator, IsRequired, IsEmail, IsMinLength } from "@resk/core/validator";
 
 // Single value
 const result = await Validator.validate({

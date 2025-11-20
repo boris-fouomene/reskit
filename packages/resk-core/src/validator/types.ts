@@ -1174,7 +1174,7 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
  *
  * #### Basic OneOf Validation Setup
  * ```typescript
- * const options: IValidatorValidateOneOfRuleOptions = {
+ * const options: IValidatorValidateMultiRuleOptions = {
  *   value: "user@example.com",
  *   ruleParams: [
  *     ({ value }) => value.includes("@") || "Must contain @",
@@ -1197,7 +1197,7 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
  *   allowedDomains: string[];
  * }
  *
- * const options: IValidatorValidateOneOfRuleOptions<ValidationContext> = {
+ * const options: IValidatorValidateMultiRuleOptions<ValidationContext> = {
  *   value: "admin@company.com",
  *   ruleParams: [
  *     // Email validation
@@ -1243,12 +1243,13 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
  * @see {@link IValidatorRuleFunction} - Type of functions in ruleParams array
  * @see {@link IValidatorValidateResult} - Result type returned by validation
  */
-export interface IValidatorValidateOneOfRuleOptions<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> extends IValidatorValidateOptions<RulesFunctions, Context> {
+export interface IValidatorValidateMultiRuleOptions<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> extends IValidatorValidateOptions<RulesFunctions, Context> {
   startTime?: number;
 }
 
-export type IValidatorOneOfRuleFunction<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> = IValidatorRuleFunction<RulesFunctions, Context>;
+export type IValidatorMultiRuleFunction<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> = IValidatorRuleFunction<RulesFunctions, Context>;
 
+export type IValidatorMultiRuleNames = "OneOf" | "AllOf";
 /**
  * ## Validation Result Types (Either Pattern)
  *

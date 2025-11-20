@@ -8,7 +8,7 @@ export * from "./enum";
 export * from "./file";
 export * from "./format";
 export * from "./numeric";
-export * from "./oneof";
+export * from "./multiRules";
 export * from "./string";
 
 /**

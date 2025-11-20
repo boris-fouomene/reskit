@@ -569,13 +569,13 @@ describe("OneOf Validation Rules", () => {
   });
 
   // ============================================================================
-  // Section 3: buildOneOfRuleDecorator Method Tests
+  // Section 3: buildMultiRuleDecorator Method Tests
   // ============================================================================
 
-  describe("buildOneOfRuleDecorator Method", () => {
+  describe("buildMultiRuleDecorator Method", () => {
     describe("Decorator Factory Creation", () => {
       it("should create a decorator factory function", () => {
-        const decoratorFactory = Validator.buildOneOfRuleDecorator(
+        const decoratorFactory = Validator.buildMultiRuleDecorator(
           function customOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -584,7 +584,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should return decorator from factory when called", () => {
-        const decoratorFactory = Validator.buildOneOfRuleDecorator(
+        const decoratorFactory = Validator.buildMultiRuleDecorator(
           function customOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -594,7 +594,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should apply decorator to class properties", () => {
-        const CustomDecorator = Validator.buildOneOfRuleDecorator(
+        const CustomDecorator = Validator.buildMultiRuleDecorator(
           function customOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -612,7 +612,7 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator with Different Rule Sets", () => {
       it("should create decorator for string rules", () => {
-        const StringRuleDecorator = Validator.buildOneOfRuleDecorator(
+        const StringRuleDecorator = Validator.buildMultiRuleDecorator(
           function stringRuleOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -631,7 +631,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create decorator for object rules with params", () => {
-        const ObjectRuleDecorator = Validator.buildOneOfRuleDecorator(
+        const ObjectRuleDecorator = Validator.buildMultiRuleDecorator(
           function objectRuleOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -646,7 +646,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create decorator for function rules", () => {
-        const FunctionRuleDecorator = Validator.buildOneOfRuleDecorator(
+        const FunctionRuleDecorator = Validator.buildMultiRuleDecorator(
           function functionRuleOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -670,7 +670,7 @@ describe("OneOf Validation Rules", () => {
         }
 
         const ContextAwareDecorator =
-          Validator.buildOneOfRuleDecorator<MyContext>(function contextOneOf(
+          Validator.buildMultiRuleDecorator<MyContext>(function contextOneOf(
             options: any
           ) {
             return Validator.validateOneOfRule<MyContext>(options);
@@ -687,7 +687,7 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator Validation Behavior", () => {
       it("should validate decorated property when rule passes", async () => {
-        const TestDecorator = Validator.buildOneOfRuleDecorator(
+        const TestDecorator = Validator.buildMultiRuleDecorator(
           function testOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -707,7 +707,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should fail validation when all rules fail", async () => {
-        const TestDecorator = Validator.buildOneOfRuleDecorator(
+        const TestDecorator = Validator.buildMultiRuleDecorator(
           function testOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -729,7 +729,7 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator with Multiple Fields", () => {
       it("should apply decorator to multiple properties independently", async () => {
-        const TestDecorator = Validator.buildOneOfRuleDecorator(
+        const TestDecorator = Validator.buildMultiRuleDecorator(
           function testOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }
@@ -752,7 +752,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should track errors for each decorated field", async () => {
-        const TestDecorator = Validator.buildOneOfRuleDecorator(
+        const TestDecorator = Validator.buildMultiRuleDecorator(
           function testOneOf(options: any) {
             return Validator.validateOneOfRule(options);
           }

@@ -174,17 +174,17 @@ import { Validator } from "../validator";
  *
  * @since 1.35.0
  * @see {@link Validator.validateOneOfRule} - The underlying validation method
- * @see {@link Validator.buildOneOfRuleDecorator} - Factory method that creates this decorator
+ * @see {@link Validator.buildMultiRuleDecorator} - Factory method that creates this decorator
  * @see {@link Validator.validateTarget} - For class-based validation using decorators
- * @see {@link IValidatorValidateOneOfRuleOptions} - Type definition for validation options
+ * @see {@link IValidatorValidateMultiRuleOptions} - Type definition for validation options
  *
  * @public
  * @decorator
  */
-export const OneOf = Validator.buildOneOfRuleDecorator(function OneOf(options) {
+export const OneOf = Validator.buildMultiRuleDecorator(function OneOf(options) {
   return Validator.validateOneOfRule(options);
 });
 
-/* Validator.registerRule("OneOf", function OneOf(options) {
-  return Validator.validateOneOfRule(options);
-}); */
+export const AllOf = Validator.buildMultiRuleDecorator(function AllOf(options) {
+  return Validator.validateAllOfRule(options);
+});

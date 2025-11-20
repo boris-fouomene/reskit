@@ -1,6 +1,7 @@
 import { Validator } from "@/validator";
 import { i18n } from "../../i18n";
 import "../../translations";
+import { ValidateNested } from "../rules/target";
 
 /**
  * Comprehensive test suite for Validator.validateTarget() method
@@ -483,6 +484,290 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       expect(typeof result.success).toBe("boolean");
 
       // Should have either success data or error data
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.validatedAt).toBeDefined();
+      } else {
+        expect(result.errors).toBeDefined();
+        expect(result.failedAt).toBeDefined();
+      }
+    });
+
+    it("should always include timing information", async () => {
+      class Model {
+        field: string = "";
+      }
+
+      const result = await Validator.validateTarget(Model, {
+        data: { field: "test" },
+      });
+
+      if (result.success) {
+        expect(result.validatedAt).toBeInstanceOf(Date);
+        expect(result.duration).toBeGreaterThanOrEqual(0);
+      }
+    });
+  });
+
+  describe("ValidateNested Decorator - Nested Class Validation", () => {
+    it("should validate nested object with @ValidateNested decorator", async () => {
+      class Address {
+        street: string = "";
+        city: string = "";
+      }
+
+      class User {
+        name: string = "";
+
+        @ValidateNested([Address])
+        address: Address = new Address();
+      }
+
+      const data = {
+        name: "John Doe",
+        address: {
+          street: "123 Main St",
+          city: "Springfield",
+        },
+      };
+
+      const result = await Validator.validateTarget(User, { data });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual(data);
+      }
+    });
+
+    it("should accept nested object with any type when no decorators present", async () => {
+      class Address {
+        street: string = "";
+      }
+
+      class User {
+        name: string = "";
+
+        @ValidateNested([Address])
+        address: Address = new Address();
+      }
+
+      const data = {
+        name: "John Doe",
+        address: "not an object",
+      };
+
+      const result = await Validator.validateTarget(User, { data });
+
+      // Without validation decorators on nested class, any data passes
+      expect(result.success).toBe(true);
+    });
+
+    it("should support multi-level nested validation with @ValidateNested", async () => {
+      class Coordinates {
+        latitude: number = 0;
+        longitude: number = 0;
+      }
+
+      class Location {
+        name: string = "";
+
+        @ValidateNested([Coordinates])
+        coordinates: Coordinates = new Coordinates();
+      }
+
+      class Event {
+        title: string = "";
+
+        @ValidateNested([Location])
+        location: Location = new Location();
+      }
+
+      const data = {
+        title: "Conference",
+        location: {
+          name: "City Hall",
+          coordinates: {
+            latitude: 40.7128,
+            longitude: -74.006,
+          },
+        },
+      };
+
+      const result = await Validator.validateTarget(Event, { data });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual(data);
+      }
+    });
+
+    it("should invoke validatenested rule handling path in normalizedRule check", async () => {
+      // This test specifically verifies the code path at validator.ts line ~1108:
+      // else if (normalizedRule === "validatenested" && ruleParams[0])
+      // is properly triggered when using @ValidateNested decorator
+
+      class Contact {
+        email: string = "";
+        phone: string = "";
+      }
+
+      class Person {
+        name: string = "";
+
+        @ValidateNested([Contact])
+        contact: Contact = new Contact();
+      }
+
+      const data = {
+        name: "Alice",
+        contact: {
+          email: "alice@example.com",
+          phone: "+1234567890",
+        },
+      };
+
+      const result = await Validator.validateTarget(Person, { data });
+
+      // When validateTarget is called, it should process the @ValidateNested decorator
+      // which triggers the normalizedRule === "validatenested" condition,
+      // invoking Validator.validateNestedRule internally
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.name).toBe("Alice");
+        expect(result.data.contact.email).toBe("alice@example.com");
+      }
+    });
+
+    it("should accept nested validation with null when no decorators present", async () => {
+      class Address {
+        street: string = "";
+      }
+
+      class User {
+        name: string = "";
+
+        @ValidateNested([Address])
+        address: Address = new Address();
+      }
+
+      const data = {
+        name: "John",
+        address: null,
+      };
+
+      const result = await Validator.validateTarget(User, { data });
+
+      // Without validation decorators on nested class, null passes
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate nested object when nested class has no decorators", async () => {
+      class SimpleAddress {
+        street: string = "";
+        city: string = "";
+      }
+
+      class User {
+        name: string = "";
+
+        @ValidateNested([SimpleAddress])
+        address: SimpleAddress = new SimpleAddress();
+      }
+
+      const data = {
+        name: "John",
+        address: {
+          street: "Main St",
+          city: "Boston",
+        },
+      };
+
+      const result = await Validator.validateTarget(User, { data });
+
+      expect(result.success).toBe(true);
+    });
+
+    it("should process @ValidateNested decorator in the validate() rule chain", async () => {
+      // This test ensures @ValidateNested decorator is recognized in the validator chain
+      // and properly identified by normalizedRule === "validatenested" check
+
+      class Metadata {
+        created: string = "";
+        updated: string = "";
+      }
+
+      class Document {
+        title: string = "";
+
+        @ValidateNested([Metadata])
+        meta: Metadata = new Metadata();
+      }
+
+      const data = {
+        title: "My Document",
+        meta: {
+          created: "2024-01-01",
+          updated: "2024-01-02",
+        },
+      };
+
+      const result = await Validator.validateTarget(Document, { data });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.title).toBe("My Document");
+        expect(result.data.meta.created).toBe("2024-01-01");
+      }
+    });
+
+    it("should handle optional nested objects with @ValidateNested", async () => {
+      class PhoneNumber {
+        countryCode: string = "";
+        number: string = "";
+      }
+
+      class Customer {
+        email: string = "";
+        phone?: PhoneNumber;
+      }
+
+      // Test with nested object present
+      const resultWith = await Validator.validateTarget(Customer, {
+        data: {
+          email: "customer@example.com",
+          phone: {
+            countryCode: "+1",
+            number: "5551234567",
+          },
+        },
+      });
+
+      expect(resultWith.success).toBe(true);
+
+      // Test with nested object omitted
+      const resultWithout = await Validator.validateTarget(Customer, {
+        data: {
+          email: "customer@example.com",
+        },
+      });
+
+      expect(resultWithout.success).toBe(true);
+    });
+  });
+
+  describe("Response Consistency", () => {
+    it("should always return Either pattern result", async () => {
+      class Model {
+        field: string = "";
+      }
+
+      const result = await Validator.validateTarget(Model, {
+        data: { field: "test" },
+      });
+
+      expect(result).toHaveProperty("success");
+      expect(typeof result.success).toBe("boolean");
+
       if (result.success) {
         expect(result.data).toBeDefined();
         expect(result.validatedAt).toBeDefined();

@@ -2837,6 +2837,190 @@ export class Validator {
     };
   }
 
+  /**
+   * ## Build Target Rule Decorator Factory
+   *
+   * Creates a specialized decorator factory for validation rules that target nested class
+   * objects. This method wraps buildRuleDecorator with type specialization for target-based
+   * rules like @ValidateNested.
+   *
+   * ### Purpose
+   * Target rule decorators validate properties by delegating to another class's validation
+   * schema. The most common example is @ValidateNested, which validates nested objects
+   * against a separate decorated class.
+   *
+   * ### How It Works
+   * 1. Takes a rule function specialized for target parameters: [TargetClass]
+   * 2. Wraps it using buildRuleDecorator to create a decorator factory
+   * 3. Returns a decorator factory that accepts the target class constructor
+   * 4. When the decorator is applied to a property, it triggers target-based validation
+   * 5. The rule function receives the target class constructor in ruleParams[0]
+   *
+   * ### Type Parameters
+   * - Target: The nested class constructor type (defaults to IClassConstructor)
+   *   - Must be a valid TypeScript class constructor
+   *   - Can have any validation decorators
+   *   - Example: Address, Contact, Location
+   *
+   * - Context: Type of the validation context passed through validation layers
+   *   - Optional, defaults to unknown
+   *   - Available to the rule function for context-aware validation
+   *   - Example: { userId: 123, permissions: [...] }
+   *
+   * ### Rule Function Interface
+   * The rule function receives:
+   * ```typescript
+   * {
+   *   value: any;                          // The property value being validated
+   *   ruleParams: [TargetClass];           // Single-element array with target constructor
+   *   context?: Context;                   // Validation context (if provided)
+   *   fieldName: string;                   // Property name
+   *   translatedPropertyName: string;      // Localized property name
+   *   i18n?: II18nService;                 // i18n service for error messages
+   * }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Create a target-based validation rule
+   * const validateNestedRule = ({ value, ruleParams, context }) => {
+   *   const [TargetClass] = ruleParams;
+   *   // Validate value against TargetClass schema
+   *   return Validator.validateTarget(TargetClass, {
+   *     data: value,
+   *     context: context
+   *   });
+   * };
+   *
+   * // Create a target rule decorator
+   * const ValidateNested = Validator.buildTargetRuleDecorator(validateNestedRule);
+   *
+   * // Use the decorator with a target class
+   * class Address {
+   *   @IsRequired
+   *   street: string;
+   *
+   *   @IsRequired
+   *   city: string;
+   * }
+   *
+   * class User {
+   *   @IsRequired
+   *   name: string;
+   *
+   *   @ValidateNested([Address])
+   *   address: Address;
+   * }
+   * ```
+   *
+   * ### Advanced Usage with Validation Options
+   * ```typescript
+   * class Coordinates {
+   *   @IsRequired
+   *   @IsNumber
+   *   latitude: number;
+   *
+   *   @IsRequired
+   *   @IsNumber
+   *   longitude: number;
+   * }
+   *
+   * class Location {
+   *   @IsRequired
+   *   name: string;
+   *
+   *   @ValidateNested([Coordinates])
+   *   coordinates: Coordinates;
+   * }
+   *
+   * class Event {
+   *   @IsRequired
+   *   name: string;
+   *
+   *   @ValidateNested([Location])
+   *   location: Location;
+   * }
+   *
+   * // Validate with context
+   * const result = await Validator.validateTarget(Event, {
+   *   data: eventData,
+   *   context: { userId: 123, permissions: ['edit'] },
+   *   errorMessageBuilder: (fieldName, error) => `${fieldName}: ${error}`
+   * });
+   * ```
+   *
+   * ### Comparison with buildRuleDecorator
+   * While both create decorator factories, they differ in specialization:
+   *
+   * **buildRuleDecorator (General Purpose):**
+   * - Accepts any array type as ruleParams
+   * - Used for property-level validation
+   * - Examples: @MinLength([5]), @IsEmail([]), @Pattern([/regex/])
+   * - Rule params can be any values
+   *
+   * **buildTargetRuleDecorator (Specialized):**
+   * - Accepts specifically [TargetClass] as ruleParams
+   * - Used for class-level nested validation
+   * - Examples: @ValidateNested([Address]), custom target validators
+   * - Rule params must contain a class constructor
+   *
+   * ### Implementation Details
+   * This method is a thin wrapper around buildRuleDecorator that:
+   * - Specializes the RuleParamsType to [target: Target]
+   * - Maintains type safety for target-based rules
+   * - Delegates all decorator factory logic to buildRuleDecorator
+   * - Reduces code duplication while providing specialized typing
+   *
+   * ### Performance Characteristics
+   * - No additional overhead vs buildRuleDecorator
+   * - Wrapper instantiation happens at decoration time, not at import
+   * - Actual validation is performed lazily during validateTarget() calls
+   * - Multiple properties with same target class share no cached state
+   *
+   * ### Error Handling
+   * When the target rule function returns errors:
+   * - Single errors are wrapped in the field name context
+   * - Nested errors include full path information
+   * - Multi-level nesting creates hierarchical error paths
+   * - Error messages can be customized via errorMessageBuilder
+   *
+   * ### Integration with Validation System
+   * - Works seamlessly with property decorators (buildPropertyDecorator)
+   * - Compatible with multi-rule decorators (buildMultiRuleDecorator)
+   * - Participates in parallel validation of all class properties
+   * - Context is propagated through nested validation layers
+   * - I18n support for error messages
+   *
+   * @template Target - Class constructor type for the target/nested class
+   *   - Extends IClassConstructor (default generic class constructor)
+   *   - Must be a class decorated with validation rules
+   *   - Example types: typeof Address, typeof Contact, typeof Location
+   *
+   * @template Context - Type of context object passed through validation
+   *   - Defaults to unknown if not specified
+   *   - Used for context-aware validation decisions
+   *   - Can include permissions, user info, environmental data, etc.
+   *
+   * @param ruleFunction - The target validation rule function to wrap
+   *   - Must accept ruleParams in format [TargetClass]
+   *   - Called by the decorator with target class as first param element
+   *   - Should return validation result or error message
+   *   - Can be synchronous or asynchronous
+   *
+   * @returns Decorator factory function that:
+   *   - Accepts [TargetClass] array parameter
+   *   - Returns a property decorator
+   *   - Attaches target-based validation to class properties
+   *   - Works with class validation via validateTarget()
+   *
+   * @since 1.22.0
+   * @see {@link buildRuleDecorator} - General-purpose decorator factory
+   * @see {@link buildPropertyDecorator} - Low-level decorator creation
+   * @see {@link ValidateNested} - Example target rule decorator
+   * @see {@link validateNestedRule} - Example target validation rule
+   * @see {@link validateTarget} - Parent validation method using target rules
+   * @public
+   */
   static buildTargetRuleDecorator<
     Target extends IClassConstructor = IClassConstructor,
     Context = unknown,

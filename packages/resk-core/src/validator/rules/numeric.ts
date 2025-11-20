@@ -531,6 +531,168 @@ function _Integer({ value, fieldName, translatedPropertyName, i18n, ...rest }: I
 export const IsInteger = Validator.buildPropertyDecorator(["Integer"]);
 Validator.registerRule("Integer", _Integer);
 
+/**
+ * ### EvenNumber Rule
+ *
+ * Validates that the field under validation is an integer and even (divisible by 2).
+ * Non-numeric inputs or non-integer numbers fail with appropriate messages.
+ *
+ * @example
+ * ```typescript
+ * // Class validation with decorator
+ * class Invoice {
+ *   @IsEvenNumber
+ *   batchNumber: number; // Must be an even integer (e.g., 2, 4, 6)
+ * }
+ *
+ * // Direct rule usage
+ * await Validator.validate({
+ *   value: 42,
+ *   rules: ['EvenNumber']
+ * }); // ✓ Valid
+ *
+ * await Validator.validate({
+ *   value: 7,
+ *   rules: ['EvenNumber']
+ * }); // ✗ Invalid (odd)
+ * ```
+ *
+ * @param options - Validation options with value and i18n context
+ * @returns Promise resolving to `true` when value is an even integer,
+ *          rejecting with a localized error message otherwise
+ *
+ * @since 1.22.0
+ * @public
+ */
+function EvenNumber({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
+  const numericValue = toNumber(value);
+  if (isNaN(numericValue)) {
+    const message = i18n.t("validator.number", {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+  if (!Number.isInteger(numericValue)) {
+    const message = i18n.t("validator.integer", {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+  if (numericValue % 2 === 0) {
+    return true;
+  } else {
+    return i18n.t("validator.evenNumber", {
+      field: translatedPropertyName || fieldName,
+      value: numericValue,
+      ...rest,
+    });
+  }
+}
+Validator.registerRule("EvenNumber", EvenNumber);
+
+/**
+ * ### IsEvenNumber Decorator
+ *
+ * Property decorator that enforces the `EvenNumber` rule.
+ * Use on numeric fields that must be even integers.
+ *
+ * @example
+ * ```typescript
+ * class Model {
+ *   @IsEvenNumber
+ *   evenId: number;
+ * }
+ * ```
+ *
+ * @public
+ */
+export const IsEvenNumber = Validator.buildPropertyDecorator(["EvenNumber"]);
+
+/**
+ * ### OddNumber Rule
+ *
+ * Validates that the field under validation is an integer and odd (not divisible by 2).
+ * Non-numeric inputs or non-integer numbers fail with appropriate messages.
+ *
+ * @example
+ * ```typescript
+ * // Class validation with decorator
+ * class Invoice {
+ *   @IsOddNumber
+ *   ticketNumber: number; // Must be an odd integer (e.g., 1, 3, 5)
+ * }
+ *
+ * // Direct rule usage
+ * await Validator.validate({
+ *   value: 9,
+ *   rules: ['OddNumber']
+ * }); // ✓ Valid
+ *
+ * await Validator.validate({
+ *   value: 10,
+ *   rules: ['OddNumber']
+ * }); // ✗ Invalid (even)
+ * ```
+ *
+ * @param options - Validation options with value and i18n context
+ * @returns Promise resolving to `true` when value is an odd integer,
+ *          rejecting with a localized error message otherwise
+ *
+ * @since 1.22.0
+ * @public
+ */
+function OddNumber({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): IValidatorResult {
+  const numericValue = toNumber(value);
+  if (isNaN(numericValue)) {
+    const message = i18n.t("validator.number", {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+  if (!Number.isInteger(numericValue)) {
+    const message = i18n.t("validator.integer", {
+      field: translatedPropertyName || fieldName,
+      value,
+      ...rest,
+    });
+    return message;
+  }
+  if (numericValue % 2 !== 0) {
+    return true;
+  } else {
+    return i18n.t("validator.oddNumber", {
+      field: translatedPropertyName || fieldName,
+      value: numericValue,
+      ...rest,
+    });
+  }
+}
+Validator.registerRule("OddNumber", OddNumber);
+
+/**
+ * ### IsOddNumber Decorator
+ *
+ * Property decorator that enforces the `OddNumber` rule.
+ * Use on numeric fields that must be odd integers.
+ *
+ * @example
+ * ```typescript
+ * class Model {
+ *   @IsOddNumber
+ *   oddId: number;
+ * }
+ * ```
+ *
+ * @public
+ */
+export const IsOddNumber = Validator.buildPropertyDecorator(["OddNumber"]);
+
 function MultipleOf({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<[number]>): IValidatorResult {
   return new Promise((resolve, reject) => {
     if (!ruleParams || !ruleParams.length) {
@@ -758,6 +920,31 @@ declare module "../types" {
     Integer: IValidatorRuleParams<[], Context>;
 
     /**
+     * ### Even Number Rule
+     *
+     * Validates that the field under validation is an integer and even (divisible by 2).
+     * Non-numeric inputs or non-integer numbers will be rejected with precise messages.
+     *
+     * @example
+     * ```typescript
+     * // Valid examples
+     * await Validator.validate({ value: 2, rules: ['EvenNumber'] }); // ✓
+     * await Validator.validate({ value: '8', rules: ['EvenNumber'] }); // ✓ numeric string
+     * await Validator.validate({ value: 0, rules: ['EvenNumber'] }); // ✓ zero is even
+     *
+     * // Invalid examples
+     * await Validator.validate({ value: 3, rules: ['EvenNumber'] }); // ✗ odd
+     * await Validator.validate({ value: 2.5, rules: ['EvenNumber'] }); // ✗ not integer
+     * await Validator.validate({ value: 'abc', rules: ['EvenNumber'] }); // ✗ not numeric
+     * ```
+     *
+     * @returns Promise resolving to true if valid, rejecting with error message if invalid
+     * @since 1.22.0
+     * @public
+     */
+    EvenNumber: IValidatorRuleParams<[], Context>;
+
+    /**
      * ### Multiple Of Rule
      *
      * Validates that the field under validation is a multiple of the specified value.
@@ -812,5 +999,30 @@ declare module "../types" {
      * @public
      */
     MultipleOf: IValidatorRuleParams<[number], Context>;
+
+    /**
+     * ### Odd Number Rule
+     *
+     * Validates that the field under validation is an integer and odd (not divisible by 2).
+     * Non-numeric inputs or non-integer numbers will be rejected with precise messages.
+     *
+     * @example
+     * ```typescript
+     * // Valid examples
+     * await Validator.validate({ value: 1, rules: ['OddNumber'] }); // ✓
+     * await Validator.validate({ value: '7', rules: ['OddNumber'] }); // ✓ numeric string
+     * await Validator.validate({ value: -5, rules: ['OddNumber'] }); // ✓ negative odd
+     *
+     * // Invalid examples
+     * await Validator.validate({ value: 4, rules: ['OddNumber'] }); // ✗ even
+     * await Validator.validate({ value: 3.14, rules: ['OddNumber'] }); // ✗ not integer
+     * await Validator.validate({ value: 'abc', rules: ['OddNumber'] }); // ✗ not numeric
+     * ```
+     *
+     * @returns Promise resolving to true if valid, rejecting with error message if invalid
+     * @since 1.22.0
+     * @public
+     */
+    OddNumber: IValidatorRuleParams<[], Context>;
   }
 }

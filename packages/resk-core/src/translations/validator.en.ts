@@ -20,10 +20,8 @@ I18n.RegisterTranslations({
         other: "Validation failed for %{count} items",
       },
       invalidRule: "Invalid validation rule: %{rule}",
-      invalidRuleParams:
-        "Invalid parameters for rule %{rule}; params: %{ruleParams[0]}, %{ruleParams[1]}, ...",
-      invalidMessage:
-        "Invalid validation message for rule %{rule}; error validating value %{value}",
+      invalidRuleParams: "Invalid parameters for rule %{rule}; params: %{ruleParams[0]}, %{ruleParams[1]}, ...",
+      invalidMessage: "Invalid validation message for rule %{rule}; error validating value %{value}",
       invalidEnumValue: "The field %{field} must be one of %{expectedValues}",
       required: "This field is required",
       minLength: "This field must be at least %{minLength} characters long",
@@ -41,43 +39,37 @@ I18n.RegisterTranslations({
       week: "This field must be a valid week",
       number: "This field must be a valid number",
       integer: "This field must be a valid integer",
+      evenNumber: "This field must be an even integer",
+      oddNumber: "This field must be an odd integer",
       float: "This field must be a valid float",
       fileName: "This field must be a valid file name",
       isNumber: "This field must be a valid number",
       isNonNullString: "This field must be a non null string",
       length: "This field must be exactly %{length} characters long",
-      lengthRange:
-        "This field must be between %{minLength} and %{maxLength} characters long",
-      numberLessThanOrEquals:
-        "This field must be less than or equal to %{ruleParams[0]}",
+      lengthRange: "This field must be between %{minLength} and %{maxLength} characters long",
+      numberLessThanOrEquals: "This field must be less than or equal to %{ruleParams[0]}",
       numberLessThan: "This field must be less than %{ruleParams[0]}",
-      numberGreaterThanOrEquals:
-        "This field must be greater than or equal to %{ruleParams[0]}",
+      numberGreaterThanOrEquals: "This field must be greater than or equal to %{ruleParams[0]}",
       numberGreaterThan: "This field must be greater than %{ruleParams[0]}",
       noteEquals: "This field must be different from %{ruleParams[0]}",
-      numberIsDifferentFrom:
-        "This field must be different from %{ruleParams[0]}",
+      numberIsDifferentFrom: "This field must be different from %{ruleParams[0]}",
       numberEquals: "This field must be equal to %{ruleParams[0]}",
       phoneNumber: "This field must be a valid phone number",
       emailOrPhoneNumber: "This field must be a valid email or phone number",
       boolean: "This field must be a valid boolean value",
-      numberBetween:
-        "This field must be between %{ruleParams[0]} and %{ruleParams[1]}",
-      decimalCount:
-        "This field must have(at least) %{ruleParams[0]} decimal places or/and at most %{ruleParams[1]} decimal places",
+      numberBetween: "This field must be between %{ruleParams[0]} and %{ruleParams[1]}",
+      decimalCount: "This field must have(at least) %{ruleParams[0]} decimal places or/and at most %{ruleParams[1]} decimal places",
       string: "This field must be a string",
-      endsWithOneOf:
-        "This field must end with one of the following values: %{endings}",
-      startsWithOneOf:
-        "This field must start with one of the following values: %{prefixes}",
+      endsWithOneOf: "This field must end with one of the following values: %{endings}",
+      startsWithOneOf: "This field must start with one of the following values: %{prefixes}",
       array: "This field must be an array",
       arrayMinLength: "This field must have at least %{minLength} items",
       arrayMaxLength: "This field must have at most %{maxLength} items",
       arrayLength: "This field must have exactly %{length} items",
-      arrayContains:
-        "This field must contain all of the following values: %{requiredValues}",
+      arrayContains: "This field must contain all of the following values: %{requiredValues}",
       arrayUnique: "This field must contain only unique values",
       oneOf: "This field must match at least one of the specified rules",
+      allOf: "This field must match all of the specified rules",
       dateAfter: "This field must be after %{date}",
       dateBefore: "This field must be before %{date}",
       dateBetween: "This field must be between %{startDate} and %{endDate}",
@@ -86,11 +78,9 @@ I18n.RegisterTranslations({
       pastDate: "This field must be a date in the past",
       file: "This field must be a valid file",
       fileSize: "This field must not exceed %{maxSize} bytes",
-      fileType:
-        "This field must be one of the following types: %{allowedTypes}",
+      fileType: "This field must be one of the following types: %{allowedTypes}",
       image: "This field must be a valid image file",
-      fileExtension:
-        "This field must have one of the following extensions: %{allowedExtensions}",
+      fileExtension: "This field must have one of the following extensions: %{allowedExtensions}",
       minFileSize: "This field must be at least %{minSize} bytes",
       uuid: "This field must be a valid UUID",
       json: "This field must be valid JSON",

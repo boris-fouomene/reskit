@@ -1024,6 +1024,7 @@ export class Validator {
           };
           const validateOptions = {
             ...extra,
+            data: data ?? Object.assign({}, data),
             ...i18nRuleOptions,
             ruleName,
             rule: ruleName,
@@ -1104,6 +1105,16 @@ export class Validator {
               }
             );
             return handleResult(oneOrAllResult);
+          } else if (normalizedRule === "validatenested" && ruleParams[0]) {
+            const nestedResult = await Validator.validateNestedRule<
+              IClassConstructor,
+              Context
+            >({
+              ...validateOptions,
+              startTime,
+              data,
+            } as any);
+            return handleResult(nestedResult);
           }
 
           if (typeof ruleFunc !== "function") {

@@ -21,7 +21,9 @@ This document covers advanced features of the Validator system including custom 
 
 Custom rules are registered once and can be used throughout your application.
 
-```typescript
+**Important:** For full TypeScript support and IntelliSense, you should augment the `IValidatorRulesMap` interface when registering custom rules. This enables type checking when using the programmatic API.
+
+````typescript
 import { Validator } from "@resk/core/validator";
 
 // Simple custom rule
@@ -42,6 +44,31 @@ Validator.registerRule("StrongPassword", ({ value, i18n }) => {
   return true;
 });
 
+// Augment IValidatorRulesMap for TypeScript support
+declare module "@resk/core/validator" {
+  export interface IValidatorRulesMap {
+    /**
+     * ### StrongPassword Rule
+     *
+     * Validates that password contains uppercase, lowercase, numbers, and special characters.
+     *
+     * @example
+     * ```typescript
+     * await Validator.validate({
+     *   value: 'SecurePass123!',
+     *   rules: ['StrongPassword']
+     * }); // ✓ Valid
+     *
+     * await Validator.validate({
+     *   value: 'weakpass',
+     *   rules: ['StrongPassword']
+     * }); // ✗ Invalid
+     * ```
+     */
+    StrongPassword: IValidatorRuleParams<[], Context>;
+  }
+}
+
 // Use with decorator
 class UserForm {
   @IsRequired
@@ -49,7 +76,7 @@ class UserForm {
   @Validator.buildPropertyDecorator(["StrongPassword"])
   password: string;
 }
-```
+````
 
 ### Rule with Parameters
 
@@ -167,6 +194,125 @@ const result = await Validator.validateTarget(PasswordForm, {
 });
 ```
 
+### Augmenting IValidatorRulesMap for Type Safety
+
+**Critical:** When registering custom rules, you should augment the `IValidatorRulesMap` interface to enable TypeScript support and IntelliSense. This is essential for:
+
+- **Type Safety**: TypeScript will validate rule names in `validate()` and `validateTarget()`
+- **IntelliSense**: IDE autocomplete suggestions for your custom rules
+- **Documentation**: JSDoc comments are shown in IntelliSense
+- **Rule Composition**: Support for combining rules as strings in arrays
+
+#### Basic Augmentation
+
+```typescript
+import { Validator, IValidatorRuleParams } from "@resk/core/validator";
+
+// Register your custom rule
+Validator.registerRule("CustomRule", ({ value }) => {
+  return typeof value === "string" || "Value must be a string";
+});
+
+// Augment the interface
+declare module "@resk/core/validator" {
+  export interface IValidatorRulesMap<Context = unknown> {
+    /**
+     * ### CustomRule
+     * Validates that value is a string.
+     */
+    CustomRule: IValidatorRuleParams<[], Context>;
+  }
+}
+
+// Now TypeScript will check the rule name
+await Validator.validate({
+  value: "hello",
+  rules: ["CustomRule"], // ✅ TypeScript knows this rule exists
+});
+
+await Validator.validate({
+  value: "hello",
+  rules: ["NonExistentRule"], // ❌ TypeScript error!
+});
+```
+
+#### Augmentation with Parameters
+
+```typescript
+// Rule with parameters
+Validator.registerRule("StringLength", ({ value, ruleParams }) => {
+  const [min, max] = ruleParams as [number, number];
+  const len = String(value).length;
+  return (
+    (len >= min && len <= max) || `Length must be between ${min} and ${max}`
+  );
+});
+
+// Augment with parameter types
+declare module "@resk/core/validator" {
+  export interface IValidatorRulesMap<Context = unknown> {
+    /**
+     * ### StringLength Rule
+     * Validates string length is between min and max.
+     *
+     * @param min - Minimum length
+     * @param max - Maximum length
+     */
+    StringLength: IValidatorRuleParams<[min: number, max: number], Context>;
+  }
+}
+
+// TypeScript validates parameters
+await Validator.validate({
+  value: "hello",
+  rules: ["StringLength[3,10]"], // ✅ Correct usage
+});
+```
+
+#### Augmentation with Context
+
+```typescript
+interface AdminContext {
+  isAdmin: boolean;
+  permissions: string[];
+}
+
+Validator.registerRule("AdminOnly", ({ value, context }) => {
+  const ctx = context as AdminContext;
+  return ctx?.isAdmin || "Admin access required";
+});
+
+declare module "@resk/core/validator" {
+  export interface IValidatorRulesMap<Context = unknown> {
+    /**
+     * ### AdminOnly Rule
+     * Restricts field to administrators only.
+     */
+    AdminOnly: IValidatorRuleParams<[], AdminContext>;
+  }
+}
+
+// Type-safe context usage
+const result = await Validator.validate<AdminContext>({
+  value: "admin_setting",
+  rules: ["AdminOnly"],
+  context: {
+    isAdmin: true,
+    permissions: ["admin:write"],
+  },
+});
+```
+
+#### Benefits Summary
+
+| Benefit           | Without Augmentation          | With Augmentation                 |
+| ----------------- | ----------------------------- | --------------------------------- |
+| **Type Checking** | No validation of rule names   | ✅ Compile-time errors for typos  |
+| **IntelliSense**  | No autocomplete               | ✅ Full autocomplete suggestions  |
+| **Documentation** | No hover help in IDE          | ✅ JSDoc comments in IntelliSense |
+| **Refactoring**   | Manual tracking of rule usage | ✅ IDE can find all usages        |
+| **Consistency**   | Easy to misspell rules        | ✅ Single source of truth         |
+
 ---
 
 ## Context-Aware Validation
@@ -197,6 +343,13 @@ Validator.registerRule("RequiresProSubscription", ({ value, context }) => {
 
   return true;
 });
+
+// Augment the interface
+declare module "@resk/core/validator" {
+  export interface IValidatorRulesMap<Context = unknown> {
+    RequiresProSubscription: IValidatorRuleParams<[], UserContext>;
+  }
+}
 
 class Feature {
   @Validator.buildPropertyDecorator(["RequiresProSubscription"])

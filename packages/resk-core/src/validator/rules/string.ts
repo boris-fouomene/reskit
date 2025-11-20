@@ -333,7 +333,7 @@ function _StartsWith({
     }
   });
 }
-
+Validator.registerRule("StartsWithOneOf", _StartsWith);
 function _String({
   value,
   fieldName,
@@ -341,23 +341,18 @@ function _String({
   i18n,
   ...rest
 }: IValidatorValidateOptions): IValidatorResult {
-  return new Promise((resolve, reject) => {
-    if (typeof value === "string") {
-      resolve(true);
-    } else {
-      const message = i18n.t("validator.string", {
+  return typeof value === "string"
+    ? true
+    : i18n.t("validator.string", {
         field: translatedPropertyName || fieldName,
         value,
         ...rest,
       });
-      reject(message);
-    }
-  });
 }
 Validator.registerRule("String", _String);
 
 /**
- * ### String Rule
+ * ### IsString Rule
  *
  * Validates that the field under validation is a string. If you would like to
  * allow the field to also be null, you should assign the nullable rule to the field.
@@ -381,7 +376,7 @@ Validator.registerRule("String", _String);
  * @since 1.22.0
  * @public
  */
-export const IsString = Validator.buildPropertyDecorator(["String"]);
+export const IsString = Validator.buildPropertyDecorator<[]>(["String"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {

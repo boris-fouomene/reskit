@@ -334,6 +334,9 @@ function _StartsWith({
   });
 }
 Validator.registerRule("StartsWithOneOf", _StartsWith);
+export const StartsWithOneOf =
+  Validator.buildRuleDecorator<string[]>(_StartsWith);
+
 function _String({
   value,
   fieldName,

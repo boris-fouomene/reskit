@@ -1,3 +1,4 @@
+import { ensureRulesRegistered } from ".";
 import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../validator";
@@ -8,14 +9,22 @@ import {
   Length,
   MaxLength,
   MinLength,
+  StartsWithOneOf,
 } from "./string";
-
+ensureRulesRegistered();
 describe("String Validation Rules", () => {
   beforeAll(async () => {
     await i18n.setLocale("en");
   });
 
   describe("IsString Rule", () => {
+    it("should work with Required rule", async () => {
+      const result = await Validator.validate({
+        value: "hello",
+        rules: ["String", "Required"],
+      });
+      expect(result.success).toBe(true);
+    });
     describe("Validation Behavior", () => {
       it("should validate string values", async () => {
         const result = await Validator.validate({
@@ -511,6 +520,141 @@ describe("String Validation Rules", () => {
     });
   });
 
+  describe("StartsWithOneOf Rule", () => {
+    describe("Validation Behavior", () => {
+      it("should validate string starting with one of values", async () => {
+        const result = await Validator.validate({
+          value: "https://example.com",
+          rules: [{ StartsWithOneOf: ["https://", "http://"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should validate with first matching prefix", async () => {
+        const result = await Validator.validate({
+          value: "production-api",
+          rules: [
+            { StartsWithOneOf: ["production", "staging", "development"] },
+          ],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should validate with any matching prefix", async () => {
+        const result = await Validator.validate({
+          value: "staging-db",
+          rules: [
+            { StartsWithOneOf: ["production", "staging", "development"] },
+          ],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should reject if not starting with any value", async () => {
+        const result = await Validator.validate({
+          value: "ftp://server.com",
+          rules: [{ StartsWithOneOf: ["https://", "http://"] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should be case sensitive", async () => {
+        const result = await Validator.validate({
+          value: "HTTP://example.com",
+          rules: [{ StartsWithOneOf: ["http://", "https://"] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject non-string values", async () => {
+        const result = await Validator.validate({
+          value: 123,
+          rules: [{ StartsWithOneOf: ["http", "https"] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should work with single character prefixes", async () => {
+        const result = await Validator.validate({
+          value: "test_value",
+          rules: [{ StartsWithOneOf: ["t", "s", "p"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should work with long prefixes", async () => {
+        const result = await Validator.validate({
+          value: "user-profile-settings",
+          rules: [{ StartsWithOneOf: ["user-profile", "admin-profile"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should validate empty string against prefixes", async () => {
+        const result = await Validator.validate({
+          value: "",
+          rules: [{ StartsWithOneOf: ["https://", "http://"] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject when params are empty", async () => {
+        const result = await Validator.validate({
+          value: "test",
+          rules: [{ StartsWithOneOf: [] }],
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe("Decorator", () => {
+      it("should validate with StartsWithOneOf decorator", async () => {
+        class ApiConfig {
+          @StartsWithOneOf(["http://", "https://"])
+          apiUrl: string = "";
+        }
+
+        const result = await Validator.validateTarget(ApiConfig, {
+          data: {
+            apiUrl: "https://api.example.com",
+          },
+        });
+
+        expect(result.success).toBe(true);
+      });
+
+      it("should reject invalid prefix with decorator", async () => {
+        class ApiConfig {
+          @StartsWithOneOf(["http://", "https://"])
+          apiUrl: string = "";
+        }
+
+        const result = await Validator.validateTarget(ApiConfig, {
+          data: {
+            apiUrl: "ftp://files.example.com",
+          },
+        });
+
+        expect(result.success).toBe(false);
+      });
+
+      it("should work with multiple prefixes in decorator", async () => {
+        class Environment {
+          @StartsWithOneOf(["prod", "staging", "dev"])
+          environmentName: string = "";
+        }
+
+        const result = await Validator.validateTarget(Environment, {
+          data: {
+            environmentName: "staging-server-01",
+          },
+        });
+
+        expect(result.success).toBe(true);
+      });
+    });
+  });
+
   describe("EndsWithOneOf Rule", () => {
     describe("Validation Behavior", () => {
       it("should validate string ending with one of values", async () => {
@@ -551,6 +695,54 @@ describe("String Validation Rules", () => {
           rules: [{ EndsWithOneOf: ["jpg", "png"] }],
         });
         expect(result.success).toBe(false);
+      });
+
+      it("should work with single character suffixes", async () => {
+        const result = await Validator.validate({
+          value: "word",
+          rules: [{ EndsWithOneOf: ["d", "t", "n"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should work with long suffixes", async () => {
+        const result = await Validator.validate({
+          value: "user-profile-settings",
+          rules: [{ EndsWithOneOf: ["-settings", "-profile", "-data"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should validate empty string against suffixes", async () => {
+        const result = await Validator.validate({
+          value: "",
+          rules: [{ EndsWithOneOf: [".jpg", ".png"] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should reject when params are empty", async () => {
+        const result = await Validator.validate({
+          value: "file.txt",
+          rules: [{ EndsWithOneOf: [] }],
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("should work with file extensions", async () => {
+        const result = await Validator.validate({
+          value: "document.docx",
+          rules: [{ EndsWithOneOf: [".pdf", ".doc", ".docx"] }],
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("should work with domain extensions", async () => {
+        const result = await Validator.validate({
+          value: "company.org",
+          rules: [{ EndsWithOneOf: [".com", ".org", ".net"] }],
+        });
+        expect(result.success).toBe(true);
       });
     });
 

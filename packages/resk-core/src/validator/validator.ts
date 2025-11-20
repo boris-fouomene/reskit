@@ -372,13 +372,8 @@ export class Validator {
   }
 
   private static getI18n(options?: { i18n?: I18n }): I18n {
-    const { i18n } = Object.assign({}, options);
-    if (i18n instanceof I18n) {
-      return i18n;
-    }
-    if (i18n && typeof (i18n as any)?.getLocale === "function" && typeof (i18n as any)?.translate === "function" && typeof (i18n as any)?.translateTarget === "function") {
-      console.log("returning i18n found ", (i18n as any).getLocale(), " is locale getted");
-      return i18n as I18n;
+    if (I18n.isI18nInstance(options?.i18n)) {
+      return options.i18n;
     }
     return defaultI18n;
   }
@@ -1211,6 +1206,7 @@ export class Validator {
 
     for (const subRule of subRules) {
       const res = await Validator.validate<Context>({ ...extra, rules: [subRule], value, i18n } as any);
+      //console.log(res, " is rest about validating ", value, "and rule name ", subRule);
       if (res.success) {
         if (!isAllOfRule) return true; // OneOf: first hit wins
         firstSuccess ??= res; // AllOf: keep first success

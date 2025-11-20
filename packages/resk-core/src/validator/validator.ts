@@ -1972,31 +1972,32 @@ export class Validator {
   /**
    * ## Build OneOf Rule Decorator Factory
    *
-   * Creates a decorator factory specifically designed for building "OneOf" validation rules.
-   * OneOf rules allow validation to succeed if at least one of the provided sub-rules passes,
-   * making them ideal for scenarios where multiple validation paths are acceptable.
+   * Creates a specialized decorator factory for building "OneOf" validation rules.
+   * This method provides a type-safe way to create decorators that implement
+   * OneOf validation logic, where validation succeeds if at least one sub-rule passes.
    *
-   * ### OneOf Validation Behavior
-   * - **Success Condition**: At least one sub-rule must validate successfully
-   * - **Failure Condition**: All sub-rules must fail for the OneOf validation to fail
-   * - **Parallel Execution**: Sub-rules are evaluated in parallel for optimal performance
-   * - **Error Aggregation**: Failed rule errors are combined with semicolons ("; ")
+   * ### OneOf Validation Concept
+   * OneOf validation allows flexible validation scenarios where multiple validation
+   * paths are acceptable. Instead of requiring all rules to pass (AND logic),
+   * OneOf requires only one rule to pass (OR logic), making it ideal for:
+   * - Alternative input formats (email OR phone number)
+   * - Flexible validation requirements
+   * - Multiple acceptable validation criteria
    *
-   * ### Use Cases
-   * - **Alternative Validation**: Accept values that match any one of several criteria
-   * - **Format Flexibility**: Allow multiple valid formats (e.g., email OR phone number)
-   * - **Conditional Validation**: Value can satisfy different validation requirements
-   * - **Flexible Input**: Support user input in various acceptable formats
+   * ### Method Implementation
+   * This method is a thin wrapper around {@link buildRuleDecorator} that provides
+   * specialized typing for OneOf rule functions. It ensures type safety while
+   * leveraging the existing decorator factory infrastructure.
    *
-   * ### Decorator Factory Pattern
-   * This method returns a decorator factory that accepts an array of validation rules
-   * and returns a property decorator. The rules can be strings, objects, or functions.
+   * ### Type Safety Features
+   * - **Generic Context**: Supports typed validation context objects
+   * - **Rule Array Types**: Properly typed arrays of validation rules
+   * - **OneOf Function Interface**: Uses `IValidatorOneOfRuleFunction` for precise typing
    *
    * @example
    * ```typescript
-   * // Create a OneOf validation rule for contact information
-   * const validateContact = ({ ruleParams }) => {
-   *   // ruleParams contains the array of sub-rules
+   * // Create a OneOf validation rule function
+   * const validateContactMethod = ({ ruleParams }) => {
    *   return async (validationOptions) => {
    *     return Validator.validateOneOfRule({
    *       ...validationOptions,
@@ -2006,19 +2007,19 @@ export class Validator {
    * };
    *
    * // Create the decorator factory
-   * const IsValidContact = Validator.buildOneOfRuleDecorator(validateContact);
+   * const IsValidContact = Validator.buildOneOfRuleDecorator(validateContactMethod);
    *
-   * // Use the decorator on a class property
+   * // Use the decorator
    * class UserProfile {
    *   @IsValidContact([
-   *     "Email",           // String rule
-   *     "PhoneNumber",     // String rule
-   *     { MinLength: [3] } // Object rule
+   *     "Email",              // String rule
+   *     "PhoneNumber",        // String rule
+   *     { MinLength: [3] }    // Object rule with parameters
    *   ])
    *   contactInfo: string;
    * }
    *
-   * // Validation examples
+   * // Validation succeeds if any rule passes
    * const result1 = await Validator.validateTarget(UserProfile, {
    *   contactInfo: "user@example.com"  // Passes Email rule
    * });
@@ -2028,78 +2029,73 @@ export class Validator {
    *   contactInfo: "+1234567890"  // Passes PhoneNumber rule
    * });
    * // result2.success === true
-   *
-   * const result3 = await Validator.validateTarget(UserProfile, {
-   *   contactInfo: "abc"  // Passes MinLength rule
-   * });
-   * // result3.success === true
-   *
-   * const result4 = await Validator.validateTarget(UserProfile, {
-   *   contactInfo: ""  // Fails all rules
-   * });
-   * // result4.success === false
-   * // result4.errors[0].message contains aggregated error messages
    * ```
    *
-   * ### Advanced Usage with Custom Rules
+   * ### Advanced Usage with Context
    * ```typescript
-   * // Create a complex OneOf rule with mixed rule types
+   * interface UserContext {
+   *   userType: 'admin' | 'user';
+   *   permissions: string[];
+   * }
+   *
    * const validateFlexibleId = ({ ruleParams }) => {
    *   return async (validationOptions) => {
-   *     return Validator.validateOneOfRule({
+   *     return Validator.validateOneOfRule<UserContext>({
    *       ...validationOptions,
    *       ruleParams: ruleParams as IValidatorRule[]
    *     });
    *   };
    * };
    *
-   * const IsValidIdentifier = Validator.buildOneOfRuleDecorator(validateFlexibleId);
+   * const IsValidIdentifier = Validator.buildOneOfRuleDecorator<UserContext>(validateFlexibleId);
    *
    * class Entity {
    *   @IsValidIdentifier([
-   *     "UUID",                    // String rule
-   *     { Pattern: [/^[A-Z]{2}\d{8}$/] }, // Object rule with regex
-   *     ({ value }) => value.startsWith('CUSTOM-') || 'Must start with CUSTOM-' // Function rule
+   *     "UUID",
+   *     ({ value, context }) => {
+   *       if (context?.userType === 'admin') {
+   *         return value.startsWith('ADMIN-') || 'Admin IDs must start with ADMIN-';
+   *       }
+   *       return false; // Skip for non-admins
+   *     }
    *   ])
    *   identifier: string;
    * }
-   *
-   * // All these would pass validation:
-   * // "550e8400-e29b-41d4-a716-446655440000" (UUID)
-   * // "AB12345678" (Pattern match)
-   * // "CUSTOM-12345" (Function rule)
    * ```
    *
    * ### Error Handling
    * ```typescript
+   * // When all sub-rules fail, errors are aggregated
    * const result = await Validator.validateTarget(Entity, {
-   *   identifier: "invalid"  // Fails all sub-rules
+   *   identifier: "invalid"  // Fails all rules
    * });
    *
    * if (!result.success) {
    *   console.log(result.errors[0].message);
-   *   // Output: "Invalid UUID; Does not match pattern; Must start with CUSTOM-"
+   *   // Output: "Invalid UUID; Admin IDs must start with ADMIN-"
    * }
    * ```
    *
-   * @template Context - Type of the validation context object passed to sub-rules
-   * @template RulesFunctions - Array type of validation rules that can be applied
+   * @template Context - Type of the validation context object passed to rules
+   * @template RulesFunctions - Array type defining the structure of validation rules
    *
-   * @param ruleFunction - Validation function that implements OneOf logic, typically calling validateOneOfRule
+   * @param ruleFunction - OneOf validation function that implements the validation logic
+   *                      Should typically delegate to `Validator.validateOneOfRule`
    *
-   * @returns Decorator factory function that accepts an array of validation rules and returns a property decorator
+   * @returns Decorator factory function that accepts rule parameters and returns a property decorator
    *
    * @remarks
-   * - This method is a specialized version of buildRuleDecorator for OneOf scenarios
-   * - The ruleFunction should typically delegate to Validator.validateOneOfRule
-   * - Rules are executed in parallel for maximum performance
-   * - Error messages from failed rules are joined with semicolons
-   * - Returns success immediately when the first sub-rule passes
+   * - This method delegates to `buildRuleDecorator` for the actual decorator creation
+   * - Provides specialized typing for OneOf validation scenarios
+   * - Enables creation of flexible validation decorators with OR logic
+   * - Rules are executed in parallel for optimal performance
+   * - Error messages from failed rules are aggregated with semicolons
    *
    * @since 1.35.0
-   * @see {@link validateOneOfRule} - The underlying validation method
-   * @see {@link buildRuleDecorator} - General rule decorator factory
+   * @see {@link buildRuleDecorator} - The underlying decorator factory
    * @see {@link buildRuleDecoratorOptional} - Optional parameter version
+   * @see {@link validateOneOfRule} - The validation method used by OneOf rules
+   * @see {@link IValidatorOneOfRuleFunction} - Type definition for rule functions
    * @public
    */
   static buildOneOfRuleDecorator<

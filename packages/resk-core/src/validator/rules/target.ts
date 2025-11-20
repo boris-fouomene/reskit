@@ -136,8 +136,15 @@ import { Validator } from "../validator";
  * @see Validator.buildTargetRuleDecorator - Decorator factory
  * @public
  */
+// Create the base ValidateNested function
+const validateNestedFunction = function ValidateNested(options: any) {
+  return Validator.validateNestedRule(options);
+};
+
+// Mark it with a symbol so it can be reliably identified even in minified code
+(validateNestedFunction as any)[Symbol.for("validatorNestedRuleMarker")] = true;
+
+// Create a wrapper decorator that captures the target class
 export const ValidateNested = Validator.buildTargetRuleDecorator(
-  function ValidateNested(options) {
-    return Validator.validateNestedRule(options as any);
-  }
+  validateNestedFunction
 );

@@ -40,6 +40,7 @@ import {
 // Enhanced metadata keys with consistent naming convention
 const VALIDATOR_TARGET_RULES_METADATA_KEY = Symbol("validatorTargetRules");
 const VALIDATOR_TARGET_OPTIONS_METADATA_KEY = Symbol("validatorTargetOptions");
+const VALIDATOR_NESTED_RULE_MARKER = Symbol.for("validatorNestedRuleMarker");
 
 /**
  * # Validator Class
@@ -2655,6 +2656,187 @@ export class Validator {
   }
 
   /**
+   * ## Check If Property Has ValidateNested Rule
+   *
+   * Determines whether a specific property of a class has the `@ValidateNested` decorator
+   * applied by inspecting the metadata attached to the property. This provides an alternative
+   * to string-based rule name checking, allowing metadata-based detection of nested validation rules.
+   *
+   * ### Purpose
+   * This method enables detection of `@ValidateNested` decorators using the reflection
+   * metadata system rather than relying on normalized rule name string comparison.
+   * This is more robust and type-safe for identifying nested validation requirements.
+   *
+   * ### How It Works
+   * 1. Retrieves all validation rules attached to the specified property
+   * 2. Checks if any rule is marked with the ValidateNested symbol marker
+   * 3. Returns true if at least one ValidateNested rule is found
+   *
+   * @example
+   * ```typescript
+   * class Address {
+   *   street: string = "";
+   *   city: string = "";
+   * }
+   *
+   * class User {
+   *   name: string = "";
+   *
+   *   @ValidateNested([Address])
+   *   address: Address = new Address();
+   * }
+   *
+   * // Check if the address property has ValidateNested
+   * const hasNested = Validator.hasValidateNestedRule(User, 'address');
+   * console.log(hasNested); // true
+   *
+   * // Check if the name property has ValidateNested
+   * const nameHasNested = Validator.hasValidateNestedRule(User, 'name');
+   * console.log(nameHasNested); // false
+   * ```
+   *
+   * ### Metadata-Based Detection
+   * Unlike the string-based `normalizedRule === "validatenested"` check in the validation
+   * pipeline, this method directly inspects decorator metadata stored on the class property.
+   * It provides:
+   * - Type safety: Works with actual decorator function references
+   * - Clarity: Explicitly checks for the ValidateNested decorator
+   * - Robustness: Works with minified code (uses symbol markers, not function names)
+   * - Decoupling: No dependency on rule name strings or normalization
+   *
+   * @template T - Class constructor type extending IClassConstructor
+   *
+   * @param target - The class constructor to inspect
+   * @param propertyKey - The property name to check for ValidateNested decorator
+   *
+   * @returns `true` if the property has a ValidateNested rule applied, `false` otherwise
+   *
+   * @since 1.36.0
+   * @see {@link getTargetRules} - Get all rules for a target class
+   * @see {@link validateNestedRule} - The underlying nested validation method
+   * @see {@link ValidateNested} - The decorator that applies nested validation
+   * @public
+   */
+  static hasValidateNestedRule<T extends IClassConstructor = any>(
+    target: T,
+    propertyKey: keyof InstanceType<T>
+  ): boolean {
+    const rules = this.getTargetRules(target);
+    const propertyRules = rules[propertyKey];
+
+    if (!Array.isArray(propertyRules)) {
+      return false;
+    }
+
+    // Check if any rule is marked with the ValidateNested symbol marker
+    const markerSymbol = Symbol.for("validatorNestedRuleMarker");
+    return propertyRules.some((rule) => {
+      if (typeof rule === "function") {
+        return (rule as any)[markerSymbol] === true;
+      }
+      if (isObj(rule) && typeof (rule as any).ruleFunction === "function") {
+        return (rule as any).ruleFunction[markerSymbol] === true;
+      }
+      return false;
+    });
+  }
+
+  /**
+   * ## Get ValidateNested Rule Parameters
+   *
+   * Retrieves the target class constructor parameter from a `@ValidateNested` decorator
+   * attached to a specific property. This allows programmatic inspection of which nested
+   * class is being validated without executing the validation.
+   *
+   * ### Purpose
+   * Extract the nested class constructor that was passed to the `@ValidateNested` decorator,
+   * useful for:
+   * - Programmatic validation inspection
+   * - Dynamic class discovery
+   * - Reflection-based tools
+   * - Testing and debugging
+   *
+   * @example
+   * ```typescript
+   * class Address {
+   *   street: string = "";
+   * }
+   *
+   * class User {
+   *   @ValidateNested([Address])
+   *   address: Address = new Address();
+   * }
+   *
+   * // Get the target class for nested validation
+   * const nestedClass = Validator.getValidateNestedTarget(User, 'address');
+   * console.log(nestedClass === Address); // true
+   * ```
+   *
+   * ### Return Value
+   * Returns the class constructor if found, or undefined if:
+   * - The property has no ValidateNested rule
+   * - The metadata cannot be retrieved
+   * - The rule parameters are invalid
+   *
+   * ### Implementation Details
+   * This method:
+   * 1. Identifies ValidateNested rules using symbol markers (works with minified code)
+   * 2. Extracts the target class from stored rule parameters
+   * 3. Returns the class constructor for reflection or dynamic validation
+   * 4. Works with nested target rules created via buildTargetRuleDecorator
+   *
+   * @template T - Class constructor type
+   *
+   * @param target - The class constructor to inspect
+   * @param propertyKey - The property with the ValidateNested decorator
+   *
+   * @returns The nested class constructor if found, undefined otherwise
+   *
+   * @since 1.36.0
+   * @see {@link hasValidateNestedRule} - Check if property has ValidateNested rule
+   * @see {@link getTargetRules} - Get all rules for a class
+   * @public
+   */
+  static getValidateNestedTarget<T extends IClassConstructor = any>(
+    target: T,
+    propertyKey: keyof InstanceType<T>
+  ): IClassConstructor | undefined {
+    const rules = this.getTargetRules(target);
+    const propertyRules = rules[propertyKey];
+
+    if (!Array.isArray(propertyRules)) {
+      return undefined;
+    }
+
+    // Find the ValidateNested rule by symbol marker
+    for (const rule of propertyRules) {
+      if (
+        typeof rule === "function" &&
+        (rule as any)[Symbol.for("validatorNestedRuleMarker")] === true
+      ) {
+        // Try to get params from the stored params symbol
+        const params = (rule as any)[Symbol.for("validatorNestedRuleParams")];
+        if (Array.isArray(params) && params.length > 0) {
+          return params[0];
+        }
+      } else if (
+        isObj(rule) &&
+        typeof (rule as any).ruleFunction === "function" &&
+        (rule as any).ruleFunction[Symbol.for("validatorNestedRuleMarker")] ===
+          true
+      ) {
+        // For object rules, try to get from params
+        const ruleParams = (rule as any).params;
+        if (Array.isArray(ruleParams) && ruleParams.length > 0) {
+          return ruleParams[0];
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
    * ## Get Target Validation Options
    *
    * Retrieves validation options that have been configured for a specific class
@@ -2831,6 +3013,30 @@ export class Validator {
         ) as RuleParamsType;
         return ruleFunction(enhancedOptions);
       };
+
+      // Preserve symbol markers from the original function
+      // This allows decorators to be reliably identified even after wrapping
+      const markerSymbol = Symbol.for("validatorNestedRuleMarker");
+      if ((ruleFunction as any)[markerSymbol]) {
+        (enhancedValidatorFunction as any)[markerSymbol] = (
+          ruleFunction as any
+        )[markerSymbol];
+        // Also store the target if present
+        const targetSymbol = Symbol.for("validatorNestedTarget");
+        if ((ruleFunction as any)[targetSymbol]) {
+          (enhancedValidatorFunction as any)[targetSymbol] = (
+            ruleFunction as any
+          )[targetSymbol];
+        }
+        // Store the rule parameters so they can be retrieved by inspection methods
+        // This is particularly important for ValidateNested to access the target class
+        const paramsSymbol = Symbol.for("validatorNestedRuleParams");
+        const normalizedParams = (
+          Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
+        ) as RuleParamsType;
+        (enhancedValidatorFunction as any)[paramsSymbol] = normalizedParams;
+      }
+
       return Validator.buildPropertyDecorator<RuleParamsType, Context>(
         enhancedValidatorFunction
       );

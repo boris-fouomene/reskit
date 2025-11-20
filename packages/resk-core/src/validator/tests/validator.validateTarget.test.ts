@@ -539,6 +539,96 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
+    it("should detect @ValidateNested decorator using metadata inspection", async () => {
+      // This test demonstrates metadata-based detection as an alternative
+      // to the string-based normalizedRule === "validatenested" check
+
+      class Address {
+        street: string = "";
+        city: string = "";
+      }
+
+      class User {
+        name: string = "";
+
+        @ValidateNested([Address])
+        address: Address = new Address();
+      }
+
+      // Use the metadata-based method to check if a property has ValidateNested
+      const hasAddressNested = Validator.hasValidateNestedRule(User, "address");
+      const hasNameNested = Validator.hasValidateNestedRule(User, "name");
+
+      expect(hasAddressNested).toBe(true);
+      expect(hasNameNested).toBe(false);
+    });
+
+    it("should retrieve nested class target from metadata", async () => {
+      // This test demonstrates retrieving the nested class constructor
+      // using metadata instead of relying on string-based rule detection
+
+      class Contact {
+        email: string = "";
+      }
+
+      class Person {
+        name: string = "";
+
+        @ValidateNested([Contact])
+        contact: Contact = new Contact();
+      }
+
+      // Retrieve the target class metadata
+      const contactTarget = Validator.getValidateNestedTarget(
+        Person,
+        "contact"
+      );
+      const nameTarget = Validator.getValidateNestedTarget(Person, "name");
+
+      expect(contactTarget).toBe(Contact);
+      expect(nameTarget).toBeUndefined();
+    });
+
+    it("should use metadata detection to ensure nested validation path", async () => {
+      // This test verifies that metadata-based detection correctly identifies
+      // properties requiring nested validation, providing an alternative to
+      // the normalizedRule === "validatenested" string check
+
+      class Address {
+        street: string = "";
+      }
+
+      class User {
+        email: string = "";
+
+        @ValidateNested([Address])
+        address: Address = new Address();
+      }
+
+      // Metadata-based detection
+      const targetRules = Validator.getTargetRules(User);
+      const hasMetadataValidation = Validator.hasValidateNestedRule(
+        User,
+        "address"
+      );
+      const nestedClass = Validator.getValidateNestedTarget(User, "address");
+
+      // All metadata-based checks should identify the nested structure
+      expect(hasMetadataValidation).toBe(true);
+      expect(nestedClass).toBe(Address);
+      expect(targetRules).toHaveProperty("address");
+
+      // Validation should also succeed
+      const result = await Validator.validateTarget(User, {
+        data: {
+          email: "test@example.com",
+          address: { street: "Main St" },
+        },
+      });
+
+      expect(result.success).toBe(true);
+    });
+
     it("should accept nested object with any type when no decorators present", async () => {
       class Address {
         street: string = "";
@@ -599,6 +689,18 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       if (result.success) {
         expect(result.data).toEqual(data);
       }
+
+      // Metadata detection for multi-level nesting
+      expect(Validator.hasValidateNestedRule(Event, "location")).toBe(true);
+      expect(Validator.hasValidateNestedRule(Location, "coordinates")).toBe(
+        true
+      );
+      expect(Validator.getValidateNestedTarget(Event, "location")).toBe(
+        Location
+      );
+      expect(Validator.getValidateNestedTarget(Location, "coordinates")).toBe(
+        Coordinates
+      );
     });
 
     it("should invoke validatenested rule handling path in normalizedRule check", async () => {

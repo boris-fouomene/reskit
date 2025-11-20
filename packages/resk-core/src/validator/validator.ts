@@ -998,13 +998,22 @@ export class Validator {
             return next();
           };
 
-          if (["oneof", "allof"].includes(String(ruleName).toLowerCase().trim())) {
-            // OneOf rule is handled separately
-            const oneOfResult = await Validator.validateMultiRule<Context>(ruleName === "oneof" ? "OneOf" : "AllOf", {
-              ...validateOptions,
-              startTime,
-            });
-            return handleResult(oneOfResult);
+          {
+            const normalizedRule = String(ruleName).toLowerCase().trim();
+            if (["oneof", "allof", "arrayof"].includes(normalizedRule)) {
+              if (normalizedRule === "arrayof") {
+                const arrayOfResult = await Validator.validateArrayOfRule<Context>({
+                  ...validateOptions,
+                  startTime,
+                } as any);
+                return handleResult(arrayOfResult);
+              }
+              const oneOrAllResult = await Validator.validateMultiRule<Context>(normalizedRule === "oneof" ? "OneOf" : "AllOf", {
+                ...validateOptions,
+                startTime,
+              });
+              return handleResult(oneOrAllResult);
+            }
           }
 
           if (typeof ruleFunc !== "function") {
@@ -1104,6 +1113,72 @@ export class Validator {
    */
   static validateAllOfRule<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>): IValidatorResult {
     return this.validateMultiRule<Context, RulesFunctions>("AllOf", options);
+  }
+
+  /**
+   * ## Validate ArrayOf Rule
+   *
+   * Validates that a value is an array and that each item in the array
+   * satisfies all of the provided sub-rules (AND logic per item).
+   *
+   * - Ensures `value` is an array; otherwise returns the localized `array` error.
+   * - Applies {@link validateMultiRule} with `"AllOf"` to each item using the provided `ruleParams`.
+   * - Aggregates failing item messages; returns `true` when all items pass.
+   * - When any items fail, returns a localized summary using `failedForNItems`
+   *   followed by concatenated item error messages.
+   *
+   * @template Context - Optional type for validation context
+   * @template RulesFunctions - Array of sub-rules applied to each item
+   * @param options - Multi-rule validation options
+   * @returns `IValidatorResult` (`Promise<boolean|string>`) - `true` if all items pass; otherwise an aggregated error string
+   * @example
+   * const res = await Validator.validateArrayOfRule({
+   *   value: ["user@example.com", "admin@example.com"],
+   *   ruleParams: ["Email"],
+   * });
+   * // res === true when every item is a valid email
+   * @since 1.36.0
+   */
+  static async validateArrayOfRule<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>): Promise<boolean | string> {
+    let { value, ruleParams, startTime, ...extra } = options;
+    startTime = isNumber(startTime) ? startTime : Date.now();
+    const subRules = (Array.isArray(ruleParams) ? ruleParams : []) as RulesFunctions;
+    const i18n = this.getI18n(extra);
+
+    // Must be an array
+    if (!Array.isArray(value)) {
+      return i18n.t("validator.array", {
+        field: extra.translatedPropertyName || extra.fieldName,
+        value,
+        ...extra,
+      });
+    }
+
+    // No sub-rules means trivially valid
+    if (subRules.length === 0 || value.length === 0) {
+      return true;
+    }
+
+    const { multiple, single } = this.getErrorMessageSeparators(i18n);
+    const failures: string[] = [];
+
+    for (let index = 0; index < value.length; index++) {
+      const item = value[index];
+      const res = await Validator.validateMultiRule<Context, RulesFunctions>("AllOf", {
+        value: item,
+        ruleParams: subRules,
+        startTime,
+        ...extra,
+      });
+      if (res !== true) {
+        failures.push(`#${index}: ${String(res)}`);
+      }
+    }
+
+    if (failures.length === 0) return true;
+
+    const header = i18n.t("validator.failedForNItems", { count: failures.length });
+    return `${header}${single}${failures.join(multiple)}`;
   }
 
   /**
@@ -1401,6 +1476,30 @@ export class Validator {
   static allOf<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(ruleParams: RulesFunctions): IValidatorRuleFunction<RulesFunctions, Context> {
     return function AllOf(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
       return Validator.validateAllOfRule<Context, RulesFunctions>({
+        ...options,
+        ruleParams,
+      });
+    };
+  }
+
+  /**
+   * ## Create ArrayOf Validation Rule
+   *
+   * Factory that returns a rule function applying AND logic across provided sub-rules
+   * to every item of an array value. Delegates to {@link validateArrayOfRule}.
+   *
+   * @template Context - Optional type for validation context
+   * @template RulesFunctions - Array of sub-rules applied to each item
+   * @param ruleParams - Sub-rules to apply to each array item
+   * @returns `IValidatorRuleFunction` usable in `Validator.validate` or decorators
+   * @example
+   * const emails = Validator.arrayOf(["Email"]);
+   * const res = await emails({ value: ["a@b.com", "c@d.com"] }); // true
+   * @since 1.36.0
+   */
+  static arrayOf<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(ruleParams: RulesFunctions): IValidatorRuleFunction<RulesFunctions, Context> {
+    return function ArrayOf(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
+      return Validator.validateArrayOfRule<Context, RulesFunctions>({
         ...options,
         ruleParams,
       });

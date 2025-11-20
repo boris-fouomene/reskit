@@ -188,3 +188,18 @@ export const OneOf = Validator.buildMultiRuleDecorator(function OneOf(options) {
 export const AllOf = Validator.buildMultiRuleDecorator(function AllOf(options) {
   return Validator.validateAllOfRule(options);
 });
+
+/**
+ * ## ArrayOf Validation Decorator
+ *
+ * Ensures a property value is an array and that every item satisfies all provided
+ * sub-rules (AND logic per item). Delegates to `Validator.validateArrayOfRule`.
+ *
+ * @example
+ * class Model {
+ *   @ArrayOf(["Email"]) emails!: string[];
+ * }
+ */
+export const ArrayOf = Validator.buildMultiRuleDecorator(function ArrayOf(options) {
+  return Validator.validateArrayOfRule(options);
+});

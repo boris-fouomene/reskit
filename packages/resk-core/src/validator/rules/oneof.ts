@@ -184,3 +184,7 @@ import { Validator } from "../validator";
 export const OneOf = Validator.buildOneOfRuleDecorator(function OneOf(options) {
   return Validator.validateOneOfRule(options);
 });
+
+Validator.registerRule("OneOf", function OneOf(options) {
+  return Validator.validateOneOfRule(options);
+});

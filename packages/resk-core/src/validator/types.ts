@@ -142,9 +142,6 @@ import { IInputFormatterResult } from "@/inputFormatter/types";
  *
  * ### Relationship to Validation System
  * This type is the foundation of the validation system and is used by:
- * - {@link Validator.validate} - Core validation method
- * - {@link Validator.validateTarget} - Class-based validation
- * - {@link Validator.buildOneOfRuleDecorator} - Decorator creation
  * - All validation decorators and rule builders
  *
  * @template ParamType - Array type for rule parameters, defaults to any array
@@ -712,6 +709,8 @@ export interface IValidatorRulesMap<Context = unknown> {
    * Validator rule that checks if a value is a number.
    */
   Number: IValidatorRuleParams<[], Context>;
+
+  OneOf: IValidatorRuleParams<IValidatorRule<Array<any>, Context>[], Context>;
 
   /**
    * Validator rule that checks if a value is a non-null string.
@@ -2093,3 +2092,78 @@ export interface IValidatorValidateTargetSuccess<Context = unknown>
 export type IValidatorValidateTargetResult<Context = unknown> =
   | IValidatorValidateTargetSuccess<Context>
   | IValidatorValidateTargetFailure<Context>;
+
+/**
+ * ## Registered Validation Rules Registry
+ *
+ * A type-safe registry mapping validation rule names to their corresponding validation functions.
+ * This mapped type provides compile-time guarantees that only valid rule names can be used
+ * to access their associated validation functions.
+ *
+ * ### Purpose
+ * Serves as the central registry for all built-in validation rules in the validator system.
+ * Enables type-safe retrieval and execution of validation functions by their string names,
+ * preventing runtime errors from invalid rule name lookups.
+ *
+ * ### Type Structure
+ * - **Key**: `IValidatorRuleName` - Valid rule names from {@link IValidatorRulesMap}
+ * - **Value**: `IValidatorRuleFunction<Params, Context>` - Corresponding validation function
+ * - **Mapped Type**: `[K in IValidatorRuleName]` ensures all rule names have functions
+ *
+ * ### Type Safety Benefits
+ * - **Compile-time Validation**: Only valid rule names can be used as keys
+ * - **Parameter Type Safety**: Each rule function has correctly typed parameters
+ * - **Context Propagation**: Context types are properly maintained throughout
+ * - **Rule Function Signature**: Ensures consistent function signatures across all rules
+ *
+ * ### Usage in Validator Class
+ * This type is primarily used internally by the {@link Validator} class:
+ * - {@link Validator.getRules} returns an instance of this type
+ * - {@link Validator.validateTarget} uses it to retrieve rule functions by name
+ * - Rule execution methods access functions through this registry
+ *
+ * ### Example Structure
+ * ```typescript
+ * const rules: IValidatorRegisteredRules = {
+ *   Required: (params, context) => { /* validation logic *\/ },
+ *   Email: (params, context) => { /* email validation *\/ },
+ *   MinLength: ([minLen], context) => { /* length validation *\/ },
+ *   // ... all other built-in rules
+ * };
+ * ```
+ *
+ * ### Relationship to Other Types
+ * - **Source of Keys**: Keys come from {@link IValidatorRuleName} (derived from {@link IValidatorRulesMap})
+ * - **Function Signatures**: Values are {@link IValidatorRuleFunction} instances
+ * - **Parameter Types**: Parameters typed via {@link IValidatorRulesMap} lookups
+ * - **Context**: Context type propagated from generic parameter
+ *
+ * ### Runtime Usage
+ * ```typescript
+ * // Type-safe rule retrieval
+ * const rules = Validator.getRules();
+ * const emailRule = rules.Email;        // ✓ Type-safe access
+ * const unknownRule = rules.Unknown;    // ✗ TypeScript error
+ *
+ * // Parameter type safety
+ * const minLengthRule = rules.MinLength; // Function<[number], Context>
+ * minLengthRule([5], context);           // ✓ Correct parameter types
+ * minLengthRule("5", context);          // ✗ Type error
+ * ```
+ *
+ * @template Context - Type of the optional validation context object
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorRuleName} - Valid rule names (keys of this registry)
+ * @see {@link IValidatorRulesMap} - Rule parameter definitions
+ * @see {@link IValidatorRuleFunction} - Validation function signature
+ * @see {@link Validator.getRules} - Method that returns this registry
+ * @see {@link Validator.validateTarget} - Method that uses this registry
+ */
+export type IValidatorRegisteredRules<Context = unknown> = {
+  [K in IValidatorRuleName]: IValidatorRuleFunction<
+    IValidatorRulesMap<Context>[K],
+    Context
+  >;
+};

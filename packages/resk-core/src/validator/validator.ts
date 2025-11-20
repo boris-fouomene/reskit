@@ -14,13 +14,13 @@ import {
 import { I18n, i18n as defaultI18n } from "../i18n";
 import {
   IValidatorOneOfRuleFunction,
+  IValidatorRegisteredRules,
   IValidatorResult,
   IValidatorRule,
   IValidatorRuleFunction,
   IValidatorRuleName,
   IValidatorRuleObject,
   IValidatorRules,
-  IValidatorRulesMap,
   IValidatorSanitizedRuleObject,
   IValidatorSanitizedRules,
   IValidatorValidateFailure,
@@ -275,9 +275,11 @@ export class Validator {
    * @see {@link findRegisteredRule} - Find a specific rule
    * @public
    */
-  static getRules(): IValidatorRulesMap {
+  static getRules<Context = unknown>(): IValidatorRegisteredRules<Context> {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
-    return isObj(rules) ? { ...rules } : ({} as IValidatorRulesMap);
+    return isObj(rules)
+      ? { ...rules }
+      : ({} as IValidatorRegisteredRules<Context>);
   }
   /**
    * ## Get Registered Rule
@@ -337,8 +339,8 @@ export class Validator {
    * @see {@link hasRule} - Check if a rule exists (type guard)
    * @public
    */
-  static getRule(ruleName: IValidatorRuleName) {
-    return this.getRules()[ruleName];
+  static getRule<Context = unknown>(ruleName: IValidatorRuleName) {
+    return this.getRules<Context>()[ruleName];
   }
   /**
    * ## Check Rule Existence (Type Guard)
@@ -648,7 +650,7 @@ export class Validator {
     invalidRules: IValidatorRules<Context>[];
   } {
     const parsedRules: IValidatorSanitizedRules<Context> = [];
-    const registeredRules = this.getRules();
+    const registeredRules = this.getRules<Context>();
     const invalidRules: IValidatorRules<Context>[] = [];
 
     const rulesToProcess = Array.isArray(inputRules) ? inputRules : [];
@@ -664,7 +666,10 @@ export class Validator {
           invalidRules.push(rule as any);
         }
       } else if (isObj(rule) && typeof rule === "object") {
-        const parsedObject = this.parseObjectRule(rule, registeredRules);
+        const parsedObject = this.parseObjectRule<Context>(
+          rule,
+          registeredRules
+        );
         if (parsedObject.length) {
           parsedRules.push(...parsedObject);
         }
@@ -722,9 +727,9 @@ export class Validator {
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
-  private static parseStringRule(
+  private static parseStringRule<Context = unknown>(
     ruleString: string,
-    registeredRules: IValidatorRulesMap
+    registeredRules: IValidatorRegisteredRules<Context>
   ): any {
     let ruleName = String(ruleString).trim();
     const ruleParameters: string[] = [];
@@ -754,7 +759,7 @@ export class Validator {
   }
   private static parseObjectRule<Context = unknown>(
     rulesObject: IValidatorRuleObject<Context>,
-    registeredRules: IValidatorRulesMap<Context>
+    registeredRules: IValidatorRegisteredRules<Context>
   ): IValidatorSanitizedRuleObject<Array<any>, Context>[] {
     const result: IValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
     if (!isObj(rulesObject) || typeof rulesObject !== "object") {
@@ -771,7 +776,7 @@ export class Validator {
         if (Array.isArray(ruleParameters)) {
           result.push({
             ruleName,
-            ruleFunction,
+            ruleFunction: ruleFunction as any,
             params: ruleParameters,
             rawRuleName: ruleName,
           });

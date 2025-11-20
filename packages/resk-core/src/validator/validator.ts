@@ -1582,7 +1582,6 @@ export class Validator {
     const i18n = this.getI18n(extra);
     const ruleParamsArray = Array.isArray(ruleParams) ? ruleParams : [];
     const target = ruleParamsArray[0] as Target | undefined;
-    extra.data = extra.data ?? Object.assign({}, extra.data);
 
     // Validate that a nested class was provided
     if (!target) {
@@ -1600,6 +1599,8 @@ export class Validator {
         ...extra,
       });
     }
+
+    //extra.data = extra.data ?? Object.assign({}, extra.data);
 
     // Delegate to validateTarget for nested class validation
     const nestedResult = await this.validateTarget<Target, Context>(

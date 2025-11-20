@@ -1106,7 +1106,12 @@ export class Validator {
               }
             );
             return handleResult(oneOrAllResult);
-          } else if (normalizedRule === "validatenested" && ruleParams[0]) {
+          } else if (
+            (normalizedRule === "validatenested" ||
+              (typeof ruleFunc === "function" &&
+                (ruleFunc as any)[VALIDATOR_NESTED_RULE_MARKER] === true)) &&
+            ruleParams[0]
+          ) {
             const nestedResult = await Validator.validateNestedRule<
               IClassConstructor,
               Context
@@ -2729,7 +2734,7 @@ export class Validator {
     }
 
     // Check if any rule is marked with the ValidateNested symbol marker
-    const markerSymbol = Symbol.for("validatorNestedRuleMarker");
+    const markerSymbol = VALIDATOR_NESTED_RULE_MARKER;
     return propertyRules.some((rule) => {
       if (typeof rule === "function") {
         return (rule as any)[markerSymbol] === true;
@@ -2812,7 +2817,7 @@ export class Validator {
     for (const rule of propertyRules) {
       if (
         typeof rule === "function" &&
-        (rule as any)[Symbol.for("validatorNestedRuleMarker")] === true
+        (rule as any)[VALIDATOR_NESTED_RULE_MARKER] === true
       ) {
         // Try to get params from the stored params symbol
         const params = (rule as any)[Symbol.for("validatorNestedRuleParams")];
@@ -2822,8 +2827,7 @@ export class Validator {
       } else if (
         isObj(rule) &&
         typeof (rule as any).ruleFunction === "function" &&
-        (rule as any).ruleFunction[Symbol.for("validatorNestedRuleMarker")] ===
-          true
+        (rule as any).ruleFunction[VALIDATOR_NESTED_RULE_MARKER] === true
       ) {
         // For object rules, try to get from params
         const ruleParams = (rule as any).params;
@@ -3016,7 +3020,7 @@ export class Validator {
 
       // Preserve symbol markers from the original function
       // This allows decorators to be reliably identified even after wrapping
-      const markerSymbol = Symbol.for("validatorNestedRuleMarker");
+      const markerSymbol = VALIDATOR_NESTED_RULE_MARKER;
       if ((ruleFunction as any)[markerSymbol]) {
         (enhancedValidatorFunction as any)[markerSymbol] = (
           ruleFunction as any

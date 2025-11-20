@@ -1089,8 +1089,23 @@ export class Validator {
           };
 
           const normalizedRule = String(ruleName).toLowerCase().trim();
-          if (["oneof", "allof", "arrayof"].includes(normalizedRule)) {
-            if (normalizedRule === "arrayof") {
+          const hasMultiRuleMarker =
+            typeof ruleFunc === "function" &&
+            ((ruleFunc as any)[Symbol.for("validatorOneOfRuleMarker")] ===
+              true ||
+              (ruleFunc as any)[Symbol.for("validatorAllOfRuleMarker")] ===
+                true ||
+              (ruleFunc as any)[Symbol.for("validatorArrayOfRuleMarker")] ===
+                true);
+          if (
+            ["oneof", "allof", "arrayof"].includes(normalizedRule) ||
+            hasMultiRuleMarker
+          ) {
+            if (
+              normalizedRule === "arrayof" ||
+              (ruleFunc as any)[Symbol.for("validatorArrayOfRuleMarker")] ===
+                true
+            ) {
               const arrayOfResult =
                 await Validator.validateArrayOfRule<Context>({
                   ...validateOptions,
@@ -1099,7 +1114,11 @@ export class Validator {
               return handleResult(arrayOfResult);
             }
             const oneOrAllResult = await Validator.validateMultiRule<Context>(
-              normalizedRule === "oneof" ? "OneOf" : "AllOf",
+              normalizedRule === "oneof" ||
+                (ruleFunc as any)[Symbol.for("validatorOneOfRuleMarker")] ===
+                  true
+                ? "OneOf"
+                : "AllOf",
               {
                 ...validateOptions,
                 startTime,

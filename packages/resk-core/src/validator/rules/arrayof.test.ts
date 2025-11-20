@@ -75,13 +75,21 @@ describe("ArrayOf Validation Rules", () => {
 
     it("should validate arrays using factory-created rule", async () => {
       const rule = Validator.arrayOf(["Email"]);
-      const result = await rule({ value: ["user@example.com"], ruleParams: ["Email"], i18n });
+      const result = await rule({
+        value: ["user@example.com"],
+        ruleParams: ["Email"],
+        i18n,
+      });
       expect(result).toBe(true);
     });
 
     it("should fail with meaningful message when factory rule items invalid", async () => {
       const rule = Validator.arrayOf(["Email"]);
-      const result = await rule({ value: ["invalid"], ruleParams: ["Email"], i18n });
+      const result = await rule({
+        value: ["invalid"],
+        ruleParams: ["Email"],
+        i18n,
+      });
       expect(result).not.toBe(true);
       expect(typeof result).toBe("string");
     });
@@ -130,12 +138,14 @@ describe("ArrayOf Validation Rules", () => {
       }
 
       const ok = await Validator.validateTarget(TestEntity, {
-        emails: ["a@b.com", "c@d.com"],
+        data: { emails: ["a@b.com", "c@d.com"] },
+        i18n,
       });
       expect(ok.success).toBe(true);
 
       const ko = await Validator.validateTarget(TestEntity, {
-        emails: ["not-email", "c@d.com"],
+        data: { emails: ["not-email", "c@d.com"] },
+        i18n,
       });
       expect(ko.success).toBe(false);
       expect(ko.message).toContain("Validation failed for");

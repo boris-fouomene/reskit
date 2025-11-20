@@ -1,7 +1,21 @@
 import { i18n, Translate } from "../../i18n";
 import "../../translations";
 
-import { IsEmail, IsEmpty, IsNonNullString, IsNullable, IsNumber, IsNumberDifferentFrom, IsNumberGreaterThan, IsNumberLessThan, IsOptional, IsRequired, IsUrl, Length, Validator } from "../index";
+import {
+  IsEmail,
+  IsEmpty,
+  IsNonNullString,
+  IsNullable,
+  IsNumber,
+  IsNumberDifferentFrom,
+  IsNumberGreaterThan,
+  IsNumberLessThan,
+  IsOptional,
+  IsRequired,
+  IsUrl,
+  Length,
+  Validator,
+} from "../index";
 
 describe("Validator Rules", () => {
   beforeAll(async () => {
@@ -123,7 +137,10 @@ describe("Validator Rules", () => {
     });
 
     it("rejects non-numeric inputs with number message", async () => {
-      const r = await Validator.getRules().OddNumber({ value: null as any, i18n });
+      const r = await Validator.getRules().OddNumber({
+        value: null as any,
+        i18n,
+      });
       expect(r).toBe(i18n.t("validator.number"));
     });
   });
@@ -304,15 +321,22 @@ describe("Validator Rules", () => {
         name: expect.arrayContaining(["Required", "NonNullString"]),
         email: expect.arrayContaining(["Email", "Required"]),
         url: ["Url"],
-        note: expect.arrayContaining(["Required", expect.any(Function), expect.any(Function)]),
-        aString: expect.arrayContaining([expect.any(Function), expect.any(Function), "Required"]),
+        note: expect.arrayContaining([
+          "Required",
+          expect.any(Function),
+          expect.any(Function),
+        ]),
+        aString: expect.arrayContaining([
+          expect.any(Function),
+          expect.any(Function),
+          "Required",
+        ]),
       });
     });
     it("Validate rules with decorators on entity", async () => {
       try {
         await Validator.validateTarget(Entity, {
-          id: 10,
-          aString: "1234567890",
+          data: { id: 10, aString: "1234567890" },
         });
       } catch (error) {
         expect(error).toMatchObject({
@@ -328,8 +352,12 @@ describe("Validator Rules", () => {
         it("should always return true (Empty rule always passes)", () => {
           expect(Validator.getRules().Empty({ value: "", i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: null, i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: undefined, i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: "test", i18n })).toBe(true);
+          expect(Validator.getRules().Empty({ value: undefined, i18n })).toBe(
+            true
+          );
+          expect(Validator.getRules().Empty({ value: "test", i18n })).toBe(
+            true
+          );
           expect(Validator.getRules().Empty({ value: 123, i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: {}, i18n })).toBe(true);
@@ -397,8 +425,7 @@ describe("Validator Rules", () => {
 
         it("should skip validation for empty string with decorator", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            emptyField: "",
-            optionalEmail: "",
+            data: { emptyField: "", optionalEmail: "" },
           });
           expect(result.data?.emptyField).toBe("");
           expect(result.data?.optionalEmail).toBe("");
@@ -406,8 +433,7 @@ describe("Validator Rules", () => {
 
         it("should apply other rules when not empty string", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            emptyField: null,
-            optionalEmail: "invalid-email",
+            data: { emptyField: null, optionalEmail: "invalid-email" },
           });
           expect(result.success).toBe(false);
         });
@@ -417,11 +443,19 @@ describe("Validator Rules", () => {
     describe("Nullable Rule", () => {
       describe("Rule Function", () => {
         it("should always return true (Nullable rule always passes)", () => {
-          expect(Validator.getRules().Nullable({ value: null, i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: undefined, i18n })).toBe(true);
+          expect(Validator.getRules().Nullable({ value: null, i18n })).toBe(
+            true
+          );
+          expect(
+            Validator.getRules().Nullable({ value: undefined, i18n })
+          ).toBe(true);
           expect(Validator.getRules().Nullable({ value: "", i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: "test", i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: 123, i18n })).toBe(true);
+          expect(Validator.getRules().Nullable({ value: "test", i18n })).toBe(
+            true
+          );
+          expect(Validator.getRules().Nullable({ value: 123, i18n })).toBe(
+            true
+          );
           expect(Validator.getRules().Nullable({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Nullable({ value: {}, i18n })).toBe(true);
         });
@@ -509,9 +543,11 @@ describe("Validator Rules", () => {
 
         it("should skip validation for null with decorator", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            nullableField: null,
-            optionalEmail: null,
-            strictString: null,
+            data: {
+              nullableField: null,
+              optionalEmail: null,
+              strictString: null,
+            },
           });
           expect(result.data?.nullableField).toBe(null);
           expect(result.data?.optionalEmail).toBe(null);
@@ -520,9 +556,11 @@ describe("Validator Rules", () => {
 
         it("should skip validation for undefined with decorator", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            nullableField: undefined,
-            optionalEmail: undefined,
-            strictString: undefined,
+            data: {
+              nullableField: undefined,
+              optionalEmail: undefined,
+              strictString: undefined,
+            },
           });
           expect(result.data?.nullableField).toBe(undefined);
           expect(result.data?.optionalEmail).toBe(undefined);
@@ -531,18 +569,22 @@ describe("Validator Rules", () => {
 
         it("should apply other rules when value is empty string", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            nullableField: "",
-            optionalEmail: "invalid-email",
-            strictString: "",
+            data: {
+              nullableField: "",
+              optionalEmail: "invalid-email",
+              strictString: "",
+            },
           });
           expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            nullableField: "valid",
-            optionalEmail: "test@example.com",
-            strictString: "non-empty",
+            data: {
+              nullableField: "valid",
+              optionalEmail: "test@example.com",
+              strictString: "non-empty",
+            },
           });
           expect(result.data?.nullableField).toBe("valid");
           expect(result.data?.optionalEmail).toBe("test@example.com");
@@ -554,11 +596,19 @@ describe("Validator Rules", () => {
     describe("Optional Rule", () => {
       describe("Rule Function", () => {
         it("should always return true (Optional rule always passes)", () => {
-          expect(Validator.getRules().Optional({ value: undefined, i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: null, i18n })).toBe(true);
+          expect(
+            Validator.getRules().Optional({ value: undefined, i18n })
+          ).toBe(true);
+          expect(Validator.getRules().Optional({ value: null, i18n })).toBe(
+            true
+          );
           expect(Validator.getRules().Optional({ value: "", i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: "test", i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: 123, i18n })).toBe(true);
+          expect(Validator.getRules().Optional({ value: "test", i18n })).toBe(
+            true
+          );
+          expect(Validator.getRules().Optional({ value: 123, i18n })).toBe(
+            true
+          );
           expect(Validator.getRules().Optional({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Optional({ value: {}, i18n })).toBe(true);
         });
@@ -646,9 +696,11 @@ describe("Validator Rules", () => {
 
         it("should skip validation for undefined with decorator", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            sometimesField: undefined,
-            optionalEmail: undefined,
-            strictString: undefined,
+            data: {
+              sometimesField: undefined,
+              optionalEmail: undefined,
+              strictString: undefined,
+            },
           });
           expect(result.data?.sometimesField).toBe(undefined);
           expect(result.data?.optionalEmail).toBe(undefined);
@@ -656,33 +708,41 @@ describe("Validator Rules", () => {
         });
 
         it("should skip validation when field is absent from data", async () => {
-          const result = await Validator.validateTarget(TestEntity, {});
+          const result = await Validator.validateTarget(TestEntity, {
+            data: {},
+          });
           expect(result.data).toEqual({});
         });
 
         it("should apply other rules when value is null", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            sometimesField: null,
-            optionalEmail: "invalid-email",
-            strictString: null,
+            data: {
+              sometimesField: null,
+              optionalEmail: "invalid-email",
+              strictString: null,
+            },
           });
           expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is empty string", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            sometimesField: "",
-            optionalEmail: "invalid-email",
-            strictString: "",
+            data: {
+              sometimesField: "",
+              optionalEmail: "invalid-email",
+              strictString: "",
+            },
           });
           expect(result.success).toBe(false);
         });
 
         it("should apply other rules when value is valid", async () => {
           const result = await Validator.validateTarget(TestEntity, {
-            sometimesField: "valid",
-            optionalEmail: "test@example.com",
-            strictString: "non-empty",
+            data: {
+              sometimesField: "valid",
+              optionalEmail: "test@example.com",
+              strictString: "non-empty",
+            },
           });
           expect(result.data?.sometimesField).toBe("valid");
           expect(result.data?.optionalEmail).toBe("test@example.com");
@@ -809,41 +869,49 @@ describe("Validator Rules", () => {
           sometimesRequired: undefined,
         };
 
-        const result = await Validator.validateTarget(ComprehensiveEntity, validData);
+        const result = await Validator.validateTarget(ComprehensiveEntity, {
+          data: validData,
+        });
         expect(result.data).toEqual(validData);
       });
 
       it("should fail when required fields are missing", async () => {
         const result = await Validator.validateTarget(ComprehensiveEntity, {
-          emptyEmail: "",
-          nullableEmail: null,
-          sometimesEmail: undefined,
-          emptyRequired: "",
-          nullableRequired: null,
-          sometimesRequired: undefined,
+          data: {
+            emptyEmail: "",
+            nullableEmail: null,
+            sometimesEmail: undefined,
+            emptyRequired: "",
+            nullableRequired: null,
+            sometimesRequired: undefined,
+          },
         });
         expect(result.success).toBe(false);
       });
 
       it("should fail when nullable fields have invalid values", async () => {
         const result = await Validator.validateTarget(ComprehensiveEntity, {
-          requiredEmail: "test@example.com",
-          emptyEmail: "invalid-email",
-          nullableEmail: "invalid-email",
-          sometimesEmail: "invalid-email",
-          emptyRequired: "",
-          nullableRequired: null,
-          sometimesRequired: undefined,
+          data: {
+            requiredEmail: "test@example.com",
+            emptyEmail: "invalid-email",
+            nullableEmail: "invalid-email",
+            sometimesEmail: "invalid-email",
+            emptyRequired: "",
+            nullableRequired: null,
+            sometimesRequired: undefined,
+          },
         });
         expect(result.success).toBe(false);
       });
 
       it("should skip Optional fields when absent from data", async () => {
         const result = await Validator.validateTarget(ComprehensiveEntity, {
-          requiredEmail: "test@example.com",
-          emptyRequired: "",
-          nullableRequired: null,
-          // sometimesEmail and sometimesRequired are absent
+          data: {
+            requiredEmail: "test@example.com",
+            emptyRequired: "",
+            nullableRequired: null,
+            // sometimesEmail and sometimesRequired are absent
+          },
         });
         expect(result.data?.requiredEmail).toBe("test@example.com");
         expect(result.data?.emptyRequired).toBe("");

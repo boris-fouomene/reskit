@@ -11,7 +11,8 @@ describe("Validator", () => {
   describe("registerRule", () => {
     it("should register a new validation rule", () => {
       const ruleName = "isEven";
-      const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
 
       Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
 
@@ -23,7 +24,8 @@ describe("Validator", () => {
   describe("getRule", () => {
     it("should retrieve a registered validation rule by name", () => {
       const ruleName = "isEven" as IValidatorRuleName;
-      const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
 
       Validator.registerRule(ruleName, ruleFunction);
 
@@ -32,14 +34,20 @@ describe("Validator", () => {
     });
 
     it("should return undefined for a non-existent rule", () => {
-      const retrievedRule = Validator.findRegisteredRule("nonExistentRule" as IValidatorRuleName);
+      const retrievedRule = Validator.findRegisteredRule(
+        "nonExistentRule" as IValidatorRuleName
+      );
       expect(retrievedRule).toBeUndefined();
     });
   });
 
   describe("parseAndValidateRules", () => {
     it("should sanitize an array of rules", () => {
-      const sanitizedRules = Validator.parseAndValidateRules(["Required", { MinLength: [2] }, { MaxLength: [10] }]);
+      const sanitizedRules = Validator.parseAndValidateRules([
+        "Required",
+        { MinLength: [2] },
+        { MaxLength: [10] },
+      ]);
       expect(sanitizedRules).toEqual({
         invalidRules: [],
         sanitizedRules: [
@@ -66,7 +74,8 @@ describe("Validator", () => {
     });
 
     it("should sanitize a function rule", () => {
-      const ruleFunction: IValidatorRuleFunction = ({ value }) => value !== null || "Value cannot be null";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value !== null || "Value cannot be null";
       const sanitizedRules = Validator.parseAndValidateRules([ruleFunction]);
       expect(sanitizedRules).toEqual({
         sanitizedRules: [ruleFunction],
@@ -84,7 +93,8 @@ describe("Validator", () => {
   describe("validate - Either Pattern (Success Cases)", () => {
     it("should return success result for valid custom rule", async () => {
       const ruleName = "isEven";
-      const ruleFunction: IValidatorRuleFunction = ({ value }) => value % 2 === 0 || "The number must be even.";
+      const ruleFunction: IValidatorRuleFunction = ({ value }) =>
+        value % 2 === 0 || "The number must be even.";
       Validator.registerRule(ruleName as IValidatorRuleName, ruleFunction);
 
       const result = await Validator.validate({
@@ -327,7 +337,9 @@ describe("Validator", () => {
 
     it("should return failure for custom error message from rule function", async () => {
       const result = await Validator.validate({
-        rules: [({ value }) => value !== "forbidden" || "This value is forbidden"],
+        rules: [
+          ({ value }) => value !== "forbidden" || "This value is forbidden",
+        ],
         value: "forbidden",
       });
 
@@ -337,7 +349,12 @@ describe("Validator", () => {
 
     it("should return failure for async rule that returns error", async () => {
       const result = await Validator.validate({
-        rules: [async ({ value }) => new Promise((resolve) => setTimeout(() => resolve("Async validation failed"), 50))],
+        rules: [
+          async ({ value }) =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve("Async validation failed"), 50)
+            ),
+        ],
         value: "test",
       });
 
@@ -347,7 +364,12 @@ describe("Validator", () => {
 
     it("should return failure for async rule that throws error", async () => {
       const result = await Validator.validate({
-        rules: [async ({ value }) => new Promise((resolve, reject) => setTimeout(() => reject(new Error("Async error")), 50))],
+        rules: [
+          async ({ value }) =>
+            new Promise((resolve, reject) =>
+              setTimeout(() => reject(new Error("Async error")), 50)
+            ),
+        ],
         value: "test",
       });
 
@@ -449,8 +471,7 @@ describe("Validator", () => {
 
       // Manually attach rules using metadata for this test
       const result = await Validator.validateTarget(User, {
-        email: "test@example.com",
-        name: "John",
+        data: { email: "test@example.com", name: "John" },
       });
 
       // Should succeed when no rules are defined
@@ -465,9 +486,12 @@ describe("Validator", () => {
       }
 
       const result = await Validator.validateTarget(Product, {
-        name: "Product Name",
-        price: 99.99,
-        url: "https://example.com/product",
+        data: {
+          name: "Product Name",
+          price: 99.99,
+          url: "https://example.com/product",
+        },
+        i18n,
       });
 
       expect(result.success).toBe(true);
@@ -484,7 +508,9 @@ describe("Validator", () => {
       }
 
       const result = await Validator.validateTarget(SimpleClass, {
-        field: "value",
+        data: {
+          field: "value",
+        },
       });
 
       expect(result.success).toBe(true);
@@ -503,8 +529,7 @@ describe("Validator", () => {
       }
 
       const result = await Validator.validateTarget(User, {
-        email: "invalid",
-        name: "",
+        data: { email: "invalid", name: "" },
       });
 
       // Result will depend on whether decorators are applied
@@ -522,7 +547,7 @@ describe("Validator", () => {
       }
 
       const result = await Validator.validateTarget(User, {
-        email: "invalid",
+        data: { email: "invalid" },
       });
 
       if (!result.success) {

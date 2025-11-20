@@ -200,6 +200,8 @@ export const AllOf = Validator.buildMultiRuleDecorator(function AllOf(options) {
  *   @ArrayOf(["Email"]) emails!: string[];
  * }
  */
-export const ArrayOf = Validator.buildMultiRuleDecorator(function ArrayOf(options) {
-  return Validator.validateArrayOfRule(options);
-});
+export const ArrayOf = Validator.buildMultiRuleDecorator(
+  function ArrayOf(options) {
+    return Validator.validateArrayOfRule(options);
+  }
+);

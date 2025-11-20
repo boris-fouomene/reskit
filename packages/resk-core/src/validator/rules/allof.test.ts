@@ -634,7 +634,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = Validator.validateTarget(TestEntity, {
-          field: "test@example.com",
+          data: {
+            field: "test@example.com",
+          },
+          i18n,
         });
 
         expect(result).toBeDefined();
@@ -709,7 +712,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(User, {
-          contact: "test@example.com",
+          data: {
+            contact: "test@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -729,7 +735,8 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(User, {
-          contact: "not-an-email",
+          data: { contact: "not-an-email" },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -753,8 +760,11 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(Form, {
-          email: "test@example.com",
-          age: 25,
+          data: {
+            email: "test@example.com",
+            age: 25,
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -776,8 +786,11 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(Form, {
-          email: "",
-          age: "not-a-number",
+          data: {
+            email: "",
+            age: "not-a-number",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -809,7 +822,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(User, {
-          contact: "test@example.com",
+          data: {
+            contact: "test@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -823,7 +839,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(User, {
-          contact: "",
+          data: {
+            contact: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -838,7 +857,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(Contact, {
-          info: "user@example.com",
+          data: {
+            info: "user@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -851,7 +873,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(Identifier, {
-          id: "550e8400-e29b-41d4-a716-446655440000",
+          data: {
+            id: "550e8400-e29b-41d4-a716-446655440000",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -866,7 +891,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(Field, {
-          value: "hello",
+          data: {
+            value: "hello",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -884,7 +912,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(CustomField, {
-          field: "ADMIN-123",
+          data: {
+            field: "ADMIN-123",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -903,7 +934,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(MixedRules, {
-          value: "user@example.com",
+          data: {
+            value: "user@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -918,7 +952,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(OptionalAllOf, {
-          contact: "test@example.com",
+          data: {
+            contact: "test@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -933,7 +970,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(ErrorTest, {
-          value: "",
+          data: {
+            value: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -948,7 +988,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(MultiError, {
-          value: "",
+          data: {
+            value: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -965,7 +1008,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(EmptyRules, {
-          value: "any-value",
+          data: {
+            value: "any-value",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -980,7 +1026,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(SingleRule, {
-          email: "test@example.com",
+          data: {
+            email: "test@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -993,7 +1042,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(SingleRule, {
-          email: "not-an-email",
+          data: {
+            email: "not-an-email",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1014,9 +1066,12 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(MultiProperty, {
-          contact: "test@example.com",
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          code: "abc123",
+          data: {
+            contact: "test@example.com",
+            id: "550e8400-e29b-41d4-a716-446655440000",
+            code: "abc123",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -1035,8 +1090,11 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(MultiProperty, {
-          contact: "",
-          id: "invalid-uuid",
+          data: {
+            contact: "",
+            id: "invalid-uuid",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1060,7 +1118,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(NumericAllOf, {
-          value: 42,
+          data: {
+            value: 42,
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -1077,7 +1138,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(BooleanAllOf, {
-          value: true,
+          data: {
+            value: true,
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -1090,7 +1154,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(ArrayAllOf, {
-          value: [1, 2, 3],
+          data: {
+            value: [1, 2, 3],
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -1105,7 +1172,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(NullTest, {
-          value: null,
+          data: {
+            value: null,
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1118,7 +1188,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(UndefinedTest, {
-          value: undefined,
+          data: {
+            value: undefined,
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1136,7 +1209,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(EmptyStringTest, {
-          value: "",
+          data: {
+            value: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);
@@ -1163,15 +1239,13 @@ describe("AllOf Validation Rules", () => {
         const result = await Validator.validateTarget<
           typeof AdminField,
           AdminContext
-        >(
-          AdminField,
-          {
+        >(AdminField, {
+          data: {
             field: "admin-value",
           },
-          {
-            context: { isAdmin: true },
-          }
-        );
+          context: { isAdmin: true },
+          i18n,
+        });
 
         expect(result.success).toBe(true);
       });
@@ -1213,10 +1287,10 @@ describe("AllOf Validation Rules", () => {
         ];
 
         for (const testData of testCases) {
-          const result = await Validator.validateTarget(
-            ComplexEntity,
-            testData
-          );
+          const result = await Validator.validateTarget(ComplexEntity, {
+            data: testData,
+            i18n,
+          });
           expect(result.success).toBe(true);
         }
       });
@@ -1231,12 +1305,18 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result1 = await Validator.validateTarget(UserProfile, {
-          contact: "test@example.com",
+          data: {
+            contact: "test@example.com",
+          },
+          i18n,
         });
 
         const result2 = await Validator.validateTarget(UserProfile, {
-          contact: "test@example.com",
-          code: "abc",
+          data: {
+            contact: "test@example.com",
+            code: "abc",
+          },
+          i18n,
         });
 
         expect(result1.success).toBe(true);
@@ -1252,7 +1332,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(DebugEntity, {
-          field: "",
+          data: {
+            field: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1269,7 +1352,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(ErrorReporting, {
-          value: "",
+          data: {
+            value: "",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(false);
@@ -1287,7 +1373,10 @@ describe("AllOf Validation Rules", () => {
 
         const start = Date.now();
         const result = await Validator.validateTarget(Performance, {
-          value: "test@example.com",
+          data: {
+            value: "test@example.com",
+          },
+          i18n,
         });
         const duration = Date.now() - start;
 
@@ -1308,7 +1397,10 @@ describe("AllOf Validation Rules", () => {
         }
 
         const result = await Validator.validateTarget(LargeRuleSet, {
-          value: "this-is-a-very-long-email-address@example.com",
+          data: {
+            value: "this-is-a-very-long-email-address@example.com",
+          },
+          i18n,
         });
 
         expect(result.success).toBe(true);

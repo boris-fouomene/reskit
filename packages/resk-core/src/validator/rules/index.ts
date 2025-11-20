@@ -7,9 +7,10 @@ export * from "./default";
 export * from "./enum";
 export * from "./file";
 export * from "./format";
-export * from "./numeric";
 export * from "./multiRules";
+export * from "./numeric";
 export * from "./string";
+export * from "./target";
 
 /**
  * Ensures that all validation rules are registered.

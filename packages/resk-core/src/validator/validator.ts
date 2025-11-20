@@ -25,11 +25,14 @@ import {
   IValidatorRules,
   IValidatorSanitizedRuleObject,
   IValidatorSanitizedRules,
+  IValidatorTargetRuleFunctionOptions,
   IValidatorValidateFailure,
   IValidatorValidateMultiRuleOptions,
   IValidatorValidateOptions,
   IValidatorValidateResult,
   IValidatorValidateSuccess,
+  IValidatorValidateTargetData,
+  IValidatorValidateTargetOptions,
   IValidatorValidateTargetResult,
   IValidatorValidationError,
 } from "./types";
@@ -1353,6 +1356,66 @@ export class Validator {
     return `${header}${single}${failures.join(multiple)}`;
   }
 
+  static async validateNestedRule<
+    Target extends IClassConstructor = IClassConstructor,
+    Context = unknown,
+  >({
+    ruleParams,
+    ...options
+  }: IValidatorTargetRuleFunctionOptions<Target, Context>): Promise<
+    boolean | string
+  > {
+    let { startTime, ...extra } = options;
+    startTime = isNumber(startTime) ? startTime : Date.now();
+    const i18n = this.getI18n(extra);
+    const ruleParamsArray = Array.isArray(ruleParams) ? ruleParams : [];
+    const target = ruleParamsArray[0] as Target | undefined;
+    extra.data = extra.data ?? Object.assign({}, extra.data);
+
+    // Validate that a nested class was provided
+    if (!target) {
+      return i18n.t("validator.invalidRule", {
+        rule: "ValidateNested",
+        ...extra,
+      });
+    }
+
+    // Validate value is an object
+    if (typeof extra.data !== "object" || extra.data === null) {
+      return i18n.t("validator.validateNested", {
+        nestedErrors: "Expected an object but received " + typeof extra.data,
+        fieldName: extra.translatedPropertyName || extra.fieldName,
+        ...extra,
+      });
+    }
+
+    // Delegate to validateTarget for nested class validation
+    const nestedResult = await this.validateTarget<Target, Context>(
+      target,
+      options
+    );
+
+    // If validation succeeded, return true
+    if (nestedResult.success) {
+      return true;
+    }
+
+    // Aggregate nested errors with field path information
+    const nestedErrors = (nestedResult as any).errors || [];
+    const errorMessages = nestedErrors
+      .map(
+        (err: any) =>
+          `[${err.translatedPropertyName ?? err.propertyName}]: ${err.message}`
+      )
+      .join("; ");
+
+    return i18n.t("validator.validateNested", {
+      nestedErrors: errorMessages,
+      fieldName: extra.translatedPropertyName || extra.fieldName,
+      ...extra,
+    });
+  }
+
   /**
    * ## Validate Multi-Rule (OneOf / AllOf)
    *
@@ -1724,6 +1787,25 @@ export class Validator {
       });
     };
   }
+
+  static validateNested<
+    Target extends IClassConstructor = IClassConstructor,
+    Context = unknown,
+  >(
+    ruleParams: [target: Target]
+  ): IValidatorRuleFunction<[target: Target], Context> {
+    return function ValidateNested({
+      data,
+      ...options
+    }: IValidatorValidateOptions<[target: Target], Context>) {
+      return Validator.validateNestedRule({
+        ...options,
+        ruleParams,
+        data: Object.assign({}, data) as IValidatorValidateTargetData<Target>,
+      });
+    };
+  }
+
   static isSuccess<Context = unknown>(
     result: IValidatorValidateResult<Context>
   ): result is IValidatorValidateSuccess<Context> {
@@ -1959,38 +2041,22 @@ export class Validator {
    * @async
    */
   static async validateTarget<
-    T extends IClassConstructor = any,
+    Target extends IClassConstructor = IClassConstructor,
     Context = unknown,
   >(
-    target: T,
-    data: Partial<Record<keyof InstanceType<T>, any>>,
-    options?: {
-      context?: Context;
+    target: Target,
+    options: Omit<IValidatorValidateTargetOptions<Target, Context>, "i18n"> & {
       i18n?: I18n;
-      errorMessageBuilder?: (
-        translatedPropertyName: string,
-        error: string,
-        builderOptions: IValidatorValidationError & {
-          propertyName: keyof InstanceType<T> | string;
-          translatedPropertyName: string;
-          i18n: I18n;
-          separators: {
-            multiple: string;
-            single: string;
-          };
-          data: Partial<Record<keyof InstanceType<T>, any>>;
-        }
-      ) => string;
     }
   ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
-    const targetRules = Validator.getTargetRules<T>(target);
+    const targetRules = Validator.getTargetRules<Target>(target);
     const { context, errorMessageBuilder, ...restOptions } = Object.assign(
       {},
-      Validator.getValidateTargetOptions(target),
+      Validator.getValidateTargetOptions(target) as any,
       options
     );
-    data = Object.assign({}, data);
+    const data = Object.assign({}, options.data);
     const i18n = this.getI18n(options);
     const messageSeparators = Validator.getErrorMessageSeparators(i18n);
     const buildErrorMessage =
@@ -2232,7 +2298,7 @@ export class Validator {
    */
   public static getValidateTargetOptions<T extends IClassConstructor>(
     target: T
-  ): Parameters<typeof Validator.validateTarget>[2] {
+  ): IValidatorValidateTargetOptions<T, any> {
     return Object.assign(
       {},
       Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {}
@@ -2355,17 +2421,23 @@ export class Validator {
         RuleParamsType,
         Context
       > = function (validationOptions) {
-        const enhancedOptions: IValidatorValidateOptions<RuleParamsType> =
-          Object.assign({}, validationOptions);
+        const enhancedOptions = Object.assign({}, validationOptions);
         enhancedOptions.ruleParams = (
           Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
         ) as RuleParamsType;
-        return ruleFunction(enhancedOptions as any);
+        return ruleFunction(enhancedOptions);
       };
       return Validator.buildPropertyDecorator<RuleParamsType, Context>(
         enhancedValidatorFunction
       );
     };
+  }
+
+  static buildTargetRuleDecorator<
+    Target extends IClassConstructor = IClassConstructor,
+    Context = unknown,
+  >(ruleFunction: IValidatorRuleFunction<[target: Target], Context>) {
+    return this.buildRuleDecorator<[target: Target], Context>(ruleFunction);
   }
   /**
    * ## Build Optional-Parameter Rule Decorator
@@ -2616,7 +2688,7 @@ export class Validator {
  * @public
  */
 export function ValidationTargetOptions(
-  validationOptions: Parameters<typeof Validator.validateTarget>[2]
+  validationOptions: IValidatorValidateTargetOptions<any, any>
 ): ClassDecorator {
   return function (targetClass: Function) {
     Reflect.defineMetadata(

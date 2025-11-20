@@ -203,17 +203,23 @@ export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = 
  */
 export type IValidatorOptionalOrEmptyRuleNames = ExtractOptionalOrEmptyKeys<IValidatorRulesMap> & keyof IValidatorRulesMap;
 
-type TupleIsEmptyOrAllOptional<T extends any[]> = T extends []
-  ? true
-  : T extends [infer U]
-    ? // Check if U is optional: optional means it includes undefined
-      U extends undefined
-      ? true
-      : false
-    : false;
+/**
+ * Helper that returns true when a tuple type allows an empty invocation.
+ * Examples:
+ * - []                         => true
+ * - [A?]                       => true (can be called with no args)
+ * - [A?, B?]                   => true (all optional)
+ * - [A, B?]                    => false (A required)
+ * - [A]                        => false (A required)
+ */
+type TupleAllowsEmpty<T extends any[]> = T extends [] ? true : [] extends T ? true : false;
 
+/**
+ * Extracts keys whose rule parameter tuple is empty or fully optional.
+ * This correctly captures cases like `[countryCode?: ICountryCode]`.
+ */
 type ExtractOptionalOrEmptyKeys<T> = {
-  [K in keyof T]: T[K] extends Array<infer Tuple extends any[]> ? (TupleIsEmptyOrAllOptional<Tuple> extends true ? K : never) : never;
+  [K in keyof T]: T[K] extends any[] ? (TupleAllowsEmpty<T[K]> extends true ? K : never) : never;
 }[keyof T];
 
 /**
@@ -1784,7 +1790,7 @@ export type IValidatorValidateResult<Context = unknown> = IValidatorValidateSucc
  * @see {@link IValidatorValidationError}
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetFailure<Context = unknown> extends Omit<BaseData<Context>, "value"> {
+export interface IValidatorValidateTargetFailure<Context = unknown> extends Omit<BaseData<Context>, "value" | "data"> {
   /** Discriminant for type narrowing - always `false` for failures */
   success: false;
 
@@ -1855,6 +1861,8 @@ export interface IValidatorValidateTargetFailure<Context = unknown> extends Omit
 
   /** Always `undefined` for target failures (type narrowing aid) */
   validatedAt?: undefined;
+
+  data: Record<string, any>;
 }
 
 /**
@@ -1944,7 +1952,7 @@ export interface IValidatorValidateTargetFailure<Context = unknown> extends Omit
  * @see {@link IValidatorValidateSuccess} - Single-value equivalent
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetSuccess<Context = unknown> extends BaseData<Context> {
+export interface IValidatorValidateTargetSuccess<Context = unknown> extends Omit<BaseData<Context>, "data"> {
   /** Discriminant for type narrowing - always `true` for success */
   success: true;
 
@@ -1980,6 +1988,8 @@ export interface IValidatorValidateTargetSuccess<Context = unknown> extends Base
    * @example 23 (milliseconds)
    */
   duration?: number;
+
+  data: Record<string, any>;
 }
 
 /**

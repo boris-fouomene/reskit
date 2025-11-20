@@ -1,36 +1,12 @@
 import { buildPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
 import { IClassConstructor, IDict, IMakeOptional } from "@/types";
-import { defaultStr, isEmpty, isNonNullString, isNumber, isObj, stringify } from "@utils/index";
+import { defaultStr, isEmpty, isNonNullString, isNumber, isObj, lowerFirst, stringify } from "@utils/index";
 import { I18n, i18n as defaultI18n } from "../i18n";
 import { IValidatorMultiRuleFunction, IValidatorMultiRuleNames, IValidatorRegisteredRules, IValidatorResult, IValidatorRule, IValidatorRuleFunction, IValidatorRuleName, IValidatorRuleObject, IValidatorRules, IValidatorSanitizedRuleObject, IValidatorSanitizedRules, IValidatorValidateFailure, IValidatorValidateMultiRuleOptions, IValidatorValidateOptions, IValidatorValidateResult, IValidatorValidateSuccess, IValidatorValidateTargetResult, IValidatorValidationError } from "./types";
 
 // Enhanced metadata keys with consistent naming convention
 const VALIDATOR_TARGET_RULES_METADATA_KEY = Symbol("validatorTargetRules");
 const VALIDATOR_TARGET_OPTIONS_METADATA_KEY = Symbol("validatorTargetOptions");
-
-function createTargetFailureResult(
-  message: string,
-  errors: IValidatorValidationError[],
-  startTime: number
-): {
-  success: false;
-  message: string;
-  errors: IValidatorValidationError[];
-  failureCount: number;
-  status: "error";
-  failedAt: Date;
-  duration: number;
-} {
-  return {
-    success: false,
-    message,
-    errors,
-    failureCount: errors.length,
-    status: "error",
-    failedAt: new Date(),
-    duration: Date.now() - startTime,
-  };
-}
 
 /**
  * # Validator Class
@@ -929,26 +905,7 @@ export class Validator {
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
-    // Check for nullable rules - if value meets nullable conditions, skip validation
-    let skipValidation = false;
-    if (isEmpty(value)) {
-      const nullableConditions = {
-        Empty: (value: any) => value === "",
-        Nullable: (value: any) => value === null || value === undefined,
-        Optional: (value: any) => value === undefined,
-      };
-      for (const rule of sanitizedRules) {
-        if (typeof rule === "function") continue;
-        if (typeof rule === "object" && rule.ruleName) {
-          const ruleName = rule.ruleName;
-          if (ruleName in nullableConditions && nullableConditions[ruleName as keyof typeof nullableConditions](value)) {
-            skipValidation = true;
-            break;
-          }
-        }
-      }
-    }
-    if (skipValidation) {
+    if (this.shouldSkipValidation({ value, rules: sanitizedRules })) {
       // Value meets nullable conditions - validation succeeds
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
@@ -1075,6 +1032,30 @@ export class Validator {
     });
   }
 
+  static shouldSkipValidation({ value, rules }: { rules: Array<IValidatorRuleName> | IValidatorSanitizedRules<any>; value: any }) {
+    // Check for nullable rules - if value meets nullable conditions, skip validation
+    if (isEmpty(value) && Array.isArray(rules)) {
+      const nullableConditions = {
+        Empty: (value: any) => value === "",
+        Nullable: (value: any) => value === null || value === undefined,
+        Optional: (value: any) => value === undefined,
+      };
+      for (const rule of rules) {
+        if (typeof rule == "function") {
+          continue;
+        }
+        let ruleName = typeof rule == "string" ? rule : undefined;
+        if (!isNonNullString(ruleName) && typeof rule === "object" && rule && isNonNullString((rule as any).ruleName)) {
+          ruleName = (rule as any).ruleName;
+        }
+        if (ruleName && ruleName in nullableConditions && nullableConditions[ruleName as keyof typeof nullableConditions](value)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * ## Validate OneOf Rule
    *
@@ -1191,7 +1172,7 @@ export class Validator {
    * @public
    * @async
    */
-  static async validateMultiRule<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(ruleName: IValidatorMultiRuleNames, { context, ruleParams, value, data, startTime, ...extra }: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
+  static async validateMultiRule<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>>(ruleName: IValidatorMultiRuleNames, { value, ruleParams, startTime, ...extra }: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
     startTime = isNumber(startTime) ? startTime : Date.now();
     // Special handling for OneOf: validate against each sub-rule in parallel
     const subRules = (Array.isArray(ruleParams) ? ruleParams : []) as RulesFunctions;
@@ -1205,7 +1186,7 @@ export class Validator {
     let firstSuccess: IValidatorValidateSuccess<Context> | null = null;
 
     for (const subRule of subRules) {
-      const res = await Validator.validate<Context>({ ...extra, rules: [subRule], value, i18n } as any);
+      const res = await Validator.validate<Context>({ value, ...extra, rules: [subRule], i18n } as any);
       //console.log(res, " is rest about validating ", value, "and rule name ", subRule);
       if (res.success) {
         if (!isAllOfRule) return true; // OneOf: first hit wins
@@ -1221,22 +1202,18 @@ export class Validator {
       return true;
     }
     if (allErrors.length === 0) return true;
-    // AllOf had failures  OR  OneOf had no success at all
-    const msg = errors.join("; ");
-    return `${
-      (i18n.t(`validator.${ruleName}`),
-      {
-        value,
-        ruleName,
-        rawRuleName: ruleName,
-        fieldName: extra.fieldName,
-        propertyName: extra.propertyName,
-        translatedPropertyName: extra.translatedPropertyName,
-        rules: [ruleName],
-        rule: ruleName,
-        ruleParams: [],
-      })
-    }:\n${msg}`;
+    return i18n.t(`validator.${lowerFirst(ruleName)}`, {
+      value,
+      ruleName,
+      rawRuleName: ruleName,
+      fieldName: extra.fieldName,
+      propertyName: extra.propertyName,
+      translatedPropertyName: extra.translatedPropertyName,
+      rules: [ruleName],
+      rule: ruleName,
+      ruleParams: [],
+      failedRulesErrors: errors.join("; "),
+    });
   }
   /**
    * ## Create OneOf Validation Rule
@@ -1691,13 +1668,10 @@ export class Validator {
     const translatedPropertyNames = i18n.translateTarget(target, { data });
     for (const propertyKey in targetRules) {
       const rules = targetRules[propertyKey];
-      // Skip validation for Optional fields that are not present in data
-      if (rules.includes("Optional") && !(propertyKey in data)) {
-        continue;
-      }
+      const { sanitizedRules } = this.parseAndValidateRules(rules);
       const value = data[propertyKey];
-      if ((value === "" || value === undefined || value === null) && ((rules.includes("Nullable") && (value === null || value === undefined)) || (rules.includes("Empty") && value === ""))) {
-        // Skip validation for Nullable fields with null/undefined value
+      // Skip validation for Optional fields that are not present in data
+      if (this.shouldSkipValidation({ value, rules: sanitizedRules })) {
         continue;
       }
       const translatedPropertyName: string = defaultStr((translatedPropertyNames as any)[propertyKey], propertyKey);
@@ -1745,7 +1719,6 @@ export class Validator {
     return new Promise<IValidatorValidateTargetResult<Context>>((resolve) => {
       return Promise.all(validationPromises).then(() => {
         const isValidationSuccessful = !validationErrors.length;
-
         if (isValidationSuccessful) {
           resolve(
             createSuccessResult<Context>(
@@ -1761,7 +1734,16 @@ export class Validator {
           const message = i18n.translate("validator.failedForNFields", {
             count: validationErrors.length,
           });
-          resolve(createTargetFailureResult(message, validationErrors, startTime));
+          resolve({
+            data,
+            success: false,
+            message,
+            errors: validationErrors,
+            failureCount: validationErrors.length,
+            status: "error",
+            failedAt: new Date(),
+            duration: Date.now() - startTime,
+          });
         }
       });
     });

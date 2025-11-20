@@ -2,14 +2,7 @@ import { IPrimitive } from "@/types";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { Validator } from "../validator";
 
-function _IsEnum<T extends IPrimitive = IPrimitive>({
-  value,
-  ruleParams,
-  fieldName,
-  translatedPropertyName,
-  i18n,
-  ...rest
-}: IValidatorValidateOptions<Array<T>>): IValidatorResult {
+function _IsEnum<T extends IPrimitive = IPrimitive>({ value, ruleParams, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions<Array<T>>): IValidatorResult {
   if (!ruleParams || !ruleParams.length) {
     const message = i18n.t("validator.invalidRuleParams", {
       rule: "Enum",

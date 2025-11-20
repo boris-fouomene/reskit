@@ -26,9 +26,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 2 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 2 passed: null value with Empty rule fails as expected"
-    );
+    console.log("✓ Test 2 passed: null value with Empty rule fails as expected");
   }
 
   // Test 3: Empty rule with undefined should fail (Required rule applied)
@@ -39,9 +37,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 3 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 3 passed: undefined value with Empty rule fails as expected"
-    );
+    console.log("✓ Test 3 passed: undefined value with Empty rule fails as expected");
   }
 
   // Test 4: Nullable rule with null should succeed
@@ -74,9 +70,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 6 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 6 passed: empty string with Nullable rule fails as expected"
-    );
+    console.log("✓ Test 6 passed: empty string with Nullable rule fails as expected");
   }
 
   // Test 7: Optional rule with undefined should succeed
@@ -98,9 +92,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 8 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 8 passed: null value with Optional rule fails as expected"
-    );
+    console.log("✓ Test 8 passed: null value with Optional rule fails as expected");
   }
 
   // Test 9: Optional rule with empty string should fail
@@ -111,9 +103,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 9 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 9 passed: empty string with Optional rule fails as expected"
-    );
+    console.log("✓ Test 9 passed: empty string with Optional rule fails as expected");
   }
 
   // Test 10: Valid value with nullable rules should still validate other rules
@@ -135,9 +125,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 11 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 11 passed: invalid email with Nullable rule fails as expected"
-    );
+    console.log("✓ Test 11 passed: invalid email with Nullable rule fails as expected");
   }
 
   // Test 12: No nullable rules with empty value should fail
@@ -148,9 +136,7 @@ async function testNullableValidation() {
     });
     console.log("✗ Test 12 failed: should have failed validation");
   } catch (error) {
-    console.log(
-      "✓ Test 12 passed: null value without nullable rules fails as expected"
-    );
+    console.log("✓ Test 12 passed: null value without nullable rules fails as expected");
   }
 }
 

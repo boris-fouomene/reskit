@@ -278,6 +278,135 @@ export class Validator {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
     return isObj(rules) ? { ...rules } : ({} as IValidatorRulesMap);
   }
+  /**
+   * ## Get Registered Rule
+   *
+   * Retrieves a specific validation rule function by its registered name. This method
+   * provides direct access to the underlying validation functions that have been
+   * registered with the Validator system.
+   *
+   * ### Rule Retrieval
+   * This method looks up rules in the internal rules registry that was populated
+   * through the `registerRule` method. It returns the actual validation function
+   * that can be used for custom validation logic or inspection.
+   *
+   * ### Return Value
+   * - Returns the validation rule function if found
+   * - Returns `undefined` if no rule with the given name exists
+   * - The returned function has the signature `IValidatorRuleFunction`
+   *
+   * @example
+   * ```typescript
+   * // Get a registered rule function
+   * const emailRule = Validator.getRule('Email');
+   * if (emailRule) {
+   *   // Use the rule directly
+   *   const result = await emailRule({
+   *     value: 'test@example.com',
+   *     ruleParams: []
+   *   });
+   *   console.log('Email validation result:', result);
+   * }
+   *
+   * // Check if a rule exists before using it
+   * const customRule = Validator.getRule('CustomRule');
+   * if (customRule) {
+   *   // Rule exists, safe to use
+   * } else {
+   *   console.log('CustomRule is not registered');
+   * }
+   *
+   * // Get rule for programmatic validation
+   * const minLengthRule = Validator.getRule('MinLength');
+   * if (minLengthRule) {
+   *   const isValid = await minLengthRule({
+   *     value: 'hello',
+     ruleParams: [3]  // Minimum length of 3
+   *   });
+   * }
+   * ```
+   *
+   * @param ruleName - The name of the validation rule to retrieve
+   *
+   * @returns The validation rule function if found, undefined otherwise
+   *
+   * @since 1.0.0
+   * @see {@link registerRule} - Register a new validation rule
+   * @see {@link getRules} - Get all registered rules
+   * @see {@link hasRule} - Check if a rule exists (type guard)
+   * @public
+   */
+  static getRule(ruleName: IValidatorRuleName) {
+    return this.getRules()[ruleName];
+  }
+  /**
+   * ## Check Rule Existence (Type Guard)
+   *
+   * Type guard method that checks whether a validation rule with the given name
+   * is registered in the Validator system. This method provides both existence
+   * checking and TypeScript type narrowing for rule names.
+   *
+   * ### Type Guard Behavior
+   * - **Input Validation**: First checks if the input is a non-null string
+   * - **Rule Lookup**: Uses `getRule` to check if the rule exists in the registry
+   * - **Type Narrowing**: Narrows `ruleName` to `IValidatorRuleName` if it returns true
+   *
+   * ### Use Cases
+   * - **Safe Rule Access**: Verify rule existence before using `getRule`
+   * - **Dynamic Validation**: Check rules at runtime before applying them
+   * - **Type Safety**: Enable TypeScript to narrow types based on rule existence
+   * - **Error Prevention**: Avoid undefined access when working with rule names
+   *
+   * @example
+   * ```typescript
+   * // Basic existence check
+   * if (Validator.hasRule('Email')) {
+   *   console.log('Email rule is available');
+   * }
+   *
+   * // Type narrowing with type guard
+   * function processRule(ruleName: string) {
+   *   if (Validator.hasRule(ruleName)) {
+   *     // TypeScript now knows ruleName is IValidatorRuleName
+   *     const rule = Validator.getRule(ruleName); // Type safe
+     return rule;
+   *   } else {
+   *     console.log(`${ruleName} is not a valid rule`);
+     return null;
+   *   }
+   * }
+   *
+   * // Safe rule processing
+   * const ruleNames = ['Email', 'Required', 'InvalidRule'];
+   * const validRules = ruleNames.filter(Validator.hasRule);
+   * console.log('Valid rules:', validRules); // ['Email', 'Required']
+   *
+   * // Dynamic rule application
+   * function applyRuleIfExists(value: any, ruleName: string) {
+   *   if (Validator.hasRule(ruleName)) {
+   *     const rule = Validator.getRule(ruleName);
+   *     return rule?.({ value, ruleParams: [] });
+   *   }
+   *   return 'Rule not found';
+   * }
+   * ```
+   *
+   * @param ruleName - The name to check for rule existence (any type, validated internally)
+   *
+   * @returns `true` if the rule exists and ruleName is a valid IValidatorRuleName, `false` otherwise
+   *
+   * @since 1.0.0
+   * @see {@link getRule} - Get the actual rule function
+   * @see {@link getRules} - Get all registered rules
+   * @see {@link registerRule} - Register a new validation rule
+   * @public
+   */
+  static hasRule(ruleName: any): ruleName is IValidatorRuleName {
+    if (!isNonNullString(ruleName)) {
+      return false;
+    }
+    return !!this.getRule(ruleName);
+  }
 
   private static getI18n(options?: { i18n?: I18n }): I18n {
     const { i18n } = Object.assign({}, options);
@@ -1110,141 +1239,161 @@ export class Validator {
   }
 
   /**
-   * ## Validate OneOf Rule
+   * ## Validate OneOf Rule - Parallel OR Validation
    *
-   * Implements "OneOf" validation logic where validation succeeds if at least one of the provided
-   * sub-rules validates successfully. This method enables flexible validation scenarios where
-   * multiple validation paths are acceptable, such as accepting either an email or phone number.
+   * Implements OneOf validation logic where validation succeeds if at least one
+   * sub-rule passes. This method executes all sub-rules in parallel and returns
+   * success immediately when any rule passes, or aggregates all error messages
+   * if all rules fail.
    *
-   * ### Key Features
-   * - **Parallel Execution**: Sub-rules are validated concurrently for optimal performance
-   * - **Short-Circuit Success**: Returns immediately when the first sub-rule passes
-   * - **Error Aggregation**: Collects and combines error messages from all failed sub-rules
-   * - **Flexible Rule Types**: Supports string, object, and function-based validation rules
-   * - **Internationalization**: Uses i18n for error messages and rule validation
-   * - **Promise-Based**: Returns a Promise that resolves on success or rejects on failure
+   * ### OneOf Validation Concept
+   * OneOf validation provides flexible validation scenarios where multiple validation
+   * paths are acceptable. Instead of requiring all rules to pass (AND logic),
+   * OneOf requires only one rule to pass (OR logic), making it ideal for:
+   * - Alternative input formats (email OR phone number)
+   * - Flexible validation requirements
+   * - Multiple acceptable validation criteria
    *
-   * ### Validation Behavior
-   * - **Success Condition**: At least one sub-rule must return a successful validation result
-   * - **Failure Condition**: All sub-rules fail, aggregated errors are returned
-   * - **Empty Rules**: If no sub-rules are provided, returns an "invalidRule" error
-   * - **Rule Processing**: Each sub-rule is validated using the standard `Validator.validate` method
+   * ### Parallel Execution
+   * All sub-rules are executed concurrently using `Promise.all()` for optimal
+   * performance. The method returns immediately upon the first successful validation,
+   * avoiding unnecessary processing of remaining rules.
    *
-   * ### Use Cases
-   * - **Alternative Formats**: Accept values in multiple valid formats (email OR phone)
-   * - **Flexible Input**: Allow users to provide data in different acceptable ways
-   * - **Conditional Validation**: Value can satisfy any one of several validation criteria
-   * - **Complex Business Rules**: Implement OR logic in validation scenarios
+   * ### Error Aggregation
+   * When all sub-rules fail, error messages are collected and joined with semicolons
+   * to provide comprehensive feedback about all validation failures.
    *
-   * ### Error Handling
-   * - **Aggregated Messages**: Failed rule errors are joined with semicolons ("; ")
-   * - **Fallback Message**: Uses i18n "validator.oneOf" message if no specific errors
-   * - **Non-String Errors**: Only string error messages are included in aggregation
-   * - **Immediate Rejection**: Fails fast with combined error messages when all rules fail
+   * ### Return Type: Promise<IValidatorResult>
+   * Returns a Promise that resolves to an IValidatorResult:
+   * - **Success**: `true` when at least one sub-rule passes
+   * - **Failure**: String error message when all sub-rules fail
    *
-   * @example
+   * ### Examples
+   *
+   * #### Basic OneOf Validation
    * ```typescript
-   * // Basic OneOf validation with email or phone
+   * // Validate that a contact field is either an email or phone number
    * const result = await Validator.validateOneOfRule({
-   *   ruleParams: ["Email", "PhoneNumber"],
-   *   value: "user@example.com",
-   *   fieldName: "contact",
+   *   ruleParams: ['Email', 'PhoneNumber'],
+   *   value: 'user@example.com',
+   *   fieldName: 'contact',
+   *   propertyName: 'contact'
    * });
-   * // Resolves to true (email validation passes)
    *
-   * // With mixed rule types
-   * const result2 = await Validator.validateOneOfRule({
-   *   ruleParams: [
-   *     "Email",
-   *     { MinLength: [10] },
-   *     ({ value }) => value.startsWith('CUSTOM-') || 'Must start with CUSTOM-'
-   *   ],
-   *   value: "CUSTOM-12345",
-   * });
-   * // Resolves to true (function rule passes)
-   *
-   * // All rules fail
-   * const result3 = await Validator.validateOneOfRule({
-   *   ruleParams: ["Email", "PhoneNumber"],
-   *   value: "invalid-input",
-   * });
-   * // Rejects with: "Invalid email format; Invalid phone number format"
+   * if (result === true) {
+   *   console.log('Contact validation passed');
+   * } else {
+   *   console.log('Contact validation failed:', result);
+   * }
    * ```
    *
-   * ### Advanced Usage with Context
+   * #### Complex OneOf with Parameters
    * ```typescript
-   * interface ValidationContext {
+   * // Validate ID that can be UUID, custom format, or admin format
+   * const result = await Validator.validateOneOfRule({
+   *   ruleParams: [
+   *     'UUID',                                    // Built-in UUID validation
+   *     { MinLength: [5] },                       // Custom length rule
+   *     ({ value }) => value.startsWith('ADMIN-') // Custom function rule
+   *   ],
+   *   value: '550e8400-e29b-41d4-a716-446655440000',
+   *   fieldName: 'identifier'
+   * });
+   * ```
+   *
+   * #### Context-Aware OneOf Validation
+   * ```typescript
+   * interface UserContext {
    *   userType: 'admin' | 'user';
    *   permissions: string[];
    * }
    *
-   * const result = await Validator.validateOneOfRule<ValidationContext>({
+   * const result = await Validator.validateOneOfRule<UserContext>({
    *   ruleParams: [
-   *     "Email",
+   *     'Email',
    *     ({ value, context }) => {
    *       if (context?.userType === 'admin') {
-   *         return value.startsWith('ADMIN-') || 'Admin IDs must start with ADMIN-';
+   *         return value.startsWith('admin@') || 'Admin emails must start with admin@';
    *       }
-   *       return false; // Skip this rule for non-admins
+   *       return false; // Skip for non-admins
    *     }
    *   ],
-   *   value: "admin@example.com",
+   *   value: 'admin@company.com',
    *   context: { userType: 'admin', permissions: ['manage'] },
+   *   fieldName: 'contactEmail'
    * });
-   * // Resolves to true (email rule passes)
    * ```
    *
-   * ### Integration with Decorators
+   * #### Error Aggregation Example
    * ```typescript
-   * // Used internally by buildOneOfRuleDecorator
-   * const IsValidContact = Validator.buildOneOfRuleDecorator(
-   *   ({ ruleParams }) => async (options) => {
-   *     return Validator.validateOneOfRule({
-   *       ...options,
-   *       ruleParams: ruleParams as IValidatorRule[]
-   *     });
-   *   }
-   * );
+   * // When all rules fail, errors are aggregated
+   * const result = await Validator.validateOneOfRule({
+   *   ruleParams: ['Email', 'PhoneNumber', { MinLength: [10] }],
+   *   value: 'invalid',  // Fails all rules
+   *   fieldName: 'contact'
+   * });
    *
-   * class User {
-   *   @IsValidContact(["Email", "PhoneNumber"])
-   *   contactInfo: string;
-   * }
+   * // result will be: "Invalid email format; Invalid phone number; Must be at least 10 characters"
    * ```
    *
-   * @template Context - Optional type for the validation context object
+   * ### Performance Characteristics
+   * - **Parallel Execution**: All rules execute simultaneously
+   * - **Early Success**: Returns immediately on first success
+   * - **Full Error Collection**: Waits for all failures before rejecting
+   * - **Memory Efficient**: No unnecessary rule processing after success
    *
-   * @param options - Configuration object for OneOf validation
-   * @param options.context - Optional context object passed to sub-rule validations
-   * @param options.ruleParams - Array of sub-rules to validate against (strings, objects, or functions)
-   * @param options.value - The value to validate against the sub-rules
+   * ### Internationalization Support
+   * Error messages are automatically translated using the provided i18n instance.
+   * Custom error messages can be provided through rule functions.
+   *
+   * @template Context - Type of the validation context object passed to rules
+   *
+   * @param options - Validation options for OneOf rule execution
+   * @param options.context - Optional context object passed to all validation rules
+   * @param options.ruleParams - Array of sub-rules to validate against (required)
+   * @param options.value - The value to validate
    * @param options.data - Optional additional data for validation context
-   * @param options.startTime - Optional start time for performance tracking (defaults to current time)
-   * @param options.fieldName - Optional field name for error messages
-   * @param options.propertyName - Optional property name for error messages
+   * @param options.startTime - Optional start time for performance tracking
+   * @param options.fieldName - Optional field name for error reporting
+   * @param options.propertyName - Optional property name for error reporting
    * @param options.translatedPropertyName - Optional translated property name
-   * @param options.i18n - Optional i18n instance for internationalization
+   * @param options.i18n - Optional internationalization instance
    *
-   * @returns Promise that resolves to `true` on success or rejects with error string on failure
+   * @returns Promise resolving to `true` if validation passes, or error message string if fails
    *
-   * @throws {string} When all sub-rules fail, rejects with aggregated error messages
-   * @throws {string} When no sub-rules are provided, rejects with "invalidRule" message
+   * @throws {string} Aggregated error messages when all sub-rules fail
+   *
+   * @remarks
+   * - Rules are executed in parallel for optimal performance
+   * - Method returns immediately upon first successful validation
+   * - Error messages from failed rules are joined with semicolons
+   * - Empty ruleParams array results in immediate failure
+   * - Supports both built-in rules and custom validation functions
+   * - Context is passed through to all sub-rule validations
    *
    * @since 1.35.0
-   * @see {@link buildOneOfRuleDecorator} - Creates decorators that use this method
-   * @see {@link validate} - Standard validation method used for sub-rules
-   * @see {@link IValidatorValidateOneOfRuleOptions} - Type definition for options
+   * @see {@link buildOneOfRuleDecorator} - Creates decorators using this method
+   * @see {@link validate} - General validation method used internally
+   * @see {@link IValidatorValidateOneOfRuleOptions} - Options type definition
    * @public
-   * @static
+   * @async
    */
-  static validateOneOfRule<Context = unknown>({
+  static validateOneOfRule<
+    Context = unknown,
+    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
+      IValidatorRule<Array<any>, Context>
+    >,
+  >({
     context,
     ruleParams,
     value,
     data,
     startTime,
     ...extra
-  }: IValidatorValidateOneOfRuleOptions<Context>): IValidatorResult {
+  }: IValidatorValidateOneOfRuleOptions<
+    Context,
+    RulesFunctions
+  >): IValidatorResult {
     startTime = isNumber(startTime) ? startTime : Date.now();
     // Special handling for OneOf: validate against each sub-rule in parallel
     const subRules = (
@@ -1291,6 +1440,176 @@ export class Validator {
           : i18n.t("validator.oneOf", i18nRuleOptions)
       );
     });
+  }
+  /**
+   * ## Create OneOf Validation Rule
+   *
+   * Factory method that creates a OneOf validation rule function. This method provides
+   * a programmatic way to create validation rules that implement OR logic, where
+   * validation succeeds if at least one of the specified sub-rules passes.
+   *
+   * ### OneOf Validation Concept
+   * OneOf validation allows flexible validation scenarios where multiple validation
+   * paths are acceptable. Instead of requiring all rules to pass (AND logic),
+   * OneOf requires only one rule to pass (OR logic), making it ideal for:
+   * - Alternative input formats (email OR phone number)
+   * - Flexible validation requirements
+   * - Multiple acceptable validation criteria
+   *
+   * ### Method Behavior
+   * This factory method returns a validation rule function that can be used directly
+   * in validation calls or registered as a named rule. The returned function delegates
+   * to `validateOneOfRule` for the actual validation logic.
+   *
+   * ### Parallel Execution
+   * When the returned rule function is executed, all sub-rules are validated in parallel
+   * using `Promise.all()` for optimal performance. The method returns immediately upon
+   * the first successful validation, avoiding unnecessary processing of remaining rules.
+   *
+   * ### Error Aggregation
+   * When all sub-rules fail, error messages are collected and joined with semicolons
+   * to provide comprehensive feedback about all validation failures.
+   *
+   * ### Examples
+   *
+   * #### Basic OneOf Rule Creation
+   * ```typescript
+   * // Create a OneOf rule that accepts either email or phone number
+   * const contactRule = Validator.oneOf(['Email', 'PhoneNumber']);
+   *
+   * // Use the rule directly
+   * const result = await contactRule({
+   *   value: 'user@example.com',
+   *   ruleParams: ['Email', 'PhoneNumber'],
+   *   fieldName: 'contact'
+   * });
+   *
+   * if (result === true) {
+   *   console.log('Contact validation passed');
+   * } else {
+   *   console.log('Contact validation failed:', result);
+   * }
+   * ```
+   *
+   * #### Complex OneOf with Mixed Rule Types
+   * ```typescript
+   * // Create a rule that accepts UUID, custom format, or admin format
+   * const identifierRule = Validator.oneOf([
+   *   'UUID',                                    // Built-in UUID validation
+   *   { MinLength: [5] },                       // Object rule with parameters
+   *   ({ value }) => value.startsWith('ADMIN-') // Custom function rule
+   * ]);
+   *
+   * const result = await identifierRule({
+   *   value: '550e8400-e29b-41d4-a716-446655440000',
+   *   ruleParams: ['UUID', { MinLength: [5] }, ({ value }) => value.startsWith('ADMIN-')],
+   *   fieldName: 'identifier'
+   * });
+   * ```
+   *
+   * #### Registering as Named Rule
+   * ```typescript
+   * // Create and register a reusable OneOf rule
+   * const contactValidator = Validator.oneOf(['Email', 'PhoneNumber']);
+   * Validator.registerRule('Contact', contactValidator);
+   *
+   * // Now use it in validation
+   * const result = await Validator.validate({
+   *   value: '+1234567890',
+   *   rules: ['Contact']
+   * });
+   * ```
+   *
+   * #### Context-Aware OneOf Rules
+   * ```typescript
+   * interface UserContext {
+   *   userType: 'admin' | 'user';
+   *   permissions: string[];
+   * }
+   *
+   * const flexibleIdRule = Validator.oneOf<UserContext>([
+   *   'UUID',
+   *   ({ value, context }) => {
+   *     if (context?.userType === 'admin') {
+   *       return value.startsWith('ADMIN-') || 'Admin IDs must start with ADMIN-';
+   *     }
+   *     return false; // Skip for non-admins
+   *   }
+   * ]);
+   *
+   * const result = await flexibleIdRule({
+   *   value: 'ADMIN-12345',
+   *   ruleParams: ['UUID', 'customValidationFunction'],
+   *   context: { userType: 'admin', permissions: ['manage'] },
+   *   fieldName: 'identifier'
+   * });
+   * ```
+   *
+   * #### Error Aggregation Example
+   * ```typescript
+   * // When all rules fail, errors are aggregated
+   * const strictRule = Validator.oneOf(['Email', 'PhoneNumber', { MinLength: [10] }]);
+   *
+   * const result = await strictRule({
+   *   value: 'invalid',  // Fails all rules
+   *   ruleParams: ['Email', 'PhoneNumber', { MinLength: [10] }],
+   *   fieldName: 'contact'
+   * });
+   *
+   * // result will be: "Invalid email format; Invalid phone number; Must be at least 10 characters"
+   * ```
+   *
+   * ### Performance Characteristics
+   * - **Parallel Execution**: All rules execute simultaneously
+   * - **Early Success**: Returns immediately on first success
+   * - **Full Error Collection**: Waits for all failures before rejecting
+   * - **Memory Efficient**: No unnecessary rule processing after success
+   *
+   * ### Internationalization Support
+   * Error messages are automatically translated using the provided i18n instance.
+   * Custom error messages can be provided through rule functions.
+   *
+   * @template Context - Type of the validation context object passed to rules
+   * @template RulesFunctions - Array type defining the structure of validation rules
+   *
+   * @param ruleParams - Array of sub-rules to validate against (required)
+   *                     Can include strings, objects, or functions
+   *
+   * @returns Validation rule function that implements OneOf logic
+   *          Returns `true` if validation passes, error message string if fails
+   *
+   * @throws {string} Aggregated error messages when all sub-rules fail
+   *
+   * @remarks
+   * - Rules are executed in parallel for optimal performance
+   * - Method returns immediately upon first successful validation
+   * - Error messages from failed rules are joined with semicolons
+   * - Empty ruleParams array results in immediate failure
+   * - Supports both built-in rules and custom validation functions
+   * - Context is passed through to all sub-rule validations
+   *
+   * @since 1.35.0
+   * @see {@link validateOneOfRule} - The underlying validation method
+   * @see {@link buildOneOfRuleDecorator} - Creates decorators using this method
+   * @see {@link registerRule} - Register the returned function as a named rule
+   * @public
+   */
+  static oneOf<
+    Context = unknown,
+    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
+      IValidatorRule<Array<any>, Context>
+    >,
+  >(
+    ruleParams: RulesFunctions
+  ): IValidatorRuleFunction<RulesFunctions, Context> {
+    return function OneOf(
+      options: IValidatorValidateOneOfRuleOptions<Context, RulesFunctions>
+    ) {
+      return Validator.validateOneOfRule<Context, RulesFunctions>({
+        ...options,
+        ruleParams,
+      });
+    };
   }
   static isSuccess<Context = unknown>(
     result: IValidatorValidateResult<Context>

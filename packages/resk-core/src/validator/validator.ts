@@ -1086,26 +1086,24 @@ export class Validator {
             return next();
           };
 
-          {
-            const normalizedRule = String(ruleName).toLowerCase().trim();
-            if (["oneof", "allof", "arrayof"].includes(normalizedRule)) {
-              if (normalizedRule === "arrayof") {
-                const arrayOfResult =
-                  await Validator.validateArrayOfRule<Context>({
-                    ...validateOptions,
-                    startTime,
-                  } as any);
-                return handleResult(arrayOfResult);
-              }
-              const oneOrAllResult = await Validator.validateMultiRule<Context>(
-                normalizedRule === "oneof" ? "OneOf" : "AllOf",
-                {
+          const normalizedRule = String(ruleName).toLowerCase().trim();
+          if (["oneof", "allof", "arrayof"].includes(normalizedRule)) {
+            if (normalizedRule === "arrayof") {
+              const arrayOfResult =
+                await Validator.validateArrayOfRule<Context>({
                   ...validateOptions,
                   startTime,
-                }
-              );
-              return handleResult(oneOrAllResult);
+                } as any);
+              return handleResult(arrayOfResult);
             }
+            const oneOrAllResult = await Validator.validateMultiRule<Context>(
+              normalizedRule === "oneof" ? "OneOf" : "AllOf",
+              {
+                ...validateOptions,
+                startTime,
+              }
+            );
+            return handleResult(oneOrAllResult);
           }
 
           if (typeof ruleFunc !== "function") {
@@ -1356,6 +1354,123 @@ export class Validator {
     return `${header}${single}${failures.join(multiple)}`;
   }
 
+  /**
+   * ## Validate Nested Rule (Core Nested Validation Executor)
+   *
+   * Internal rule function that validates a nested object against a class constructor with
+   * validation decorators. This method is the workhorse for nested class validation, delegating
+   * to {@link validateTarget} for the actual multi-field validation logic.
+   *
+   * ### Purpose
+   * This method implements the core logic for the `ValidateNested` rule, enabling validation of
+   * complex hierarchical object structures where a property value must itself be validated against
+   * a decorated class schema. It acts as the bridge between single-value rule validation and
+   * multi-field class-based validation.
+   *
+   * ### Validation Flow
+   * 1. **Parameter Extraction**: Extracts the target class constructor from `ruleParams[0]`
+   * 2. **Validation**: Calls `validateTarget()` to validate the nested object against the class
+   * 3. **Error Aggregation**: Collects nested validation errors with property path information
+   * 4. **Result Formatting**: Returns either `true` (success) or error message string (failure)
+   *
+   * ### Error Handling Strategy
+   * - **Missing Class Constructor**: Returns invalidRule error if no target class provided
+   * - **Invalid Data Type**: Returns validateNested error if data is not an object
+   * - **Nested Validation Failures**: Aggregates all nested field errors with property names in format:
+   *   `"[propertyName]: error message; [propertyName]: error message"`
+   * - **Successful Validation**: Returns `true` without modification
+   *
+   * ### Type Parameters
+   * - `Target` - Class constructor extending IClassConstructor with validation decorators
+   * - `Context` - Optional validation context type passed through nested validations
+   *
+   * ### Return Values
+   * - `true` - Nested object validation succeeded
+   * - `string` - Validation failed; returns i18n-formatted error message with nested error details
+   *
+   * ### Usage Context
+   * This method is primarily used as:
+   * - The internal handler for the `validateNested` factory function
+   * - A sub-rule within multi-rule validators (OneOf, AllOf)
+   * - Direct validator for nested object properties in class-based validation
+   *
+   * ### Example
+   * ```typescript
+   * class Address {
+   *   @IsRequired
+   *   @MinLength([5])
+   *   street: string;
+   *
+   *   @IsRequired
+   *   @IsPostalCode
+   *   postalCode: string;
+   * }
+   *
+   * class User {
+   *   @IsRequired
+   *   name: string;
+   *
+   *   @ValidateNested([Address])
+   *   address: Address;
+   * }
+   *
+   * // When validating a User instance with an Address property,
+   * // validateNestedRule is called to validate the address against the Address class
+   * const result = await Validator.validateTarget(User, {
+   * data : {
+   *   name: "John",
+   *   address: { street: "123 Main St", postalCode: "12345" }
+   * }});
+   * ```
+   *
+   * ### Key Features
+   * - **DRY Principle**: Reuses existing `validateTarget` logic to avoid code duplication
+   * - **Error Context**: Preserves field hierarchy information in error messages
+   * - **i18n Integration**: Uses translation system for localized error messages
+   * - **Context Propagation**: Passes validation context through to nested validators
+   * - **Timing Tracking**: Maintains duration tracking across nested validations
+   *
+   * @template Target - Class constructor type (must extend IClassConstructor)
+   * @template Context - Optional validation context type
+   *
+   * @param options - Validation rule function options (IValidatorTargetRuleFunctionOptions<Target, Context>)
+   * @param options.ruleParams - Array containing the nested class constructor at index [0]
+   * @param options.value - The nested object value to validate (extracted to data property)
+   * @param options.data - The nested object data to validate against the target class
+   * @param options.context - Optional validation context passed to all validation rules
+   * @param options.fieldName - Optional field identifier for error messages
+   * @param options.propertyName - Optional property identifier for error messages
+   * @param options.translatedPropertyName - Optional i18n property name for error messages
+   * @param options.startTime - Optional timestamp for duration tracking
+   * @param options.i18n - Optional i18n instance for error message translation
+   *
+   * @returns Promise<boolean | string>
+   * - Resolves to `true` if nested object validation succeeds
+   * - Resolves to error message string if validation fails
+   * - Never rejects; all errors are returned as resolution values
+   * - Error messages include nested field paths: `"[fieldName]: error; [fieldName]: error"`
+   *
+   * @throws {Never} This method never throws errors; all failures are returned as strings
+   *
+   * @remarks
+   * - This is an internal method primarily used by the `validateNested` factory
+   * - Accepts IValidatorTargetRuleFunctionOptions which omits validateTarget's i18n parameter
+   * - Delegates directly to validateTarget(target, options) maintaining all context
+   * - Nested validation errors include property names for clear error tracing
+   * - The method integrates seamlessly with the multi-rule validation system
+   * - Supports recursive nesting of arbitrarily deep object structures
+   * - Performance: Delegates to validateTarget which validates fields in parallel
+   * - Error aggregation uses nested field paths for hierarchical clarity
+   *
+   * @since 1.36.0
+   * @see {@link validateNested} - Factory function that creates rule functions using this method
+   * @see {@link validateTarget} - The underlying class-based validation method (accepts options with data)
+   * @see {@link ValidateNested} - Decorator that uses this method via the factory
+   * @see {@link IValidatorTargetRuleFunctionOptions} - Options interface for this method
+   * @see {@link buildMultiRuleDecorator} - Decorator builder for complex multi-rule scenarios
+   * @internal
+   * @async
+   */
   static async validateNestedRule<
     Target extends IClassConstructor = IClassConstructor,
     Context = unknown,
@@ -1788,6 +1903,232 @@ export class Validator {
     };
   }
 
+  /**
+   * ## Create Nested Validation Rule Factory
+   *
+   * Factory function that creates a validation rule function for validating nested objects
+   * against a decorated class schema. This method follows the factory pattern established by
+   * {@link oneOf}, {@link allOf}, and {@link arrayOf} for consistency across complex validation rules.
+   *
+   * ### Purpose
+   * The `validateNested` factory enables validation of hierarchical data structures by creating
+   * a reusable rule function that validates object properties against class-based validation schemas.
+   * It bridges the gap between single-value rules and multi-field class validation.
+   *
+   * ### How It Works
+   * 1. **Factory Invocation**: Called with a class constructor `[target]` parameter
+   * 2. **Returns Rule Function**: Returns a rule function that validates nested objects
+   * 3. **Rule Execution**: When the rule is executed, it delegates to `validateNestedRule`
+   * 4. **Result**: Returns `true` on success or error message string on failure
+   *
+   * ### Factory Pattern Consistency
+   * Like `oneOf`, `allOf`, and `arrayOf`, this factory:
+   * - Accepts rule parameters during factory creation
+   * - Returns an `IValidatorRuleFunction` for use in validators
+   * - Supports generic typing for Context
+   * - Follows the nested function closure pattern
+   * - Can be registered as a named rule via `Validator.registerRule()`
+   *
+   * ### Key Characteristics
+   * - **Lazy Evaluation**: Rule parameters are captured at factory creation time
+   * - **Composability**: Can be combined with other rules using OneOf, AllOf, ArrayOf
+   * - **Type Safety**: Full TypeScript support with generic Target class type
+   * - **Contextual Validation**: Supports optional validation context propagation
+   * - **i18n Support**: Automatically uses i18n system for error messages
+   *
+   * ### Usage Patterns
+   *
+   * #### Direct Factory Usage
+   * ```typescript
+   * class Address {
+   *   @IsRequired
+   *   street: string;
+   *
+   *   @IsRequired
+   *   postalCode: string;
+   * }
+   *
+   * class UserForm {
+   *   @IsRequired
+   *   @IsEmail
+   *   email: string;
+   *
+   *   @ValidateNested([Address])
+   *   address: Address;
+   * }
+   *
+   * // Validator.validateNested is called internally by the @ValidateNested decorator
+   * ```
+   *
+   * #### Programmatic Rule Creation
+   * ```typescript
+   * const nestedAddressRule = Validator.validateNested([Address]);
+   *
+   * const result = await nestedAddressRule({
+   *   data: { street: "123 Main St", postalCode: "12345" },
+   *   fieldName: "address"
+   * });
+   * ```
+   *
+   * #### Registration as Named Rule
+   * ```typescript
+   * const addressValidator = Validator.validateNested([Address]);
+   * Validator.registerRule('AddressValidator', addressValidator);
+   *
+   * // Now can be used by name in validation rules
+   * class User {
+   *   @ValidateNested([Address])
+   *   address: Address;
+   * }
+   * ```
+   *
+   * #### Composition with MultiRule Validators
+   * ```typescript
+   * // Using ValidateNested within OneOf (e.g., either Address or simplified Location)
+   * class Location {
+   *   @IsRequired
+   *   coordinates: string; // e.g., "40.7128,-74.0060"
+   * }
+   *
+   * const addressOrLocation = Validator.oneOf([
+   *   Validator.validateNested([Address]),
+   *   Validator.validateNested([Location])
+   * ]);
+   * ```
+   *
+   * #### Nested Validation with Context
+   * ```typescript
+   * interface UserContext {
+   *   userId: number;
+   *   isAdmin: boolean;
+   * }
+   *
+   * class AdminProfile {
+   *   @IsRequired
+   *   role: string;
+   *
+   *   @IsRequired
+   *   permissions: string[];
+   * }
+   *
+   * // When context is provided during validation
+   * const result = await Validator.validateTarget(User, {
+   *  data: userData,
+   *   context: { userId: 1, isAdmin: true }
+   * });
+   * ```
+   *
+   * ### Type Parameters
+   * - `Target` - Class constructor type (extends IClassConstructor) that the nested object must satisfy
+   * - `Context` - Optional validation context type passed through nested validations
+   *
+   * ### Parameters
+   * @param ruleParams - Tuple containing the nested class constructor at position [0].
+   *                     Must be a class decorated with validation rules.
+   *
+   * ### Returns
+   * `IValidatorRuleFunction<[target: Target], Context>` - A rule function that:
+   * - Accepts validation options with nested object data (IValidatorValidateOptions)
+   * - Delegates to `validateNestedRule` for actual validation
+   * - Returns `true` on successful nested object validation
+   * - Returns error message string if any nested field validation fails
+   * - Propagates context and i18n through nested validations
+   *
+   * ### Implementation Details
+   * The returned rule function:
+   * 1. Extracts the data property from validation options
+   * 2. Creates a shallow copy of the data using `Object.assign`
+   * 3. Calls `validateNestedRule` with the combined parameters
+   * 4. Properly types the data as `IValidatorValidateTargetData<Target>`
+   * 5. Delegates to validateTarget via validateNestedRule which expects options.data
+   *
+   * ### Error Message Format
+   * When nested validation fails, error messages include field-level details:
+   * ```
+   * "Validation failed: [fieldName]: error message; [fieldName]: error message"
+   * ```
+   *
+   * ### Performance Characteristics
+   * - **Lazy Evaluation**: Parameters are captured but not executed until rule runs
+   * - **Efficient Nesting**: Reuses validateTarget's parallel field validation
+   * - **Memory Efficient**: Shallow copy of data prevents unnecessary object duplication
+   * - **Async Optimized**: Properly awaits nested async validation rules
+   *
+   * ### Internationalization
+   * - Error messages are automatically localized using the i18n system
+   * - Supports translation keys: `validator.validateNested`, `validator.invalidRule`
+   * - Property names can be translated based on i18n configuration
+   *
+   * ### Integration with Decorator System
+   * This factory is the foundation for the `@ValidateNested` decorator:
+   * ```typescript
+   * const ValidateNested = buildMultiRuleDecorator(function ValidateNested(options) {
+   *   return { validateNested: Validator.validateNested(options.nested) };
+   * });
+   * ```
+   *
+   * @template Target - Class constructor for the nested object schema
+   * @template Context - Optional context type for validations
+   *
+   * @param ruleParams - Tuple `[target]` where target is the class constructor
+   *
+   * @returns IValidatorRuleFunction - Rule function for nested object validation
+   *          - Accepts options with nested object data
+   *          - Returns true on success, error string on failure
+   *          - Supports context propagation
+   *          - Integrates with validation pipeline
+   *
+   * @throws {Never} The returned rule function never throws; errors are returned as strings
+   *
+   * @remarks
+   * - This factory closely parallels the `oneOf`, `allOf`, and `arrayOf` factory pattern
+   * - The class constructor in ruleParams must have validation decorators
+   * - Nested validation errors include property names for traceability
+   * - Supports recursive nesting (nested class can have ValidateNested properties)
+   * - Data is shallow-copied to prevent external modifications
+   * - Fully compatible with TypeScript's strict type checking
+   *
+   * @example
+   * ```typescript
+   * // Simple nested validation
+   * class Contact {
+   *   @IsRequired @IsEmail email: string;
+   *   @IsRequired @IsPhoneNumber phone: string;
+   * }
+   *
+   * class Person {
+   *   @IsRequired @MinLength([2]) name: string;
+   *   @ValidateNested([Contact]) contact: Contact;
+   * }
+   *
+   * const person = {
+   *   name: "Alice",
+   *   contact: {
+   *     email: "alice@example.com",
+   *     phone: "+1234567890"
+   *   }
+   * };
+   *
+   * const result = await Validator.validateTarget(Person, {data:person});
+   * if (result.success) {
+   *   console.log("Valid person with contact", result.data);
+   * } else {
+   *   console.error("Validation errors", result.errors);
+   * }
+   * ```
+   *
+   * @since 1.36.0
+   * @see {@link validateNestedRule} - The underlying validation executor that delegates to validateTarget
+   * @see {@link ValidateNested} - Decorator using this factory
+   * @see {@link validateTarget} - Multi-field class validation (signature: validateTarget<T, Context>(target, options))
+   * @see {@link IValidatorValidateOptions} - Validation options interface for rule functions
+   * @see {@link IValidatorValidateTargetOptions} - Target validation options interface
+   * @see {@link oneOf} - Similar factory for OneOf rule creation
+   * @see {@link allOf} - Similar factory for AllOf rule creation
+   * @see {@link arrayOf} - Similar factory for ArrayOf rule creation
+   * @see {@link buildMultiRuleDecorator} - Decorator builder for complex rules
+   * @public
+   */
   static validateNested<
     Target extends IClassConstructor = IClassConstructor,
     Context = unknown,
@@ -1936,10 +2277,12 @@ export class Validator {
    * }
    *
    * const result = await Validator.validateTarget(ProductForm, {
-   *   title: "Awesome Product",
+   *   data : {
+   *  title: "Awesome Product",
    *   price: 29.99,
    *   description: "",
    *   // imageUrl omitted (valid with @IsOptional)
+   *   }
    * });
    * ```
    *
@@ -1977,7 +2320,7 @@ export class Validator {
    *
    * #### Error Handling
    * ```typescript
-   * const result = await Validator.validateTarget(UserForm, userData);
+   * const result = await Validator.validateTarget(UserForm, {data:userData});
    *
    * if (!result.success) {
    *   // Access failure details
@@ -1997,7 +2340,7 @@ export class Validator {
    *
    * #### Type Guards
    * ```typescript
-   * const result = await Validator.validateTarget(UserForm, data);
+   * const result = await Validator.validateTarget(UserForm, {data});
    *
    * if (result.success) {
    *   // result.data is properly typed
@@ -2008,34 +2351,84 @@ export class Validator {
    * }
    * ```
    *
-   * @template T - Class constructor type (extends IClassConstructor)
-   * @template Context - Optional type for validation context passed to rules
+   * ### Signature
+   * ```typescript
+   * static async validateTarget<
+   *   Target extends IClassConstructor = IClassConstructor,
+   *   Context = unknown,
+   * >(
+   *   target: Target,
+   *   options: Omit<IValidatorValidateTargetOptions<Target, Context>, "i18n"> & {
+   *     i18n?: I18n;
+   *   }
+   * ): Promise<IValidatorValidateTargetResult<Context>>
+   * ```
+   *
+   * ### Method Parameters
+   * The method accepts two parameters:
+   * 1. `target` - Class constructor decorated with validation rules
+   * 2. `options` - Configuration object containing validation data and settings
+   *
+   * ### Options Structure
+   * The `options` parameter extends `IValidatorValidateTargetOptions` and includes:
+   * - `data`: Object containing property values to validate (can be partial)
+   * - `context`: Optional context object passed to all validation rules
+   * - `errorMessageBuilder`: Optional custom error message formatter function
+   *   - Signature: `(translatedPropertyName: string, error: string, options?: any) => string`
+   *   - Default: `(name, error) => \"[${name}] : ${error}\"`
+   * - `i18n`: Optional I18n instance (merged with default i18n if not provided)
+   * - Other properties from IValidatorValidateTargetOptions
+   *
+   * ### Usage Examples
+   * ```typescript
+   * // Simple validation with data object
+   * const result = await Validator.validateTarget(UserForm, {
+   *   data: { email: \"test@example.com\", name: \"John\" },
+   *   context: { userId: 123 }
+   * });
+   *
+   * // With custom error formatting
+   * const result = await Validator.validateTarget(UserForm, {
+   *   data: { email: \"test@example.com\", name: \"John\" },
+   *   errorMessageBuilder: (name, error) => `Field ${name}: ${error}`
+   * });
+   * ```
+   *
+   * @template Target - Class constructor type (extends IClassConstructor)\n   * @template Context - Optional type for validation context passed to rules
    *
    * @param target - Class constructor decorated with validation decorators (e.g., UserForm)
-   * @param data - Object containing property values to validate (can be partial)
-   * @param options - Optional validation options
+   * @param options - Validation options object\n   *                Extended from IValidatorValidateTargetOptions with optional i18n property\n   *                Type: Omit<IValidatorValidateTargetOptions<Target, Context>, \"i18n\"> & { i18n?: I18n }
+   * @param options.data - Object containing property values to validate (can be partial, required)
    * @param options.context - Optional context object passed to all validation rules
    * @param options.errorMessageBuilder - Optional custom error message formatter function
+   * @param options.i18n - Optional i18n instance for localization
    *
-   * @returns Promise resolving to IValidatorValidateTargetResult<T>
-   *          - Success: object with success=true, data (validated object), validatedAt, duration
-   *          - Failure: object with success=false, errors (array), failureCount, message, failedAt, duration
+   * @returns Promise<IValidatorValidateTargetResult<Context>>
+   * - **Success**: object with success=true, data (validated object), validatedAt, duration, status=\"success\"
+   * - **Failure**: object with success=false, errors (array), failureCount, message, failedAt, duration, status=\"error\"
+   * - Never throws; all errors are returned in the result object
    *
    * @throws {Never} This method never throws. All errors are returned in the result object.
    *
    * @remarks
-   * - Validation is performed in parallel for all fields using Promise.all()
-   * - Fields decorated with @IsOptional can be omitted from input data
-   * - Nullable/Empty rules prevent other rules from executing for that field
-   * - Property names are translated using i18n if available
-   * - Errors include field-specific information for precise error reporting
+   * - Validation is performed in parallel for all decorated fields using Promise.all()
+   * - Fields decorated with @IsOptional can be omitted entirely from input data\n   * - Nullable/Empty rules prevent other rules from executing for that field
+   * - Property names are translated using i18n if available (via i18n.translateTarget method)
+   * - Errors include field-specific information: propertyName, translatedPropertyName, message, ruleName, value
+   * - Custom errorMessageBuilder allows field-level error message customization
+   * - Context is propagated through to all field validation rules
+   * - Supports nested validation through @ValidateNested rule and validateNested factory
+   * - Error messages use default format: \"[translatedPropertyName] : error\" unless custom builder provided
+   * - Integrates with the multi-rule system (OneOf, AllOf, ArrayOf) for field validation
    *
    * @since 1.0.0
-   * @see {@link validate} - For single-value validation
+   * @see {@link validate} - For single-value validation without class schema
+   * @see {@link validateNestedRule} - Internal rule handler that delegates to validateTarget
+   * @see {@link validateNested} - Factory creating nested validation rule functions
    * @see {@link buildPropertyDecorator} - To create custom validation decorators
-   * @see {@link registerRule} - To register custom validation rules
-   * @see {@link IValidatorValidateTargetResult} - Result type documentation
+   * @see {@link registerRule} - To register custom validation rules\n   * @see {@link IValidatorValidateTargetResult} - Result type documentation
    * @see {@link IValidatorValidationError} - Error details type
+   * @see {@link IValidatorValidateTargetOptions} - Full options interface
    *
    * @public
    * @async

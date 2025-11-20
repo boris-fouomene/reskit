@@ -723,7 +723,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    NumberBetween: IValidatorRuleFunction<[min: number, max: number], Context>;
+    NumberBetween: IValidatorRuleParams<[min: number, max: number], Context>;
 
     /**
      * ### DecimalPlaces Rule
@@ -773,7 +773,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DecimalPlaces: IValidatorRuleFunction<
+    DecimalPlaces: IValidatorRuleParams<
       [minDecimalPlaces: number, maxDecimalPlaces?: number],
       Context
     >;
@@ -820,7 +820,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Integer: IValidatorRuleFunction<[number], Context>;
+    Integer: IValidatorRuleParams<[number], Context>;
 
     /**
      * ### Multiple Of Rule
@@ -876,6 +876,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MultipleOf: IValidatorRuleFunction<[number], Context>;
+    MultipleOf: IValidatorRuleParams<[number], Context>;
   }
 }

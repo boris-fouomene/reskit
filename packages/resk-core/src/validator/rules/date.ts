@@ -667,7 +667,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Date: IValidatorRuleFunction<[], Context>;
+    Date: IValidatorRuleParams<[], Context>;
 
     /**
      * ### DateAfter Rule
@@ -715,7 +715,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateAfter: IValidatorRuleFunction<[date: string | Date], Context>;
+    DateAfter: IValidatorRuleParams<[date: string | Date], Context>;
 
     /**
      * ### DateBefore Rule
@@ -763,7 +763,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateBefore: IValidatorRuleFunction<[date: string | Date], Context>;
+    DateBefore: IValidatorRuleParams<[date: string | Date], Context>;
 
     /**
      * ### DateBetween Rule
@@ -812,7 +812,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    DateBetween: IValidatorRuleFunction<
+    DateBetween: IValidatorRuleParams<
       [minDate: string | Date, maxDate: string | Date],
       Context
     >;
@@ -863,7 +863,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    SameDate: IValidatorRuleFunction<[date: string | Date], Context>;
+    SameDate: IValidatorRuleParams<[date: string | Date], Context>;
 
     /**
      * ### FutureDate Rule
@@ -907,7 +907,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FutureDate: IValidatorRuleFunction<[], Context>;
+    FutureDate: IValidatorRuleParams<[], Context>;
 
     /**
      * ### PastDate Rule
@@ -951,6 +951,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    PastDate: IValidatorRuleFunction<[], Context>;
+    PastDate: IValidatorRuleParams<[], Context>;
   }
 }

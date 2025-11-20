@@ -18,6 +18,7 @@ import {
   IValidatorRule,
   IValidatorRuleFunction,
   IValidatorRuleName,
+  IValidatorRuleObject,
   IValidatorRules,
   IValidatorRulesMap,
   IValidatorSanitizedRuleObject,
@@ -560,9 +561,7 @@ export class Validator {
   ): IValidatorRuleFunction<ParamType, Context> | undefined {
     if (!isNonNullString(ruleName)) return undefined;
     const rules = Validator.getRules();
-    return rules[ruleName] as
-      | IValidatorRuleFunction<ParamType, Context>
-      | undefined;
+    return rules[ruleName] as any | undefined;
   }
 
   /**
@@ -638,7 +637,7 @@ export class Validator {
    *
    * @since 1.22.0
    * @see {@link parseStringRule} - Internal string rule parser
-   * @see {@link parseObjectRules} - Internal object rule parser
+   * @see {@link parseObjectRule} - Internal object rule parser
    * @see {@link validate} - Uses this method for rule processing
    * @public
    */
@@ -665,9 +664,10 @@ export class Validator {
           invalidRules.push(rule as any);
         }
       } else if (isObj(rule) && typeof rule === "object") {
-        const parsedObjectRules = this.parseObjectRules(rule, registeredRules);
-        parsedRules.push(...parsedObjectRules.valid);
-        invalidRules.push(...parsedObjectRules.invalid);
+        const parsedObject = this.parseObjectRule(rule, registeredRules);
+        if (parsedObject.length) {
+          parsedRules.push(...parsedObject);
+        }
       }
     }
 
@@ -752,90 +752,33 @@ export class Validator {
 
     return null;
   }
-
-  /**
-   * ## Parse Object-Based Validation Rules
-   *
-   * Internal helper method that processes object-format validation rules into standardized
-   * rule objects. This method handles the conversion of key-value pair rules where the
-   * key is the rule name and the value contains the parameters.
-   *
-   * @template Context - Type of the validation context object
-   * ### Object Format Structure
-   * ```typescript
-   * {
-   *   ruleName: parameters,           // parameters can be array or single value
-   *   anotherRule: [param1, param2], // array of parameters
-   *   simpleRule: []                  // no parameters
-   * }
-   * ```
-   *
-   * ### Processing Logic
-   * 1. **Iteration**: Loops through each property in the rules object
-   * 2. **Validation**: Checks if the rule name corresponds to a registered rule
-   * 3. **Parameter Handling**: Ensures parameters are in array format
-   * 4. **Categorization**: Separates valid rules from invalid ones
-   * 5. **Standardization**: Converts to consistent internal format
-   *
-   * @example
-   * ```typescript
-   * // Object rules input
-   * const objectRules = {
-   *   Required: [],
-   *   MinLength: [5],
-   *   Between: [10, 20],
-   *   CustomRule: 'singleParam',
-   *   InvalidRule: []  // Will be marked as invalid if not registered
-   * };
-   *
-   * const result = parseObjectRules(objectRules, registeredRules);
-   * // result.valid contains standardized rule objects
-   * // result.invalid contains ['InvalidRule'] if not registered
-   * ```
-   *
-   * @internal
-   * @param rulesObject - Object containing rule names as keys and parameters as values
-   * @param registeredRules - Map of all currently registered validation rules
-   *
-   * @returns Object containing categorized rule processing results
-   * @returns returns.valid - Array of successfully parsed and validated rule objects
-   * @returns returns.invalid - Array of rule names that couldn't be processed
-   *
-   * @since 1.22.0
-   * @see {@link parseAndValidateRules} - Public method that uses this parser
-   * @private
-   */
-  private static parseObjectRules<Context = unknown>(
-    rulesObject: Record<IValidatorRuleName, any>,
+  private static parseObjectRule<Context = unknown>(
+    rulesObject: IValidatorRuleObject<Context>,
     registeredRules: IValidatorRulesMap<Context>
-  ): {
-    valid: any[];
-    invalid: IValidatorRules<Context>[];
-  } {
-    const validRules: IValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
-    const invalidRules: IValidatorRules<Context>[] = [];
-
+  ): IValidatorSanitizedRuleObject<Array<any>, Context>[] {
+    const result: IValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
+    if (!isObj(rulesObject) || typeof rulesObject !== "object") {
+      return result;
+    }
     for (const propertyKey in rulesObject) {
       if (Object.hasOwnProperty.call(rulesObject, propertyKey)) {
-        const ruleParameters = rulesObject[propertyKey as IValidatorRuleName];
-        const ruleFunction = registeredRules[
-          propertyKey as IValidatorRuleName
-        ] as IValidatorRuleFunction;
-
-        if (typeof ruleFunction === "function") {
-          validRules.push({
-            ruleName: propertyKey as IValidatorRuleName,
-            params: Array.isArray(ruleParameters) ? ruleParameters : [],
-            ruleFunction: ruleFunction,
-            rawRuleName: String(propertyKey),
+        const ruleName: IValidatorRuleName = propertyKey as IValidatorRuleName;
+        if (typeof registeredRules[ruleName] !== "function") {
+          continue;
+        }
+        const ruleFunction = registeredRules[ruleName];
+        const ruleParameters = (rulesObject as any)[ruleName];
+        if (Array.isArray(ruleParameters)) {
+          result.push({
+            ruleName,
+            ruleFunction,
+            params: ruleParameters,
+            rawRuleName: ruleName,
           });
-        } else {
-          invalidRules.push(propertyKey as any);
         }
       }
     }
-
-    return { valid: validRules, invalid: invalidRules };
+    return result;
   }
 
   /**
@@ -1435,7 +1378,9 @@ export class Validator {
       await Promise.all(subValidationPromises);
       return reject(
         errorsMessages.length
-          ? errorsMessages.join("; ") ||
+          ? i18n.t("validator.oneOf", i18nRuleOptions) +
+              `:\n` +
+              errorsMessages.join("; ") ||
               i18n.t("validator.oneOf", i18nRuleOptions)
           : i18n.t("validator.oneOf", i18nRuleOptions)
       );

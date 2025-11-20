@@ -7,39 +7,175 @@ import { I18n } from "@/i18n";
 import { IInputFormatterResult } from "@/inputFormatter/types";
 
 /**
- * Represents a validation rule that can be applied to a value.
+ * ## Validation Rule Type
  *
- * This type defines the various ways a validation rule can be specified:
- * - As a validation function that performs the actual validation logic
- * - As a string representing the name of a predefined rule
- * - As a parameterized rule string (e.g., "MinLength[5]")
- * - As an object mapping rule names to their implementations
+ * The core union type representing all possible ways to specify a validation rule in the validator system.
+ * This type provides maximum flexibility by supporting multiple rule specification formats while maintaining
+ * type safety and runtime validation capabilities.
  *
- * @template ParamType - The type of parameters that the rule accepts (default: Array<any>)
- * @template Context - The type of the optional validation context
+ * ### Purpose
+ * Defines the complete set of valid rule specifications that can be used in validation operations.
+ * Supports four different rule formats to accommodate various use cases and developer preferences.
+ *
+ * ### Union Members
+ *
+ * #### 1. Function Rules (`IValidatorRuleFunction`)
+ * Custom validation logic defined as functions. Most flexible but requires implementation.
+ * ```typescript
+ * ({ value, context }) => value.length > 5
+ * ```
+ *
+ * #### 2. Named Rules (`IValidatorRuleName`)
+ * Simple string references to built-in validation rules. Most concise format.
+ * ```typescript
+ * "Required" | "Email" | "MinLength" | etc.
+ * ```
+ *
+ * #### 3. Parameterized Rules (Template Literal)
+ * Built-in rules with parameters specified in string format. Readable and concise.
+ * ```typescript
+ * "MinLength[5]" | "MaxLength[100]" | "NumberBetween[0,100]"
+ * ```
+ *
+ * #### 4. Object Rules (`IValidatorRuleObject`)
+ * Structured object format with type-safe parameters. Most type-safe format.
+ * ```typescript
+ * { MinLength: [5] } | { Email: [] } | { NumberBetween: [0, 100] }
+ * ```
+ *
+ * ### Type Parameters
+ * - **ParamType**: Array type for rule parameters (default: `Array<any>`)
+ * - **Context**: Type of optional validation context (default: `unknown`)
+ *
+ * ### Usage Examples
+ *
+ * #### Mixed Rule Array
+ * ```typescript
+ * const rules: IValidatorRules = [
+ *   "Required",                    // Named rule
+ *   "MinLength[3]",               // Parameterized rule
+ *   { MaxLength: [50] },          // Object rule
+ *   ({ value }) => value !== "",  // Function rule
+ * ];
+ * ```
+ *
+ * #### Type-Safe Rule Creation
+ * ```typescript
+ * // All these are valid IValidatorRule instances
+ * const rule1: IValidatorRule = "Email";
+ * const rule2: IValidatorRule = "MinLength[5]";
+ * const rule3: IValidatorRule = { Required: [] };
+ * const rule4: IValidatorRule = ({ value }) => typeof value === 'string';
+ * ```
+ *
+ * #### In Validation Operations
+ * ```typescript
+ * // Single rule validation
+ * const result = await Validator.validate({
+ *   value: "test@example.com",
+ *   rules: "Email",  // IValidatorRule
+ * });
+ *
+ * // Multiple rules validation
+ * const multiResult = await Validator.validate({
+ *   value: "hello",
+ *   rules: ["Required", "MinLength[3]", { MaxLength: [10] }],  // IValidatorRule[]
+ * });
+ * ```
+ *
+ * ### Rule Resolution Process
+ * When a rule is processed, the system:
+ * 1. **Identifies the format** based on the union member
+ * 2. **Resolves to a function** using {@link Validator.getRule}
+ * 3. **Applies parameters** if specified
+ * 4. **Executes validation** with value and context
+ *
+ * ### Type Safety Benefits
+ * - **Compile-time validation** of rule names and parameters
+ * - **IDE autocomplete** for built-in rules
+ * - **Refactoring safety** - rule signature changes are caught
+ * - **Runtime safety** - invalid rules are rejected during parsing
+ *
+ * ### Performance Considerations
+ * - **Function rules**: Fastest (direct execution)
+ * - **Named rules**: Fast (lookup table)
+ * - **Parameterized rules**: Medium (parsing required)
+ * - **Object rules**: Medium (type mapping required)
+ *
+ * ### Best Practices
+ *
+ * #### Choose Rule Format Wisely
+ * ```typescript
+ * // ✅ Use named rules for simple cases
+ * const simpleRules = ["Required", "Email"];
+ *
+ * // ✅ Use parameterized rules for single parameters
+ * const lengthRules = ["MinLength[5]", "MaxLength[100]"];
+ *
+ * // ✅ Use object rules for complex parameters or type safety
+ * const complexRules = [{ NumberBetween: [0, 100] }];
+ *
+ * // ✅ Use function rules for custom logic
+ * const customRules = [({ value }) => value % 2 === 0];
+ * ```
+ *
+ * #### Combine Rule Types
+ * ```typescript
+ * const comprehensiveRules: IValidatorRules = [
+ *   "Required",           // Built-in
+ *   "MinLength[3]",      // Parameterized
+ *   { Email: [] },       // Object (type-safe)
+ *   ({ value, context }) => {  // Custom function
+ *     return context?.allowSpecialChars || !/[!@#$%]/.test(value);
+ *   },
+ * ];
+ * ```
+ *
+ * ### Error Handling
+ * Invalid rules are caught during validation:
+ * ```typescript
+ * // These will throw validation errors:
+ * const invalid1 = "UnknownRule";        // Rule doesn't exist
+ * const invalid2 = "MinLength[abc]";     // Invalid parameter type
+ * const invalid3 = { UnknownRule: [] };  // Unknown rule name
+ * ```
+ *
+ * ### Relationship to Validation System
+ * This type is the foundation of the validation system and is used by:
+ * - {@link Validator.validate} - Core validation method
+ * - {@link Validator.validateTarget} - Class-based validation
+ * - {@link Validator.buildOneOfRuleDecorator} - Decorator creation
+ * - All validation decorators and rule builders
+ *
+ * @template ParamType - Array type for rule parameters, defaults to any array
+ * @template Context - Type of optional validation context, defaults to unknown
  *
  * @example
  * ```typescript
- * // Using a rule name
- * const rule1: IValidatorRule = "Required";
+ * // Define flexible validation rules
+ * type UserRules = IValidatorRule[];
  *
- * // Using a parameterized rule
- * const rule2: IValidatorRule = "MinLength[5]";
+ * const userValidationRules: UserRules = [
+ *   "Required",
+ *   "MinLength[2]",
+ *   { MaxLength: [50] },
+ *   ({ value }) => !/\s/.test(value),  // No spaces
+ * ];
  *
- * // Using a validation function
- * const rule3: IValidatorRule = ({ value }) => value.length >= 3 || "Too short";
- *
- * // Using an object mapping
- * const rule4: IValidatorRule = {
- *   Required: ({ value }) => !!value || "Required field"
- * };
+ * // Use in validation
+ * const result = await Validator.validate({
+ *   value: "john_doe",
+ *   rules: userValidationRules,
+ * });
  * ```
  *
- * @public
  * @since 1.0.0
- * @see {@link IValidatorRuleFunction} - The function-based rule type
- * @see {@link IValidatorRuleName} - The string-based rule name type
- * @see {@link IValidatorRulesMap} - The predefined rules interface
+ * @see {@link IValidatorRuleFunction} - Function-based rules
+ * @see {@link IValidatorRuleName} - Built-in rule names
+ * @see {@link IValidatorRuleObject} - Object-based rules
+ * @see {@link IValidatorRulesMap} - Built-in rule definitions
+ * @see {@link Validator} - Main validation class
+ * @public
  */
 export type IValidatorRule<
   ParamType extends Array<any> = Array<any>,
@@ -48,9 +184,137 @@ export type IValidatorRule<
   | IValidatorRuleFunction<ParamType, Context>
   | IValidatorRuleName
   | `${IValidatorRuleName}[${string}]`
-  | {
-      [K in IValidatorRuleName]: IValidatorRulesMap<Context>[K];
-    };
+  | IValidatorRuleObject<Context>;
+
+/**
+ * ## Validation Rule Object Type
+ *
+ * Represents a structured object format for specifying validation rules with their parameters.
+ * This type creates a mapped type that ensures type safety when defining rules as objects
+ * rather than strings or functions.
+ *
+ * ### Purpose
+ * Provides a strongly-typed way to specify validation rules with parameters using object notation.
+ * This is particularly useful when you need to ensure type safety for rule parameters at compile time.
+ *
+ * ### Type Structure
+ * This is a mapped type that creates an object where:
+ * - **Key**: Must be a valid `IValidatorRuleName` (e.g., "MinLength", "Email", etc.)
+ * - **Value**: Must match the parameter type defined in `IValidatorRulesMap` for that rule
+ *
+ * ### Generated Structure
+ * For each rule in `IValidatorRulesMap`, this type generates an object like:
+ * ```typescript
+ * {
+ *   MinLength: [number];        // Requires array with one number
+ *   Email: [];                  // Requires empty array
+ *   NumberBetween: [number, number]; // Requires array with two numbers
+ * }
+ * ```
+ *
+ * ### Usage Examples
+ *
+ * #### Basic Rule Objects
+ * ```typescript
+ * // Valid rule objects
+ * const minLengthRule: IValidatorRuleObject = {
+ *   MinLength: [5]  // Must be array with one number
+ * };
+ *
+ * const emailRule: IValidatorRuleObject = {
+ *   Email: []  // Must be empty array
+ * };
+ *
+ * const betweenRule: IValidatorRuleObject = {
+ *   NumberBetween: [0, 100]  // Must be array with two numbers
+ * };
+ * ```
+ *
+ * #### In Validation Rules Array
+ * ```typescript
+ * const rules: IValidatorRules = [
+ *   "Required",                    // String rule
+ *   "MinLength[5]",               // Parameterized string rule
+ *   { MinLength: [5] },           // Object rule (this type)
+ *   ({ value }) => value > 0,     // Function rule
+ * ];
+ * ```
+ *
+ * #### Type Safety Benefits
+ * ```typescript
+ * // TypeScript will catch these errors:
+ * const invalid1: IValidatorRuleObject = {
+ *   MinLength: 5  // ❌ Error: Must be array, not number
+ * };
+ *
+ * const invalid2: IValidatorRuleObject = {
+ *   MinLength: [5, 10]  // ❌ Error: MinLength only takes one parameter
+ * };
+ *
+ * const invalid3: IValidatorRuleObject = {
+ *   UnknownRule: []  // ❌ Error: UnknownRule not in IValidatorRuleName
+ * };
+ * ```
+ *
+ * ### Relationship to Other Rule Types
+ * This type is one of four union members in {@link IValidatorRule}:
+ * - `IValidatorRuleFunction` - Custom validation functions
+ * - `IValidatorRuleName` - Simple rule names (strings)
+ * - `` `${IValidatorRuleName}[${string}]` `` - Parameterized rule strings
+ * - `IValidatorRuleObject` - Structured rule objects (this type)
+ *
+ * ### When to Use
+ * Use this type when you need:
+ * - **Type Safety**: Compile-time validation of rule parameters
+ * - **IDE Support**: Better autocomplete and error detection
+ * - **Complex Parameters**: Rules with multiple typed parameters
+ * - **Refactoring Safety**: Changes to rule signatures are caught by TypeScript
+ *
+ * ### Comparison with String Rules
+ * | Aspect | Object Rules | String Rules |
+ * |--------|-------------|--------------|
+ * | Type Safety | ✅ Full compile-time checking | ⚠️ Runtime parameter validation |
+ * | Autocomplete | ✅ Parameter types shown | ❌ No parameter hints |
+ * | Refactoring | ✅ Breaking changes caught | ❌ May break silently |
+ * | Readability | ✅ Self-documenting | ⚠️ Requires knowledge of syntax |
+ * | Flexibility | ✅ Strongly typed | ✅ Dynamic |
+ *
+ * @template Context - Type of the optional validation context
+ *
+ * @example
+ * ```typescript
+ * // Define rules with full type safety
+ * const userRules: IValidatorRules = [
+ *   { Required: [] },
+ *   { Email: [] },
+ *   { MinLength: [3] },
+ *   { MaxLength: [50] },
+ * ];
+ *
+ * // TypeScript ensures parameter types match
+ * const result = await Validator.validate({
+ *   value: "test@example.com",
+ *   rules: userRules,
+ * });
+ * ```
+ *
+ * @since 1.0.0
+ * @see {@link IValidatorRule} - Union type that includes this
+ * @see {@link IValidatorRuleName} - Valid rule names
+ * @see {@link IValidatorRulesMap} - Parameter type definitions
+ * @see {@link IValidatorRuleFunction} - Function-based rules
+ * @public
+ */
+export type IValidatorRuleObject<Context = unknown> = Partial<{
+  [K in IValidatorRuleName]: {
+    [P in K]: IValidatorRulesMap<Context>[P];
+  };
+}>;
+
+export type IValidatorRuleParams<
+  ParamType extends Array<any>,
+  Context = unknown,
+> = ParamType;
 /**
  * Represents an array of validation rules to be applied to a value.
  *
@@ -345,12 +609,7 @@ export type IValidatorRuleFunction<
  * This type enhances type safety in your code by ensuring that only valid validation rule names
  * can be used, reducing the risk of runtime errors due to typos or invalid rule names.
  */
-export type IValidatorRuleName = {
-  [K in keyof IValidatorRulesMap]: IValidatorRulesMap[K] extends IValidatorRuleFunction
-    ? K
-    : never;
-}[keyof IValidatorRulesMap];
-
+export type IValidatorRuleName = keyof IValidatorRulesMap & string;
 /**
  * Represents a mapping of validation rule names to their corresponding validation rules.
  *
@@ -384,42 +643,42 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a number is less than or equals a specified value.
    */
-  NumberLessThanOrEqual: IValidatorRuleFunction<[number], Context>;
+  NumberLessThanOrEqual: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a number is less than a specified value.
    */
-  NumberLessThan: IValidatorRuleFunction<[number], Context>;
+  NumberLessThan: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a number is greater than or equals a specified value.
    */
-  NumberGreaterThanOrEqual: IValidatorRuleFunction<[number], Context>;
+  NumberGreaterThanOrEqual: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a number is greater than a specified value.
    */
-  NumberGreaterThan: IValidatorRuleFunction<[number], Context>;
+  NumberGreaterThan: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a number is equal to a specified value.
    */
-  NumberEqual: IValidatorRuleFunction<[number], Context>;
+  NumberEqual: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a number is different from a specified value.
    */
-  NumberIsDifferentFrom: IValidatorRuleFunction<[number], Context>;
+  NumberIsDifferentFrom: IValidatorRuleParams<[number], Context>;
 
   /**
    * Validator rule that checks if a value is present and not empty.
    */
-  Required: IValidatorRuleFunction<[any], Context>;
+  Required: IValidatorRuleParams<[any], Context>;
 
   /**
    * Validator rule that validates the length of a string.
    */
-  Length: IValidatorRuleFunction<
+  Length: IValidatorRuleParams<
     [lengthOrMinLength: number, maxLength?: number],
     Context
   >;
@@ -427,67 +686,67 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a string meets a minimum length requirement.
    */
-  MinLength: IValidatorRuleFunction<[minLength: number], Context>;
+  MinLength: IValidatorRuleParams<[minLength: number], Context>;
 
   /**
    * Validator rule that checks if a string does not exceed a maximum length.
    */
-  MaxLength: IValidatorRuleFunction<[maxLength: number], Context>;
+  MaxLength: IValidatorRuleParams<[maxLength: number], Context>;
 
   /**
    * Validator rule that checks if a value is a valid email address format.
    */
-  Email: IValidatorRuleFunction<[], Context>;
+  Email: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a valid URL format.
    */
-  Url: IValidatorRuleFunction<[], Context>;
+  Url: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a valid file name.
    */
-  FileName: IValidatorRuleFunction<[], Context>;
+  FileName: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a number.
    */
-  Number: IValidatorRuleFunction<[], Context>;
+  Number: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a non-null string.
    */
-  NonNullString: IValidatorRuleFunction<[], Context>;
+  NonNullString: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a string.
    */
-  String: IValidatorRuleFunction<[], Context>;
+  String: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a valid phone number.
    */
-  PhoneNumber: IValidatorRuleFunction<[], Context>;
+  PhoneNumber: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that checks if a value is a valid email or phone number.
    */
-  EmailOrPhoneNumber: IValidatorRuleFunction<[], Context>;
+  EmailOrPhoneNumber: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that marks a field as allowing empty strings (validation skipped if "").
    */
-  Empty: IValidatorRuleFunction<[], Context>;
+  Empty: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that marks a field as nullable (validation skipped if null or undefined).
    */
-  Nullable: IValidatorRuleFunction<[], Context>;
+  Nullable: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that marks a field as sometimes validated (validation skipped if undefined).
    */
-  Optional: IValidatorRuleFunction<[], Context>;
+  Optional: IValidatorRuleParams<[], Context>;
 }
 
 /**

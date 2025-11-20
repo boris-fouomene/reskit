@@ -438,7 +438,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    String: IValidatorRuleFunction<[], Context>;
+    String: IValidatorRuleParams<[], Context>;
 
     /**
      * ### StartsWithOneOf Rule
@@ -484,7 +484,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    StartsWithOneOf: IValidatorRuleFunction<string[], Context>;
+    StartsWithOneOf: IValidatorRuleParams<string[], Context>;
 
     /**
      * ### Ends With Rule
@@ -530,6 +530,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    EndsWithOneOf: IValidatorRuleFunction<string[], Context>;
+    EndsWithOneOf: IValidatorRuleParams<string[], Context>;
   }
 }

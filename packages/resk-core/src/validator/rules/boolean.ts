@@ -113,6 +113,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Boolean: IValidatorRuleFunction<[], Context>;
+    Boolean: IValidatorRuleParams<[], Context>;
   }
 }

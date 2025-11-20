@@ -448,7 +448,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Array: IValidatorRuleFunction<Array<any>, Context>;
+    Array: IValidatorRuleParams<Array<any>, Context>;
 
     /**
      * ### ArrayMinLength Rule
@@ -496,7 +496,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayMinLength: IValidatorRuleFunction<[minLength: number], Context>;
+    ArrayMinLength: IValidatorRuleParams<[minLength: number], Context>;
 
     /**
      * ### ArrayMaxLength Rule
@@ -544,7 +544,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayMaxLength: IValidatorRuleFunction<[maxLength: number], Context>;
+    ArrayMaxLength: IValidatorRuleParams<[maxLength: number], Context>;
 
     /**
      * ### ArrayLength Rule
@@ -597,7 +597,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayLength: IValidatorRuleFunction<[length: number], Context>;
+    ArrayLength: IValidatorRuleParams<[length: number], Context>;
 
     /**
      * ### ArrayContains Rule
@@ -645,7 +645,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayContains: IValidatorRuleFunction<any[], Context>;
+    ArrayContains: IValidatorRuleParams<any[], Context>;
 
     /**
      * ### ArrayUnique Rule
@@ -694,6 +694,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    ArrayUnique: IValidatorRuleFunction<Array<any>, Context>;
+    ArrayUnique: IValidatorRuleParams<Array<any>, Context>;
   }
 }

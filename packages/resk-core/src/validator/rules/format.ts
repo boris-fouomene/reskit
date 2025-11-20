@@ -789,7 +789,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    UUID: IValidatorRuleFunction<[], Context>;
+    UUID: IValidatorRuleParams<[], Context>;
 
     /**
      * ### JSON Rule
@@ -834,7 +834,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    JSON: IValidatorRuleFunction<[], Context>;
+    JSON: IValidatorRuleParams<[], Context>;
 
     /**
      * ### Base64 Rule
@@ -879,7 +879,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Base64: IValidatorRuleFunction<[], Context>;
+    Base64: IValidatorRuleParams<[], Context>;
 
     /**
      * ### HexColor Rule
@@ -939,7 +939,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    HexColor: IValidatorRuleFunction<[], Context>;
+    HexColor: IValidatorRuleParams<[], Context>;
 
     /**
      * ### CreditCard Rule
@@ -989,7 +989,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    CreditCard: IValidatorRuleFunction<[], Context>;
+    CreditCard: IValidatorRuleParams<[], Context>;
 
     /**
      * ### IP Rule
@@ -1053,7 +1053,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    IP: IValidatorRuleFunction<string[], Context>;
+    IP: IValidatorRuleParams<string[], Context>;
 
     /**
      * ### MACAddress Rule
@@ -1108,7 +1108,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MACAddress: IValidatorRuleFunction<[], Context>;
+    MACAddress: IValidatorRuleParams<[], Context>;
 
     /**
      * ### Matches Rule
@@ -1161,6 +1161,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Matches: IValidatorRuleFunction<string[], Context>;
+    Matches: IValidatorRuleParams<string[], Context>;
   }
 }

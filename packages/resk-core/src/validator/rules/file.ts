@@ -482,7 +482,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    File: IValidatorRuleFunction<[], Context>;
+    File: IValidatorRuleParams<[], Context>;
 
     /**
      * ### MaxFileSize Rule
@@ -525,7 +525,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MaxFileSize: IValidatorRuleFunction<[size: number], Context>;
+    MaxFileSize: IValidatorRuleParams<[size: number], Context>;
 
     /**
      * ### FileType Rule
@@ -568,7 +568,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FileType: IValidatorRuleFunction<string[], Context>;
+    FileType: IValidatorRuleParams<string[], Context>;
 
     /**
      * ### Image Rule
@@ -612,7 +612,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    Image: IValidatorRuleFunction<[], Context>;
+    Image: IValidatorRuleParams<[], Context>;
 
     /**
      * ### FileExtension Rule
@@ -655,7 +655,7 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    FileExtension: IValidatorRuleFunction<string[], Context>;
+    FileExtension: IValidatorRuleParams<string[], Context>;
 
     /**
      * ### MinFileSize Rule
@@ -698,6 +698,6 @@ declare module "../types" {
      * @since 1.22.0
      * @public
      */
-    MinFileSize: IValidatorRuleFunction<[minSize: number], Context>;
+    MinFileSize: IValidatorRuleParams<[minSize: number], Context>;
   }
 }

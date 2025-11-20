@@ -77,6 +77,7 @@ I18n.RegisterTranslations({
       arrayContains:
         "This field must contain all of the following values: %{requiredValues}",
       arrayUnique: "This field must contain only unique values",
+      oneOf: "This field must match at least one of the specified rules",
       dateAfter: "This field must be after %{date}",
       dateBefore: "This field must be before %{date}",
       dateBetween: "This field must be between %{startDate} and %{endDate}",

@@ -3,12 +3,13 @@ import { Validator } from "../validator";
 export * from "./array";
 export * from "./boolean";
 export * from "./date";
+export * from "./default";
 export * from "./enum";
 export * from "./file";
 export * from "./format";
 export * from "./numeric";
+export * from "./oneof";
 export * from "./string";
-export * from "./default";
 
 /**
  * Ensures that all validation rules are registered.

@@ -1,7 +1,7 @@
 import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../validator";
-import { ArrayContains, ArrayLength, ArrayMaxLength, ArrayMinLength, ArrayUnique, IsArray } from "./array";
+import { ArrayAllNumbers, ArrayAllStrings, ArrayContains, ArrayLength, ArrayMaxLength, ArrayMinLength, ArrayUnique, IsArray } from "./array";
 
 describe("Array Validation Rules", () => {
   beforeAll(async () => {
@@ -513,6 +513,114 @@ describe("Array Validation Rules", () => {
           tags: ["javascript", "typescript", "javascript"],
         });
         expect(result.success).toBe(false);
+      });
+    });
+  });
+
+  describe("ArrayAllStrings Rule", () => {
+    describe("Rule Function", () => {
+      it("validates arrays of strings", async () => {
+        const r1 = await Validator.getRules().ArrayAllStrings({ value: ["a", "b"], i18n });
+        const r2 = await Validator.getRules().ArrayAllStrings({ value: ["", "x"], i18n });
+        const r3 = await Validator.getRules().ArrayAllStrings({ value: [], i18n });
+        expect(r1).toBe(true);
+        expect(r2).toBe(true);
+        expect(r3).toBe(true);
+      });
+
+      it("rejects arrays containing non-strings", async () => {
+        const r1 = await Validator.getRules().ArrayAllStrings({ value: ["a", 1], i18n });
+        const r2 = await Validator.getRules().ArrayAllStrings({ value: [null], i18n });
+        const r3 = await Validator.getRules().ArrayAllStrings({ value: [undefined], i18n });
+        const r4 = await Validator.getRules().ArrayAllStrings({ value: [true], i18n });
+        const r5 = await Validator.getRules().ArrayAllStrings({ value: [["nested"]], i18n });
+        expect(r1).toBe(i18n.t("validator.arrayAllStrings"));
+        expect(r2).toBe(i18n.t("validator.arrayAllStrings"));
+        expect(r3).toBe(i18n.t("validator.arrayAllStrings"));
+        expect(r4).toBe(i18n.t("validator.arrayAllStrings"));
+        expect(r5).toBe(i18n.t("validator.arrayAllStrings"));
+      });
+
+      it("rejects non-array values with array message", async () => {
+        const r1 = await Validator.getRules().ArrayAllStrings({ value: "not array", i18n });
+        const r2 = await Validator.getRules().ArrayAllStrings({ value: 123, i18n });
+        const r3 = await Validator.getRules().ArrayAllStrings({ value: null as any, i18n });
+        expect(r1).toBe(i18n.t("validator.array"));
+        expect(r2).toBe(i18n.t("validator.array"));
+        expect(r3).toBe(i18n.t("validator.array"));
+      });
+    });
+
+    describe("Decorator", () => {
+      class StringList {
+        @ArrayAllStrings
+        items?: string[];
+      }
+
+      it("registers decorator and validates", async () => {
+        const rules = Validator.getTargetRules(StringList);
+        expect(rules.items).toContain("ArrayAllStrings");
+
+        const ok = await Validator.validateTarget(StringList, { items: ["x", "y"] });
+        expect(ok.success).toBe(true);
+
+        const bad = await Validator.validateTarget(StringList, { items: ["x", 1 as any] });
+        expect(bad.success).toBe(false);
+      });
+    });
+  });
+
+  describe("ArrayAllNumbers Rule", () => {
+    describe("Rule Function", () => {
+      it("validates arrays of numbers", async () => {
+        const r1 = await Validator.getRules().ArrayAllNumbers({ value: [1, 2, 3], i18n });
+        const r2 = await Validator.getRules().ArrayAllNumbers({ value: [1.1, 2.2], i18n });
+        const r3 = await Validator.getRules().ArrayAllNumbers({ value: [-1, 0, 5], i18n });
+        const r4 = await Validator.getRules().ArrayAllNumbers({ value: [], i18n });
+        expect(r1).toBe(true);
+        expect(r2).toBe(true);
+        expect(r3).toBe(true);
+        expect(r4).toBe(true);
+      });
+
+      it("rejects arrays containing non-numbers or NaN", async () => {
+        const r1 = await Validator.getRules().ArrayAllNumbers({ value: [1, "2" as any], i18n });
+        const r2 = await Validator.getRules().ArrayAllNumbers({ value: [NaN], i18n });
+        const r3 = await Validator.getRules().ArrayAllNumbers({ value: [null], i18n });
+        const r4 = await Validator.getRules().ArrayAllNumbers({ value: [undefined], i18n });
+        const r5 = await Validator.getRules().ArrayAllNumbers({ value: [[1]], i18n });
+        expect(r1).toBe(i18n.t("validator.arrayAllNumbers"));
+        expect(r2).toBe(i18n.t("validator.arrayAllNumbers"));
+        expect(r3).toBe(i18n.t("validator.arrayAllNumbers"));
+        expect(r4).toBe(i18n.t("validator.arrayAllNumbers"));
+        expect(r5).toBe(i18n.t("validator.arrayAllNumbers"));
+      });
+
+      it("rejects non-array values with array message", async () => {
+        const r1 = await Validator.getRules().ArrayAllNumbers({ value: "not array", i18n });
+        const r2 = await Validator.getRules().ArrayAllNumbers({ value: 123, i18n });
+        const r3 = await Validator.getRules().ArrayAllNumbers({ value: null as any, i18n });
+        expect(r1).toBe(i18n.t("validator.array"));
+        expect(r2).toBe(i18n.t("validator.array"));
+        expect(r3).toBe(i18n.t("validator.array"));
+      });
+    });
+
+    describe("Decorator", () => {
+      class NumberList {
+        @ArrayAllNumbers
+        values?: number[];
+      }
+
+      it("registers decorator and validates", async () => {
+        const rules = Validator.getTargetRules(NumberList);
+        expect(rules.values).toContain("ArrayAllNumbers");
+
+        const ok = await Validator.validateTarget(NumberList, { values: [1, 2, 3] });
+        expect(ok.success).toBe(true);
+
+        const bad = await Validator.validateTarget(NumberList, { values: [1, "2" as any] });
+        expect(bad.success).toBe(false);
       });
     });
   });

@@ -68,6 +68,8 @@ I18n.RegisterTranslations({
       arrayLength: "This field must have exactly %{length} items",
       arrayContains: "This field must contain all of the following values: %{requiredValues}",
       arrayUnique: "This field must contain only unique values",
+      arrayAllStrings: "This field must be an array of strings",
+      arrayAllNumbers: "This field must be an array of numbers",
       oneOf: "This field must match at least one of the specified rules",
       allOf: "This field must match all of the specified rules",
       dateAfter: "This field must be after %{date}",

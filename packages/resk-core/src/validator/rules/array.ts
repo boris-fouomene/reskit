@@ -33,7 +33,7 @@ Validator.registerRule("Array", _Array);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const IsArray = Validator.buildPropertyDecorator(["Array"]);
@@ -95,7 +95,7 @@ Validator.registerRule("ArrayMinLength", _ArrayMinLength);
  * @param options.ruleParams - Array containing minimum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const ArrayMinLength = Validator.buildRuleDecorator<[number]>(_ArrayMinLength);
@@ -157,7 +157,7 @@ Validator.registerRule("ArrayMaxLength", _ArrayMaxLength);
  * @param options.ruleParams - Array containing maximum length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const ArrayMaxLength = Validator.buildRuleDecorator<[number]>(_ArrayMaxLength);
@@ -219,7 +219,7 @@ Validator.registerRule("ArrayLength", _ArrayLength);
  * @param options.ruleParams - Array containing exact length
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const ArrayLength = Validator.buildRuleDecorator<[number]>(_ArrayLength);
@@ -290,7 +290,7 @@ Validator.registerRule("ArrayContains", _ArrayContains);
  * @param options.ruleParams - Array of values that must be contained
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const ArrayContains = Validator.buildRuleDecorator<any[]>(_ArrayContains);
@@ -355,10 +355,105 @@ Validator.registerRule("ArrayUnique", _ArrayUnique);
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  *
- * @since 1.22.0
+ * @since 1.35.1
  * @public
  */
 export const ArrayUnique = Validator.buildPropertyDecorator(["ArrayUnique"]);
+
+function _ArrayAllStrings({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): boolean | string {
+  if (!Array.isArray(value)) {
+    return i18n.t("validator.array", { field: translatedPropertyName || fieldName, value, ...rest });
+  }
+
+  const allStrings = value.every((item) => typeof item === "string");
+  if (allStrings) {
+    return true;
+  }
+
+  const message = i18n.t("validator.arrayAllStrings", {
+    field: translatedPropertyName || fieldName,
+    value,
+    ...rest,
+  });
+  return message;
+}
+Validator.registerRule("ArrayAllStrings", _ArrayAllStrings);
+
+function _ArrayAllNumbers({ value, fieldName, translatedPropertyName, i18n, ...rest }: IValidatorValidateOptions): boolean | string {
+  if (!Array.isArray(value)) {
+    return i18n.t("validator.array", { field: translatedPropertyName || fieldName, value, ...rest });
+  }
+
+  const allNumbers = value.every((item) => typeof item === "number" && !Number.isNaN(item));
+  if (allNumbers) {
+    return true;
+  }
+
+  const message = i18n.t("validator.arrayAllNumbers", {
+    field: translatedPropertyName || fieldName,
+    value,
+    ...rest,
+  });
+  return message;
+}
+Validator.registerRule("ArrayAllNumbers", _ArrayAllNumbers);
+
+/**
+ * ### ArrayAllStrings Rule
+ *
+ * Validates that all elements in the array are strings.
+ * The check is strict — only primitive `string` values pass; other types fail.
+ *
+ * @example
+ * ```typescript
+ * // Programmatic API
+ * await Validator.validate({ value: ["a", "b"], rules: ["ArrayAllStrings"] }); // ✓ Valid
+ * await Validator.validate({ value: ["a", 1], rules: ["ArrayAllStrings"] }); // ✗ Invalid
+ * await Validator.validate({ value: "not an array", rules: ["ArrayAllStrings"] }); // ✗ Invalid (not an array)
+ *
+ * // Class validation
+ * class Tags {
+ *   @ArrayAllStrings
+ *   tags: string[];
+ * }
+ * ```
+ *
+ * @param options - Validation options containing value and context
+ * @returns Promise resolving to true if valid, rejecting with error message if invalid
+ *
+ * @since 1.35.1
+ * @public
+ */
+export const ArrayAllStrings = Validator.buildPropertyDecorator(["ArrayAllStrings"]);
+
+/**
+ * ### ArrayAllNumbers Rule
+ *
+ * Validates that all elements in the array are numbers.
+ * The check is strict — only primitive `number` values pass; `NaN` fails.
+ *
+ * @example
+ * ```typescript
+ * // Programmatic API
+ * await Validator.validate({ value: [1, 2, 3], rules: ["ArrayAllNumbers"] }); // ✓ Valid
+ * await Validator.validate({ value: [1, "2"], rules: ["ArrayAllNumbers"] }); // ✗ Invalid
+ * await Validator.validate({ value: [1, NaN], rules: ["ArrayAllNumbers"] }); // ✗ Invalid (NaN)
+ * await Validator.validate({ value: "not an array", rules: ["ArrayAllNumbers"] }); // ✗ Invalid (not an array)
+ *
+ * // Class validation
+ * class Scores {
+ *   @ArrayAllNumbers
+ *   values: number[];
+ * }
+ * ```
+ *
+ * @param options - Validation options containing value and context
+ * @returns Promise resolving to true if valid, rejecting with error message if invalid
+ *
+ * @since 1.35.1
+ * @public
+ */
+export const ArrayAllNumbers = Validator.buildPropertyDecorator(["ArrayAllNumbers"]);
 
 declare module "../types" {
   export interface IValidatorRulesMap<Context = unknown> {
@@ -402,7 +497,7 @@ declare module "../types" {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     Array: IValidatorRuleParams<[], Context>;
@@ -450,7 +545,7 @@ declare module "../types" {
      * @param options.ruleParams - Array containing minimum length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     ArrayMinLength: IValidatorRuleParams<[minLength: number], Context>;
@@ -498,7 +593,7 @@ declare module "../types" {
      * @param options.ruleParams - Array containing maximum length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     ArrayMaxLength: IValidatorRuleParams<[maxLength: number], Context>;
@@ -551,7 +646,7 @@ declare module "../types" {
      * @param options.ruleParams - Array containing exact length
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     ArrayLength: IValidatorRuleParams<[length: number], Context>;
@@ -599,7 +694,7 @@ declare module "../types" {
      * @param options.ruleParams - Array of values that must be contained
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     ArrayContains: IValidatorRuleParams<any[], Context>;
@@ -648,9 +743,60 @@ declare module "../types" {
      * @param options - Validation options containing value and context
      * @returns Promise resolving to true if valid, rejecting with error message if invalid
      *
-     * @since 1.22.0
+     * @since 1.35.1
      * @public
      */
     ArrayUnique: IValidatorRuleParams<[], Context>;
+
+    /**
+     * ### ArrayAllStrings Rule
+     *
+     * Validates that all elements in the array are strings.
+     *
+     * @example
+     * ```typescript
+     * await Validator.validate({ value: ["a", "b"], rules: ["ArrayAllStrings"] }); // ✓ Valid
+     * await Validator.validate({ value: ["a", 1], rules: ["ArrayAllStrings"] }); // ✗ Invalid
+     * await Validator.validate({ value: "not an array", rules: ["ArrayAllStrings"] }); // ✗ Invalid
+     *
+     * class Tags {
+     *   @ArrayAllStrings
+     *   tags: string[];
+     * }
+     * ```
+     *
+     * @param options - Validation options containing value and context
+     * @returns Promise resolving to true if valid, rejecting with error message if invalid
+     *
+     * @since 1.35.1
+     * @public
+     */
+    ArrayAllStrings: IValidatorRuleParams<[], Context>;
+
+    /**
+     * ### ArrayAllNumbers Rule
+     *
+     * Validates that all elements in the array are numbers. `NaN` fails.
+     *
+     * @example
+     * ```typescript
+     * await Validator.validate({ value: [1, 2, 3], rules: ["ArrayAllNumbers"] }); // ✓ Valid
+     * await Validator.validate({ value: [1, "2"], rules: ["ArrayAllNumbers"] }); // ✗ Invalid
+     * await Validator.validate({ value: [1, NaN], rules: ["ArrayAllNumbers"] }); // ✗ Invalid
+     * await Validator.validate({ value: "not an array", rules: ["ArrayAllNumbers"] }); // ✗ Invalid
+     *
+     * class Scores {
+     *   @ArrayAllNumbers
+     *   values: number[];
+     * }
+     * ```
+     *
+     * @param options - Validation options containing value and context
+     * @returns Promise resolving to true if valid, rejecting with error message if invalid
+     *
+     * @since 1.35.1
+     * @public
+     */
+    ArrayAllNumbers: IValidatorRuleParams<[], Context>;
   }
 }

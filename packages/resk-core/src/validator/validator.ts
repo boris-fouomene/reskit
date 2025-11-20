@@ -1169,31 +1169,19 @@ export class Validator {
             return next();
           };
 
-          const normalizedRule = String(ruleName).toLowerCase().trim();
+          // Check for multi-rule decorators (OneOf, AllOf, ArrayOf) using symbol markers
+          // These decorators are never registered as named rules, only available as decorator functions
+          const markerType = getMultiRuleType(ruleFunc);
 
-          // Check for multi-rule decorators (OneOf, AllOf, ArrayOf) using both
-          // string-based detection (backward compatibility) and marker-based detection (minification-safe)
-          const isMultiRule =
-            ["oneof", "allof", "arrayof"].includes(normalizedRule) ||
-            hasMultiRuleMarker(ruleFunc);
-
-          if (isMultiRule) {
-            // Determine the specific multi-rule type
-            const markerType = getMultiRuleType(ruleFunc);
-            const ruleType =
-              (normalizedRule as "oneof" | "allof" | "arrayof") || markerType;
-
-            if (ruleType === "arrayof") {
-              const arrayOfResult =
-                await Validator.validateArrayOfRule<Context>({
-                  ...validateOptions,
-                  startTime,
-                } as any);
-              return handleResult(arrayOfResult);
-            }
-
+          if (markerType === "arrayof") {
+            const arrayOfResult = await Validator.validateArrayOfRule<Context>({
+              ...validateOptions,
+              startTime,
+            } as any);
+            return handleResult(arrayOfResult);
+          } else if (markerType === "oneof" || markerType === "allof") {
             const oneOrAllResult = await Validator.validateMultiRule<Context>(
-              ruleType === "oneof" ? "OneOf" : "AllOf",
+              markerType === "oneof" ? "OneOf" : "AllOf",
               {
                 ...validateOptions,
                 startTime,
@@ -1201,8 +1189,7 @@ export class Validator {
             );
             return handleResult(oneOrAllResult);
           } else if (
-            (normalizedRule === "validatenested" ||
-              hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER)) &&
+            hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER) &&
             ruleParams[0]
           ) {
             const nestedResult = await Validator.validateNestedRule<

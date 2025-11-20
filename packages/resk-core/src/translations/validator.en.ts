@@ -70,6 +70,7 @@ I18n.RegisterTranslations({
       arrayUnique: "This field must contain only unique values",
       arrayAllStrings: "This field must be an array of strings",
       arrayAllNumbers: "This field must be an array of numbers",
+      arrayOf: "This field must be an array whose items match all specified rules according to the following error messages :\n%{failedRulesErrors}",
       oneOf: "This field must match at least one of the specified rules according to the following error messages :\n%{failedRulesErrors}",
       allOf: "This field must match all of the specified rules according to the following error message :\n%{failedRulesErrors}",
       dateAfter: "This field must be after %{date}",

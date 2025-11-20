@@ -1,7 +1,6 @@
 import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../index";
-import { IValidatorRuleName } from "../types";
 
 describe("Validator.validate() - Either Pattern Tests", () => {
   beforeAll(async () => {
@@ -24,7 +23,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass MinLength rule when value is long enough", async () => {
       const result = await Validator.validate({
-        rules: ["MinLength[3]"],
+        rules: [{ MinLength: [3] }],
         value: "hello",
       });
 
@@ -36,7 +35,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass MaxLength rule when value is short enough", async () => {
       const result = await Validator.validate({
-        rules: ["MaxLength[10]"],
+        rules: [{ MaxLength: [10] }],
         value: "hello",
       });
 
@@ -63,7 +62,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberGreaterThan when value is larger", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThan[5]"],
+        rules: [{ NumberGreaterThan: [5] }],
         value: 10,
       });
 
@@ -72,7 +71,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberLessThan when value is smaller", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThan[10]"],
+        rules: [{ NumberLessThan: [10] }],
         value: 5,
       });
 
@@ -81,7 +80,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass multiple rules all together", async () => {
       const result = await Validator.validate({
-        rules: ["Required", "Email", "MinLength[5]"],
+        rules: ["Required", "Email", { MinLength: [5] }],
         value: "test@example.com",
       });
 
@@ -126,7 +125,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberEqual when values match", async () => {
       const result = await Validator.validate({
-        rules: ["NumberEqual[42]"],
+        rules: [{ NumberEqual: [42] }],
         value: 42,
       });
 
@@ -135,7 +134,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberGreaterThanOrEqual at boundary", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThanOrEqual[10]"],
+        rules: [{ NumberGreaterThanOrEqual: [10] }],
         value: 10,
       });
 
@@ -144,7 +143,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberLessThanOrEqual at boundary", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThanOrEqual[10]"],
+        rules: [{ NumberLessThanOrEqual: [10] }],
         value: 10,
       });
 
@@ -212,20 +211,20 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail MinLength rule when value is too short", async () => {
       const result = await Validator.validate({
-        rules: ["MinLength[10]"],
+        rules: [{ MinLength: [10] }],
         value: "short",
       });
 
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error?.ruleName).toBe("MinLength");
-        expect(result.error?.ruleParams).toContain("10");
+        expect(result.error?.ruleParams).toContain(10);
       }
     });
 
     it("should fail MaxLength rule when value is too long", async () => {
       const result = await Validator.validate({
-        rules: ["MaxLength[5]"],
+        rules: [{ MaxLength: [5] }],
         value: "this is too long",
       });
 
@@ -261,7 +260,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberGreaterThan when value is too small", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThan[10]"],
+        rules: [{ NumberGreaterThan: [10] }],
         value: 5,
       });
 
@@ -273,7 +272,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberLessThan when value is too large", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThan[10]"],
+        rules: [{ NumberLessThan: [10] }],
         value: 15,
       });
 
@@ -285,7 +284,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberEqual when values don't match", async () => {
       const result = await Validator.validate({
-        rules: ["NumberEqual[42]"],
+        rules: [{ NumberEqual: [42] }],
         value: 10,
       });
 
@@ -297,7 +296,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail with invalid rule name", async () => {
       const result = await Validator.validate({
-        rules: ["NonExistentRule" as IValidatorRuleName],
+        rules: ["NonExistentRule" as any],
         value: "test",
       });
 
@@ -321,7 +320,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should stop at first failing rule in a chain", async () => {
       const result = await Validator.validate({
-        rules: ["Required", "MinLength[5]", "MaxLength[10]"],
+        rules: ["Required", { MinLength: [5] }, { MaxLength: [10] }],
         value: "ab",
       });
 
@@ -333,7 +332,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberGreaterThanOrEqual at boundary minus one", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThanOrEqual[10]"],
+        rules: [{ NumberGreaterThanOrEqual: [10] }],
         value: 9,
       });
 
@@ -342,7 +341,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberLessThanOrEqual at boundary plus one", async () => {
       const result = await Validator.validate({
-        rules: ["NumberLessThanOrEqual[10]"],
+        rules: [{ NumberLessThanOrEqual: [10] }],
         value: 11,
       });
 
@@ -422,12 +421,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should handle async rule error gracefully", async () => {
       const result = await Validator.validate({
-        rules: [
-          async ({ value }) =>
-            new Promise((resolve) =>
-              setTimeout(() => resolve("Async error message"), 10)
-            ),
-        ],
+        rules: [async ({ value }) => new Promise((resolve) => setTimeout(() => resolve("Async error message"), 10))],
         value: "test",
       });
 
@@ -439,12 +433,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should handle async rule rejection gracefully", async () => {
       const result = await Validator.validate({
-        rules: [
-          async ({ value }) =>
-            new Promise((resolve, reject) =>
-              setTimeout(() => reject("Async rejection"), 10)
-            ),
-        ],
+        rules: [async ({ value }) => new Promise((resolve, reject) => setTimeout(() => reject("Async rejection"), 10))],
         value: "test",
       });
 
@@ -456,7 +445,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail NumberIsDifferentFrom when values are equal", async () => {
       const result = await Validator.validate({
-        rules: ["NumberIsDifferentFrom[42]"],
+        rules: [{ NumberIsDifferentFrom: [42] }],
         value: 42,
       });
 
@@ -468,7 +457,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should pass NumberIsDifferentFrom when values are different", async () => {
       const result = await Validator.validate({
-        rules: ["NumberIsDifferentFrom[42]"],
+        rules: [{ NumberIsDifferentFrom: [42] }],
         value: 10,
       });
 
@@ -496,13 +485,13 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should include rule parameters in error", async () => {
       const result = await Validator.validate({
-        rules: ["MinLength[15]"],
+        rules: [{ MinLength: [15] }],
         value: "short",
       });
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error?.ruleParams).toContain("15");
+        expect(result.error?.ruleParams).toContain(15);
       }
     });
 
@@ -524,7 +513,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
   describe("Complex Validation Scenarios", () => {
     it("should validate email and minimum length together", async () => {
       const result = await Validator.validate({
-        rules: ["Email", "MinLength[10]"],
+        rules: ["Email", { MinLength: [10] }],
         value: "short@mail.com",
       });
 
@@ -536,7 +525,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
     it("should validate URL and maximum length together", async () => {
       const longUrl = "https://example.com/" + "a".repeat(200);
       const result = await Validator.validate({
-        rules: ["Url", "MaxLength[50]"],
+        rules: ["Url", { MaxLength: [50] }],
         value: longUrl,
       });
 
@@ -548,7 +537,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should validate number range with multiple rules", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThan[0]", "NumberLessThan[100]"],
+        rules: [{ NumberGreaterThan: [0] }, { NumberLessThan: [100] }],
         value: 50,
       });
 
@@ -557,7 +546,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail on number range outside lower bound", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThan[0]", "NumberLessThan[100]"],
+        rules: [{ NumberGreaterThan: [0] }, { NumberLessThan: [100] }],
         value: -5,
       });
 
@@ -566,7 +555,7 @@ describe("Validator.validate() - Either Pattern Tests", () => {
 
     it("should fail on number range outside upper bound", async () => {
       const result = await Validator.validate({
-        rules: ["NumberGreaterThan[0]", "NumberLessThan[100]"],
+        rules: [{ NumberGreaterThan: [0] }, { NumberLessThan: [100] }],
         value: 150,
       });
 

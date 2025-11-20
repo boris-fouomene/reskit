@@ -5,6 +5,7 @@
 export type IValidatorResult = boolean | string | Promise<boolean | string>;
 import { I18n } from "@/i18n";
 import { IInputFormatterResult } from "@/inputFormatter/types";
+import { ICountryCode } from "@countries/types";
 
 /**
  * ## Validation Rule Type
@@ -174,14 +175,46 @@ import { IInputFormatterResult } from "@/inputFormatter/types";
  * @see {@link Validator} - Main validation class
  * @public
  */
-export type IValidatorRule<
-  ParamType extends Array<any> = Array<any>,
-  Context = unknown,
-> =
-  | IValidatorRuleFunction<ParamType, Context>
-  | IValidatorRuleName
-  | `${IValidatorRuleName}[${string}]`
-  | IValidatorRuleObject<Context>;
+export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = unknown> = IValidatorRuleFunction<ParamType, Context> | IValidatorOptionalOrEmptyRuleNames | IValidatorRuleObject<Context>;
+
+/**
+ * @typedef {IValidatorOptionalOrEmptyRuleNames}
+ * Union of rule names whose **runtime parameter list** is either
+ *  - completely empty (`[]`), or
+ *  - contains only optional elements (e.g. `[countryCode?: string]`).
+ *
+ * These are the rules that can be invoked without supplying arguments
+ * or whose arguments are truly optional at the call-site.
+ *
+ * ┌-------------------------------------------------------------------------┐
+ * │  EXAMPLES                                                               │
+ * │  ----------                                                             │
+ * │  ✔  "Email"                // Array<[]>                                │
+ * │  ✔  "PhoneNumber"          // Array<[countryCode?: string]>            │
+ * │  ✘  "Length"               // Array<[number, number?], Context>        │
+ * │  ✘  "NumberLessThan"       // Array<[number]>                          │
+ * └-------------------------------------------------------------------------┘
+ *
+ * The type is built in two steps:
+ *  1. `ExtractOptionalOrEmptyKeys` keeps the keys whose tuple is empty or
+ *     fully optional (see helper below).
+ *  2. `& keyof IValidatorRulesMap` is a sanity filter that guarantees we
+ *     never leak alien keys should the utility mis-behave.
+ */
+export type IValidatorOptionalOrEmptyRuleNames = ExtractOptionalOrEmptyKeys<IValidatorRulesMap> & keyof IValidatorRulesMap;
+
+type TupleIsEmptyOrAllOptional<T extends any[]> = T extends []
+  ? true
+  : T extends [infer U]
+    ? // Check if U is optional: optional means it includes undefined
+      U extends undefined
+      ? true
+      : false
+    : false;
+
+type ExtractOptionalOrEmptyKeys<T> = {
+  [K in keyof T]: T[K] extends Array<infer Tuple extends any[]> ? (TupleIsEmptyOrAllOptional<Tuple> extends true ? K : never) : never;
+}[keyof T];
 
 /**
  * ## Validation Rule Object Type
@@ -303,15 +336,18 @@ export type IValidatorRule<
  * @public
  */
 export type IValidatorRuleObject<Context = unknown> = Partial<{
+  [K in IValidatorRuleName]: IValidatorRulesMap<Context>[K];
+}>;
+
+/**
+ * export type IValidatorRuleObject<Context = unknown> = Partial<{
   [K in IValidatorRuleName]: {
     [P in K]: IValidatorRulesMap<Context>[P];
   };
-}>;
+}>
+ */
 
-export type IValidatorRuleParams<
-  ParamType extends Array<any>,
-  Context = unknown,
-> = ParamType;
+export type IValidatorRuleParams<ParamType extends Array<any>, Context = unknown> = ParamType;
 /**
  * Represents an array of validation rules to be applied to a value.
  *
@@ -348,9 +384,7 @@ export type IValidatorRuleParams<
  * @see {@link IValidatorValidateOptions} - Options interface that uses this type
  * @see {@link Validator.validate} - Validation method that accepts these rules
  */
-export type IValidatorRules<Context = unknown> = Array<
-  IValidatorRule<Array<any>, Context>
->;
+export type IValidatorRules<Context = unknown> = Array<IValidatorRule<Array<any>, Context>>;
 /**
  * @typedef IValidatorSanitizedRule
  * Represents a sanitized validation rule.
@@ -372,12 +406,7 @@ export type IValidatorRules<Context = unknown> = Array<
  *     ruleFunction: minLengthRule,
  * };
  */
-export type IValidatorSanitizedRule<
-  ParamType extends Array<any> = Array<any>,
-  Context = unknown,
-> =
-  | IValidatorRuleFunction<ParamType, Context>
-  | IValidatorSanitizedRuleObject<ParamType, Context>;
+export type IValidatorSanitizedRule<ParamType extends Array<any> = Array<any>, Context = unknown> = IValidatorRuleFunction<ParamType, Context> | IValidatorSanitizedRuleObject<ParamType, Context>;
 
 /**
  * ## Sanitized Rule Object
@@ -433,10 +462,7 @@ export type IValidatorSanitizedRule<
  * @see {@link IValidatorRuleFunction} - The validation function type
  * @see {@link IValidatorRuleName} - Rule name type
  */
-export interface IValidatorSanitizedRuleObject<
-  ParamType extends Array<any> = Array<any>,
-  Context = unknown,
-> {
+export interface IValidatorSanitizedRuleObject<ParamType extends Array<any> = Array<any>, Context = unknown> {
   /**
    * The parsed name of the validation rule
    *
@@ -516,8 +542,7 @@ export interface IValidatorSanitizedRuleObject<
  *     },
  * ];
  */
-export type IValidatorSanitizedRules<Context = unknown> =
-  IValidatorSanitizedRule<Array<any>, Context>[];
+export type IValidatorSanitizedRules<Context = unknown> = IValidatorSanitizedRule<Array<any>, Context>[];
 
 /**
  * @typedef IValidatorRuleFunction
@@ -568,12 +593,7 @@ export type IValidatorSanitizedRules<Context = unknown> =
  * - This type is essential for defining custom validation logic in forms, allowing developers to create reusable and flexible validation rules.
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
-export type IValidatorRuleFunction<
-  ParamType extends Array<any> = Array<any>,
-  Context = unknown,
-> = (
-  options: IValidatorValidateOptions<ParamType, Context>
-) => IValidatorResult;
+export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Context = unknown> = (options: IValidatorValidateOptions<ParamType, Context>) => IValidatorResult;
 
 /**
  * @interface IValidatorRuleName
@@ -670,15 +690,12 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a value is present and not empty.
    */
-  Required: IValidatorRuleParams<[any], Context>;
+  Required: IValidatorRuleParams<[], Context>;
 
   /**
    * Validator rule that validates the length of a string.
    */
-  Length: IValidatorRuleParams<
-    [lengthOrMinLength: number, maxLength?: number],
-    Context
-  >;
+  Length: IValidatorRuleParams<[lengthOrMinLength: number, maxLength?: number], Context>;
 
   /**
    * Validator rule that checks if a string meets a minimum length requirement.
@@ -710,8 +727,6 @@ export interface IValidatorRulesMap<Context = unknown> {
    */
   Number: IValidatorRuleParams<[], Context>;
 
-  OneOf: IValidatorRuleParams<IValidatorRule<Array<any>, Context>[], Context>;
-
   /**
    * Validator rule that checks if a value is a non-null string.
    */
@@ -725,7 +740,7 @@ export interface IValidatorRulesMap<Context = unknown> {
   /**
    * Validator rule that checks if a value is a valid phone number.
    */
-  PhoneNumber: IValidatorRuleParams<[], Context>;
+  PhoneNumber: IValidatorRuleParams<[countryCode?: ICountryCode], Context>;
 
   /**
    * Validator rule that checks if a value is a valid email or phone number.
@@ -877,11 +892,7 @@ export interface IValidatorRulesMap<Context = unknown> {
  * @see {@link IValidatorRule} - Rule interface
  * @see {@link BaseData} - Base properties (value, data, context)
  */
-export interface IValidatorValidateOptions<
-  ParamType extends Array<any> = Array<any>,
-  Context = unknown,
-> extends Omit<Partial<IInputFormatterResult>, "value">,
-    BaseData<Context> {
+export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>, Context = unknown> extends Omit<Partial<IInputFormatterResult>, "value">, BaseData<Context> {
   /**
    * The list of validation rules to apply
    *
@@ -1232,21 +1243,11 @@ export interface IValidatorValidateOptions<
  * @see {@link IValidatorRuleFunction} - Type of functions in ruleParams array
  * @see {@link IValidatorValidateResult} - Result type returned by validation
  */
-export interface IValidatorValidateOneOfRuleOptions<
-  Context = unknown,
-  RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-    IValidatorRule<Array<any>, Context>
-  >,
-> extends IValidatorValidateOptions<RulesFunctions, Context> {
+export interface IValidatorValidateOneOfRuleOptions<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> extends IValidatorValidateOptions<RulesFunctions, Context> {
   startTime?: number;
 }
 
-export type IValidatorOneOfRuleFunction<
-  Context = unknown,
-  RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-    IValidatorRule<Array<any>, Context>
-  >,
-> = IValidatorRuleFunction<RulesFunctions, Context>;
+export type IValidatorOneOfRuleFunction<Context = unknown, RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<IValidatorRule<Array<any>, Context>>> = IValidatorRuleFunction<RulesFunctions, Context>;
 
 /**
  * ## Validation Result Types (Either Pattern)
@@ -1349,8 +1350,7 @@ export interface IValidatorValidationError {
  * @see {@link Validator.validate}
  * @see {@link Validator.isSuccess}
  */
-export interface IValidatorValidateSuccess<Context = unknown>
-  extends BaseData<Context> {
+export interface IValidatorValidateSuccess<Context = unknown> extends BaseData<Context> {
   /** Discriminant for type narrowing - always `true` for success */
   success: true;
 
@@ -1576,8 +1576,7 @@ interface BaseData<Context = unknown> {
  * @see {@link Validator.validate}
  * @see {@link Validator.isFailure}
  */
-export interface IValidatorValidateFailure<Context = unknown>
-  extends BaseData<Context> {
+export interface IValidatorValidateFailure<Context = unknown> extends BaseData<Context> {
   /** Discriminant for type narrowing - always `false` for failure */
   success: false;
 
@@ -1689,9 +1688,7 @@ export interface IValidatorValidateFailure<Context = unknown>
  * @see {@link Validator.isSuccess} - Type guard for success
  * @see {@link Validator.isFailure} - Type guard for failure
  */
-export type IValidatorValidateResult<Context = unknown> =
-  | IValidatorValidateSuccess<Context>
-  | IValidatorValidateFailure<Context>;
+export type IValidatorValidateResult<Context = unknown> = IValidatorValidateSuccess<Context> | IValidatorValidateFailure<Context>;
 
 /**
  * ## Validate Target Result Types
@@ -1786,8 +1783,7 @@ export type IValidatorValidateResult<Context = unknown> =
  * @see {@link IValidatorValidationError}
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetFailure<Context = unknown>
-  extends Omit<BaseData<Context>, "value"> {
+export interface IValidatorValidateTargetFailure<Context = unknown> extends Omit<BaseData<Context>, "value"> {
   /** Discriminant for type narrowing - always `false` for failures */
   success: false;
 
@@ -1947,8 +1943,7 @@ export interface IValidatorValidateTargetFailure<Context = unknown>
  * @see {@link IValidatorValidateSuccess} - Single-value equivalent
  * @see {@link Validator.validateTarget}
  */
-export interface IValidatorValidateTargetSuccess<Context = unknown>
-  extends BaseData<Context> {
+export interface IValidatorValidateTargetSuccess<Context = unknown> extends BaseData<Context> {
   /** Discriminant for type narrowing - always `true` for success */
   success: true;
 
@@ -2089,9 +2084,7 @@ export interface IValidatorValidateTargetSuccess<Context = unknown>
  * @see {@link Validator.isFailure} - Type guard for failure
  * @see {@link IValidatorValidateResult} - Single-value equivalent
  */
-export type IValidatorValidateTargetResult<Context = unknown> =
-  | IValidatorValidateTargetSuccess<Context>
-  | IValidatorValidateTargetFailure<Context>;
+export type IValidatorValidateTargetResult<Context = unknown> = IValidatorValidateTargetSuccess<Context> | IValidatorValidateTargetFailure<Context>;
 
 /**
  * ## Registered Validation Rules Registry
@@ -2162,8 +2155,5 @@ export type IValidatorValidateTargetResult<Context = unknown> =
  * @see {@link Validator.validateTarget} - Method that uses this registry
  */
 export type IValidatorRegisteredRules<Context = unknown> = {
-  [K in IValidatorRuleName]: IValidatorRuleFunction<
-    IValidatorRulesMap<Context>[K],
-    Context
-  >;
+  [K in IValidatorRuleName]: IValidatorRuleFunction<IValidatorRulesMap<Context>[K], Context>;
 };

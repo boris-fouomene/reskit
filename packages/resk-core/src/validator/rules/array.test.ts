@@ -1,14 +1,7 @@
 import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../validator";
-import {
-  ArrayContains,
-  ArrayLength,
-  ArrayMaxLength,
-  ArrayMinLength,
-  ArrayUnique,
-  IsArray,
-} from "./array";
+import { ArrayContains, ArrayLength, ArrayMaxLength, ArrayMinLength, ArrayUnique, IsArray } from "./array";
 
 describe("Array Validation Rules", () => {
   beforeAll(async () => {
@@ -155,7 +148,7 @@ describe("Array Validation Rules", () => {
       it("should validate with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1, 2, 3],
-          rules: ["ArrayMinLength[2]"],
+          rules: [{ ArrayMinLength: [2] }],
         });
         expect(result.success).toBe(true);
       });
@@ -163,7 +156,7 @@ describe("Array Validation Rules", () => {
       it("should reject insufficient length with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1],
-          rules: ["ArrayMinLength[2]"],
+          rules: [{ ArrayMinLength: [2] }],
         });
         expect(result.success).toBe(false);
       });
@@ -239,7 +232,7 @@ describe("Array Validation Rules", () => {
       it("should validate with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1, 2],
-          rules: ["ArrayMaxLength[3]"],
+          rules: [{ ArrayMaxLength: [3] }],
         });
         expect(result.success).toBe(true);
       });
@@ -247,7 +240,7 @@ describe("Array Validation Rules", () => {
       it("should reject excessive length with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1, 2, 3, 4],
-          rules: ["ArrayMaxLength[3]"],
+          rules: [{ ArrayMaxLength: [3] }],
         });
         expect(result.success).toBe(false);
       });
@@ -309,7 +302,7 @@ describe("Array Validation Rules", () => {
       it("should validate exact length with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1, 2, 3],
-          rules: ["ArrayLength[3]"],
+          rules: [{ ArrayLength: [3] }],
         });
         expect(result.success).toBe(true);
       });
@@ -317,7 +310,7 @@ describe("Array Validation Rules", () => {
       it("should reject wrong length with programmatic API", async () => {
         const result = await Validator.validate({
           value: [1, 2],
-          rules: ["ArrayLength[3]"],
+          rules: [{ ArrayLength: [3] }],
         });
         expect(result.success).toBe(false);
       });
@@ -397,7 +390,7 @@ describe("Array Validation Rules", () => {
       it("should validate containing values with programmatic API", async () => {
         const result = await Validator.validate({
           value: ["read", "write", "delete"],
-          rules: ["ArrayContains[read,write]"],
+          rules: [{ ArrayContains: ["read", "write"] }],
         });
         expect(result.success).toBe(true);
       });
@@ -405,7 +398,7 @@ describe("Array Validation Rules", () => {
       it("should reject missing values with programmatic API", async () => {
         const result = await Validator.validate({
           value: ["read", "write"],
-          rules: ["ArrayContains[read,delete]"],
+          rules: [{ ArrayContains: ["read", "delete"] }],
         });
         expect(result.success).toBe(false);
       });
@@ -512,11 +505,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.validateTarget(TestEntity, {
           tags: ["javascript", "typescript", "react"],
         });
-        expect(result.data?.tags).toEqual([
-          "javascript",
-          "typescript",
-          "react",
-        ]);
+        expect(result.data?.tags).toEqual(["javascript", "typescript", "react"]);
       });
 
       it("should reject duplicate values with decorator", async () => {
@@ -557,12 +546,7 @@ describe("Array Validation Rules", () => {
       it("should validate with multiple array rules", async () => {
         const result = await Validator.validate({
           value: [1, 2, 3],
-          rules: [
-            "Array",
-            "ArrayMinLength[2]",
-            "ArrayMaxLength[5]",
-            "ArrayUnique",
-          ],
+          rules: ["Array", { ArrayMinLength: [2] }, { ArrayMaxLength: [5] }, "ArrayUnique"],
         });
         expect(result.success).toBe(true);
       });
@@ -570,12 +554,7 @@ describe("Array Validation Rules", () => {
       it("should reject when any rule fails", async () => {
         const result = await Validator.validate({
           value: [1, 1, 1],
-          rules: [
-            "Array",
-            "ArrayMinLength[2]",
-            "ArrayMaxLength[5]",
-            "ArrayUnique",
-          ],
+          rules: ["Array", { ArrayMinLength: [2] }, { ArrayMaxLength: [5] }, "ArrayUnique"],
         });
         expect(result.success).toBe(false);
       });

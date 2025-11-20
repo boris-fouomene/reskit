@@ -37,10 +37,76 @@ import {
   IValidatorValidationError,
 } from "./types";
 
-// Enhanced metadata keys with consistent naming convention
+// ============================================================================
+// METADATA & MARKER CONSTANTS - Centralized definitions to avoid duplication
+// ============================================================================
+
+/** Metadata keys for storing validation target information on classes */
 const VALIDATOR_TARGET_RULES_METADATA_KEY = Symbol("validatorTargetRules");
 const VALIDATOR_TARGET_OPTIONS_METADATA_KEY = Symbol("validatorTargetOptions");
+
+/** Symbol markers for identifying rule decorators (survives minification) */
 const VALIDATOR_NESTED_RULE_MARKER = Symbol.for("validatorNestedRuleMarker");
+const VALIDATOR_NESTED_RULE_PARAMS = Symbol.for("validatorNestedRuleParams");
+const VALIDATOR_ONEOF_RULE_MARKER = Symbol.for("validatorOneOfRuleMarker");
+const VALIDATOR_ALLOF_RULE_MARKER = Symbol.for("validatorAllOfRuleMarker");
+const VALIDATOR_ARRAYOF_RULE_MARKER = Symbol.for("validatorArrayOfRuleMarker");
+
+/** Array of all multi-rule markers for easy iteration and checking */
+const VALIDATOR_MULTI_RULE_MARKERS = [
+  VALIDATOR_ONEOF_RULE_MARKER,
+  VALIDATOR_ALLOF_RULE_MARKER,
+  VALIDATOR_ARRAYOF_RULE_MARKER,
+];
+
+/**
+ * Checks if a rule function has any of the multi-rule markers.
+ * Used to reliably detect OneOf, AllOf, or ArrayOf rules even in minified code.
+ * @param ruleFunc - The rule function to check
+ * @returns true if the function has any multi-rule marker
+ */
+function hasMultiRuleMarker(ruleFunc: any): boolean {
+  if (typeof ruleFunc !== "function") return false;
+  return VALIDATOR_MULTI_RULE_MARKERS.some(
+    (marker) => ruleFunc[marker] === true
+  );
+}
+
+/**
+ * Checks if a rule function has a specific marker.
+ * @param ruleFunc - The rule function to check
+ * @param marker - The marker symbol to check for
+ * @returns true if the function has the specified marker
+ */
+function hasRuleMarker(ruleFunc: any, marker: symbol): boolean {
+  return typeof ruleFunc === "function" && ruleFunc[marker] === true;
+}
+
+/**
+ * Gets the type of multi-rule from marker inspection.
+ * @param ruleFunc - The rule function to inspect
+ * @returns "oneof" | "allof" | "arrayof" | undefined
+ */
+function getMultiRuleType(
+  ruleFunc: any
+): "oneof" | "allof" | "arrayof" | undefined {
+  if (hasRuleMarker(ruleFunc, VALIDATOR_ONEOF_RULE_MARKER)) return "oneof";
+  if (hasRuleMarker(ruleFunc, VALIDATOR_ALLOF_RULE_MARKER)) return "allof";
+  if (hasRuleMarker(ruleFunc, VALIDATOR_ARRAYOF_RULE_MARKER)) return "arrayof";
+  return undefined;
+}
+
+/**
+ * Marks a rule function with a specific marker symbol.
+ * Used during decorator creation to mark OneOf, AllOf, ArrayOf, ValidateNested rules.
+ * @param ruleFunc - The rule function to mark
+ * @param marker - The marker symbol to apply
+ */
+function markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
+  if (typeof ruleFunc === "function") {
+    (ruleFunc as any)[marker] = true;
+  }
+}
 
 /**
  * # Validator Class
@@ -127,6 +193,21 @@ export class Validator {
    * @since 1.0.0
    */
   private static readonly RULES_METADATA_KEY = Symbol("validationRules");
+
+  /**
+   * ## Mark Rule With Symbol
+   *
+   * Marks a rule function with a specific marker symbol. Used internally to mark
+   * decorators (OneOf, AllOf, ArrayOf, ValidateNested) for reliable identification
+   * even in minified code. Symbols survive minification while function names do not.
+   *
+   * @param ruleFunc - The rule function to mark
+   * @param marker - The marker symbol to apply
+   * @internal
+   */
+  static markRuleWithSymbol(ruleFunc: any, marker: symbol): void {
+    markRuleWithSymbol(ruleFunc, marker);
+  }
 
   /**
    * ## Register Validation Rule
@@ -1089,23 +1170,20 @@ export class Validator {
           };
 
           const normalizedRule = String(ruleName).toLowerCase().trim();
-          const hasMultiRuleMarker =
-            typeof ruleFunc === "function" &&
-            ((ruleFunc as any)[Symbol.for("validatorOneOfRuleMarker")] ===
-              true ||
-              (ruleFunc as any)[Symbol.for("validatorAllOfRuleMarker")] ===
-                true ||
-              (ruleFunc as any)[Symbol.for("validatorArrayOfRuleMarker")] ===
-                true);
-          if (
+
+          // Check for multi-rule decorators (OneOf, AllOf, ArrayOf) using both
+          // string-based detection (backward compatibility) and marker-based detection (minification-safe)
+          const isMultiRule =
             ["oneof", "allof", "arrayof"].includes(normalizedRule) ||
-            hasMultiRuleMarker
-          ) {
-            if (
-              normalizedRule === "arrayof" ||
-              (ruleFunc as any)[Symbol.for("validatorArrayOfRuleMarker")] ===
-                true
-            ) {
+            hasMultiRuleMarker(ruleFunc);
+
+          if (isMultiRule) {
+            // Determine the specific multi-rule type
+            const markerType = getMultiRuleType(ruleFunc);
+            const ruleType =
+              (normalizedRule as "oneof" | "allof" | "arrayof") || markerType;
+
+            if (ruleType === "arrayof") {
               const arrayOfResult =
                 await Validator.validateArrayOfRule<Context>({
                   ...validateOptions,
@@ -1113,12 +1191,9 @@ export class Validator {
                 } as any);
               return handleResult(arrayOfResult);
             }
+
             const oneOrAllResult = await Validator.validateMultiRule<Context>(
-              normalizedRule === "oneof" ||
-                (ruleFunc as any)[Symbol.for("validatorOneOfRuleMarker")] ===
-                  true
-                ? "OneOf"
-                : "AllOf",
+              ruleType === "oneof" ? "OneOf" : "AllOf",
               {
                 ...validateOptions,
                 startTime,
@@ -1127,8 +1202,7 @@ export class Validator {
             return handleResult(oneOrAllResult);
           } else if (
             (normalizedRule === "validatenested" ||
-              (typeof ruleFunc === "function" &&
-                (ruleFunc as any)[VALIDATOR_NESTED_RULE_MARKER] === true)) &&
+              hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER)) &&
             ruleParams[0]
           ) {
             const nestedResult = await Validator.validateNestedRule<
@@ -2753,13 +2827,15 @@ export class Validator {
     }
 
     // Check if any rule is marked with the ValidateNested symbol marker
-    const markerSymbol = VALIDATOR_NESTED_RULE_MARKER;
     return propertyRules.some((rule) => {
       if (typeof rule === "function") {
-        return (rule as any)[markerSymbol] === true;
+        return hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER);
       }
       if (isObj(rule) && typeof (rule as any).ruleFunction === "function") {
-        return (rule as any).ruleFunction[markerSymbol] === true;
+        return hasRuleMarker(
+          (rule as any).ruleFunction,
+          VALIDATOR_NESTED_RULE_MARKER
+        );
       }
       return false;
     });
@@ -2836,17 +2912,17 @@ export class Validator {
     for (const rule of propertyRules) {
       if (
         typeof rule === "function" &&
-        (rule as any)[VALIDATOR_NESTED_RULE_MARKER] === true
+        hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER)
       ) {
         // Try to get params from the stored params symbol
-        const params = (rule as any)[Symbol.for("validatorNestedRuleParams")];
+        const params = (rule as any)[VALIDATOR_NESTED_RULE_PARAMS];
         if (Array.isArray(params) && params.length > 0) {
           return params[0];
         }
       } else if (
         isObj(rule) &&
         typeof (rule as any).ruleFunction === "function" &&
-        (rule as any).ruleFunction[VALIDATOR_NESTED_RULE_MARKER] === true
+        hasRuleMarker((rule as any).ruleFunction, VALIDATOR_NESTED_RULE_MARKER)
       ) {
         // For object rules, try to get from params
         const ruleParams = (rule as any).params;
@@ -3037,27 +3113,18 @@ export class Validator {
         return ruleFunction(enhancedOptions);
       };
 
-      // Preserve symbol markers from the original function
-      // This allows decorators to be reliably identified even after wrapping
-      const markerSymbol = VALIDATOR_NESTED_RULE_MARKER;
-      if ((ruleFunction as any)[markerSymbol]) {
-        (enhancedValidatorFunction as any)[markerSymbol] = (
-          ruleFunction as any
-        )[markerSymbol];
-        // Also store the target if present
-        const targetSymbol = Symbol.for("validatorNestedTarget");
-        if ((ruleFunction as any)[targetSymbol]) {
-          (enhancedValidatorFunction as any)[targetSymbol] = (
-            ruleFunction as any
-          )[targetSymbol];
-        }
+      // Preserve symbol markers from the original function through wrapping
+      // This allows decorators to be reliably identified even in minified code
+      if (hasRuleMarker(ruleFunction, VALIDATOR_NESTED_RULE_MARKER)) {
+        (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_MARKER] = true;
+
         // Store the rule parameters so they can be retrieved by inspection methods
         // This is particularly important for ValidateNested to access the target class
-        const paramsSymbol = Symbol.for("validatorNestedRuleParams");
         const normalizedParams = (
           Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
         ) as RuleParamsType;
-        (enhancedValidatorFunction as any)[paramsSymbol] = normalizedParams;
+        (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_PARAMS] =
+          normalizedParams;
       }
 
       return Validator.buildPropertyDecorator<RuleParamsType, Context>(

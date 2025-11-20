@@ -184,12 +184,12 @@ import { Validator } from "../validator";
 export const OneOf = Validator.buildMultiRuleDecorator(function OneOf(options) {
   return Validator.validateOneOfRule(options);
 });
-(OneOf as any)[Symbol.for("validatorOneOfRuleMarker")] = true;
+Validator.markRuleWithSymbol(OneOf, Symbol.for("validatorOneOfRuleMarker"));
 
 export const AllOf = Validator.buildMultiRuleDecorator(function AllOf(options) {
   return Validator.validateAllOfRule(options);
 });
-(AllOf as any)[Symbol.for("validatorAllOfRuleMarker")] = true;
+Validator.markRuleWithSymbol(AllOf, Symbol.for("validatorAllOfRuleMarker"));
 
 /**
  * ## ArrayOf Validation Decorator
@@ -207,4 +207,4 @@ export const ArrayOf = Validator.buildMultiRuleDecorator(
     return Validator.validateArrayOfRule(options);
   }
 );
-(ArrayOf as any)[Symbol.for("validatorArrayOfRuleMarker")] = true;
+Validator.markRuleWithSymbol(ArrayOf, Symbol.for("validatorArrayOfRuleMarker"));

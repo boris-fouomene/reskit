@@ -1593,11 +1593,15 @@ export class Validator {
 
     // Validate value is an object
     if (typeof extra.data !== "object" || extra.data === null) {
-      return i18n.t("validator.validateNested", {
-        nestedErrors: "Expected an object but received " + typeof extra.data,
-        fieldName: extra.translatedPropertyName || extra.fieldName,
-        ...extra,
-      });
+      const receivedType = extra.data === null ? "null" : typeof extra.data;
+      return (
+        i18n.t("validator.validateNestedInvalidType", {
+          fieldName:
+            extra.translatedPropertyName || extra.fieldName || "This field",
+          receivedType: receivedType,
+          ...extra,
+        }) || `The field must be an object, but received ${receivedType}`
+      );
     }
 
     //extra.data = extra.data ?? Object.assign({}, extra.data);

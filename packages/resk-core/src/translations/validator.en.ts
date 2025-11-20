@@ -82,13 +82,15 @@ I18n.RegisterTranslations({
       arrayAllStrings: "This field must be an array of strings",
       arrayAllNumbers: "This field must be an array of numbers",
       arrayOf:
-        "This field must be an array whose items match all specified rules according to the following error messages :\n%{failedRulesErrors}",
+        "The field %{fieldName} must be an array where each item matches all the specified rules. Errors:\n%{failedRulesErrors}",
       oneOf:
-        "This field must match at least one of the specified rules according to the following error messages :\n%{failedRulesErrors}",
+        "The field %{fieldName} must match at least one of the following validation rules:\n%{failedRulesErrors}",
       allOf:
-        "This field must match all of the specified rules according to the following error message :\n%{failedRulesErrors}",
+        "The field %{fieldName} must match all of the following validation rules:\n%{failedRulesErrors}",
       validateNested:
-        "This field must be a valid nested object with the following validation errors:\n%{nestedErrors}",
+        "The field %{fieldName} must be a valid nested object. Errors:\n%{nestedErrors}",
+      validateNestedInvalidType:
+        "The field %{fieldName} must be an object, but received %{receivedType}",
       dateAfter: "This field must be after %{date}",
       dateBefore: "This field must be before %{date}",
       dateBetween: "This field must be between %{startDate} and %{endDate}",

@@ -1399,6 +1399,20 @@ export interface IValidatorValidateOptions<ParamsType extends IValidatorRulePara
   fieldName?: string;
 
   /**
+   * The label of the field being validated
+   *
+   * Identifies the label of the field being validated.
+   * This is typically the actual label of your data class.
+   * Used for error reporting and mapping validation errors back to properties.
+   * This is used to display the field label in the error message.
+   * If translatedPropertyName is provided, it will have the same value otherwise it will be the fieldName.
+   *
+   * @type {string}
+   * @optional
+   */
+  fieldLabel?: string;
+
+  /**
    * The object property name being validated
    *
    * Identifies the property on the object/class being validated.

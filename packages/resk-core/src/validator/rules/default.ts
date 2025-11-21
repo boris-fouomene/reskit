@@ -4,11 +4,8 @@ Validator.registerRule("Required", function Required(options) {
   const { value, i18n } = options;
   // Check if value is truly empty (null, undefined, or empty string)
   // Empty arrays, empty objects, 0, false, NaN are NOT considered empty
-  const isValueEmpty =
-    value === null ||
-    value === undefined ||
-    (typeof value === "string" && value === "");
-  return !isValueEmpty || i18n.t("validator.required");
+  const isValueEmpty = value === null || value === undefined || (typeof value === "string" && value === "");
+  return !isValueEmpty || i18n.t("validator.required", options);
 });
 
 /**

@@ -7,6 +7,8 @@ function _Array({ value, fieldName, translatedPropertyName, i18n, ...rest }: IVa
   } else {
     const message = i18n.t("validator.array", {
       field: translatedPropertyName || fieldName,
+      fieldName,
+      translatedPropertyName,
       value,
       ...rest,
     });

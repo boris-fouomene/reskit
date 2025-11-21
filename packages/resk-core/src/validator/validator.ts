@@ -979,15 +979,10 @@ export class Validator {
       value,
       data,
     };
+    const translateOptions = this.getI18nTranslateOptions(extra);
     // Handle invalid rules - return failure result instead of rejecting
     if (invalidRules.length) {
-      const message = invalidRules
-        .map((rule) =>
-          i18n.t("validator.invalidRule", {
-            rule: isNonNullString(rule) ? rule : "unnamed rule",
-          })
-        )
-        .join(separators.multiple);
+      const message = invalidRules.map((rule) => i18n.t("validator.invalidRule", { ...translateOptions, rule: isNonNullString(rule) ? rule : "unnamed rule" })).join(separators.multiple);
       const error = createValidationError(message, {
         value,
         fieldName: extra.fieldName,
@@ -1008,12 +1003,6 @@ export class Validator {
     }
 
     extra.fieldName = extra.propertyName = defaultStr(extra.fieldName, extra.propertyName);
-    const i18nRulesOptions = {
-      //...extra,
-      value,
-      rules,
-    };
-
     return new Promise((resolve) => {
       let index = -1;
       const rulesLength = sanitizedRules.length;
@@ -1038,7 +1027,10 @@ export class Validator {
         }
 
         const i18nRuleOptions = {
-          ...i18nRulesOptions,
+          //...extra,
+          value,
+          rules,
+          ...translateOptions,
           rule: defaultStr(ruleName),
           ruleName,
           rawRuleName,
@@ -1064,9 +1056,7 @@ export class Validator {
               ruleName,
               rawRuleName,
               ruleParams,
-              fieldName: extra.fieldName,
-              propertyName: extra.propertyName,
-              translatedPropertyName: extra.translatedPropertyName,
+              ...translateOptions,
             });
             return resolve(createFailureResult(error, successOrErrorData, startTime));
           } else if (isNonNullString(result)) {
@@ -1075,9 +1065,7 @@ export class Validator {
               ruleName,
               rawRuleName,
               ruleParams,
-              fieldName: extra.fieldName,
-              propertyName: extra.propertyName,
-              translatedPropertyName: extra.translatedPropertyName,
+              ...translateOptions,
             });
             return resolve(createFailureResult(error, successOrErrorData, startTime));
           } else if ((result as any) instanceof Error) {
@@ -1086,9 +1074,7 @@ export class Validator {
               ruleName,
               rawRuleName,
               ruleParams,
-              fieldName: extra.fieldName,
-              propertyName: extra.propertyName,
-              translatedPropertyName: extra.translatedPropertyName,
+              ...translateOptions,
             });
             return resolve(createFailureResult(error, successOrErrorData, startTime));
           }
@@ -1127,9 +1113,7 @@ export class Validator {
             ruleName,
             rawRuleName,
             ruleParams,
-            fieldName: extra.fieldName,
-            propertyName: extra.propertyName,
-            translatedPropertyName: extra.translatedPropertyName,
+            ...translateOptions,
           });
           return resolve(createFailureResult(error, successOrErrorData, startTime));
         }
@@ -1286,6 +1270,7 @@ export class Validator {
         field: extra.translatedPropertyName || extra.fieldName,
         value,
         ...extra,
+        context: undefined,
       });
     }
 
@@ -1317,7 +1302,23 @@ export class Validator {
     });
     return `${header}${single}${failures.join(multiple)}`;
   }
-
+  static getI18nTranslateOptions({ fieldName, propertyName, fieldLabel, translatedPropertyName, context, data, ...rest }: Partial<IValidatorValidateOptions<Array<any>, any>>) {
+    fieldName = defaultStr(fieldName, propertyName);
+    fieldLabel = defaultStr(fieldLabel, translatedPropertyName, fieldName);
+    const r: Partial<IValidatorValidateOptions<Array<any>, any>> = {
+      fieldLabel,
+      translatedPropertyName: defaultStr(translatedPropertyName, fieldLabel),
+      propertyName: defaultStr(propertyName, fieldName),
+      fieldName,
+    };
+    if ("data" in rest && rest.data !== undefined) {
+      (r as any).data = rest.data;
+    }
+    if ("value" in rest) {
+      r.value = rest.value;
+    }
+    return r;
+  }
   /**
    * ## Validate Nested Rule (Core Nested Validation Executor)
    *
@@ -1441,13 +1442,14 @@ export class Validator {
     const i18n = this.getI18n(extra);
     const ruleParamsArray = Array.isArray(ruleParams) ? ruleParams : [];
     const target = ruleParamsArray[0] as Target | undefined;
-
+    const translateProperties = {
+      rule: "ValidateNested",
+      ...this.getI18nTranslateOptions(extra),
+      value,
+    };
     // Validate that a nested class was provided
     if (!target) {
-      return i18n.t("validator.invalidRule", {
-        rule: "ValidateNested",
-        ...extra,
-      });
+      return i18n.t("validator.invalidRule", translateProperties);
     }
 
     // Validate value is an object
@@ -1455,9 +1457,8 @@ export class Validator {
       const receivedType = value === null ? "null" : typeof value;
       return (
         i18n.t("validator.validateNestedInvalidType", {
-          fieldName: defaultStr(extra.translatedPropertyName, extra.fieldName),
+          ...translateProperties,
           receivedType: receivedType,
-          ...extra,
         }) || `The field must be an object, but received ${receivedType}`
       );
     }
@@ -1482,8 +1483,7 @@ export class Validator {
 
     return i18n.t("validator.validateNested", {
       nestedErrors: errorMessages,
-      fieldName: extra.translatedPropertyName || extra.fieldName,
-      ...extra,
+      ...translateProperties,
     });
   }
 
@@ -1589,12 +1589,10 @@ export class Validator {
     }
     if (allErrors.length === 0) return true;
     return i18n.t(`validator.${lowerFirst(ruleName)}`, {
+      ...this.getI18nTranslateOptions(extra as any),
       value,
       ruleName,
       rawRuleName: ruleName,
-      fieldName: extra.fieldName,
-      propertyName: extra.propertyName,
-      translatedPropertyName: extra.translatedPropertyName,
       rules: [ruleName],
       rule: ruleName,
       ruleParams: [],
@@ -2368,6 +2366,7 @@ export class Validator {
           fieldName: propertyKey,
           propertyName: propertyKey,
           rules: targetRules[propertyKey],
+          fieldLabel: defaultStr(translatedPropertyName, propertyKey),
         }).then((validationResult) => {
           if (validationResult.success) {
             validatedFieldCount++;

@@ -198,6 +198,8 @@ function _UUID({ value, fieldName, translatedPropertyName, i18n, ...rest }: IVal
     if (typeof value !== "string") {
       const message = i18n.t("validator.uuid", {
         field: translatedPropertyName || fieldName,
+        fieldName,
+        translatedPropertyName,
         value,
         ...rest,
       });

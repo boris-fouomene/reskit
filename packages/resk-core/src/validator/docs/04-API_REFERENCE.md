@@ -425,7 +425,7 @@ Creates a decorator for nested class validation (ValidateNested).
 
 ```typescript
 static buildTargetRuleDecorator(
-  ruleFunction: (options: IValidatorTargetRuleFunctionOptions) =>
+  ruleFunction: (options: IValidatorNestedRuleFunctionOptions) =>
     Promise<boolean | string>
 ): (target: [IClassConstructor]) => PropertyDecorator
 ```

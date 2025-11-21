@@ -1,8 +1,10 @@
 import { i18n } from "../../i18n";
 import "../../translations";
 import {
+  ArrayOf,
   ensureRulesRegistered,
   IsEmail,
+  IsNonNullString,
   IsOptional,
   IsRequired,
   MinLength,
@@ -93,11 +95,10 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
           address: "not-an-object",
         } as any,
       });
-
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
-    it("should pass validation when nested object is null but nested class has no decorators", async () => {
+    it("should fail validation when nested object is null but nested class has no decorators", async () => {
       class Address {
         street: string = "";
       }
@@ -113,11 +114,10 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
           address: null,
         } as any,
       });
-
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
-    it("should pass when nested object is undefined without @IsOptional if nested class has no decorators", async () => {
+    it("should fail when nested object is undefined without @IsOptional if nested class has no decorators", async () => {
       class Address {
         street: string = "";
       }
@@ -134,10 +134,10 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
         } as any,
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
-    it("should pass when nested object is array but nested class has no decorators", async () => {
+    it("should fail when nested object is array but nested class has no decorators", async () => {
       class Address {
         street: string = "";
       }
@@ -154,7 +154,7 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
         } as any,
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
   });
 
@@ -576,7 +576,7 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should pass when nested properties have no decorators regardless of data types", async () => {
+    it("should fail when nested properties have no decorators regardless of data types", async () => {
       class Address {
         street: string = "";
       }
@@ -601,7 +601,7 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
         } as any,
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
   });
 
@@ -773,7 +773,7 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should handle primitive value in nested property when no decorators", async () => {
+    it("should not handle primitive value in nested property when no decorators", async () => {
       class Address {
         street: string = "";
       }
@@ -790,10 +790,10 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
         } as any,
       });
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
-    it("should handle boolean value in nested property when no decorators", async () => {
+    it("should not handle boolean value in nested property when no decorators", async () => {
       class Address {
         street: string = "";
       }
@@ -810,6 +810,26 @@ describe("ValidateNested Validation - Comprehensive Test Suite", () => {
         } as any,
       });
 
+      expect(result.success).toBe(false);
+    });
+
+    it("should handle Array value of nested properties", async () => {
+      class Address {
+        @IsNonNullString
+        street: string = "";
+      }
+
+      class User {
+        @ArrayOf([Validator.validateNested([Address])])
+        address: Address = new Address();
+      }
+
+      // Without decorators, boolean passes
+      const result = await Validator.validateTarget(User, {
+        data: {
+          address: [{ street: "123 Main St" }, { street: "456 Elm St" }],
+        } as any,
+      });
       expect(result.success).toBe(true);
     });
 

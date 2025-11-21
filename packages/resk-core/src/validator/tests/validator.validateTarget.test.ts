@@ -649,7 +649,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       const result = await Validator.validateTarget(User, { data });
 
       // Without validation decorators on nested class, any data passes
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
     it("should support multi-level nested validation with @ValidateNested", async () => {
@@ -740,7 +740,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
     });
 
-    it("should accept nested validation with null when no decorators present", async () => {
+    it("should fail nested validation with null when no decorators present", async () => {
       class Address {
         street: string = "";
       }
@@ -758,9 +758,8 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       };
 
       const result = await Validator.validateTarget(User, { data });
-
       // Without validation decorators on nested class, null passes
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(false);
     });
 
     it("should validate nested object when nested class has no decorators", async () => {

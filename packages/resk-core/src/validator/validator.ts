@@ -14,8 +14,10 @@ import {
 } from "@utils/index";
 import { I18n, i18n as defaultI18n } from "../i18n";
 import {
+  IValidatorDefaultMultiRule,
   IValidatorMultiRuleFunction,
   IValidatorMultiRuleNames,
+  IValidatorNestedRuleFunctionOptions,
   IValidatorRegisteredRules,
   IValidatorResult,
   IValidatorRule,
@@ -25,13 +27,11 @@ import {
   IValidatorRules,
   IValidatorSanitizedRuleObject,
   IValidatorSanitizedRules,
-  IValidatorTargetRuleFunctionOptions,
   IValidatorValidateFailure,
   IValidatorValidateMultiRuleOptions,
   IValidatorValidateOptions,
   IValidatorValidateResult,
   IValidatorValidateSuccess,
-  IValidatorValidateTargetData,
   IValidatorValidateTargetOptions,
   IValidatorValidateTargetResult,
   IValidatorValidationError,
@@ -1197,9 +1197,10 @@ export class Validator {
               Context
             >({
               ...validateOptions,
-              startTime,
               data,
-            } as any);
+              startTime,
+              ruleParams: ruleParams as any,
+            });
             return handleResult(nestedResult);
           }
 
@@ -1330,9 +1331,8 @@ export class Validator {
    */
   static validateOneOfRule<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
   ): IValidatorResult {
@@ -1362,9 +1362,8 @@ export class Validator {
    */
   static validateAllOfRule<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
   ): IValidatorResult {
@@ -1397,9 +1396,8 @@ export class Validator {
    */
   static async validateArrayOfRule<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
   ): Promise<boolean | string> {
@@ -1530,7 +1528,7 @@ export class Validator {
    * @template Target - Class constructor type (must extend IClassConstructor)
    * @template Context - Optional validation context type
    *
-   * @param options - Validation rule function options (IValidatorTargetRuleFunctionOptions<Target, Context>)
+   * @param options - Validation rule function options (IValidatorNestedRuleFunctionOptions<Target, Context>)
    * @param options.ruleParams - Array containing the nested class constructor at index [0]
    * @param options.value - The nested object value to validate (extracted to data property)
    * @param options.data - The nested object data to validate against the target class
@@ -1551,7 +1549,7 @@ export class Validator {
    *
    * @remarks
    * - This is an internal method primarily used by the `validateNested` factory
-   * - Accepts IValidatorTargetRuleFunctionOptions which omits validateTarget's i18n parameter
+   * - Accepts IValidatorNestedRuleFunctionOptions which omits validateTarget's i18n parameter
    * - Delegates directly to validateTarget(target, options) maintaining all context
    * - Nested validation errors include property names for clear error tracing
    * - The method integrates seamlessly with the multi-rule validation system
@@ -1563,7 +1561,7 @@ export class Validator {
    * @see {@link validateNested} - Factory function that creates rule functions using this method
    * @see {@link validateTarget} - The underlying class-based validation method (accepts options with data)
    * @see {@link ValidateNested} - Decorator that uses this method via the factory
-   * @see {@link IValidatorTargetRuleFunctionOptions} - Options interface for this method
+   * @see {@link IValidatorNestedRuleFunctionOptions} - Options interface for this method
    * @see {@link buildMultiRuleDecorator} - Decorator builder for complex multi-rule scenarios
    * @internal
    * @async
@@ -1574,10 +1572,10 @@ export class Validator {
   >({
     ruleParams,
     ...options
-  }: IValidatorTargetRuleFunctionOptions<Target, Context>): Promise<
+  }: IValidatorNestedRuleFunctionOptions<Target, Context>): Promise<
     boolean | string
   > {
-    let { startTime, ...extra } = options;
+    let { startTime, value, ...extra } = options;
     startTime = isNumber(startTime) ? startTime : Date.now();
     const i18n = this.getI18n(extra);
     const ruleParamsArray = Array.isArray(ruleParams) ? ruleParams : [];
@@ -1592,12 +1590,11 @@ export class Validator {
     }
 
     // Validate value is an object
-    if (typeof extra.data !== "object" || extra.data === null) {
-      const receivedType = extra.data === null ? "null" : typeof extra.data;
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      const receivedType = value === null ? "null" : typeof value;
       return (
         i18n.t("validator.validateNestedInvalidType", {
-          fieldName:
-            extra.translatedPropertyName || extra.fieldName || "This field",
+          fieldName: defaultStr(extra.translatedPropertyName, extra.fieldName),
           receivedType: receivedType,
           ...extra,
         }) || `The field must be an object, but received ${receivedType}`
@@ -1607,10 +1604,11 @@ export class Validator {
     //extra.data = extra.data ?? Object.assign({}, extra.data);
 
     // Delegate to validateTarget for nested class validation
-    const nestedResult = await this.validateTarget<Target, Context>(
-      target,
-      options
-    );
+    const nestedResult = await this.validateTarget<Target, Context>(target, {
+      ...options,
+      data: value,
+      parentData: extra.data,
+    });
 
     // If validation succeeded, return true
     if (nestedResult.success) {
@@ -1701,9 +1699,8 @@ export class Validator {
    */
   static async validateMultiRule<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     ruleName: IValidatorMultiRuleNames,
     {
@@ -1917,9 +1914,8 @@ export class Validator {
    */
   static oneOf<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     ruleParams: RulesFunctions
   ): IValidatorRuleFunction<RulesFunctions, Context> {
@@ -1956,9 +1952,8 @@ export class Validator {
    */
   static allOf<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     ruleParams: RulesFunctions
   ): IValidatorRuleFunction<RulesFunctions, Context> {
@@ -1989,9 +1984,8 @@ export class Validator {
    */
   static arrayOf<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(
     ruleParams: RulesFunctions
   ): IValidatorRuleFunction<RulesFunctions, Context> {
@@ -2237,14 +2231,12 @@ export class Validator {
   >(
     ruleParams: [target: Target]
   ): IValidatorRuleFunction<[target: Target], Context> {
-    return function ValidateNested({
-      data,
-      ...options
-    }: IValidatorValidateOptions<[target: Target], Context>) {
+    return function ValidateNested(
+      options: IValidatorValidateOptions<[target: Target], Context>
+    ) {
       return Validator.validateNestedRule({
         ...options,
         ruleParams,
-        data: Object.assign({}, data) as IValidatorValidateTargetData<Target>,
       });
     };
   }
@@ -3349,9 +3341,8 @@ export class Validator {
 
   static buildMultiRuleDecorator<
     Context = unknown,
-    RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-      IValidatorRule<Array<any>, Context>
-    >,
+    RulesFunctions extends
+      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
   >(ruleFunction: IValidatorMultiRuleFunction<Context, RulesFunctions>) {
     return this.buildRuleDecorator<RulesFunctions, Context>(ruleFunction);
   }

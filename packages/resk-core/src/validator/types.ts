@@ -636,10 +636,16 @@ export type IValidatorRuleFunction<
   options: IValidatorValidateOptions<ParamType, Context>
 ) => IValidatorResult;
 
-export interface IValidatorTargetRuleFunctionOptions<
+export interface IValidatorNestedRuleFunctionOptions<
   Target extends IClassConstructor = IClassConstructor,
   Context = unknown,
-> extends IValidatorValidateTargetOptions<Target, Context, [target: Target]> {}
+> extends Omit<
+    IValidatorValidateTargetOptions<Target, Context, [target: Target]>,
+    "data"
+  > {
+  value?: IValidatorValidateTargetData<Target>;
+  data?: Record<string, any>;
+}
 
 /**
  * @interface IValidatorRuleName
@@ -1298,12 +1304,15 @@ export interface IValidatorValidateOptions<
  */
 export interface IValidatorValidateMultiRuleOptions<
   Context = unknown,
-  RulesFunctions extends Array<IValidatorRule<Array<any>, Context>> = Array<
-    IValidatorRule<Array<any>, Context>
-  >,
+  RulesFunctions extends
+    IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
 > extends IValidatorValidateOptions<RulesFunctions, Context> {
   startTime?: number;
 }
+export type IValidatorDefaultMultiRule<
+  Context = unknown,
+  ParamsTypes extends Array<any> = any,
+> = Array<IValidatorRule<ParamsTypes, Context>>;
 
 export type IValidatorMultiRuleFunction<
   Context = unknown,
@@ -1325,6 +1334,12 @@ export interface IValidatorValidateTargetOptions<
     "data" | "rule" | "value"
   > {
   data: IValidatorValidateTargetData<Target>;
+  /**
+   * The parent data/context for nested validations
+   *
+   * When validating nested objects, this property holds the parent
+   */
+  parentData?: Record<string, any>;
   startTime?: number;
   errorMessageBuilder?: (
     translatedPropertyName: string,

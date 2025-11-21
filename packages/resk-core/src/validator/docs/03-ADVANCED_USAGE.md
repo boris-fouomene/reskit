@@ -9,9 +9,9 @@ This document covers advanced features of the Validator system including custom 
 3. [Async Validation Rules](#async-validation-rules)
 4. [Nested Object Validation](#nested-object-validation)
 5. [Multi-Rule Composition](#multi-rule-composition)
-6. [Error Handling & Customization](#error-handling--customization)
+6. [Error Handling &amp; Customization](#error-handling--customization)
 7. [Performance Optimization](#performance-optimization)
-8. [TypeScript & Type Safety](#typescript--type-safety)
+8. [TypeScript &amp; Type Safety](#typescript--type-safety)
 
 ---
 
@@ -685,6 +685,34 @@ const result = await Validator.validateTarget(Contact, {
       { number: "+1-555-987-6543", label: "office" },
     ],
   },
+});
+```
+
+### Array of Nested Object
+
+```typescript
+class Address {
+  @IsNonNullString
+  street: string = "";
+}
+
+class User {
+  @ArrayOf([Validator.validateNested([Address])])
+  address: Address = new Address();
+}
+
+// will pass validation
+const result = await Validator.validateTarget(User, {
+  data: {
+    address: [{ street: "123 Main St" }, { street: "456 Elm St" }],
+  } as any,
+});
+
+// will fail the validation because, the second data has not a valid streed field (non null string)
+const result = await Validator.validateTarget(User, {
+  data: {
+    address: [{ street: "123 Main St" }, { street: "" }],
+  } as any,
 });
 ```
 

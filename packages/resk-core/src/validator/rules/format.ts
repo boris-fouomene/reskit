@@ -618,7 +618,7 @@ function _Matches({ value, ruleParams, fieldName, translatedPropertyName, i18n, 
     return message;
   }
   const messageParams = defaultStr(ruleParams[1]).trim();
-  const translatedMessage = defaultStr(messageParams ? i18n.resolveTranslations(messageParams) : "").trim();
+  const translatedMessage = defaultStr(messageParams ? i18n.getNestedTranslation(messageParams) : "").trim();
   const message =
     translatedMessage ??
     i18n.t("validator.regex", {

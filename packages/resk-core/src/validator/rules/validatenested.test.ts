@@ -1,15 +1,5 @@
 import { i18n } from "../../i18n";
-import "../../translations";
-import {
-  ArrayOf,
-  ensureRulesRegistered,
-  IsEmail,
-  IsNonNullString,
-  IsOptional,
-  IsRequired,
-  MinLength,
-  ValidateNested,
-} from "../index";
+import { ArrayOf, ensureRulesRegistered, IsEmail, IsNonNullString, IsOptional, IsRequired, MinLength, ValidateNested } from "../index";
 import { Validator } from "../validator";
 
 ensureRulesRegistered();

@@ -1,16 +1,6 @@
 import { i18n } from "../../i18n";
-import "../../translations";
 import { Validator } from "../validator";
-import {
-  ArrayAllNumbers,
-  ArrayAllStrings,
-  ArrayContains,
-  ArrayLength,
-  ArrayMaxLength,
-  ArrayMinLength,
-  ArrayUnique,
-  IsArray,
-} from "./array";
+import { ArrayAllNumbers, ArrayAllStrings, ArrayContains, ArrayLength, ArrayMaxLength, ArrayMinLength, ArrayUnique, IsArray } from "./array";
 
 describe("Array Validation Rules", () => {
   beforeAll(async () => {
@@ -514,11 +504,7 @@ describe("Array Validation Rules", () => {
         const result = await Validator.validateTarget(TestEntity, {
           data: { tags: ["javascript", "typescript", "react"] },
         });
-        expect(result.data?.tags).toEqual([
-          "javascript",
-          "typescript",
-          "react",
-        ]);
+        expect(result.data?.tags).toEqual(["javascript", "typescript", "react"]);
       });
 
       it("should reject duplicate values with decorator", async () => {
@@ -744,12 +730,7 @@ describe("Array Validation Rules", () => {
       it("should validate with multiple array rules", async () => {
         const result = await Validator.validate({
           value: [1, 2, 3],
-          rules: [
-            "Array",
-            { ArrayMinLength: [2] },
-            { ArrayMaxLength: [5] },
-            "ArrayUnique",
-          ],
+          rules: ["Array", { ArrayMinLength: [2] }, { ArrayMaxLength: [5] }, "ArrayUnique"],
         });
         expect(result.success).toBe(true);
       });
@@ -757,12 +738,7 @@ describe("Array Validation Rules", () => {
       it("should reject when any rule fails", async () => {
         const result = await Validator.validate({
           value: [1, 1, 1],
-          rules: [
-            "Array",
-            { ArrayMinLength: [2] },
-            { ArrayMaxLength: [5] },
-            "ArrayUnique",
-          ],
+          rules: ["Array", { ArrayMinLength: [2] }, { ArrayMaxLength: [5] }, "ArrayUnique"],
         });
         expect(result.success).toBe(false);
       });

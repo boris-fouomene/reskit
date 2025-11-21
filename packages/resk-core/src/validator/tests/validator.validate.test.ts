@@ -1,5 +1,4 @@
 import { i18n } from "../../i18n";
-import "../../translations";
 import { Validator } from "../index";
 
 describe("Validator.validate() - Either Pattern Tests", () => {

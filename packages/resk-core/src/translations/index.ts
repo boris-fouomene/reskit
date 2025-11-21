@@ -1,6 +1,15 @@
-import "./resources.en";
-import "./auth.en";
-import "./validator.en";
-import "./date.en";
-import "./currencies.en";
-import "./httpClient.en";
+import { auth } from "./auth.en";
+import { currencies } from "./currencies.en";
+import countries from "@countries/countries";
+import { dates } from "./date.en";
+import { resources } from "./resources.en";
+import { validator } from "./validator.en";
+
+export const en = {
+  auth,
+  currencies,
+  countries,
+  dates,
+  resources,
+  validator,
+};

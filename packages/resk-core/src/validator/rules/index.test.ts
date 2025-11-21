@@ -1,21 +1,6 @@
 import { i18n, Translate } from "../../i18n";
-import "../../translations";
 
-import {
-  IsEmail,
-  IsEmpty,
-  IsNonNullString,
-  IsNullable,
-  IsNumber,
-  IsNumberDifferentFrom,
-  IsNumberGreaterThan,
-  IsNumberLessThan,
-  IsOptional,
-  IsRequired,
-  IsUrl,
-  Length,
-  Validator,
-} from "../index";
+import { IsEmail, IsEmpty, IsNonNullString, IsNullable, IsNumber, IsNumberDifferentFrom, IsNumberGreaterThan, IsNumberLessThan, IsOptional, IsRequired, IsUrl, Length, Validator } from "../index";
 
 describe("Validator Rules", () => {
   beforeAll(async () => {
@@ -321,16 +306,8 @@ describe("Validator Rules", () => {
         name: expect.arrayContaining(["Required", "NonNullString"]),
         email: expect.arrayContaining(["Email", "Required"]),
         url: ["Url"],
-        note: expect.arrayContaining([
-          "Required",
-          expect.any(Function),
-          expect.any(Function),
-        ]),
-        aString: expect.arrayContaining([
-          expect.any(Function),
-          expect.any(Function),
-          "Required",
-        ]),
+        note: expect.arrayContaining(["Required", expect.any(Function), expect.any(Function)]),
+        aString: expect.arrayContaining([expect.any(Function), expect.any(Function), "Required"]),
       });
     });
     it("Validate rules with decorators on entity", async () => {
@@ -352,12 +329,8 @@ describe("Validator Rules", () => {
         it("should always return true (Empty rule always passes)", () => {
           expect(Validator.getRules().Empty({ value: "", i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: null, i18n })).toBe(true);
-          expect(Validator.getRules().Empty({ value: undefined, i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Empty({ value: "test", i18n })).toBe(
-            true
-          );
+          expect(Validator.getRules().Empty({ value: undefined, i18n })).toBe(true);
+          expect(Validator.getRules().Empty({ value: "test", i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: 123, i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Empty({ value: {}, i18n })).toBe(true);
@@ -443,19 +416,11 @@ describe("Validator Rules", () => {
     describe("Nullable Rule", () => {
       describe("Rule Function", () => {
         it("should always return true (Nullable rule always passes)", () => {
-          expect(Validator.getRules().Nullable({ value: null, i18n })).toBe(
-            true
-          );
-          expect(
-            Validator.getRules().Nullable({ value: undefined, i18n })
-          ).toBe(true);
+          expect(Validator.getRules().Nullable({ value: null, i18n })).toBe(true);
+          expect(Validator.getRules().Nullable({ value: undefined, i18n })).toBe(true);
           expect(Validator.getRules().Nullable({ value: "", i18n })).toBe(true);
-          expect(Validator.getRules().Nullable({ value: "test", i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Nullable({ value: 123, i18n })).toBe(
-            true
-          );
+          expect(Validator.getRules().Nullable({ value: "test", i18n })).toBe(true);
+          expect(Validator.getRules().Nullable({ value: 123, i18n })).toBe(true);
           expect(Validator.getRules().Nullable({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Nullable({ value: {}, i18n })).toBe(true);
         });
@@ -596,19 +561,11 @@ describe("Validator Rules", () => {
     describe("Optional Rule", () => {
       describe("Rule Function", () => {
         it("should always return true (Optional rule always passes)", () => {
-          expect(
-            Validator.getRules().Optional({ value: undefined, i18n })
-          ).toBe(true);
-          expect(Validator.getRules().Optional({ value: null, i18n })).toBe(
-            true
-          );
+          expect(Validator.getRules().Optional({ value: undefined, i18n })).toBe(true);
+          expect(Validator.getRules().Optional({ value: null, i18n })).toBe(true);
           expect(Validator.getRules().Optional({ value: "", i18n })).toBe(true);
-          expect(Validator.getRules().Optional({ value: "test", i18n })).toBe(
-            true
-          );
-          expect(Validator.getRules().Optional({ value: 123, i18n })).toBe(
-            true
-          );
+          expect(Validator.getRules().Optional({ value: "test", i18n })).toBe(true);
+          expect(Validator.getRules().Optional({ value: 123, i18n })).toBe(true);
           expect(Validator.getRules().Optional({ value: [], i18n })).toBe(true);
           expect(Validator.getRules().Optional({ value: {}, i18n })).toBe(true);
         });

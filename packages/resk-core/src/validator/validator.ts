@@ -1015,115 +1015,73 @@ export class Validator {
     };
 
     return new Promise((resolve) => {
-      setTimeout(() => {
-        let index = -1;
-        const rulesLength = sanitizedRules.length;
-        const next = async function (): Promise<any> {
-          index++;
-          if (index >= rulesLength) {
-            return resolve(createSuccessResult(successOrErrorData, startTime));
-          }
-          const rule = sanitizedRules[index];
-          let ruleName = undefined;
-          let rawRuleName: IValidatorRuleName | string | undefined = undefined;
-          let ruleParams: any[] = [];
-          let ruleFunc: IValidatorRuleFunction<Array<any>, Context> | undefined = typeof rule === "function" ? rule : undefined;
-          if (typeof rule === "object" && isObj(rule)) {
-            ruleFunc = rule.ruleFunction;
-            ruleParams = Array.isArray(rule.params) ? rule.params : [];
-            ruleName = rule.ruleName;
-            rawRuleName = rule.rawRuleName;
-          } else if (typeof rule == "function") {
-            ruleName = rule.name as any;
-            rawRuleName = ruleName;
-          }
+      let index = -1;
+      const rulesLength = sanitizedRules.length;
+      const next = async function (): Promise<any> {
+        index++;
+        if (index >= rulesLength) {
+          return resolve(createSuccessResult(successOrErrorData, startTime));
+        }
+        const rule = sanitizedRules[index];
+        let ruleName = undefined;
+        let rawRuleName: IValidatorRuleName | string | undefined = undefined;
+        let ruleParams: any[] = [];
+        let ruleFunc: IValidatorRuleFunction<Array<any>, Context> | undefined = typeof rule === "function" ? rule : undefined;
+        if (typeof rule === "object" && isObj(rule)) {
+          ruleFunc = rule.ruleFunction;
+          ruleParams = Array.isArray(rule.params) ? rule.params : [];
+          ruleName = rule.ruleName;
+          rawRuleName = rule.rawRuleName;
+        } else if (typeof rule == "function") {
+          ruleName = rule.name as any;
+          rawRuleName = ruleName;
+        }
 
-          const i18nRuleOptions = {
-            ...i18nRulesOptions,
-            rule: defaultStr(ruleName),
-            ruleName,
-            rawRuleName,
-            ruleParams,
-          };
-          const validateOptions = {
-            ...extra,
-            data: data ?? Object.assign({}, data),
-            ...i18nRuleOptions,
-            ruleName,
-            rule: ruleName,
-            rawRuleName,
-            ruleParams,
-            rules,
-            value,
-            i18n,
-          };
-          const handleResult = (result: any) => {
-            result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
-            if (result === false) {
-              const error = createValidationError(i18n.t("validator.invalidMessage", i18nRuleOptions), {
-                value,
-                ruleName,
-                rawRuleName,
-                ruleParams,
-                fieldName: extra.fieldName,
-                propertyName: extra.propertyName,
-                translatedPropertyName: extra.translatedPropertyName,
-              });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
-            } else if (isNonNullString(result)) {
-              const error = createValidationError(result, {
-                value,
-                ruleName,
-                rawRuleName,
-                ruleParams,
-                fieldName: extra.fieldName,
-                propertyName: extra.propertyName,
-                translatedPropertyName: extra.translatedPropertyName,
-              });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
-            } else if ((result as any) instanceof Error) {
-              const error = createValidationError(stringify(result), {
-                value,
-                ruleName,
-                rawRuleName,
-                ruleParams,
-                fieldName: extra.fieldName,
-                propertyName: extra.propertyName,
-                translatedPropertyName: extra.translatedPropertyName,
-              });
-              return resolve(createFailureResult(error, successOrErrorData, startTime));
-            }
-            return next();
-          };
-
-          // Check for multi-rule decorators (OneOf, AllOf, ArrayOf) using symbol markers
-          // These decorators are never registered as named rules, only available as decorator functions
-          const markerType = getMultiRuleType(ruleFunc);
-
-          if (markerType === "arrayof") {
-            const arrayOfResult = await Validator.validateArrayOfRule<Context>({
-              ...validateOptions,
-              startTime,
-            } as any);
-            return handleResult(arrayOfResult);
-          } else if (markerType === "oneof" || markerType === "allof") {
-            const oneOrAllResult = await Validator.validateMultiRule<Context>(markerType === "oneof" ? "OneOf" : "AllOf", {
-              ...validateOptions,
-              startTime,
+        const i18nRuleOptions = {
+          ...i18nRulesOptions,
+          rule: defaultStr(ruleName),
+          ruleName,
+          rawRuleName,
+          ruleParams,
+        };
+        const validateOptions = {
+          ...extra,
+          data: data ?? Object.assign({}, data),
+          ...i18nRuleOptions,
+          ruleName,
+          rule: ruleName,
+          rawRuleName,
+          ruleParams,
+          rules,
+          value,
+          i18n,
+        };
+        const handleResult = (result: any) => {
+          result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
+          if (result === false) {
+            const error = createValidationError(i18n.t("validator.invalidMessage", i18nRuleOptions), {
+              value,
+              ruleName,
+              rawRuleName,
+              ruleParams,
+              fieldName: extra.fieldName,
+              propertyName: extra.propertyName,
+              translatedPropertyName: extra.translatedPropertyName,
             });
-            return handleResult(oneOrAllResult);
-          } else if (hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER) && ruleParams[0]) {
-            const nestedResult = await Validator.validateNestedRule<IClassConstructor, Context>({
-              ...validateOptions,
-              data,
-              startTime,
-              ruleParams: ruleParams as any,
+            return resolve(createFailureResult(error, successOrErrorData, startTime));
+          } else if (isNonNullString(result)) {
+            const error = createValidationError(result, {
+              value,
+              ruleName,
+              rawRuleName,
+              ruleParams,
+              fieldName: extra.fieldName,
+              propertyName: extra.propertyName,
+              translatedPropertyName: extra.translatedPropertyName,
             });
-            return handleResult(nestedResult);
-          }
-
-          if (typeof ruleFunc !== "function") {
-            const error = createValidationError(i18n.t("validator.invalidRule", i18nRuleOptions), {
+            return resolve(createFailureResult(error, successOrErrorData, startTime));
+          } else if ((result as any) instanceof Error) {
+            const error = createValidationError(stringify(result), {
               value,
               ruleName,
               rawRuleName,
@@ -1134,16 +1092,56 @@ export class Validator {
             });
             return resolve(createFailureResult(error, successOrErrorData, startTime));
           }
-
-          try {
-            const result = await ruleFunc(validateOptions as any);
-            return handleResult(result);
-          } catch (e) {
-            return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
-          }
+          return next();
         };
-        return next();
-      }, 0);
+
+        // Check for multi-rule decorators (OneOf, AllOf, ArrayOf) using symbol markers
+        // These decorators are never registered as named rules, only available as decorator functions
+        const markerType = getMultiRuleType(ruleFunc);
+
+        if (markerType === "arrayof") {
+          const arrayOfResult = await Validator.validateArrayOfRule<Context>({
+            ...validateOptions,
+            startTime,
+          } as any);
+          return handleResult(arrayOfResult);
+        } else if (markerType === "oneof" || markerType === "allof") {
+          const oneOrAllResult = await Validator.validateMultiRule<Context>(markerType === "oneof" ? "OneOf" : "AllOf", {
+            ...validateOptions,
+            startTime,
+          });
+          return handleResult(oneOrAllResult);
+        } else if (hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER) && ruleParams[0]) {
+          const nestedResult = await Validator.validateNestedRule<IClassConstructor, Context>({
+            ...validateOptions,
+            data,
+            startTime,
+            ruleParams: ruleParams as any,
+          });
+          return handleResult(nestedResult);
+        }
+
+        if (typeof ruleFunc !== "function") {
+          const error = createValidationError(i18n.t("validator.invalidRule", i18nRuleOptions), {
+            value,
+            ruleName,
+            rawRuleName,
+            ruleParams,
+            fieldName: extra.fieldName,
+            propertyName: extra.propertyName,
+            translatedPropertyName: extra.translatedPropertyName,
+          });
+          return resolve(createFailureResult(error, successOrErrorData, startTime));
+        }
+
+        try {
+          const result = await ruleFunc(validateOptions as any);
+          return handleResult(result);
+        } catch (e) {
+          return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
+        }
+      };
+      return next();
     });
   }
 

@@ -1,5 +1,4 @@
 import { i18n } from "../../i18n";
-import "../../translations";
 import { ensureRulesRegistered } from "../index";
 import { IValidatorRule } from "../types";
 
@@ -88,8 +87,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should accept function rules", async () => {
-        const customRule = ({ value }: any) =>
-          value.startsWith("TEST-") || "Must start with TEST-";
+        const customRule = ({ value }: any) => value.startsWith("TEST-") || "Must start with TEST-";
 
         const result = await Validator.validateOneOfRule({
           ruleParams: ["Email", customRule],
@@ -100,8 +98,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should accept mixed string, object, and function rules", async () => {
-        const customRule = ({ value }: any) =>
-          value.includes("@") || "Must include @";
+        const customRule = ({ value }: any) => value.includes("@") || "Must include @";
 
         const result = await Validator.validateOneOfRule({
           ruleParams: ["Email", { MinLength: [10] }, customRule],
@@ -112,8 +109,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should fail when all mixed rules fail", async () => {
-        const customRule = ({ value }: any) =>
-          value.startsWith("ADMIN-") || "Must start with ADMIN-";
+        const customRule = ({ value }: any) => value.startsWith("ADMIN-") || "Must start with ADMIN-";
 
         const result = await Validator.validateOneOfRule({
           ruleParams: ["Email", { MinLength: [50] }, customRule],
@@ -331,10 +327,7 @@ describe("OneOf Validation Rules", () => {
 
       it("should handle object values", async () => {
         const result = await Validator.validateOneOfRule({
-          ruleParams: [
-            "Email",
-            ({ value }) => typeof value === "object" && value !== null,
-          ],
+          ruleParams: ["Email", ({ value }) => typeof value === "object" && value !== null],
           value: { key: "value" },
           i18n,
         });
@@ -415,12 +408,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create rule with multiple items", async () => {
-        const rule = Validator.oneOf([
-          "Email",
-          "PhoneNumber",
-          "UUID",
-          "Number",
-        ]);
+        const rule = Validator.oneOf(["Email", "PhoneNumber", "UUID", "Number"]);
         const result = await rule({
           value: "test@example.com",
           ruleParams: ["Email", "PhoneNumber", "UUID", "Number"],
@@ -452,16 +440,10 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create rule from function rules only", async () => {
-        const rule = Validator.oneOf([
-          ({ value }: any) => value > 10,
-          ({ value }: any) => value < 5,
-        ]);
+        const rule = Validator.oneOf([({ value }: any) => value > 10, ({ value }: any) => value < 5]);
         const result = await rule({
           value: 3,
-          ruleParams: [
-            ({ value }: any) => value > 10,
-            ({ value }: any) => value < 5,
-          ],
+          ruleParams: [({ value }: any) => value > 10, ({ value }: any) => value < 5],
           i18n,
         });
         expect(result).toBe(true);
@@ -487,18 +469,11 @@ describe("OneOf Validation Rules", () => {
           isAdmin: boolean;
         }
 
-        const rule = Validator.oneOf<MyContext>([
-          "Email",
-          ({ value, context }) => (context?.isAdmin ? true : "Not admin"),
-        ]);
+        const rule = Validator.oneOf<MyContext>(["Email", ({ value, context }) => (context?.isAdmin ? true : "Not admin")]);
 
         const result = await rule({
           value: "anything",
-          ruleParams: [
-            "Email",
-            ({ value, context }: any) =>
-              context?.isAdmin ? true : "Not admin",
-          ],
+          ruleParams: ["Email", ({ value, context }: any) => (context?.isAdmin ? true : "Not admin")],
           context: {
             userId: 123,
             isAdmin: true,
@@ -578,30 +553,24 @@ describe("OneOf Validation Rules", () => {
   describe("buildMultiRuleDecorator Method", () => {
     describe("Decorator Factory Creation", () => {
       it("should create a decorator factory function", () => {
-        const decoratorFactory = Validator.buildMultiRuleDecorator(
-          function customOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const decoratorFactory = Validator.buildMultiRuleDecorator(function customOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
         expect(typeof decoratorFactory).toBe("function");
       });
 
       it("should return decorator from factory when called", () => {
-        const decoratorFactory = Validator.buildMultiRuleDecorator(
-          function customOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const decoratorFactory = Validator.buildMultiRuleDecorator(function customOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
         const decorator = decoratorFactory(["Email", "PhoneNumber"]);
         expect(typeof decorator).toBe("function");
       });
 
       it("should apply decorator to class properties", () => {
-        const CustomDecorator = Validator.buildMultiRuleDecorator(
-          function customOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const CustomDecorator = Validator.buildMultiRuleDecorator(function customOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class TestEntity {
           @CustomDecorator(["Email", "PhoneNumber"])
@@ -615,11 +584,9 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator with Different Rule Sets", () => {
       it("should create decorator for string rules", () => {
-        const StringRuleDecorator = Validator.buildMultiRuleDecorator(
-          function stringRuleOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const StringRuleDecorator = Validator.buildMultiRuleDecorator(function stringRuleOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class TestEntity {
           @StringRuleDecorator(["Email", "PhoneNumber"])
@@ -634,11 +601,9 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create decorator for object rules with params", () => {
-        const ObjectRuleDecorator = Validator.buildMultiRuleDecorator(
-          function objectRuleOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const ObjectRuleDecorator = Validator.buildMultiRuleDecorator(function objectRuleOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class TestEntity {
           @ObjectRuleDecorator([{ MinLength: [5] }, { MaxLength: [3] }])
@@ -649,11 +614,9 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should create decorator for function rules", () => {
-        const FunctionRuleDecorator = Validator.buildMultiRuleDecorator(
-          function functionRuleOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const FunctionRuleDecorator = Validator.buildMultiRuleDecorator(function functionRuleOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         const customRule = ({ value }: any) => typeof value === "string";
 
@@ -672,12 +635,9 @@ describe("OneOf Validation Rules", () => {
           role: string;
         }
 
-        const ContextAwareDecorator =
-          Validator.buildMultiRuleDecorator<MyContext>(function contextOneOf(
-            options: any
-          ) {
-            return Validator.validateOneOfRule<MyContext>(options);
-          });
+        const ContextAwareDecorator = Validator.buildMultiRuleDecorator<MyContext>(function contextOneOf(options: any) {
+          return Validator.validateOneOfRule<MyContext>(options);
+        });
 
         class TestEntity {
           @ContextAwareDecorator(["Email"])
@@ -690,11 +650,9 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator Validation Behavior", () => {
       it("should validate decorated property when rule passes", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class User {
           @TestDecorator(["Email", "PhoneNumber"])
@@ -710,11 +668,9 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should fail validation when all rules fail", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class User {
           @TestDecorator(["Email", "PhoneNumber"])
@@ -732,11 +688,9 @@ describe("OneOf Validation Rules", () => {
 
     describe("Decorator with Multiple Fields", () => {
       it("should apply decorator to multiple properties independently", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class Form {
           @TestDecorator(["Email"])
@@ -754,11 +708,9 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should track errors for each decorated field", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testOneOf(options: any) {
-            return Validator.validateOneOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testOneOf(options: any) {
+          return Validator.validateOneOfRule(options);
+        });
 
         class Form {
           @TestDecorator(["Email"])
@@ -903,11 +855,7 @@ describe("OneOf Validation Rules", () => {
     describe("OneOf with Mixed Rule Types", () => {
       it("should validate with mixed string, object, and function rules", async () => {
         class MixedRules {
-          @OneOf([
-            "Email",
-            { MinLength: [8] },
-            ({ value }) => value.includes("@"),
-          ])
+          @OneOf(["Email", { MinLength: [8] }, ({ value }) => value.includes("@")])
           value: string = "";
         }
 
@@ -1059,12 +1007,8 @@ describe("OneOf Validation Rules", () => {
 
         expect(result.success).toBe(false);
         expect((result as any).errors?.length).toBe(2);
-        const contactError = (result as any).errors?.find(
-          (e: any) => e.propertyName === "contact"
-        );
-        const idError = (result as any).errors?.find(
-          (e: any) => e.propertyName === "id"
-        );
+        const contactError = (result as any).errors?.find((e: any) => e.propertyName === "contact");
+        const idError = (result as any).errors?.find((e: any) => e.propertyName === "id");
         expect(contactError).toBeDefined();
         expect(idError).toBeDefined();
       });
@@ -1172,10 +1116,7 @@ describe("OneOf Validation Rules", () => {
           field: string = "";
         }
 
-        const result = await Validator.validateTarget<
-          typeof AdminField,
-          AdminContext
-        >(AdminField, {
+        const result = await Validator.validateTarget<typeof AdminField, AdminContext>(AdminField, {
           data: {
             field: "admin-value",
           },
@@ -1207,23 +1148,11 @@ describe("OneOf Validation Rules", () => {
     describe("Complex Validation Scenarios", () => {
       it("should handle deeply nested OneOf rules", async () => {
         class ComplexEntity {
-          @OneOf([
-            "Email",
-            "PhoneNumber",
-            "UUID",
-            "Number",
-            ({ value }) => typeof value === "string" && value.length > 0,
-          ])
+          @OneOf(["Email", "PhoneNumber", "UUID", "Number", ({ value }) => typeof value === "string" && value.length > 0])
           multiField: string | number = "";
         }
 
-        const testCases = [
-          { multiField: "test@example.com" },
-          { multiField: "+1 202 555 0185" },
-          { multiField: "550e8400-e29b-41d4-a716-446655440000" },
-          { multiField: 12345 },
-          { multiField: "any-string" },
-        ];
+        const testCases = [{ multiField: "test@example.com" }, { multiField: "+1 202 555 0185" }, { multiField: "550e8400-e29b-41d4-a716-446655440000" }, { multiField: 12345 }, { multiField: "any-string" }];
 
         for (const testData of testCases) {
           const result = await Validator.validateTarget(ComplexEntity, {
@@ -1308,10 +1237,7 @@ describe("OneOf Validation Rules", () => {
       });
 
       it("should handle large rule arrays efficiently", async () => {
-        const manyRules = Array.from(
-          { length: 20 },
-          (_, i) => `rule${i}`
-        ) as any[];
+        const manyRules = Array.from({ length: 20 }, (_, i) => `rule${i}`) as any[];
         manyRules[0] = "Email"; // Make sure one rule can pass
 
         class LargeRuleSet {

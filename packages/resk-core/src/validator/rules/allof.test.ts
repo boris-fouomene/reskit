@@ -1,5 +1,4 @@
 import { i18n } from "../../i18n";
-import "../../translations";
 import { ensureRulesRegistered } from "../index";
 import { IValidatorRule } from "../types";
 
@@ -89,8 +88,7 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should accept function rules", async () => {
-        const customRule = ({ value }: any) =>
-          value.startsWith("TEST-") || "Must start with TEST-";
+        const customRule = ({ value }: any) => value.startsWith("TEST-") || "Must start with TEST-";
 
         const result = await Validator.validateAllOfRule({
           ruleParams: [({ value }: any) => value.length > 0, customRule],
@@ -101,8 +99,7 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should accept mixed string, object, and function rules", async () => {
-        const customRule = ({ value }: any) =>
-          value.includes("@") || "Must include @";
+        const customRule = ({ value }: any) => value.includes("@") || "Must include @";
 
         const result = await Validator.validateAllOfRule({
           ruleParams: ["Required", { MinLength: [5] }, customRule],
@@ -113,8 +110,7 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should fail when any mixed rule fails", async () => {
-        const customRule = ({ value }: any) =>
-          value.startsWith("ADMIN-") || "Must start with ADMIN-";
+        const customRule = ({ value }: any) => value.startsWith("ADMIN-") || "Must start with ADMIN-";
 
         const result = await Validator.validateAllOfRule({
           ruleParams: ["Email", { MinLength: [50] }, customRule],
@@ -303,10 +299,7 @@ describe("AllOf Validation Rules", () => {
 
       it("should handle empty string value", async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: [
-            ({ value }) => value === "",
-            ({ value }) => typeof value === "string",
-          ],
+          ruleParams: [({ value }) => value === "", ({ value }) => typeof value === "string"],
           value: "",
           i18n,
         });
@@ -326,10 +319,7 @@ describe("AllOf Validation Rules", () => {
 
       it("should handle boolean values", async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: [
-            ({ value }) => typeof value === "boolean",
-            ({ value }) => value === true,
-          ],
+          ruleParams: [({ value }) => typeof value === "boolean", ({ value }) => value === true],
           value: true,
           i18n,
         });
@@ -339,10 +329,7 @@ describe("AllOf Validation Rules", () => {
 
       it("should handle object values", async () => {
         const result = await Validator.validateAllOfRule({
-          ruleParams: [
-            ({ value }) => typeof value === "object" && value !== null,
-            ({ value }) => value.hasOwnProperty("key"),
-          ],
+          ruleParams: [({ value }) => typeof value === "object" && value !== null, ({ value }) => value.hasOwnProperty("key")],
           value: { key: "value" },
           i18n,
         });
@@ -455,16 +442,10 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should create rule from function rules only", async () => {
-        const rule = Validator.allOf([
-          ({ value }: any) => value.length > 5,
-          ({ value }: any) => value.includes("@"),
-        ]);
+        const rule = Validator.allOf([({ value }: any) => value.length > 5, ({ value }: any) => value.includes("@")]);
         const result = await rule({
           value: "user@example.com",
-          ruleParams: [
-            ({ value }: any) => value.length > 5,
-            ({ value }: any) => value.includes("@"),
-          ],
+          ruleParams: [({ value }: any) => value.length > 5, ({ value }: any) => value.includes("@")],
           i18n,
         });
         expect(result).toBe(true);
@@ -473,11 +454,7 @@ describe("AllOf Validation Rules", () => {
       it("should create rule from mixed rule types", async () => {
         const customRule = ({ value }: any) => value.includes("@");
 
-        const rule = Validator.allOf([
-          "Required",
-          { MinLength: [5] },
-          customRule,
-        ]);
+        const rule = Validator.allOf(["Required", { MinLength: [5] }, customRule]);
         const result = await rule({
           value: "user@example.com",
           ruleParams: ["Required", { MinLength: [5] }, customRule],
@@ -494,18 +471,11 @@ describe("AllOf Validation Rules", () => {
           isAdmin: boolean;
         }
 
-        const rule = Validator.allOf<MyContext>([
-          "Required",
-          ({ value, context }) => (context?.isAdmin ? true : "Not admin"),
-        ]);
+        const rule = Validator.allOf<MyContext>(["Required", ({ value, context }) => (context?.isAdmin ? true : "Not admin")]);
 
         const result = await rule({
           value: "test",
-          ruleParams: [
-            "Required",
-            ({ value, context }: any) =>
-              context?.isAdmin ? true : "Not admin",
-          ],
+          ruleParams: ["Required", ({ value, context }: any) => (context?.isAdmin ? true : "Not admin")],
           context: {
             userId: 123,
             isAdmin: true,
@@ -585,30 +555,24 @@ describe("AllOf Validation Rules", () => {
   describe("buildMultiRuleDecorator Method", () => {
     describe("Decorator Factory Creation", () => {
       it("should create a decorator factory function", () => {
-        const decoratorFactory = Validator.buildMultiRuleDecorator(
-          function customAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const decoratorFactory = Validator.buildMultiRuleDecorator(function customAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
         expect(typeof decoratorFactory).toBe("function");
       });
 
       it("should return decorator from factory when called", () => {
-        const decoratorFactory = Validator.buildMultiRuleDecorator(
-          function customAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const decoratorFactory = Validator.buildMultiRuleDecorator(function customAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
         const decorator = decoratorFactory(["Required", "Email"]);
         expect(typeof decorator).toBe("function");
       });
 
       it("should apply decorator to class properties", () => {
-        const CustomDecorator = Validator.buildMultiRuleDecorator(
-          function customAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const CustomDecorator = Validator.buildMultiRuleDecorator(function customAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class TestEntity {
           @CustomDecorator(["Required", "Email"])
@@ -622,11 +586,9 @@ describe("AllOf Validation Rules", () => {
 
     describe("Decorator with Different Rule Sets", () => {
       it("should create decorator for string rules", () => {
-        const StringRuleDecorator = Validator.buildMultiRuleDecorator(
-          function stringRuleAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const StringRuleDecorator = Validator.buildMultiRuleDecorator(function stringRuleAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class TestEntity {
           @StringRuleDecorator(["Required", "Email"])
@@ -644,11 +606,9 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should create decorator for object rules with params", () => {
-        const ObjectRuleDecorator = Validator.buildMultiRuleDecorator(
-          function objectRuleAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const ObjectRuleDecorator = Validator.buildMultiRuleDecorator(function objectRuleAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class TestEntity {
           @ObjectRuleDecorator([{ MinLength: [5] }, { MaxLength: [20] }])
@@ -659,11 +619,9 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should create decorator for function rules", () => {
-        const FunctionRuleDecorator = Validator.buildMultiRuleDecorator(
-          function functionRuleAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const FunctionRuleDecorator = Validator.buildMultiRuleDecorator(function functionRuleAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         const customRule = ({ value }: any) => value.length > 3;
 
@@ -682,12 +640,9 @@ describe("AllOf Validation Rules", () => {
           role: string;
         }
 
-        const ContextAwareDecorator =
-          Validator.buildMultiRuleDecorator<MyContext>(function contextAllOf(
-            options: any
-          ) {
-            return Validator.validateAllOfRule<MyContext>(options);
-          });
+        const ContextAwareDecorator = Validator.buildMultiRuleDecorator<MyContext>(function contextAllOf(options: any) {
+          return Validator.validateAllOfRule<MyContext>(options);
+        });
 
         class TestEntity {
           @ContextAwareDecorator(["Required"])
@@ -700,11 +655,9 @@ describe("AllOf Validation Rules", () => {
 
     describe("Decorator Validation Behavior", () => {
       it("should validate decorated property when all rules pass", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class User {
           @TestDecorator(["Required", "Email"])
@@ -723,11 +676,9 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should fail validation when any rule fails", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class User {
           @TestDecorator(["Required", "Email"])
@@ -745,11 +696,9 @@ describe("AllOf Validation Rules", () => {
 
     describe("Decorator with Multiple Fields", () => {
       it("should apply decorator to multiple properties independently", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class Form {
           @TestDecorator(["Required", "Email"])
@@ -771,11 +720,9 @@ describe("AllOf Validation Rules", () => {
       });
 
       it("should track errors for each decorated field", async () => {
-        const TestDecorator = Validator.buildMultiRuleDecorator(
-          function testAllOf(options: any) {
-            return Validator.validateAllOfRule(options);
-          }
-        );
+        const TestDecorator = Validator.buildMultiRuleDecorator(function testAllOf(options: any) {
+          return Validator.validateAllOfRule(options);
+        });
 
         class Form {
           @TestDecorator(["Required", "Email"])
@@ -904,10 +851,7 @@ describe("AllOf Validation Rules", () => {
     describe("AllOf with Function Rules", () => {
       it("should validate with custom function rules", async () => {
         class CustomField {
-          @AllOf([
-            ({ value }) => value.length > 0,
-            ({ value }) => value.startsWith("ADMIN-"),
-          ])
+          @AllOf([({ value }) => value.length > 0, ({ value }) => value.startsWith("ADMIN-")])
           field: string = "";
         }
 
@@ -925,11 +869,7 @@ describe("AllOf Validation Rules", () => {
     describe("AllOf with Mixed Rule Types", () => {
       it("should validate with mixed string, object, and function rules", async () => {
         class MixedRules {
-          @AllOf([
-            "Required",
-            { MinLength: [8] },
-            ({ value }) => value.includes("@"),
-          ])
+          @AllOf(["Required", { MinLength: [8] }, ({ value }) => value.includes("@")])
           value: string = "";
         }
 
@@ -1099,12 +1039,8 @@ describe("AllOf Validation Rules", () => {
 
         expect(result.success).toBe(false);
         expect((result as any).errors?.length).toBe(2);
-        const contactError = (result as any).errors?.find(
-          (e: any) => e.propertyName === "contact"
-        );
-        const idError = (result as any).errors?.find(
-          (e: any) => e.propertyName === "id"
-        );
+        const contactError = (result as any).errors?.find((e: any) => e.propertyName === "contact");
+        const idError = (result as any).errors?.find((e: any) => e.propertyName === "id");
         expect(contactError).toBeDefined();
         expect(idError).toBeDefined();
       });
@@ -1130,10 +1066,7 @@ describe("AllOf Validation Rules", () => {
 
       it("should validate boolean values", async () => {
         class BooleanAllOf {
-          @AllOf([
-            ({ value }) => typeof value === "boolean",
-            ({ value }) => value === true,
-          ])
+          @AllOf([({ value }) => typeof value === "boolean", ({ value }) => value === true])
           value: boolean = false;
         }
 
@@ -1201,10 +1134,7 @@ describe("AllOf Validation Rules", () => {
     describe("AllOf with Empty String", () => {
       it("should handle empty string value", async () => {
         class EmptyStringTest {
-          @AllOf([
-            ({ value }) => value === "",
-            ({ value }) => typeof value === "string",
-          ])
+          @AllOf([({ value }) => value === "", ({ value }) => typeof value === "string"])
           value: string = "";
         }
 
@@ -1236,10 +1166,7 @@ describe("AllOf Validation Rules", () => {
           field: string = "";
         }
 
-        const result = await Validator.validateTarget<
-          typeof AdminField,
-          AdminContext
-        >(AdminField, {
+        const result = await Validator.validateTarget<typeof AdminField, AdminContext>(AdminField, {
           data: {
             field: "admin-value",
           },
@@ -1271,20 +1198,11 @@ describe("AllOf Validation Rules", () => {
     describe("Complex Validation Scenarios", () => {
       it("should handle deeply nested AllOf rules", async () => {
         class ComplexEntity {
-          @AllOf([
-            "Required",
-            "Email",
-            { MinLength: [5] },
-            ({ value }) => value.includes("@"),
-            ({ value }) => value.length < 50,
-          ])
+          @AllOf(["Required", "Email", { MinLength: [5] }, ({ value }) => value.includes("@"), ({ value }) => value.length < 50])
           multiField: string = "";
         }
 
-        const testCases = [
-          { multiField: "test@example.com" },
-          { multiField: "user@domain.org" },
-        ];
+        const testCases = [{ multiField: "test@example.com" }, { multiField: "user@domain.org" }];
 
         for (const testData of testCases) {
           const result = await Validator.validateTarget(ComplexEntity, {

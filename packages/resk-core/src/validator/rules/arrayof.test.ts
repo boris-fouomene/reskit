@@ -1,5 +1,4 @@
 import { i18n } from "../../i18n";
-import "../../translations";
 import { ensureRulesRegistered } from "../index";
 import { Validator } from "../validator";
 import { ArrayOf } from "./multiRules";

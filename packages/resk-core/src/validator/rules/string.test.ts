@@ -1,16 +1,7 @@
 import { ensureRulesRegistered } from ".";
 import { i18n } from "../../i18n";
-import "../../translations";
 import { Validator } from "../validator";
-import {
-  EndsWithOneOf,
-  IsNonNullString,
-  IsString,
-  Length,
-  MaxLength,
-  MinLength,
-  StartsWithOneOf,
-} from "./string";
+import { EndsWithOneOf, IsNonNullString, IsString, Length, MaxLength, MinLength, StartsWithOneOf } from "./string";
 ensureRulesRegistered();
 describe("String Validation Rules", () => {
   beforeAll(async () => {
@@ -533,9 +524,7 @@ describe("String Validation Rules", () => {
       it("should validate with first matching prefix", async () => {
         const result = await Validator.validate({
           value: "production-api",
-          rules: [
-            { StartsWithOneOf: ["production", "staging", "development"] },
-          ],
+          rules: [{ StartsWithOneOf: ["production", "staging", "development"] }],
         });
         expect(result.success).toBe(true);
       });
@@ -543,9 +532,7 @@ describe("String Validation Rules", () => {
       it("should validate with any matching prefix", async () => {
         const result = await Validator.validate({
           value: "staging-db",
-          rules: [
-            { StartsWithOneOf: ["production", "staging", "development"] },
-          ],
+          rules: [{ StartsWithOneOf: ["production", "staging", "development"] }],
         });
         expect(result.success).toBe(true);
       });

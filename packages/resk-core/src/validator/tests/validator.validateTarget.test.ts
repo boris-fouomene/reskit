@@ -1,6 +1,5 @@
 import { Validator } from "@/validator";
 import { i18n } from "../../i18n";
-import "../../translations";
 import { ValidateNested } from "../rules/target";
 
 /**
@@ -99,15 +98,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
         field: any;
       }
 
-      const variations = [
-        { field: "string" },
-        { field: 123 },
-        { field: true },
-        { field: null },
-        { field: undefined },
-        { field: { nested: "object" } },
-        { field: ["array"] },
-      ];
+      const variations = [{ field: "string" }, { field: 123 }, { field: true }, { field: null }, { field: undefined }, { field: { nested: "object" } }, { field: ["array"] }];
 
       for (const data of variations) {
         const result = await Validator.validateTarget(OpenModel, { data });
@@ -258,9 +249,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       const instances = [{ id: "1" }, { id: "2" }, { id: "3" }];
 
-      const results = await Promise.all(
-        instances.map((data) => Validator.validateTarget(Model, { data }))
-      );
+      const results = await Promise.all(instances.map((data) => Validator.validateTarget(Model, { data })));
 
       expect(results).toHaveLength(3);
       results.forEach((result) => {
@@ -273,11 +262,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
         value: string = "";
       }
 
-      const results = await Promise.all([
-        Validator.validateTarget(Model, { data: { value: "a" } }),
-        Validator.validateTarget(Model, { data: { value: "b" } }),
-        Validator.validateTarget(Model, { data: { value: "c" } }),
-      ]);
+      const results = await Promise.all([Validator.validateTarget(Model, { data: { value: "a" } }), Validator.validateTarget(Model, { data: { value: "b" } }), Validator.validateTarget(Model, { data: { value: "c" } })]);
 
       expect(results[0].success).toBe(true);
       expect(results[1].success).toBe(true);
@@ -579,10 +564,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
       }
 
       // Retrieve the target class metadata
-      const contactTarget = Validator.getValidateNestedTarget(
-        Person,
-        "contact"
-      );
+      const contactTarget = Validator.getValidateNestedTarget(Person, "contact");
       const nameTarget = Validator.getValidateNestedTarget(Person, "name");
 
       expect(contactTarget).toBe(Contact);
@@ -607,10 +589,7 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       // Metadata-based detection
       const targetRules = Validator.getTargetRules(User);
-      const hasMetadataValidation = Validator.hasValidateNestedRule(
-        User,
-        "address"
-      );
+      const hasMetadataValidation = Validator.hasValidateNestedRule(User, "address");
       const nestedClass = Validator.getValidateNestedTarget(User, "address");
 
       // All metadata-based checks should identify the nested structure
@@ -692,15 +671,9 @@ describe("Validator.validateTarget() - Class Validation with Either Pattern", ()
 
       // Metadata detection for multi-level nesting
       expect(Validator.hasValidateNestedRule(Event, "location")).toBe(true);
-      expect(Validator.hasValidateNestedRule(Location, "coordinates")).toBe(
-        true
-      );
-      expect(Validator.getValidateNestedTarget(Event, "location")).toBe(
-        Location
-      );
-      expect(Validator.getValidateNestedTarget(Location, "coordinates")).toBe(
-        Coordinates
-      );
+      expect(Validator.hasValidateNestedRule(Location, "coordinates")).toBe(true);
+      expect(Validator.getValidateNestedTarget(Event, "location")).toBe(Location);
+      expect(Validator.getValidateNestedTarget(Location, "coordinates")).toBe(Coordinates);
     });
 
     it("should invoke validatenested rule handling path in normalizedRule check", async () => {

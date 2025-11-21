@@ -974,12 +974,14 @@ export class Validator {
     const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules<Context>(rules);
     const separators = Validator.getErrorMessageSeparators(i18n);
     const { value, context, data } = extra;
+
+    const translateOptions = this.getI18nTranslateOptions(extra);
     const successOrErrorData = {
+      ...translateOptions,
       context,
       value,
       data,
     };
-    const translateOptions = this.getI18nTranslateOptions(extra);
     // Handle invalid rules - return failure result instead of rejecting
     if (invalidRules.length) {
       const message = invalidRules.map((rule) => i18n.t("validator.invalidRule", { ...translateOptions, rule: isNonNullString(rule) ? rule : "unnamed rule" })).join(separators.multiple);

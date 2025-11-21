@@ -1,5 +1,5 @@
-import { i18n } from "../../i18n";
-import { ensureRulesRegistered } from "../index";
+import { i18n, Translate } from "../../i18n";
+import { ensureRulesRegistered, IsEmail, IsOptional, IsPhoneNumber, IsRequired, IsString, MaxLength, MinLength } from "../index";
 import { IValidatorRule } from "../types";
 
 import { Validator } from "../validator";
@@ -16,6 +16,55 @@ describe("AllOf Validation Rules", () => {
   // Section 1: validateAllOfRule Method Tests
   // ============================================================================
 
+  describe("Validate oneOf rule", () => {
+    it("should return true when all rules pass", async () => {
+      const result = await Validator.validateOneOfRule({
+        ruleParams: ["Email", "Required"],
+        value: "user@example.com",
+        i18n,
+      });
+      expect(result).toBe(true);
+    });
+    class RegisterDto {
+      @IsEmail
+      @IsRequired
+      @MaxLength([120])
+      @Translate("auth.register.dto.email")
+      email: string = "";
+
+      @IsRequired
+      @MinLength([8])
+      @Translate("auth.register.dto.password")
+      password: string = "";
+
+      @IsOptional
+      @IsString
+      @MaxLength([50])
+      @Translate("auth.register.dto.firstName")
+      firstName?: string;
+
+      @IsOptional
+      @IsString
+      @MaxLength([50])
+      @Translate("auth.register.dto.lastName")
+      lastName?: string;
+
+      @IsOptional
+      @IsString
+      @IsPhoneNumber()
+      @Translate("auth.register.dto.phoneNumber")
+      phoneNumber?: string;
+    }
+    it.only("should validate single email or array of emails", async () => {
+      const result = await Validator.validateTarget(RegisterDto, {
+        data: {
+          email: "borisfouomen14@gmail.com",
+          password: "1",
+        },
+      });
+      expect(result.message).toContain("failed for one field");
+    });
+  });
   describe("validateAllOfRule Method", () => {
     describe("Basic Functionality", () => {
       it("should return true when all rules pass", async () => {

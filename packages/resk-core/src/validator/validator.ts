@@ -24,6 +24,7 @@ import {
   IValidatorRuleFunction,
   IValidatorRuleName,
   IValidatorRuleObject,
+  IValidatorRuleParams,
   IValidatorRules,
   IValidatorSanitizedRuleObject,
   IValidatorSanitizedRules,
@@ -3082,7 +3083,7 @@ export class Validator {
    * @public
    */
   static buildRuleDecorator<
-    RuleParamsType extends Array<any> = Array<any>,
+    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
     Context = unknown,
   >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters: RuleParamsType) {
@@ -3329,7 +3330,7 @@ export class Validator {
    * @public
    */
   static buildRuleDecoratorOptional<
-    RuleParamsType extends Array<any> = Array<any>,
+    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
     Context = unknown,
   >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters?: RuleParamsType) {
@@ -3398,7 +3399,7 @@ export class Validator {
    * @internal
    */
   static buildPropertyDecorator<
-    RuleParamsType extends Array<any> = Array<any>,
+    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
     Context = unknown,
   >(
     rule:

@@ -1,12 +1,142 @@
-/**
- * Represents the result of a validation rule.
- * Can be boolean (success/failure), string (error message), or a Promise resolving to either.
- */
-export type IValidatorResult = boolean | string | Promise<boolean | string>;
 import { I18n } from "@/i18n";
 import { IInputFormatterResult } from "@/inputFormatter/types";
 import { IClassConstructor } from "@/types";
 import { ICountryCode } from "@countries/types";
+
+/**
+ * ## Validation Result Type
+ *
+ * The fundamental return type for all validation operations in the validator system.
+ * This union type represents the possible outcomes of any validation rule execution,
+ * supporting both synchronous and asynchronous validation patterns.
+ *
+ * ### Union Members
+ *
+ * #### Synchronous Results
+ * - **`boolean`**: Direct success/failure indication
+ *   - `true`: Validation passed
+ *   - `false`: Validation failed
+ *
+ * - **`string`**: Validation failure with error message
+ *   - Contains the error message explaining why validation failed
+ *   - Used when validation fails and provides specific feedback
+ *
+ * #### Asynchronous Results
+ * - **`Promise<boolean | string>`**: Asynchronous validation result
+ *   - Resolves to `true` for success
+ *   - Resolves to `string` for failure with error message
+ *   - Enables complex validations requiring I/O, network calls, or async operations
+ *
+ * ### Usage Patterns
+ *
+ * #### Synchronous Validation
+ * ```typescript
+ * function validateEmail(value: string): IValidatorResult {
+ *   if (!value.includes("@")) {
+ *     return "Invalid email format";  // string = failure
+ *   }
+ *   return true;  // boolean = success
+ * }
+ * ```
+ *
+ * #### Asynchronous Validation
+ * ```typescript
+ * async function validateUniqueUsername(username: string): Promise<IValidatorResult> {
+ *   const exists = await checkUsernameInDatabase(username);
+ *   if (exists) {
+ *     return "Username already taken";  // Promise<string> = failure
+ *   }
+ *   return true;  // Promise<boolean> = success
+ * }
+ * ```
+ *
+ * #### In Validation Rules
+ * ```typescript
+ * const customRule: IValidatorRuleFunction = async ({ value }) => {
+ *   // Synchronous check
+ *   if (!value) return "Value is required";
+ *
+ *   // Asynchronous check
+ *   const isValid = await externalValidationAPI(value);
+ *   return isValid || "External validation failed";
+ * };
+ * ```
+ *
+ * ### Type Safety and Flexibility
+ * This type provides maximum flexibility while maintaining type safety:
+ * - **Synchronous rules** can return immediate results
+ * - **Asynchronous rules** can perform complex operations
+ * - **Error messages** provide detailed feedback
+ * - **Boolean results** for simple pass/fail scenarios
+ *
+ * ### Integration with Validation System
+ * All validation rule functions return this type, enabling:
+ * - Consistent error handling across all rules
+ * - Support for both sync and async validation logic
+ * - Standardized result processing in the validator core
+ * - Flexible error message generation and i18n support
+ *
+ * ### Best Practices
+ *
+ * #### Prefer Specific Error Messages
+ * ```typescript
+ * // ✅ Good: Specific error messages
+ * return "Email must contain @ symbol";
+ *
+ * // ❌ Avoid: Generic failures
+ * return false;
+ * ```
+ *
+ * #### Handle Async Operations Properly
+ * ```typescript
+ * // ✅ Good: Proper async handling
+ * const result = await externalCheck(value);
+ * return result ? true : "Validation failed externally";
+ *
+ * // ❌ Avoid: Unhandled promises
+ * return externalCheck(value);  // Returns Promise<Promise<...>>
+ * ```
+ *
+ * #### Consistent Return Patterns
+ * ```typescript
+ * // ✅ Good: Consistent boolean/string returns
+ * if (condition) return true;
+ * return "Error message";
+ *
+ * // ❌ Avoid: Mixed return types without clear logic
+ * if (success) return true;
+ * if (warning) return "Warning message";
+ * return false;  // Inconsistent with string returns above
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Synchronous validation rule
+ * function validateMinLength(value: string, minLength: number): IValidatorResult {
+ *   if (value.length < minLength) {
+ *     return `Must be at least ${minLength} characters long`;
+ *   }
+ *   return true;
+ * }
+ *
+ * // Asynchronous validation rule
+ * async function validateUniqueEmail(email: string): Promise<IValidatorResult> {
+ *   try {
+ *     const exists = await userRepository.exists({ email });
+ *     return exists ? "Email already registered" : true;
+ *   } catch (error) {
+ *     return "Unable to verify email uniqueness";
+ *   }
+ * }
+ * ```
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorRuleFunction} - Functions that return this type
+ * @see {@link IValidatorValidateResult} - Higher-level validation results
+ * @see {@link Validator.validate} - Main validation method
+ */
+export type IValidatorResult = boolean | string | Promise<boolean | string>;
 
 /**
  * ## Validation Rule Type
@@ -46,7 +176,7 @@ import { ICountryCode } from "@countries/types";
  * ```
  *
  * ### Type Parameters
- * - **ParamType**: Array type for rule parameters (default: `Array<any>`)
+ * - **ParamsType**: Array type for rule parameters (default: `Array<any>`)
  * - **Context**: Type of optional validation context (default: `unknown`)
  *
  * ### Usage Examples
@@ -146,7 +276,7 @@ import { ICountryCode } from "@countries/types";
  * This type is the foundation of the validation system and is used by:
  * - All validation decorators and rule builders
  *
- * @template ParamType - Array type for rule parameters, defaults to any array
+ * @template ParamsType - Array type for rule parameters, defaults to any array
  * @template Context - Type of optional validation context, defaults to unknown
  *
  * @example
@@ -177,10 +307,10 @@ import { ICountryCode } from "@countries/types";
  * @public
  */
 export type IValidatorRule<
-  ParamType extends Array<any> = Array<any>,
+  ParamsType extends IValidatorRuleParams = IValidatorRuleParams,
   Context = unknown,
 > =
-  | IValidatorRuleFunction<ParamType, Context>
+  | IValidatorRuleFunction<ParamsType, Context>
   | IValidatorOptionalOrEmptyRuleNames
   | IValidatorRuleObject<Context>;
 
@@ -362,18 +492,6 @@ export type IValidatorRuleObject<Context = unknown> = Partial<{
 }>;
 
 /**
- * export type IValidatorRuleObject<Context = unknown> = Partial<{
-  [K in IValidatorRuleName]: {
-    [P in K]: IValidatorRulesMap<Context>[P];
-  };
-}>
- */
-
-export type IValidatorRuleParams<
-  ParamType extends Array<any>,
-  Context = unknown,
-> = ParamType;
-/**
  * Represents an array of validation rules to be applied to a value.
  *
  * This type defines a collection of validation rules that will be executed
@@ -434,11 +552,11 @@ export type IValidatorRules<Context = unknown> = Array<
  * };
  */
 export type IValidatorSanitizedRule<
-  ParamType extends Array<any> = Array<any>,
+  ParamsType extends IValidatorRuleParams = IValidatorRuleParams,
   Context = unknown,
 > =
-  | IValidatorRuleFunction<ParamType, Context>
-  | IValidatorSanitizedRuleObject<ParamType, Context>;
+  | IValidatorRuleFunction<ParamsType, Context>
+  | IValidatorSanitizedRuleObject<ParamsType, Context>;
 
 /**
  * ## Sanitized Rule Object
@@ -485,7 +603,7 @@ export type IValidatorSanitizedRule<
  * - A direct function (`IValidatorRuleFunction`)
  * - A structured object (`IValidatorSanitizedRuleObject`)
  *
- * @template ParamType - The type of parameters that the rule accepts (default: Array<any>)
+ * @template ParamsType - The type of parameters that the rule accepts (default: Array<any>)
  * @template Context - The type of the optional validation context
  *
  * @public
@@ -495,7 +613,7 @@ export type IValidatorSanitizedRule<
  * @see {@link IValidatorRuleName} - Rule name type
  */
 export interface IValidatorSanitizedRuleObject<
-  ParamType extends Array<any> = Array<any>,
+  ParamsType extends IValidatorRuleParams = IValidatorRuleParams,
   Context = unknown,
 > {
   /**
@@ -521,12 +639,12 @@ export interface IValidatorSanitizedRuleObject<
    * For example, "MinLength[5,10]" would result in `[5, 10]`.
    * Empty array for rules that don't take parameters.
    *
-   * @type {ParamType}
+   * @type {ParamsType}
    * @example [] // For "Required" rule
    * @example [5] // For "MinLength[5]" rule
    * @example [0, 100] // For "NumberBetween[0,100]" rule
    */
-  params: ParamType;
+  params: ParamsType;
 
   /**
    * The validation function that implements the rule logic
@@ -535,10 +653,10 @@ export interface IValidatorSanitizedRuleObject<
    * This function receives validation options and returns a result
    * indicating whether the validation passed or failed.
    *
-   * @type {IValidatorRuleFunction<ParamType, Context>}
+   * @type {IValidatorRuleFunction<ParamsType, Context>}
    * @see {@link IValidatorRuleFunction}
    */
-  ruleFunction: IValidatorRuleFunction<ParamType, Context>;
+  ruleFunction: IValidatorRuleFunction<ParamsType, Context>;
 
   /**
    * The original unparsed rule specification
@@ -587,7 +705,7 @@ export type IValidatorSanitizedRules<Context = unknown> =
  * This function takes a set of options and performs validation on a given value,
  * returning the result of the validation process.
  *
- * @template ParamType The type of the parameters that the rule function accepts.
+ * @template ParamsType The type of the parameters that the rule function accepts.
  *
  * ### Structure:
  * - The function accepts a single parameter:
@@ -630,12 +748,223 @@ export type IValidatorSanitizedRules<Context = unknown> =
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
 export type IValidatorRuleFunction<
-  ParamType extends Array<any> = Array<any>,
+  ParamsType extends IValidatorRuleParams = IValidatorRuleParams,
   Context = unknown,
 > = (
-  options: IValidatorValidateOptions<ParamType, Context>
+  options: IValidatorValidateOptions<ParamsType, Context>
 ) => IValidatorResult;
 
+/**
+ * ## Validation Rule Parameters Type
+ *
+ * A conditional type that defines the parameter structure for validation rules.
+ * This type handles both mutable and readonly array parameters, providing flexibility
+ * for validation rules that accept different parameter formats.
+ *
+ * ### Type Behavior
+ * - **Empty Arrays**: When `ParamsType` is an empty array `[]`, resolves to `[]`
+ * - **Non-Empty Arrays**: Resolves to either the original `ParamsType` or its readonly variant `Readonly<ParamsType>`
+ * - **Readonly Support**: Accepts both `Array<any>` and `ReadonlyArray<any>` as input types
+ *
+ * ### Purpose
+ * This type enables validation rules to accept parameters in multiple formats:
+ * - Regular arrays: `[minLength: number]` for `MinLength[5]`
+ * - Readonly arrays: `readonly [minLength: number]` for const assertions
+ * - Empty parameters: `[]` for rules like `Required` that take no parameters
+ *
+ * ### Generic Parameters
+ * - **ParamsType**: The parameter array type (must extend `Array<any>` or `ReadonlyArray<any>`)
+ * - **Context**: Optional context type (defaults to `unknown`)
+ *
+ * ### Usage in Rule Definitions
+ * ```typescript
+ * // Rule that takes a single number parameter
+ * MinLength: IValidatorRuleParams<[minLength: number], Context>;
+ *
+ * // Rule that takes min and max number parameters
+ * Length: IValidatorRuleParams<[lengthOrMin: number, maxLength?: number], Context>;
+ *
+ * // Rule that takes no parameters
+ * Required: IValidatorRuleParams<[], Context>;
+ *
+ * // Rule that accepts readonly arrays (e.g., const assertions)
+ * IsEnum: IValidatorRuleParams<ReadonlyArray<string>, Context>;
+ * ```
+ *
+ * ### Type Resolution Examples
+ * ```typescript
+ * // Empty array resolves to empty array
+ * type RequiredParams = IValidatorRuleParams<[], Context>; // []
+ *
+ * // Single parameter array
+ * type MinLengthParams = IValidatorRuleParams<[number], Context>; // [number] | readonly [number]
+ *
+ * // Multiple parameters
+ * type BetweenParams = IValidatorRuleParams<[number, number], Context>; // [number, number] | readonly [number, number]
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - Used by {@link IValidatorRulesMap} to define parameter types for each rule
+ * - Compatible with {@link IValidatorRuleFunction} parameter signatures
+ * - Supports both mutable and immutable parameter arrays for flexibility
+ *
+ * @template ParamsType - The parameter array type (extends Array<any> | ReadonlyArray<any>)
+ * @template Context - Optional context type for validation (defaults to unknown)
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorRulesMap} - Uses this type for rule parameter definitions
+ * @see {@link IValidatorRuleFunction} - Validation function that receives these parameters
+ * @see {@link IValidatorRule} - Complete rule definition including this parameter type
+ */
+export type IValidatorRuleParams<
+  ParamsType extends Array<any> | ReadonlyArray<any> = Array<any>,
+  Context = unknown,
+> = ParamsType extends [] ? [] : ParamsType | Readonly<ParamsType>;
+
+/**
+ * ## Nested Rule Function Options
+ *
+ * Configuration interface for validating nested objects or complex data structures
+ * within the validation system. This interface is specifically designed for rule functions
+ * that need to validate target objects (classes with decorators) rather than simple values.
+ *
+ * ### Purpose
+ * Provides a specialized options interface for validation rule functions that operate on
+ * nested or complex data structures. Unlike {@link IValidatorValidateOptions} which handles
+ * single values, this interface is tailored for scenarios where validation rules need to
+ * work with entire class instances or nested object hierarchies.
+ *
+ * ### Key Differences from IValidatorValidateOptions
+ * - **Extends from IValidatorValidateTargetOptions**: Inherits target-specific properties
+ * - **Omits "data" property**: Uses its own `data` property instead
+ * - **Optional value property**: Accepts target data instead of single values
+ * - **Flexible data property**: Allows any record structure for nested validation
+ *
+ * ### Inheritance Structure
+ * ```
+ * IValidatorNestedRuleFunctionOptions
+ *   ↳ extends Omit<IValidatorValidateTargetOptions<Target, Context, [target: Target]>, "data">
+ *     ↳ extends Omit<IValidatorValidateOptions<ParamsType, Context>, "data" | "rule" | "value">
+ *       ↳ extends Omit<Partial<IInputFormatterResult>, "value">
+ *         ↳ extends BaseData<Context>
+ * ```
+ *
+ * ### Generic Parameters
+ * - **Target**: The class constructor type being validated (extends `IClassConstructor`)
+ * - **Context**: Optional context type for validation (defaults to `unknown`)
+ *
+ * ### Properties Overview
+ *
+ * #### Inherited Properties
+ * - **rules**: Array of validation rules to apply
+ * - **ruleParams**: Parameters for the current rule
+ * - **ruleName**: Name of the validation rule
+ * - **rawRuleName**: Original unparsed rule name
+ * - **message**: Custom error message
+ * - **fieldName**: Form field identifier
+ * - **propertyName**: Object property name
+ * - **translatedPropertyName**: Localized property name
+ * - **i18n**: Internationalization instance
+ * - **sanitizedRules**: Preprocessed rules
+ * - **startTime**: Performance tracking timestamp
+ * - **errorMessageBuilder**: Custom error message builder
+ * - **parentData**: Parent context for nested validations
+ *
+ * #### Own Properties
+ * - **value**: Optional target data to validate
+ * - **data**: Flexible data object for nested validation context
+ *
+ * ### Usage in Nested Validation
+ * ```typescript
+ * class UserProfile {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsRequired
+ *   @ValidateNested
+ *   address: Address;
+ * }
+ *
+ * // Custom nested validation rule
+ * const validateNestedProfile: IValidatorRuleFunction<
+ *   [target: UserProfile],
+ *   ValidationContext
+ * > = async (options: IValidatorNestedRuleFunctionOptions<UserProfile, ValidationContext>) => {
+ *   const { value, data, context } = options;
+ *
+ *   // Validate the nested profile
+ *   if (value && typeof value === 'object') {
+ *     // Perform nested validation logic
+ *     const result = await Validator.validateTarget(UserProfile, value);
+ *     return result.success || "Profile validation failed";
+ *   }
+ *
+ *   return true;
+ * };
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link Validator.validateNestedRule} method
+ * - **Complements**: {@link IValidatorValidateTargetOptions} for target validation
+ * - **Extends**: {@link IValidatorValidateOptions} with target-specific modifications
+ * - **Supports**: Complex nested object validation scenarios
+ *
+ * ### Common Use Cases
+ *
+ * #### 1. Nested Object Validation
+ * ```typescript
+ * const options: IValidatorNestedRuleFunctionOptions<User, Context> = {
+ *   value: userInstance,        // Full user object
+ *   data: { parentForm: form }, // Additional context
+ *   propertyName: "user",       // Property being validated
+ *   context: validationContext, // Typed context
+ * };
+ * ```
+ *
+ * #### 2. Array of Objects Validation
+ * ```typescript
+ * const options: IValidatorNestedRuleFunctionOptions<Item[], Context> = {
+ *   value: itemsArray,          // Array of items
+ *   data: { index: 0 },         // Current index context
+ *   propertyName: "items",      // Array property name
+ * };
+ * ```
+ *
+ * #### 3. Conditional Nested Validation
+ * ```typescript
+ * const options: IValidatorNestedRuleFunctionOptions<Address, Context> = {
+ *   value: addressData,         // Address object (if present)
+ *   data: { required: true },   // Validation requirements
+ *   propertyName: "shippingAddress",
+ *   context: { userType: "premium" },
+ * };
+ * ```
+ *
+ * ### Type Safety Benefits
+ * - **Compile-time validation** of target types
+ * - **Type-safe property access** on nested objects
+ * - **Context propagation** through validation hierarchy
+ * - **Flexible data structures** for complex validation scenarios
+ *
+ * ### Performance Considerations
+ * - **Target validation overhead**: More expensive than single-value validation
+ * - **Parallel processing**: Multiple nested validations can run concurrently
+ * - **Memory usage**: Larger data structures require more memory
+ * - **Serialization**: Complex objects may need special handling
+ *
+ * @template Target - The class constructor type being validated (must extend IClassConstructor)
+ * @template Context - Optional context type for validation (defaults to unknown)
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorValidateTargetOptions} - Base target validation options
+ * @see {@link IValidatorValidateOptions} - Single-value validation options
+ * @see {@link Validator.validateNestedRule} - Method that uses this interface
+ * @see {@link IValidatorValidateTargetData} - Target data type
+ * @see {@link IClassConstructor} - Class constructor constraint
+ */
 export interface IValidatorNestedRuleFunctionOptions<
   Target extends IClassConstructor = IClassConstructor,
   Context = unknown,
@@ -707,6 +1036,110 @@ export type IValidatorRuleName = keyof IValidatorRulesMap & string;
  *
  * This interface is useful for organizing and managing validation rules in a structured way,
  * making it easier to apply and reference them in  validation scenarios.
+ */
+/**
+ * ## Validation Rules Parameter Map
+ *
+ * Central type definition mapping validation rule names to their parameter signatures.
+ * This interface serves as the authoritative source for all built-in validation rules,
+ * defining the exact parameter types each rule accepts.
+ *
+ * ### Purpose
+ * Provides compile-time type safety for validation rule parameters across the entire
+ * validation system. Each property represents a built-in validation rule and its
+ * expected parameter structure.
+ *
+ * ### Type Structure
+ * - **Key**: Rule name (string literal from {@link IValidatorRuleName})
+ * - **Value**: Parameter array type (extends {@link IValidatorRuleParams})
+ * - **Context**: Optional validation context type (defaults to `unknown`)
+ *
+ * ### Parameter Type Patterns
+ * - **Empty Arrays `[]`**: Rules that take no parameters (e.g., "Required", "Email")
+ * - **Single Parameters `[Type]`**: Rules with one required parameter (e.g., "MinLength[number]")
+ * - **Optional Parameters `[Type?]`**: Rules with optional parameters (e.g., "PhoneNumber[string?]")
+ * - **Multiple Parameters `[Type1, Type2]`**: Rules with multiple required parameters
+ * - **Complex Parameters**: Rules with mixed required/optional parameters
+ *
+ * ### Usage in Type System
+ * This interface is used throughout the validator to:
+ * - Type-check rule parameters at compile time
+ * - Generate {@link IValidatorRuleName} union type
+ * - Create {@link IValidatorRegisteredRules} registry type
+ * - Validate rule definitions in rule implementation files
+ *
+ * ### Rule Categories
+ *
+ * #### Presence Validation
+ * - **Required**: Ensures value is present and not empty
+ * - **Nullable**: Allows null/undefined values (skips validation)
+ * - **Optional**: Allows undefined values (skips validation)
+ * - **Empty**: Allows empty strings (skips validation for "")
+ *
+ * #### Type Validation
+ * - **String**: Validates value is a string
+ * - **Number**: Validates value is a number
+ * - **NonNullString**: Validates value is a non-null string
+ *
+ * #### String Validation
+ * - **MinLength**: Minimum character length requirement
+ * - **MaxLength**: Maximum character length limit
+ * - **Length**: Exact length or length range requirement
+ * - **FileName**: Valid file name format
+ *
+ * #### Numeric Validation
+ * - **NumberGreaterThan**: Value must be greater than specified number
+ * - **NumberGreaterThanOrEqual**: Value must be >= specified number
+ * - **NumberLessThan**: Value must be less than specified number
+ * - **NumberLessThanOrEqual**: Value must be <= specified number
+ * - **NumberEqual**: Value must equal specified number
+ * - **NumberIsDifferentFrom**: Value must differ from specified number
+ *
+ * #### Format Validation
+ * - **Email**: Valid email address format
+ * - **Url**: Valid URL format
+ * - **PhoneNumber**: Valid phone number (with optional country code)
+ * - **EmailOrPhoneNumber**: Valid email or phone number
+ *
+ * ### Parameter Examples
+ * ```typescript
+ * // Rules with no parameters
+ * Required: IValidatorRuleParams<[], Context>;           // "Required"
+ * Email: IValidatorRuleParams<[], Context>;              // "Email"
+ *
+ * // Rules with single parameters
+ * MinLength: IValidatorRuleParams<[number], Context>;    // "MinLength[5]"
+ * NumberEqual: IValidatorRuleParams<[number], Context>;  // "NumberEqual[42]"
+ *
+ * // Rules with optional parameters
+ * PhoneNumber: IValidatorRuleParams<[ICountryCode?], Context>; // "PhoneNumber" or "PhoneNumber[US]"
+ *
+ * // Rules with multiple parameters
+ * Length: IValidatorRuleParams<[number, number?], Context>; // "Length[5]" or "Length[5,10]"
+ * ```
+ *
+ * ### Extending the Rules Map
+ * When adding new validation rules:
+ * 1. Add the rule name and parameter type to this interface
+ * 2. Implement the rule function in the appropriate rule file
+ * 3. Register the rule in the validator's rule registry
+ * 4. Update rule name unions and type definitions as needed
+ *
+ * ### Relationship to Validation System
+ * - **Foundation**: Base type for all rule definitions
+ * - **Type Safety**: Ensures parameter type checking
+ * - **Rule Discovery**: Used to generate valid rule names
+ * - **Function Signatures**: Defines parameter types for rule functions
+ * - **Runtime Validation**: Parameters validated against these types
+ *
+ * @template Context - Type of the optional validation context (defaults to unknown)
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorRuleName} - Union type derived from this interface's keys
+ * @see {@link IValidatorRegisteredRules} - Registry type using this interface
+ * @see {@link IValidatorRuleParams} - Base parameter type for all rules
+ * @see {@link Validator} - Main validator class that uses these rules
  */
 export interface IValidatorRulesMap<Context = unknown> {
   /**
@@ -818,137 +1251,8 @@ export interface IValidatorRulesMap<Context = unknown> {
   Optional: IValidatorRuleParams<[], Context>;
 }
 
-/**
- * @interface IValidatorValidateOptions
- * Represents the result of a form validation.
- *
- * The validation result can be one of the following:
- *
- * - A `Promise<boolean | string>`: Indicates that the validation is asynchronous.
- *   - If resolved to `true`, the validation has succeeded.
- *   - If resolved to a `string`, it represents an error message indicating a validation failure.
- * - A `string`: Represents an invalid validation result, where the string contains an error message.
- * - A `boolean`: Indicates the success or failure of the validation.
- *   - If `true`, the validation has succeeded.
- *   - If `false`, the validation has failed.
- *
- * ### Usage:
- * - When a validation function returns a string, it signifies that the validation has failed,
- *   and the string should be treated as an error message.
- * - When a validation function returns `true`, it indicates that the validation has passed.
- * - When a validation function returns a `Promise`, it should be awaited to determine the validation result.
- *
- * @example
- * ```typescript
- * // Example of a synchronous validation function
- * function validateUsername(username: string): IValidatorResult {
- *     if (username.length < 5) {
- *         return "Username must be at least 5 characters long."; // Invalid validation
-/**
- * Represents a mapping of validation rule names to their corresponding validation rules.
- *
- * The `IValidatorRulesMap` interface defines an object where each key is a PascalCase string
- * representing the name of a validation rule, and the value is the corresponding validation rule
- * of type `IValidatorRule`. This allows for easy retrieval and management of validation rules
- * by name.
- *
- * ### Structure:
- * - **Key**: A PascalCase string representing the name of the validation rule.
- * - **Value**: An `IValidatorRule`, which can be a string, a function, or an array of rules.
- *
- * ### Example:
- *
- * ```typescript
- * const validationRules: IValidatorRulesMap = {
- *     Required: "Required",
- *     MinLength: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
- *     MaxLength: ({ value }) => value.length <= 10 || "Maximum length is 10 characters.",
- * };
- *
- * // Usage
- * const rule = validationRules.Required;
- * const minLengthRule = validationRules.MinLength;
- * const maxLengthRule = validationRules.MaxLength;
- * ```
- */
-
-/**
- * ## Validation Options for Single-Value Validation
- *
- * Configuration object passed to {@link Validator.validate} to specify how a single value
- * should be validated. Includes rules, parameters, context, and metadata.
- *
- * ### Overview
- * The `IValidatorValidateOptions` interface encapsulates all the parameters needed to perform
- * validation on a single value. It combines rule specifications, validation parameters, context,
- * error handling, and field identification.
- *
- * ### Key Properties
- * - **rules**: Array of validation rules to apply
- * - **value**: The value being validated (from BaseData)
- * - **context**: Optional validation context
- * - **message**: Custom error message override
- * - **fieldName/propertyName**: Field identification
- * - **ruleParams**: Parameters passed to the rule function
- *
- * ### Usage Example
- * ```typescript
- * const options: IValidatorValidateOptions = {
- *   value: "user@example.com",
- *   rules: [
- *     { ruleName: "Required" },
- *     { ruleName: "Email" }
- *   ],
- *   fieldName: "email_input",
- *   propertyName: "email",
- *   message: "Please enter a valid email address",
- *   context: { userId: 123 }
- * };
- *
- * const result = await Validator.validate(options);
- * ```
- *
- * ### With Rule Parameters
- * ```typescript
- * const options: IValidatorValidateOptions = {
- *   value: "test123",
- *   rules: [
- *     { ruleName: "MinLength", params: [6] }
- *   ],
- *   ruleParams: [6],
- *   propertyName: "password"
- * };
- *
- * const result = await Validator.validate(options);
- * ```
- *
- * ### Context Usage
- * ```typescript
- * interface ValidationContext {
- *   userId: number;
- *   userRole: string;
- * }
- *
- * const options: IValidatorValidateOptions<any, ValidationContext> = {
- *   value: someValue,
- *   rules: ["Required"],
- *   context: {
- *     userId: 42,
- *     userRole: "admin"
- *   }
- * };
- * ```
- *
- * @template ParamType - The type of parameters that the validation rule accepts (default: Array<any>)
- * @template Context - The type of the optional validation context
- *
- * @public
- * @since 1.0.0
- * @see {@link IValidatorRule} - Rule interface
- * @see {@link BaseData} - Base properties (value, data, context)
- */
 export interface IValidatorValidateOptions<
-  ParamType extends Array<any> = Array<any>,
+  ParamsType extends IValidatorRuleParams = IValidatorRuleParams,
   Context = unknown,
 > extends Omit<Partial<IInputFormatterResult>, "value">,
     BaseData<Context> {
@@ -995,7 +1299,7 @@ export interface IValidatorValidateOptions<
    * Specifies the specific rule to apply. Can be used to override or specify
    * a particular rule from the `rules` array, or to apply a single rule directly.
    *
-   * @type {IValidatorRule<ParamType, Context>}
+   * @type {IValidatorRule<ParamsType, Context>}
    * @optional
    *
    * @example
@@ -1009,7 +1313,7 @@ export interface IValidatorValidateOptions<
    *
    * @see {@link IValidatorRule}
    */
-  rule?: IValidatorRule<ParamType, Context>;
+  rule?: IValidatorRule<ParamsType, Context>;
 
   /**
    * Parameters passed to the validation rule
@@ -1018,7 +1322,7 @@ export interface IValidatorValidateOptions<
    * MinLength rule, this would be `[5]` to require minimum 5 characters.
    * These are typically extracted from raw rule names like "MinLength[5]".
    *
-   * @type {ParamType}
+   * @type {ParamsType}
    * @optional
    *
    * @example
@@ -1040,7 +1344,7 @@ export interface IValidatorValidateOptions<
    * };
    * ```
    */
-  ruleParams?: ParamType;
+  ruleParams?: ParamsType;
 
   /**
    * The name of the validation rule
@@ -1311,7 +1615,7 @@ export interface IValidatorValidateMultiRuleOptions<
 }
 export type IValidatorDefaultMultiRule<
   Context = unknown,
-  ParamsTypes extends Array<any> = any,
+  ParamsTypes extends IValidatorRuleParams = any,
 > = Array<IValidatorRule<ParamsTypes, Context>>;
 
 export type IValidatorMultiRuleFunction<
@@ -1325,10 +1629,208 @@ export type IValidatorValidateTargetData<
   Target extends IClassConstructor = IClassConstructor,
 > = Partial<Record<keyof InstanceType<Target>, any>>;
 
+/**
+ * ## Target Validation Options
+ *
+ * Configuration interface for validating entire class instances with decorated properties.
+ * This interface extends {@link IValidatorValidateOptions} with target-specific properties
+ * for complex object validation scenarios.
+ *
+ * ### Purpose
+ * Provides a specialized options interface for validating class instances where multiple
+ * properties have validation decorators. Unlike single-value validation, this interface
+ * handles validation of entire objects with potentially many fields and nested structures.
+ *
+ * ### Key Differences from IValidatorValidateOptions
+ * - **data property**: Required and typed as target data (not optional generic data)
+ * - **Omits "rule" and "value"**: Uses target-specific data structure instead
+ * - **parentData**: Supports nested validation context
+ * - **errorMessageBuilder**: Customizable error message formatting for target validation
+ * - **startTime**: Performance tracking for multi-field validation
+ *
+ * ### Inheritance Structure
+ * ```
+ * IValidatorValidateTargetOptions
+ *   ↳ extends Omit<IValidatorValidateOptions<ParamsTypes, Context>, "data" | "rule" | "value">
+ *     ↳ extends Omit<Partial<IInputFormatterResult>, "value">
+ *       ↳ extends BaseData<Context> (but overrides data property)
+ * ```
+ *
+ * ### Generic Parameters
+ * - **Target**: The class constructor type being validated (extends `IClassConstructor`)
+ * - **Context**: Optional context type for validation (defaults to `unknown`)
+ * - **ParamsTypes**: Parameter types for validation rules (defaults to `IValidatorRuleParams`)
+ *
+ * ### Properties Overview
+ *
+ * #### Inherited Properties (from IValidatorValidateOptions)
+ * - **rules**: Array of validation rules to apply to the target
+ * - **ruleParams**: Parameters for the current rule
+ * - **ruleName**: Name of the validation rule
+ * - **rawRuleName**: Original unparsed rule name
+ * - **message**: Custom error message
+ * - **fieldName**: Form field identifier
+ * - **propertyName**: Object property name
+ * - **translatedPropertyName**: Localized property name
+ * - **i18n**: Internationalization instance
+ * - **sanitizedRules**: Preprocessed rules
+ *
+ * #### Target-Specific Properties
+ * - **data**: Required target data to validate (typed as `IValidatorValidateTargetData<Target>`)
+ * - **parentData**: Parent context for nested validations
+ * - **startTime**: Performance tracking timestamp
+ * - **errorMessageBuilder**: Custom error message builder function
+ *
+ * ### Usage in Target Validation
+ * ```typescript
+ * class UserProfile {
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ *
+ *   @IsRequired
+ *   @MinLength([2])
+ *   name: string;
+ *
+ *   @ValidateNested
+ *   address: Address;
+ * }
+ *
+ * // Basic target validation
+ * const options: IValidatorValidateTargetOptions<UserProfile> = {
+ *   data: {
+ *     email: "user@example.com",
+ *     name: "John",
+ *     address: { street: "123 Main St", city: "Anytown" }
+ *   },
+ *   propertyName: "userProfile",
+ *   context: validationContext,
+ *   i18n: defaultI18n,
+ * };
+ *
+ * const result = await Validator.validateTarget(UserProfile, options.data);
+ * ```
+ *
+ * ### Error Message Builder
+ * The `errorMessageBuilder` allows customization of error message formatting:
+ * ```typescript
+ * const customErrorBuilder = (
+ *   translatedPropertyName: string,
+ *   error: string,
+ *   options: IValidatorValidationError & {
+ *     propertyName: string;
+ *     translatedPropertyName: string;
+ *     i18n: I18n;
+ *     separators: { multiple: string; single: string };
+ *     data: Partial<Record<keyof Target, any>>;
+ *   }
+ * ) => {
+ *   return `[${translatedPropertyName}]: ${error}`;
+ * };
+ *
+ * const options: IValidatorValidateTargetOptions<UserProfile> = {
+ *   data: userData,
+ *   errorMessageBuilder: customErrorBuilder,
+ * };
+ * ```
+ *
+ * ### Nested Validation Context
+ * The `parentData` property enables context sharing in nested validations:
+ * ```typescript
+ * // Parent validation
+ * const parentOptions: IValidatorValidateTargetOptions<Company> = {
+ *   data: {
+ *     name: "ACME Corp",
+ *     employees: [employeeData1, employeeData2]
+ *   },
+ *   parentData: undefined, // Root level
+ * };
+ *
+ * // Nested validation (for each employee)
+ * const nestedOptions: IValidatorValidateTargetOptions<Employee> = {
+ *   data: employeeData,
+ *   parentData: { companyName: "ACME Corp" }, // Context from parent
+ *   propertyName: "employee",
+ * };
+ * ```
+ *
+ * ### Performance Tracking
+ * The `startTime` property enables duration measurement:
+ * ```typescript
+ * const startTime = Date.now();
+ * const options: IValidatorValidateTargetOptions<UserForm> = {
+ *   data: formData,
+ *   startTime, // Track when validation began
+ * };
+ *
+ * const result = await Validator.validateTarget(UserForm, formData, options);
+ * if (result.success) {
+ *   console.log(`Validation took ${result.duration}ms`);
+ * }
+ * ```
+ *
+ * ### Type Safety Benefits
+ * - **Compile-time validation** of target class types
+ * - **Property type checking** for data objects
+ * - **Context propagation** through validation hierarchy
+ * - **Error message customization** with proper typing
+ *
+ * ### Common Use Cases
+ *
+ * #### 1. Form Validation
+ * ```typescript
+ * const formOptions: IValidatorValidateTargetOptions<RegistrationForm> = {
+ *   data: {
+ *     email: submittedEmail,
+ *     password: submittedPassword,
+ *     confirmPassword: submittedConfirm,
+ *   },
+ *   fieldName: "registration_form",
+ *   context: { userType: "new" },
+ * };
+ * ```
+ *
+ * #### 2. API Request Validation
+ * ```typescript
+ * const apiOptions: IValidatorValidateTargetOptions<CreateUserRequest> = {
+ *   data: requestBody,
+ *   propertyName: "request",
+ *   context: { requestId: req.id, userAgent: req.headers['user-agent'] },
+ * };
+ * ```
+ *
+ * #### 3. Nested Object Validation
+ * ```typescript
+ * const nestedOptions: IValidatorValidateTargetOptions<OrderItem> = {
+ *   data: itemData,
+ *   parentData: { orderId: "12345", customerId: "67890" },
+ *   propertyName: "item",
+ *   errorMessageBuilder: customFormatter,
+ * };
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Used by**: {@link Validator.validateTarget} method
+ * - **Extends**: {@link IValidatorValidateOptions} with target-specific modifications
+ * - **Supports**: Multi-field validation with error aggregation
+ * - **Integrates with**: Decorator-based validation system
+ *
+ * @template Target - The class constructor type being validated (must extend IClassConstructor)
+ * @template Context - Optional context type for validation (defaults to unknown)
+ * @template ParamsTypes - Parameter types for validation rules (defaults to IValidatorRuleParams)
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorValidateOptions} - Base options interface being extended
+ * @see {@link IValidatorValidateTargetData} - Target data type
+ * @see {@link Validator.validateTarget} - Method that uses this interface
+ * @see {@link IClassConstructor} - Class constructor constraint
+ * @see {@link IValidatorValidationError} - Error type for errorMessageBuilder
+ */
 export interface IValidatorValidateTargetOptions<
   Target extends IClassConstructor = IClassConstructor,
   Context = unknown,
-  ParamsTypes extends Array<any> = Array<any>,
+  ParamsTypes extends IValidatorRuleParams = IValidatorRuleParams,
 > extends Omit<
     IValidatorValidateOptions<ParamsTypes, Context>,
     "data" | "rule" | "value"
@@ -1365,7 +1867,115 @@ export type IValidatorMultiRuleNames = "OneOf" | "AllOf";
  * This provides strong type safety and prevents accessing wrong properties based on the result state.
  */
 
-// Base error interface for validation failures
+/**
+ * ## Validation Error Details
+ *
+ * Comprehensive error information structure for validation failures.
+ * This interface defines the complete error object that is returned when validation rules fail,
+ * providing detailed context about what went wrong and where.
+ *
+ * ### Purpose
+ * Serves as the standardized error format across the entire validation system.
+ * Contains all necessary information for error reporting, debugging, and user feedback.
+ * Used by both single-value and target validation failure results.
+ *
+ * ### Key Properties
+ * - **status**: Always "error" for type discrimination
+ * - **name**: Error class name ("ValidatorValidationError")
+ * - **message**: Human-readable error message (translated if available)
+ * - **ruleName**: The specific validation rule that failed
+ * - **value**: The actual value that failed validation
+ * - **propertyName**: Object property name (for target validation)
+ * - **fieldName**: Form field identifier
+ *
+ * ### Usage in Validation Results
+ * This interface is used in failure results:
+ * - {@link IValidatorValidateFailure.error} - Single value validation failures
+ * - {@link IValidatorValidateTargetFailure.errors} - Array of errors in target validation
+ *
+ * ### Error Message Structure
+ * Error messages follow a consistent format:
+ * ```
+ * "[PropertyName]: Error message from rule"
+ * ```
+ * For example: `"[Email]: Must be valid email format"`
+ *
+ * ### Internationalization Support
+ * - **translatedPropertyName**: Localized property name for user-facing messages
+ * - **message**: Can be translated based on i18n configuration
+ * - **timestamp**: When the error occurred (for logging/debugging)
+ *
+ * ### Metadata and Extensibility
+ * - **code**: Programmatic error code for conditional handling
+ * - **severity**: Error level ("error", "warning", "info")
+ * - **metadata**: Additional error context as key-value pairs
+ *
+ * ### Example Error Object
+ * ```typescript
+ * const error: IValidatorValidationError = {
+ *   status: "error",
+ *   name: "ValidatorValidationError",
+ *   message: "[Email]: Must be valid email format",
+ *   ruleName: "Email",
+ *   ruleParams: [],
+ *   rawRuleName: "Email",
+ *   propertyName: "email",
+ *   fieldName: "email_input",
+ *   translatedPropertyName: "Email Address",
+ *   value: "invalid-email",
+ *   code: "INVALID_EMAIL",
+ *   severity: "error",
+ *   timestamp: new Date(),
+ *   metadata: {
+ *     suggestion: "Please use format: user@example.com",
+ *     domain: "example.com"
+ *   }
+ * };
+ * ```
+ *
+ * ### Relationship to Validation System
+ * - **Created by**: Validation rule functions when they return failure strings
+ * - **Processed by**: {@link Validator.validate} and {@link Validator.validateTarget}
+ * - **Used in**: Error aggregation and reporting throughout the system
+ * - **Compatible with**: Standard error handling patterns and logging systems
+ *
+ * ### Best Practices
+ *
+ * #### Error Message Guidelines
+ * ```typescript
+ * // ✅ Good: Specific, actionable messages
+ * message: "[Password]: Must contain at least one uppercase letter"
+ *
+ * // ❌ Avoid: Generic or unhelpful messages
+ * message: "Invalid input"
+ * ```
+ *
+ * #### Using Error Codes
+ * ```typescript
+ * // Enable programmatic error handling
+ * if (error.code === "EMAIL_INVALID_FORMAT") {
+ *   highlightEmailField();
+ *   showEmailFormatHint();
+ * }
+ * ```
+ *
+ * #### Metadata for Rich Errors
+ * ```typescript
+ * // Provide additional context
+ * error.metadata = {
+ *   minLength: 8,
+ *   actualLength: 5,
+ *   missingChars: ["uppercase", "number"]
+ * };
+ * ```
+ *
+ * @public
+ * @since 1.0.0
+ * @see {@link IValidatorValidateFailure} - Single validation failure result
+ * @see {@link IValidatorValidateTargetFailure} - Target validation failure result
+ * @see {@link Validator.validate} - Method that creates these errors
+ * @see {@link Validator.validateTarget} - Method that creates these errors
+ */
 export interface IValidatorValidationError {
   /** Always 'error' for failures */
   status: "error";

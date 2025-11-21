@@ -1,17 +1,6 @@
-import {
-  buildPropertyDecorator,
-  getDecoratedProperties,
-} from "@/resources/decorators";
+import { buildPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
 import { IClassConstructor, IDict, IMakeOptional } from "@/types";
-import {
-  defaultStr,
-  isEmpty,
-  isNonNullString,
-  isNumber,
-  isObj,
-  lowerFirst,
-  stringify,
-} from "@utils/index";
+import { defaultStr, isEmpty, isNonNullString, isNumber, isObj, lowerFirst, stringify } from "@utils/index";
 import { I18n, i18n as defaultI18n } from "../i18n";
 import {
   IValidatorDefaultMultiRule,
@@ -54,11 +43,7 @@ const VALIDATOR_ALLOF_RULE_MARKER = Symbol.for("validatorAllOfRuleMarker");
 const VALIDATOR_ARRAYOF_RULE_MARKER = Symbol.for("validatorArrayOfRuleMarker");
 
 /** Array of all multi-rule markers for easy iteration and checking */
-const VALIDATOR_MULTI_RULE_MARKERS = [
-  VALIDATOR_ONEOF_RULE_MARKER,
-  VALIDATOR_ALLOF_RULE_MARKER,
-  VALIDATOR_ARRAYOF_RULE_MARKER,
-];
+const VALIDATOR_MULTI_RULE_MARKERS = [VALIDATOR_ONEOF_RULE_MARKER, VALIDATOR_ALLOF_RULE_MARKER, VALIDATOR_ARRAYOF_RULE_MARKER];
 
 /**
  * Checks if a rule function has any of the multi-rule markers.
@@ -68,9 +53,7 @@ const VALIDATOR_MULTI_RULE_MARKERS = [
  */
 function hasMultiRuleMarker(ruleFunc: any): boolean {
   if (typeof ruleFunc !== "function") return false;
-  return VALIDATOR_MULTI_RULE_MARKERS.some(
-    (marker) => ruleFunc[marker] === true
-  );
+  return VALIDATOR_MULTI_RULE_MARKERS.some((marker) => ruleFunc[marker] === true);
 }
 
 /**
@@ -88,9 +71,7 @@ function hasRuleMarker(ruleFunc: any, marker: symbol): boolean {
  * @param ruleFunc - The rule function to inspect
  * @returns "oneof" | "allof" | "arrayof" | undefined
  */
-function getMultiRuleType(
-  ruleFunc: any
-): "oneof" | "allof" | "arrayof" | undefined {
+function getMultiRuleType(ruleFunc: any): "oneof" | "allof" | "arrayof" | undefined {
   if (hasRuleMarker(ruleFunc, VALIDATOR_ONEOF_RULE_MARKER)) return "oneof";
   if (hasRuleMarker(ruleFunc, VALIDATOR_ALLOF_RULE_MARKER)) return "allof";
   if (hasRuleMarker(ruleFunc, VALIDATOR_ARRAYOF_RULE_MARKER)) return "arrayof";
@@ -282,13 +263,7 @@ export class Validator {
    * @see {@link getRules} - Get all registered rules
    * @public
    */
-  static registerRule<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  >(
-    ruleName: IValidatorRuleName,
-    ruleHandler: IValidatorRuleFunction<ParamType, Context>
-  ): void {
+  static registerRule<ParamType extends Array<any> = Array<any>, Context = unknown>(ruleName: IValidatorRuleName, ruleHandler: IValidatorRuleFunction<ParamType, Context>): void {
     if (!isNonNullString(ruleName)) {
       throw new Error("Rule name must be a non-empty string");
     }
@@ -299,11 +274,7 @@ export class Validator {
 
     const existingRules = Validator.getRules();
     const updatedRules = { ...existingRules, [ruleName]: ruleHandler };
-    Reflect.defineMetadata(
-      Validator.RULES_METADATA_KEY,
-      updatedRules,
-      Validator
-    );
+    Reflect.defineMetadata(Validator.RULES_METADATA_KEY, updatedRules, Validator);
   }
 
   /**
@@ -341,9 +312,7 @@ export class Validator {
    */
   static getRules<Context = unknown>(): IValidatorRegisteredRules<Context> {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
-    return isObj(rules)
-      ? { ...rules }
-      : ({} as IValidatorRegisteredRules<Context>);
+    return isObj(rules) ? { ...rules } : ({} as IValidatorRegisteredRules<Context>);
   }
   /**
    * ## Get Registered Rule
@@ -531,10 +500,7 @@ export class Validator {
     single: string;
   } {
     const i18n = this.getI18n({ i18n: customI18n });
-    const translatedSeparator: IDict = Object.assign(
-      {},
-      i18n.getNestedTranslation("validator.separators")
-    ) as IDict;
+    const translatedSeparator: IDict = Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict;
     return {
       multiple: defaultStr(translatedSeparator.multiple, ", "),
       single: defaultStr(translatedSeparator.single, ", "),
@@ -605,12 +571,7 @@ export class Validator {
    * @see {@link getRules} - Get all rules
    * @public
    */
-  static findRegisteredRule<
-    ParamType extends Array<any> = Array<any>,
-    Context = unknown,
-  >(
-    ruleName: IValidatorRuleName
-  ): IValidatorRuleFunction<ParamType, Context> | undefined {
+  static findRegisteredRule<ParamType extends Array<any> = Array<any>, Context = unknown>(ruleName: IValidatorRuleName): IValidatorRuleFunction<ParamType, Context> | undefined {
     if (!isNonNullString(ruleName)) return undefined;
     const rules = Validator.getRules();
     return rules[ruleName] as any | undefined;
@@ -716,10 +677,7 @@ export class Validator {
           invalidRules.push(rule as any);
         }
       } else if (isObj(rule) && typeof rule === "object") {
-        const parsedObject = this.parseObjectRule<Context>(
-          rule,
-          registeredRules
-        );
+        const parsedObject = this.parseObjectRule<Context>(rule, registeredRules);
         if (parsedObject.length) {
           parsedRules.push(...parsedObject);
         }
@@ -777,10 +735,7 @@ export class Validator {
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
-  private static parseStringRule<Context = unknown>(
-    ruleString: string,
-    registeredRules: IValidatorRegisteredRules<Context>
-  ): any {
+  private static parseStringRule<Context = unknown>(ruleString: string, registeredRules: IValidatorRegisteredRules<Context>): any {
     let ruleName = String(ruleString).trim();
     const ruleParameters: string[] = [];
 
@@ -807,10 +762,7 @@ export class Validator {
 
     return null;
   }
-  private static parseObjectRule<Context = unknown>(
-    rulesObject: IValidatorRuleObject<Context>,
-    registeredRules: IValidatorRegisteredRules<Context>
-  ): IValidatorSanitizedRuleObject<Array<any>, Context>[] {
+  private static parseObjectRule<Context = unknown>(rulesObject: IValidatorRuleObject<Context>, registeredRules: IValidatorRegisteredRules<Context>): IValidatorSanitizedRuleObject<Array<any>, Context>[] {
     const result: IValidatorSanitizedRuleObject<Array<any>, Context>[] = [];
     if (!isObj(rulesObject) || typeof rulesObject !== "object") {
       return result;
@@ -1016,17 +968,10 @@ export class Validator {
    * @public
    * @async
    */
-  static async validate<Context = unknown>({
-    rules,
-    ...extra
-  }: IMakeOptional<
-    IValidatorValidateOptions<Array<any>, Context>,
-    "i18n"
-  >): Promise<IValidatorValidateResult<Context>> {
+  static async validate<Context = unknown>({ rules, ...extra }: IMakeOptional<IValidatorValidateOptions<Array<any>, Context>, "i18n">): Promise<IValidatorValidateResult<Context>> {
     const i18n = this.getI18n(extra);
     const startTime = Date.now();
-    const { sanitizedRules, invalidRules } =
-      Validator.parseAndValidateRules<Context>(rules);
+    const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules<Context>(rules);
     const separators = Validator.getErrorMessageSeparators(i18n);
     const { value, context, data } = extra;
     const successOrErrorData = {
@@ -1062,10 +1007,7 @@ export class Validator {
       return createSuccessResult<Context>(successOrErrorData, startTime);
     }
 
-    extra.fieldName = extra.propertyName = defaultStr(
-      extra.fieldName,
-      extra.propertyName
-    );
+    extra.fieldName = extra.propertyName = defaultStr(extra.fieldName, extra.propertyName);
     const i18nRulesOptions = {
       //...extra,
       value,
@@ -1085,9 +1027,7 @@ export class Validator {
           let ruleName = undefined;
           let rawRuleName: IValidatorRuleName | string | undefined = undefined;
           let ruleParams: any[] = [];
-          let ruleFunc:
-            | IValidatorRuleFunction<Array<any>, Context>
-            | undefined = typeof rule === "function" ? rule : undefined;
+          let ruleFunc: IValidatorRuleFunction<Array<any>, Context> | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "object" && isObj(rule)) {
             ruleFunc = rule.ruleFunction;
             ruleParams = Array.isArray(rule.params) ? rule.params : [];
@@ -1118,28 +1058,18 @@ export class Validator {
             i18n,
           };
           const handleResult = (result: any) => {
-            result =
-              typeof result === "string"
-                ? isNonNullString(result)
-                  ? result
-                  : i18n.t("validator.invalidMessage", i18nRuleOptions)
-                : result;
+            result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
             if (result === false) {
-              const error = createValidationError(
-                i18n.t("validator.invalidMessage", i18nRuleOptions),
-                {
-                  value,
-                  ruleName,
-                  rawRuleName,
-                  ruleParams,
-                  fieldName: extra.fieldName,
-                  propertyName: extra.propertyName,
-                  translatedPropertyName: extra.translatedPropertyName,
-                }
-              );
-              return resolve(
-                createFailureResult(error, successOrErrorData, startTime)
-              );
+              const error = createValidationError(i18n.t("validator.invalidMessage", i18nRuleOptions), {
+                value,
+                ruleName,
+                rawRuleName,
+                ruleParams,
+                fieldName: extra.fieldName,
+                propertyName: extra.propertyName,
+                translatedPropertyName: extra.translatedPropertyName,
+              });
+              return resolve(createFailureResult(error, successOrErrorData, startTime));
             } else if (isNonNullString(result)) {
               const error = createValidationError(result, {
                 value,
@@ -1150,9 +1080,7 @@ export class Validator {
                 propertyName: extra.propertyName,
                 translatedPropertyName: extra.translatedPropertyName,
               });
-              return resolve(
-                createFailureResult(error, successOrErrorData, startTime)
-              );
+              return resolve(createFailureResult(error, successOrErrorData, startTime));
             } else if ((result as any) instanceof Error) {
               const error = createValidationError(stringify(result), {
                 value,
@@ -1163,9 +1091,7 @@ export class Validator {
                 propertyName: extra.propertyName,
                 translatedPropertyName: extra.translatedPropertyName,
               });
-              return resolve(
-                createFailureResult(error, successOrErrorData, startTime)
-              );
+              return resolve(createFailureResult(error, successOrErrorData, startTime));
             }
             return next();
           };
@@ -1181,22 +1107,13 @@ export class Validator {
             } as any);
             return handleResult(arrayOfResult);
           } else if (markerType === "oneof" || markerType === "allof") {
-            const oneOrAllResult = await Validator.validateMultiRule<Context>(
-              markerType === "oneof" ? "OneOf" : "AllOf",
-              {
-                ...validateOptions,
-                startTime,
-              }
-            );
+            const oneOrAllResult = await Validator.validateMultiRule<Context>(markerType === "oneof" ? "OneOf" : "AllOf", {
+              ...validateOptions,
+              startTime,
+            });
             return handleResult(oneOrAllResult);
-          } else if (
-            hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER) &&
-            ruleParams[0]
-          ) {
-            const nestedResult = await Validator.validateNestedRule<
-              IClassConstructor,
-              Context
-            >({
+          } else if (hasRuleMarker(ruleFunc, VALIDATOR_NESTED_RULE_MARKER) && ruleParams[0]) {
+            const nestedResult = await Validator.validateNestedRule<IClassConstructor, Context>({
               ...validateOptions,
               data,
               startTime,
@@ -1206,32 +1123,23 @@ export class Validator {
           }
 
           if (typeof ruleFunc !== "function") {
-            const error = createValidationError(
-              i18n.t("validator.invalidRule", i18nRuleOptions),
-              {
-                value,
-                ruleName,
-                rawRuleName,
-                ruleParams,
-                fieldName: extra.fieldName,
-                propertyName: extra.propertyName,
-                translatedPropertyName: extra.translatedPropertyName,
-              }
-            );
-            return resolve(
-              createFailureResult(error, successOrErrorData, startTime)
-            );
+            const error = createValidationError(i18n.t("validator.invalidRule", i18nRuleOptions), {
+              value,
+              ruleName,
+              rawRuleName,
+              ruleParams,
+              fieldName: extra.fieldName,
+              propertyName: extra.propertyName,
+              translatedPropertyName: extra.translatedPropertyName,
+            });
+            return resolve(createFailureResult(error, successOrErrorData, startTime));
           }
 
           try {
             const result = await ruleFunc(validateOptions as any);
             return handleResult(result);
           } catch (e) {
-            return handleResult(
-              typeof e === "string"
-                ? e
-                : (e as any)?.message || e?.toString() || stringify(e)
-            );
+            return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
           }
         };
         return next();
@@ -1270,13 +1178,7 @@ export class Validator {
    * @see {@link validateTarget} - Also uses this method for class-based validation
    * @public
    */
-  static shouldSkipValidation({
-    value,
-    rules,
-  }: {
-    rules: Array<IValidatorRuleName> | IValidatorSanitizedRules<any>;
-    value: any;
-  }) {
+  static shouldSkipValidation({ value, rules }: { rules: Array<IValidatorRuleName> | IValidatorSanitizedRules<any>; value: any }) {
     // Check for nullable rules - if value meets nullable conditions, skip validation
     if (isEmpty(value) && Array.isArray(rules)) {
       const nullableConditions = {
@@ -1289,19 +1191,10 @@ export class Validator {
           continue;
         }
         let ruleName = typeof rule == "string" ? rule : undefined;
-        if (
-          !isNonNullString(ruleName) &&
-          typeof rule === "object" &&
-          rule &&
-          isNonNullString((rule as any).ruleName)
-        ) {
+        if (!isNonNullString(ruleName) && typeof rule === "object" && rule && isNonNullString((rule as any).ruleName)) {
           ruleName = (rule as any).ruleName;
         }
-        if (
-          ruleName &&
-          ruleName in nullableConditions &&
-          nullableConditions[ruleName as keyof typeof nullableConditions](value)
-        ) {
+        if (ruleName && ruleName in nullableConditions && nullableConditions[ruleName as keyof typeof nullableConditions](value)) {
           return true;
         }
       }
@@ -1330,13 +1223,7 @@ export class Validator {
    * @since 1.35.0
    * @see {@link validateMultiRule}
    */
-  static validateOneOfRule<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-  ): IValidatorResult {
+  static validateOneOfRule<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>): IValidatorResult {
     return this.validateMultiRule<Context, RulesFunctions>("OneOf", options);
   }
 
@@ -1361,13 +1248,7 @@ export class Validator {
    * @since 1.35.0
    * @see {@link validateMultiRule}
    */
-  static validateAllOfRule<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-  ): IValidatorResult {
+  static validateAllOfRule<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>): IValidatorResult {
     return this.validateMultiRule<Context, RulesFunctions>("AllOf", options);
   }
 
@@ -1395,18 +1276,10 @@ export class Validator {
    * // res === true when every item is a valid email
    * @since 1.36.0
    */
-  static async validateArrayOfRule<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-  ): Promise<boolean | string> {
+  static async validateArrayOfRule<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>): Promise<boolean | string> {
     let { value, ruleParams, startTime, ...extra } = options;
     startTime = isNumber(startTime) ? startTime : Date.now();
-    const subRules = (
-      Array.isArray(ruleParams) ? ruleParams : []
-    ) as RulesFunctions;
+    const subRules = (Array.isArray(ruleParams) ? ruleParams : []) as RulesFunctions;
     const i18n = this.getI18n(extra);
 
     // Must be an array
@@ -1428,15 +1301,12 @@ export class Validator {
 
     for (let index = 0; index < value.length; index++) {
       const item = value[index];
-      const res = await Validator.validateMultiRule<Context, RulesFunctions>(
-        "AllOf",
-        {
-          value: item,
-          ruleParams: subRules,
-          startTime,
-          ...extra,
-        }
-      );
+      const res = await Validator.validateMultiRule<Context, RulesFunctions>("AllOf", {
+        value: item,
+        ruleParams: subRules,
+        startTime,
+        ...extra,
+      });
       if (res !== true) {
         failures.push(`#${index}: ${String(res)}`);
       }
@@ -1567,15 +1437,7 @@ export class Validator {
    * @internal
    * @async
    */
-  static async validateNestedRule<
-    Target extends IClassConstructor = IClassConstructor,
-    Context = unknown,
-  >({
-    ruleParams,
-    ...options
-  }: IValidatorNestedRuleFunctionOptions<Target, Context>): Promise<
-    boolean | string
-  > {
+  static async validateNestedRule<Target extends IClassConstructor = IClassConstructor, Context = unknown>({ ruleParams, ...options }: IValidatorNestedRuleFunctionOptions<Target, Context>): Promise<boolean | string> {
     let { startTime, value, ...extra } = options;
     startTime = isNumber(startTime) ? startTime : Date.now();
     const i18n = this.getI18n(extra);
@@ -1618,12 +1480,7 @@ export class Validator {
 
     // Aggregate nested errors with field path information
     const nestedErrors = (nestedResult as any).errors || [];
-    const errorMessages = nestedErrors
-      .map(
-        (err: any) =>
-          `[${err.translatedPropertyName ?? err.propertyName}]: ${err.message}`
-      )
-      .join("; ");
+    const errorMessages = nestedErrors.map((err: any) => `[${err.translatedPropertyName ?? err.propertyName}]: ${err.message}`).join("; ");
 
     return i18n.t("validator.validateNested", {
       nestedErrors: errorMessages,
@@ -1698,24 +1555,10 @@ export class Validator {
    * @public
    * @async
    */
-  static async validateMultiRule<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    ruleName: IValidatorMultiRuleNames,
-    {
-      value,
-      ruleParams,
-      startTime,
-      ...extra
-    }: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-  ) {
+  static async validateMultiRule<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(ruleName: IValidatorMultiRuleNames, { value, ruleParams, startTime, ...extra }: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
     startTime = isNumber(startTime) ? startTime : Date.now();
     // Special handling for OneOf: validate against each sub-rule in parallel
-    const subRules = (
-      Array.isArray(ruleParams) ? ruleParams : []
-    ) as RulesFunctions;
+    const subRules = (Array.isArray(ruleParams) ? ruleParams : []) as RulesFunctions;
     const i18n = this.getI18n(extra);
     const isAllOfRule = ruleName === "AllOf";
     if (subRules.length === 0) {
@@ -1913,16 +1756,8 @@ export class Validator {
    * @see {@link registerRule} - Register the returned function as a named rule
    * @public
    */
-  static oneOf<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    ruleParams: RulesFunctions
-  ): IValidatorRuleFunction<RulesFunctions, Context> {
-    return function OneOf(
-      options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-    ) {
+  static oneOf<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(ruleParams: RulesFunctions): IValidatorRuleFunction<RulesFunctions, Context> {
+    return function OneOf(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
       return Validator.validateOneOfRule<Context, RulesFunctions>({
         ...options,
         ruleParams,
@@ -1951,16 +1786,8 @@ export class Validator {
    * @see {@link registerRule}
    * @public
    */
-  static allOf<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    ruleParams: RulesFunctions
-  ): IValidatorRuleFunction<RulesFunctions, Context> {
-    return function AllOf(
-      options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-    ) {
+  static allOf<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(ruleParams: RulesFunctions): IValidatorRuleFunction<RulesFunctions, Context> {
+    return function AllOf(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
       return Validator.validateAllOfRule<Context, RulesFunctions>({
         ...options,
         ruleParams,
@@ -1983,16 +1810,8 @@ export class Validator {
    * const res = await emails({ value: ["a@b.com", "c@d.com"] }); // true
    * @since 1.36.0
    */
-  static arrayOf<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(
-    ruleParams: RulesFunctions
-  ): IValidatorRuleFunction<RulesFunctions, Context> {
-    return function ArrayOf(
-      options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>
-    ) {
+  static arrayOf<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(ruleParams: RulesFunctions): IValidatorRuleFunction<RulesFunctions, Context> {
+    return function ArrayOf(options: IValidatorValidateMultiRuleOptions<Context, RulesFunctions>) {
       return Validator.validateArrayOfRule<Context, RulesFunctions>({
         ...options,
         ruleParams,
@@ -2226,15 +2045,8 @@ export class Validator {
    * @see {@link buildMultiRuleDecorator} - Decorator builder for complex rules
    * @public
    */
-  static validateNested<
-    Target extends IClassConstructor = IClassConstructor,
-    Context = unknown,
-  >(
-    ruleParams: [target: Target]
-  ): IValidatorRuleFunction<[target: Target], Context> {
-    return function ValidateNested(
-      options: IValidatorValidateOptions<[target: Target], Context>
-    ) {
+  static validateNested<Target extends IClassConstructor = IClassConstructor, Context = unknown>(ruleParams: [target: Target]): IValidatorRuleFunction<[target: Target], Context> {
+    return function ValidateNested(options: IValidatorValidateOptions<[target: Target], Context>) {
       return Validator.validateNestedRule({
         ...options,
         ruleParams,
@@ -2242,21 +2054,12 @@ export class Validator {
     };
   }
 
-  static isSuccess<Context = unknown>(
-    result: IValidatorValidateResult<Context>
-  ): result is IValidatorValidateSuccess<Context> {
+  static isSuccess<Context = unknown>(result: IValidatorValidateResult<Context>): result is IValidatorValidateSuccess<Context> {
     return isObj(result) && result.success === true;
   }
 
-  static isFailure<Context = unknown>(
-    result: any
-  ): result is IValidatorValidateFailure<Context> {
-    return (
-      isObj(result) &&
-      result.success === false &&
-      isObj(result.error) &&
-      result.error.name == "ValidatorValidationError"
-    );
+  static isFailure<Context = unknown>(result: any): result is IValidatorValidateFailure<Context> {
+    return isObj(result) && result.success === false && isObj(result.error) && result.error.name == "ValidatorValidationError";
   }
 
   /**
@@ -2528,10 +2331,7 @@ export class Validator {
    * @public
    * @async
    */
-  static async validateTarget<
-    Target extends IClassConstructor = IClassConstructor,
-    Context = unknown,
-  >(
+  static async validateTarget<Target extends IClassConstructor = IClassConstructor, Context = unknown>(
     target: Target,
     options: Omit<IValidatorValidateTargetOptions<Target, Context>, "i18n"> & {
       i18n?: I18n;
@@ -2539,19 +2339,11 @@ export class Validator {
   ): Promise<IValidatorValidateTargetResult<Context>> {
     const startTime = Date.now();
     const targetRules = Validator.getTargetRules<Target>(target);
-    const { context, errorMessageBuilder, ...restOptions } = Object.assign(
-      {},
-      Validator.getValidateTargetOptions(target) as any,
-      options
-    );
+    const { context, errorMessageBuilder, ...restOptions } = Object.assign({}, Validator.getValidateTargetOptions(target) as any, options);
     const data = Object.assign({}, options.data);
     const i18n = this.getI18n(options);
     const messageSeparators = Validator.getErrorMessageSeparators(i18n);
-    const buildErrorMessage =
-      typeof errorMessageBuilder === "function"
-        ? errorMessageBuilder
-        : (translatedPropertyName: string, error: string) =>
-            `[${String(translatedPropertyName)}] : ${error}`;
+    const buildErrorMessage = typeof errorMessageBuilder === "function" ? errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
 
     const validationErrors: IValidatorValidationError[] = [];
     const validationPromises: Promise<IValidatorValidateResult<Context>>[] = [];
@@ -2566,10 +2358,7 @@ export class Validator {
       if (this.shouldSkipValidation({ value, rules: sanitizedRules })) {
         continue;
       }
-      const translatedPropertyName: string = defaultStr(
-        (translatedPropertyNames as any)[propertyKey],
-        propertyKey
-      );
+      const translatedPropertyName: string = defaultStr((translatedPropertyNames as any)[propertyKey], propertyKey);
       validationPromises.push(
         Validator.validate<Context>({
           context,
@@ -2586,18 +2375,14 @@ export class Validator {
             validatedFieldCount++;
           } else {
             const errorMessage = stringify(validationResult.error?.message);
-            const formattedMessage = buildErrorMessage(
-              translatedPropertyName,
-              errorMessage,
-              {
-                ...Object.assign({}, validationResult.error),
-                separators: messageSeparators,
-                data,
-                propertyName: propertyKey,
-                translatedPropertyName: translatedPropertyName,
-                i18n,
-              }
-            );
+            const formattedMessage = buildErrorMessage(translatedPropertyName, errorMessage, {
+              ...Object.assign({}, validationResult.error),
+              separators: messageSeparators,
+              data,
+              propertyName: propertyKey,
+              translatedPropertyName: translatedPropertyName,
+              i18n,
+            });
             validationErrors.push({
               name: "ValidatorValidationError",
               status: "error" as const,
@@ -2634,7 +2419,6 @@ export class Validator {
             count: validationErrors.length,
           });
           resolve({
-            data,
             success: false,
             message,
             errors: validationErrors,
@@ -2642,6 +2426,7 @@ export class Validator {
             status: "error",
             failedAt: new Date(),
             duration: Date.now() - startTime,
+            data,
           });
         }
       });
@@ -2729,13 +2514,8 @@ export class Validator {
    * @see {@link buildPropertyDecorator} - How rules are attached to properties
    * @public
    */
-  static getTargetRules<T extends IClassConstructor = any>(
-    target: T
-  ): Record<keyof InstanceType<T>, IValidatorRule[]> {
-    return getDecoratedProperties(
-      target,
-      VALIDATOR_TARGET_RULES_METADATA_KEY
-    ) as Record<keyof InstanceType<T>, IValidatorRule[]>;
+  static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
+    return getDecoratedProperties(target, VALIDATOR_TARGET_RULES_METADATA_KEY) as Record<keyof InstanceType<T>, IValidatorRule[]>;
   }
 
   /**
@@ -2800,10 +2580,7 @@ export class Validator {
    * @see {@link ValidateNested} - The decorator that applies nested validation
    * @public
    */
-  static hasValidateNestedRule<T extends IClassConstructor = any>(
-    target: T,
-    propertyKey: keyof InstanceType<T>
-  ): boolean {
+  static hasValidateNestedRule<T extends IClassConstructor = any>(target: T, propertyKey: keyof InstanceType<T>): boolean {
     const rules = this.getTargetRules(target);
     const propertyRules = rules[propertyKey];
 
@@ -2817,10 +2594,7 @@ export class Validator {
         return hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER);
       }
       if (isObj(rule) && typeof (rule as any).ruleFunction === "function") {
-        return hasRuleMarker(
-          (rule as any).ruleFunction,
-          VALIDATOR_NESTED_RULE_MARKER
-        );
+        return hasRuleMarker((rule as any).ruleFunction, VALIDATOR_NESTED_RULE_MARKER);
       }
       return false;
     });
@@ -2882,10 +2656,7 @@ export class Validator {
    * @see {@link getTargetRules} - Get all rules for a class
    * @public
    */
-  static getValidateNestedTarget<T extends IClassConstructor = any>(
-    target: T,
-    propertyKey: keyof InstanceType<T>
-  ): IClassConstructor | undefined {
+  static getValidateNestedTarget<T extends IClassConstructor = any>(target: T, propertyKey: keyof InstanceType<T>): IClassConstructor | undefined {
     const rules = this.getTargetRules(target);
     const propertyRules = rules[propertyKey];
 
@@ -2895,20 +2666,13 @@ export class Validator {
 
     // Find the ValidateNested rule by symbol marker
     for (const rule of propertyRules) {
-      if (
-        typeof rule === "function" &&
-        hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER)
-      ) {
+      if (typeof rule === "function" && hasRuleMarker(rule, VALIDATOR_NESTED_RULE_MARKER)) {
         // Try to get params from the stored params symbol
         const params = (rule as any)[VALIDATOR_NESTED_RULE_PARAMS];
         if (Array.isArray(params) && params.length > 0) {
           return params[0];
         }
-      } else if (
-        isObj(rule) &&
-        typeof (rule as any).ruleFunction === "function" &&
-        hasRuleMarker((rule as any).ruleFunction, VALIDATOR_NESTED_RULE_MARKER)
-      ) {
+      } else if (isObj(rule) && typeof (rule as any).ruleFunction === "function" && hasRuleMarker((rule as any).ruleFunction, VALIDATOR_NESTED_RULE_MARKER)) {
         // For object rules, try to get from params
         const ruleParams = (rule as any).params;
         if (Array.isArray(ruleParams) && ruleParams.length > 0) {
@@ -2966,13 +2730,8 @@ export class Validator {
    * @see {@link ValidationTargetOptions} - Decorator to set these options
    * @public
    */
-  public static getValidateTargetOptions<T extends IClassConstructor>(
-    target: T
-  ): IValidatorValidateTargetOptions<T, any> {
-    return Object.assign(
-      {},
-      Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {}
-    );
+  public static getValidateTargetOptions<T extends IClassConstructor>(target: T): IValidatorValidateTargetOptions<T, any> {
+    return Object.assign({}, Reflect.getMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, target) || {});
   }
 
   /**
@@ -3082,19 +2841,11 @@ export class Validator {
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
    */
-  static buildRuleDecorator<
-    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
-    Context = unknown,
-  >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+  static buildRuleDecorator<RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters: RuleParamsType) {
-      const enhancedValidatorFunction: IValidatorRuleFunction<
-        RuleParamsType,
-        Context
-      > = function (validationOptions) {
+      const enhancedValidatorFunction: IValidatorRuleFunction<RuleParamsType, Context> = function (validationOptions) {
         const enhancedOptions = Object.assign({}, validationOptions);
-        enhancedOptions.ruleParams = (
-          Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
-        ) as RuleParamsType;
+        enhancedOptions.ruleParams = (Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]) as RuleParamsType;
         return ruleFunction(enhancedOptions);
       };
 
@@ -3105,16 +2856,11 @@ export class Validator {
 
         // Store the rule parameters so they can be retrieved by inspection methods
         // This is particularly important for ValidateNested to access the target class
-        const normalizedParams = (
-          Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]
-        ) as RuleParamsType;
-        (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_PARAMS] =
-          normalizedParams;
+        const normalizedParams = (Array.isArray(ruleParameters) ? ruleParameters : [ruleParameters]) as RuleParamsType;
+        (enhancedValidatorFunction as any)[VALIDATOR_NESTED_RULE_PARAMS] = normalizedParams;
       }
 
-      return Validator.buildPropertyDecorator<RuleParamsType, Context>(
-        enhancedValidatorFunction
-      );
+      return Validator.buildPropertyDecorator<RuleParamsType, Context>(enhancedValidatorFunction);
     };
   }
 
@@ -3302,10 +3048,7 @@ export class Validator {
    * @see {@link validateTarget} - Parent validation method using target rules
    * @public
    */
-  static buildTargetRuleDecorator<
-    Target extends IClassConstructor = IClassConstructor,
-    Context = unknown,
-  >(ruleFunction: IValidatorRuleFunction<[target: Target], Context>) {
+  static buildTargetRuleDecorator<Target extends IClassConstructor = IClassConstructor, Context = unknown>(ruleFunction: IValidatorRuleFunction<[target: Target], Context>) {
     return this.buildRuleDecorator<[target: Target], Context>(ruleFunction);
   }
   /**
@@ -3329,22 +3072,13 @@ export class Validator {
    * @see {@link buildRuleDecorator}
    * @public
    */
-  static buildRuleDecoratorOptional<
-    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
-    Context = unknown,
-  >(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
+  static buildRuleDecoratorOptional<RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams, Context = unknown>(ruleFunction: IValidatorRuleFunction<RuleParamsType, Context>) {
     return function (ruleParameters?: RuleParamsType) {
-      return Validator.buildRuleDecorator<RuleParamsType, Context>(
-        ruleFunction
-      )(ruleParameters as RuleParamsType);
+      return Validator.buildRuleDecorator<RuleParamsType, Context>(ruleFunction)(ruleParameters as RuleParamsType);
     };
   }
 
-  static buildMultiRuleDecorator<
-    Context = unknown,
-    RulesFunctions extends
-      IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>,
-  >(ruleFunction: IValidatorMultiRuleFunction<Context, RulesFunctions>) {
+  static buildMultiRuleDecorator<Context = unknown, RulesFunctions extends IValidatorDefaultMultiRule<Context> = IValidatorDefaultMultiRule<Context>>(ruleFunction: IValidatorMultiRuleFunction<Context, RulesFunctions>) {
     return this.buildRuleDecorator<RulesFunctions, Context>(ruleFunction);
   }
 
@@ -3398,23 +3132,10 @@ export class Validator {
    * @see {@link buildRuleDecorator} - Higher-level decorator creation
    * @internal
    */
-  static buildPropertyDecorator<
-    RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams,
-    Context = unknown,
-  >(
-    rule:
-      | IValidatorRule<RuleParamsType, Context>
-      | IValidatorRule<RuleParamsType, Context>[]
-  ): PropertyDecorator {
-    return buildPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(
-      VALIDATOR_TARGET_RULES_METADATA_KEY,
-      (oldRules) => {
-        return [
-          ...(Array.isArray(oldRules) ? oldRules : []),
-          ...(Array.isArray(rule) ? rule : [rule]),
-        ];
-      }
-    );
+  static buildPropertyDecorator<RuleParamsType extends IValidatorRuleParams = IValidatorRuleParams, Context = unknown>(rule: IValidatorRule<RuleParamsType, Context> | IValidatorRule<RuleParamsType, Context>[]): PropertyDecorator {
+    return buildPropertyDecorator<IValidatorRule<RuleParamsType, Context>[]>(VALIDATOR_TARGET_RULES_METADATA_KEY, (oldRules) => {
+      return [...(Array.isArray(oldRules) ? oldRules : []), ...(Array.isArray(rule) ? rule : [rule])];
+    });
   }
 }
 
@@ -3555,15 +3276,9 @@ export class Validator {
  * @decorator
  * @public
  */
-export function ValidationTargetOptions(
-  validationOptions: IValidatorValidateTargetOptions<any, any>
-): ClassDecorator {
+export function ValidationTargetOptions(validationOptions: IValidatorValidateTargetOptions<any, any>): ClassDecorator {
   return function (targetClass: Function) {
-    Reflect.defineMetadata(
-      VALIDATOR_TARGET_OPTIONS_METADATA_KEY,
-      validationOptions,
-      targetClass
-    );
+    Reflect.defineMetadata(VALIDATOR_TARGET_OPTIONS_METADATA_KEY, validationOptions, targetClass);
   };
 }
 

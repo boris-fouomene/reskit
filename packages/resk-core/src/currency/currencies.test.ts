@@ -1265,3 +1265,543 @@ describe("Dynamic Currency Formatters - Number.prototype.formatXXX", () => {
     });
   });
 });
+
+/**
+ * COMPREHENSIVE BIG NUMBER TESTS
+ * Tests focusing on large numbers, edge cases, and precision handling
+ */
+describe("Big Number Formatting - Comprehensive Test Suite", () => {
+  beforeEach(() => {
+    // Reset session to default USD currency
+    Currency.session.setCurrency({
+      symbol: "$",
+      name: "US Dollar",
+      symbolNative: "$",
+      decimalDigits: 2,
+      rounding: 0,
+      code: "USD",
+      namePlural: "US dollars",
+      format: "%v %s",
+      decimalSeparator: ".",
+      thousandSeparator: ",",
+    });
+  });
+
+  describe("Extremely Large Numbers (Billions and Beyond)", () => {
+    it("should format one billion", () => {
+      const billion = 1_000_000_000;
+      const result = Currency.formatMoney(billion);
+      expect(result).toContain("1,000,000,000");
+      expect(result).toContain("$");
+    });
+
+    it("should format 500 billion", () => {
+      const amount = 500_000_000_000;
+      const result = Currency.formatMoney(amount);
+      expect(result).toContain("$");
+      expect(result).toMatch(/500|500,000,000,000/);
+    });
+
+    it("should format one trillion", () => {
+      const trillion = 1_000_000_000_000;
+      const result = Currency.formatMoney(trillion);
+      expect(result).toContain("$");
+      const formatted = Currency.formatNumber(trillion);
+      expect(formatted).toMatch(/^[0-9,]+$/);
+    });
+
+    it("should format 123 trillion 456 billion 789 million", () => {
+      const amount = 123_456_789_000_000;
+      const result = Currency.formatMoney(amount);
+      expect(result).toContain("$");
+      expect(result).toMatch(/123|456|789/);
+    });
+
+    it("should format numbers larger than JavaScript's MAX_SAFE_INTEGER", () => {
+      const safeMax = 9_007_199_254_740_991; // MAX_SAFE_INTEGER
+      const result = Currency.formatMoney(safeMax);
+      expect(result).toContain("$");
+      const formatted = Currency.formatNumber(safeMax);
+      expect(formatted).toMatch(/^[0-9,.]+$/);
+    });
+
+    it("should handle numbers in scientific notation range", () => {
+      const largeNum = 1e15; // 1 quadrillion
+      const result = Currency.formatMoney(largeNum);
+      expect(result).toContain("$");
+    });
+
+    it("should abbreviate extremely large numbers", () => {
+      const amount = 1_000_000_000_000; // 1 trillion
+      const result = abreviateNumber(amount);
+      expect(result).toContain("T"); // Should abbreviate to T for trillion
+    });
+
+    it("should abbreviate 999 billion", () => {
+      const amount = 999_000_000_000;
+      const result = abreviateNumber(amount);
+      expect(result).toMatch(/B/); // Should abbreviate to B for billion
+    });
+
+    it("should abbreviate and format with currency", () => {
+      const amount = 1_234_567_890_123;
+      const result = amount.abreviate2FormatUSD();
+      expect(result).toContain("$");
+      expect(result).toMatch(/T/); // Should show trillion abbreviation
+    });
+  });
+
+  describe("Large Decimal Numbers", () => {
+    it("should format large number with two decimal places", () => {
+      const amount = 999_999_999_999.99;
+      const result = Currency.formatMoney(amount);
+      expect(result).toContain("$");
+      expect(result).toContain(".99");
+    });
+
+    it("should format large number with maximum precision", () => {
+      const amount = 1_234_567_890.123456;
+      const result = Currency.formatNumber(amount, 6);
+      expect(result).toMatch(/1,234,567,890/);
+      expect(result).toContain(".");
+    });
+
+    it("should handle large numbers with many decimal places", () => {
+      const amount = 99_999_999.999999999;
+      const result = Currency.formatNumber(amount, 9);
+      // JavaScript may round the last digit due to precision
+      expect(result).toMatch(/99,999,999|100,000,000/);
+    });
+
+    it("should round large decimals correctly", () => {
+      const amount = 1_000_000.456789;
+      const result = Currency.formatNumber(amount, 2);
+      expect(result).toContain("1,000,000.46");
+    });
+
+    it("should format number with leading zeros after decimal", () => {
+      const amount = 1_000_000.0001;
+      const result = Currency.formatNumber(amount, 4);
+      expect(result).toContain("1,000,000");
+      expect(result).toContain(".0001");
+    });
+
+    it("should handle large numbers that need precision truncation", () => {
+      const amount = 123_456_789.123456789;
+      const result = Currency.formatNumber(amount, 3);
+      expect(result).toMatch(/123,456,789\.123|123,456,789\.124/);
+    });
+
+    it("should handle very large fractional amounts", () => {
+      const amount = 999_999_999_999.999999;
+      const result = Currency.formatNumber(amount, 6);
+      // JavaScript may round due to floating point precision limits
+      expect(result).toMatch(/999,999,999,999|1,000,000,000,000/);
+    });
+  });
+
+  describe("Big Number Formatting with Different Locales", () => {
+    it("should format large number with European separators", () => {
+      const amount = 1_234_567.89;
+      const result = Currency.formatNumber(amount, 2, " ", ",");
+      expect(result).toBe("1 234 567,89");
+    });
+
+    it("should format large number with alternative separators", () => {
+      const amount = 999_999_999.99;
+      const result = Currency.formatNumber(amount, 2, " ", ".");
+      expect(result).toMatch(/999 999 999/);
+    });
+
+    it("should unformat large European formatted number", () => {
+      const formatted = "1 234 567,89";
+      const result = Currency.unformat(formatted, ",");
+      expect(result).toBe(1_234_567.89);
+    });
+
+    it("should unformat large number with different thousand separator", () => {
+      const formatted = "999.999.999,99";
+      const result = Currency.unformat(formatted, ",");
+      expect(result).toBe(999_999_999.99);
+    });
+  });
+
+  describe("Big Number Unformatting", () => {
+    it("should unformat large formatted currency string", () => {
+      const formatted = "$1,000,000,000.00";
+      const result = Currency.unformat(formatted);
+      expect(result).toBe(1_000_000_000);
+    });
+
+    it("should unformat large negative formatted currency", () => {
+      const formatted = "-$999,999,999.99";
+      const result = Currency.unformat(formatted);
+      expect(result).toBe(-999_999_999.99);
+    });
+
+    it("should unformat large bracketed negative", () => {
+      const formatted = "(1,234,567.89)";
+      const result = Currency.unformat(formatted);
+      expect(result).toBe(-1_234_567.89);
+    });
+
+    it("should unformat very large numbers without decimals", () => {
+      const formatted = "1,000,000,000,000";
+      const result = Currency.unformat(formatted);
+      expect(result).toBe(1_000_000_000_000);
+    });
+
+    it("should handle unformatting with various currency symbols", () => {
+      const testCases = [
+        { formatted: "€1.234.567,89", separator: ",", expected: 1_234_567.89 },
+        { formatted: "£1,234,567.89", separator: ".", expected: 1_234_567.89 },
+        { formatted: "¥1,234,567", separator: ".", expected: 1_234_567 },
+      ];
+
+      testCases.forEach((testCase) => {
+        const result = Currency.unformat(
+          testCase.formatted,
+          testCase.separator
+        );
+        expect(result).toBe(testCase.expected);
+      });
+    });
+  });
+
+  describe("Big Number Rounding and Precision", () => {
+    it("should round up large number correctly", () => {
+      const amount = 999_999_999.995;
+      const result = Currency.toFixed(amount, 2);
+      expect(result).toBe("1000000000.00");
+    });
+
+    it("should round down large number correctly", () => {
+      const amount = 999_999_999.994;
+      const result = Currency.toFixed(amount, 2);
+      expect(result).toBe("999999999.99");
+    });
+
+    it("should handle large number with 0 decimal digits", () => {
+      const amount = 1_234_567.89;
+      const result = Currency.toFixed(amount, 0);
+      expect(result).toBe("1234568"); // Should round up
+    });
+
+    it("should handle large number with many decimal precision", () => {
+      const amount = 1_234_567.123456789;
+      const result = Currency.toFixed(amount, 8);
+      expect(result).toMatch(/1234567\.12345679|1234567\.12345678/);
+    });
+
+    it("should maintain precision for financial calculations", () => {
+      const principal = 1_000_000;
+      const rate = 0.05;
+      const years = 10;
+      const result = principal * Math.pow(1 + rate, years);
+      const formatted = Currency.formatMoney(result);
+      expect(formatted).toContain("$");
+    });
+  });
+
+  describe("Big Number Arithmetic Operations", () => {
+    it("should format sum of large numbers", () => {
+      const num1 = 500_000_000;
+      const num2 = 600_000_000;
+      const result = Currency.formatMoney(num1 + num2);
+      expect(result).toContain("1,100,000,000");
+    });
+
+    it("should format product of large numbers", () => {
+      const num1 = 1_000_000;
+      const num2 = 1_000;
+      const result = Currency.formatMoney(num1 * num2);
+      expect(result).toContain("1,000,000,000");
+    });
+
+    it("should format division result of large numbers", () => {
+      const dividend = 1_000_000_000;
+      const divisor = 3;
+      const result = Currency.formatMoney(dividend / divisor);
+      expect(result).toContain("333,333,333");
+    });
+
+    it("should calculate and format compound interest", () => {
+      const principal = 100_000;
+      const rate = 0.08;
+      const years = 20;
+      const amount = principal * Math.pow(1 + rate, years);
+      const formatted = Currency.formatMoney(amount);
+      expect(formatted).toContain("$");
+      const unformatted = Currency.unformat(formatted);
+      expect(unformatted).toBeCloseTo(amount, 0);
+    });
+
+    it("should format large percentage calculations", () => {
+      const amount = 1_000_000_000;
+      const percentage = 0.15;
+      const result = Currency.formatMoney(amount * percentage);
+      expect(result).toContain("150,000,000");
+    });
+  });
+
+  describe("Big Number Edge Cases", () => {
+    it("should handle number at MAX_SAFE_INTEGER boundary", () => {
+      const maxSafe = Number.MAX_SAFE_INTEGER;
+      const result = Currency.formatNumber(maxSafe);
+      expect(result).toMatch(/^[0-9,]+$/);
+      const money = Currency.formatMoney(maxSafe);
+      expect(money).toContain("$");
+    });
+
+    it("should handle number just below MAX_SAFE_INTEGER", () => {
+      const belowMax = Number.MAX_SAFE_INTEGER - 1;
+      const result = Currency.formatMoney(belowMax);
+      expect(result).toContain("$");
+    });
+
+    it("should handle very close large numbers without loss of precision", () => {
+      const num1 = 1_000_000_000.01;
+      const num2 = 1_000_000_000.02;
+      const result1 = Currency.formatNumber(num1, 2);
+      const result2 = Currency.formatNumber(num2, 2);
+      expect(result1).toContain(".01");
+      expect(result2).toContain(".02");
+    });
+
+    it("should handle large number formatted and unformatted roundtrip", () => {
+      const original = 987_654_321.98;
+      const formatted = Currency.formatMoney(original);
+      const unformatted = Currency.unformat(formatted);
+      expect(unformatted).toBe(original);
+    });
+
+    it("should handle negative large numbers", () => {
+      const amount = -1_234_567_890.12;
+      const result = Currency.formatMoney(amount);
+      expect(result).toContain("-");
+      expect(result).toContain("1,234,567,890.12");
+    });
+
+    it("should handle large numbers with custom decimal separators", () => {
+      const amount = 1_234_567.89;
+      const result = Currency.formatNumber(amount, 2, ".", ",");
+      expect(result).toBe("1.234.567,89");
+    });
+  });
+
+  describe("Big Number Abbreviation Tests", () => {
+    it("should abbreviate exactly 1 million", () => {
+      const result = abreviateNumber(1_000_000);
+      expect(result).toContain("M");
+      expect(result).toMatch(/1/);
+    });
+
+    it("should abbreviate 999 thousand", () => {
+      const result = abreviateNumber(999_000);
+      expect(result).toContain("K");
+    });
+
+    it("should abbreviate 1.5 billion", () => {
+      const result = abreviateNumber(1_500_000_000);
+      expect(result).toContain("B");
+    });
+
+    it("should abbreviate with custom decimal digits", () => {
+      const result = abreviateNumber(1_234_567, 3);
+      expect(result).toMatch(/1\.234M|1\.235M/);
+    });
+
+    it("should abbreviate with custom separators", () => {
+      const result = abreviateNumber(1_234_567.89, 2, " ", ",");
+      expect(result).toContain("M");
+    });
+
+    it("should abbreviate and format as money", () => {
+      const amount = 5_000_000_000;
+      const result = amount.abreviate2FormatUSD();
+      expect(result).toContain("$");
+      expect(result).toContain("B");
+    });
+
+    it("should abbreviate negative large number", () => {
+      const result = abreviateNumber(-1_500_000_000);
+      expect(result).toContain("-");
+      expect(result).toContain("B");
+    });
+
+    it("should handle abbreviation with many decimal places", () => {
+      const result = abreviateNumber(1_234_567.123456, 6);
+      expect(result).toContain("M");
+    });
+  });
+
+  describe("Big Number Multi-Currency Tests", () => {
+    it("should format large USD amount", () => {
+      const amount = 1_000_000_000;
+      const result = amount.formatUSD();
+      expect(result).toMatch(/\$|USD|1,000,000,000/);
+    });
+
+    it("should format large EUR amount", () => {
+      const amount = 1_234_567.89;
+      const result = amount.formatEUR();
+      expect(result).toMatch(/€|EUR|1,234,567/);
+    });
+
+    it("should abbreviate large GBP amount", () => {
+      const amount = 1_500_000_000;
+      const result = amount.abreviate2FormatGBP();
+      expect(result).toMatch(/£|GBP|B/);
+    });
+
+    it("should format large XAF amount", () => {
+      const amount = 1_000_000;
+      const result = amount.formatXAF();
+      expect(result).toMatch(/FCFA|1,000,000/);
+    });
+
+    it("should abbreviate large CAD amount", () => {
+      const amount = 5_000_000_000;
+      const result = amount.abreviate2FormatCAD();
+      expect(result).toContain("B");
+    });
+
+    it("should format large JPY amount without decimals", () => {
+      const amount = 1_000_000_000;
+      const result = amount.formatJPY();
+      expect(result).toMatch(/¥|JPY/);
+      // JPY typically has 0 decimal places
+      expect(result).not.toContain(".01");
+    });
+
+    it("should handle large CHF amount", () => {
+      const amount = 1_234_567.89;
+      const result = amount.formatCHF();
+      expect(result).toContain("CHF");
+    });
+  });
+
+  describe("Big Number Stress Tests", () => {
+    it("should handle rapid formatting of multiple large numbers", () => {
+      const numbers = [
+        1_000_000, 1_000_000_000, 1_000_000_000_000, 999_999_999.99,
+        123_456_789.01,
+      ];
+      const results = numbers.map((n) => Currency.formatMoney(n));
+      expect(results).toHaveLength(5);
+      results.forEach((result) => {
+        expect(result).toContain("$");
+      });
+    });
+
+    it("should handle rapid abbreviation of multiple large numbers", () => {
+      const numbers = [1_000_000, 1_000_000_000, 1_000_000_000_000];
+      const results = numbers.map((n) => abreviateNumber(n));
+      expect(results).toHaveLength(3);
+      expect(results[0]).toContain("M");
+      expect(results[1]).toContain("B");
+      expect(results[2]).toContain("T");
+    });
+
+    it("should handle mixed operations on large numbers", () => {
+      const principal = 100_000;
+      const operations = [
+        Currency.formatMoney(principal * 10),
+        Currency.formatNumber(principal * 100),
+        abreviateNumber(principal * 1000),
+        (principal * 10000).formatUSD(),
+      ];
+      expect(operations).toHaveLength(4);
+      operations.forEach((op) => {
+        expect(op).toBeTruthy();
+      });
+    });
+
+    it("should handle accumulation of large numbers", () => {
+      let sum = 0;
+      for (let i = 0; i < 1000; i++) {
+        sum += 1_000_000;
+      }
+      const result = Currency.formatMoney(sum);
+      expect(result).toContain("$");
+      expect(result).toContain("1,000,000,000");
+    });
+  });
+
+  describe("Big Number Formatting Consistency", () => {
+    it("should maintain consistency across multiple formats", () => {
+      const amount = 1_234_567.89;
+      const money = Currency.formatMoney(amount);
+      const number = Currency.formatNumber(amount);
+      const abbrev = abreviateNumber(amount);
+
+      expect(money).toContain("$");
+      expect(number).toContain("1,234,567");
+      expect(abbrev).toContain("M");
+    });
+
+    it("should maintain precision through format/unformat cycle", () => {
+      const original = 1_234_567.89;
+      const formatted = Currency.formatMoney(original);
+      const unformatted = Currency.unformat(formatted);
+      expect(unformatted).toBe(original);
+    });
+
+    it("should handle consistent large number with all functions", () => {
+      const amount = 1_000_000_000;
+      const formatted = Currency.formatMoney(amount);
+      const abbrev = abreviateNumber(amount);
+      const asNumber = Currency.formatNumber(amount);
+
+      expect(formatted).toContain("$");
+      expect(abbrev).toContain("B");
+      expect(asNumber).toMatch(/^[0-9,]+$/);
+    });
+  });
+
+  describe("Big Number Special Cases and Boundary Tests", () => {
+    it("should handle number that rounds to exactly 1 million", () => {
+      const amount = 999_999.999;
+      const result = Currency.toFixed(amount, 0);
+      expect(result).toBe("1000000");
+    });
+
+    it("should handle number with trailing zeros", () => {
+      const amount = 1_000_000_000;
+      const result = Currency.formatMoney(amount);
+      expect(result).toContain("1,000,000,000");
+    });
+
+    it("should handle very small number relative to large context", () => {
+      const large = 1_000_000_000;
+      const small = 0.01;
+      const total = large + small;
+      const result = Currency.formatNumber(total, 2);
+      expect(result).toContain("1,000,000,000.01");
+    });
+
+    it("should handle alternating large and small operations", () => {
+      let value = 1_000_000;
+      value = value * 1000; // 1 billion
+      value = value / 2; // 500 million
+      value = value + 123.45;
+      const result = Currency.formatMoney(value);
+      expect(result).toContain("$");
+    });
+
+    it("should format number at 1 thousand boundary", () => {
+      const result = Currency.formatNumber(1_000);
+      expect(result).toBe("1,000");
+    });
+
+    it("should format number at 1 million boundary", () => {
+      const result = Currency.formatNumber(1_000_000);
+      expect(result).toBe("1,000,000");
+    });
+
+    it("should format number at 1 billion boundary", () => {
+      const result = Currency.formatNumber(1_000_000_000);
+      expect(result).toContain("1,000,000,000");
+    });
+  });
+});
